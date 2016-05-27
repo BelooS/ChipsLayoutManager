@@ -3,8 +3,12 @@ package beloo.recyclerviewcustomadapter;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.util.SparseArray;
 import android.view.View;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
@@ -65,12 +69,15 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
             anchorBottom = getDecoratedBottom(anchorView);
         }
 
-        int viewLeft = 0;
+        int viewRight = getWidth();
         int maxTop = anchorBottom;
 
         int pos = anchorPos - 1;
         int viewBottom = anchorTop; //нижняя граница следующей вьюшки будет начитаться от верхней границы предыдущей
         boolean fillNext = viewBottom > 0;
+
+        List<Pair<Rect, View>> rowViews = new LinkedList<>();
+        int rowViewsWidth = 0;
 
         while (fillNext && pos >= 0) {
             View view = viewCache.get(pos); //проверяем кэш
@@ -82,21 +89,47 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 int viewHeight = getDecoratedMeasuredHeight(view);
                 int viewWidth = getDecoratedMeasuredWidth(view);
 
-                if (!(viewLeft == 0 || viewLeft + viewWidth <= getWidth())) {
+                if (!(viewRight == getWidth() || viewRight - viewWidth >= 0)) {
                     //go to next row, increase top coordinate, reset left
-                    viewLeft = 0;
+                    viewRight = getWidth();
                     viewBottom = maxTop;
+                    fillNext = viewBottom >= 0;
                 }
 
-                fillNext = viewBottom >= 0;
                 if (fillNext) {
-                    //view can be placed in current row, layout it
-                    layoutDecorated(view, viewLeft, viewBottom - viewHeight, viewLeft + viewWidth, viewBottom);
-                    viewLeft = getDecoratedRight(view);
+                    /*view can be placed in current row, but we can't determine real position, until row will be filled,
+                    so generate rect for the view and layout it in the end of the row
+                     */
+                    int left = viewRight - viewWidth;
+                    Rect viewRect = new Rect(left, viewBottom - viewHeight, viewRight, viewBottom);
+
+                    rowViews.add(new Pair<>(viewRect, view));
+
+                    viewRight = left;
                     maxTop = Math.max(maxTop, getDecoratedTop(view));
+                    rowViewsWidth += viewWidth;
                 } else {
                     removeView(view);
                     recycler.recycleView(view);
+                }
+
+                if (!fillNext || pos == 0) {
+
+                    int offset = getWidth() - rowViewsWidth;
+
+                    //align left row
+                    for (int i = 0; i < rowViews.size(); i++) {
+                        Pair<Rect, View> rowViewRectPair = rowViews.get(i);
+                        Rect viewRect = rowViewRectPair.first;
+                        viewRect.left = viewRect.left - offset;
+                        viewRect.right = viewRect.right - offset;
+
+                        //layout whole views in a row
+                        layoutDecorated(rowViewRectPair.second, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
+                    }
+
+                    rowViewsWidth = 0;
+                    rowViews.clear();
                 }
 
                 pos--;
@@ -105,7 +138,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 //если вьюшка есть в кэше - просто аттачим её обратно
                 //нет необходимости проводить measure/layout цикл.
 
-                int viewRight = getDecoratedRight(view);
+                viewRight = getDecoratedRight(view);
 
                 attachView(view);
                 viewCache.remove(pos);
@@ -115,7 +148,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
                 fillNext = viewBottom > 0 || viewRight < getWidth();
 
-                viewLeft = 0;
+                viewRight = 0;
                 pos--;
 
             }
@@ -156,9 +189,8 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                     //go to next row, increase top coordinate, reset left
                     viewLeft = 0;
                     viewTop = maxBottom;
+                    fillNext = viewTop <= height;
                 }
-
-                fillNext = viewTop <= height;
 
                 if (fillNext) {
                     //view can be placed in current row, layout it
