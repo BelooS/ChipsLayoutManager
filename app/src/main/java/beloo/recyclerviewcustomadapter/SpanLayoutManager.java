@@ -3,6 +3,7 @@ package beloo.recyclerviewcustomadapter;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.Pair;
 import android.util.SparseArray;
 import android.view.View;
@@ -47,6 +48,10 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
             detachView(viewCache.valueAt(i));
         }
 
+//        if (viewCache.size() > 0) {
+//            Log.d("cachedViews", "from " + viewCache.keyAt(0) + " to " + viewCache.keyAt(viewCache.size() - 1));
+//        }
+
         fillUp(anchorView, recycler);
         fillDown(anchorView, recycler);
 
@@ -55,6 +60,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         //удалились из адаптера
         for (int i = 0; i < viewCache.size(); i++) {
             recycler.recycleView(viewCache.valueAt(i));
+            Log.d("fill", "recycle position =" + viewCache.keyAt(i));
         }
 
     }
@@ -62,26 +68,25 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     private void fillUp(@Nullable View anchorView, RecyclerView.Recycler recycler) {
         int anchorPos = 0;
         int anchorTop = 0;
-        int anchorBottom = 0;
         if (anchorView != null) {
             anchorPos = getPosition(anchorView);
             anchorTop = getDecoratedTop(anchorView);
-            anchorBottom = getDecoratedBottom(anchorView);
         }
 
         int viewRight = getWidth();
-        int maxTop = anchorBottom;
+        int maxTop = -1;
 
         int pos = anchorPos - 1;
         int viewBottom = anchorTop; //нижняя граница следующей вьюшки будет начитаться от верхней границы предыдущей
-        boolean fillNext = viewBottom > 0;
 
         List<Pair<Rect, View>> rowViews = new LinkedList<>();
         int rowViewsWidth = 0;
+        int offset = 0;
 
-        while (fillNext && pos >= 0) {
+        while (pos >= 0) {
             View view = viewCache.get(pos); //проверяем кэш
             if (view == null) {
+//                Log.d("fillUp", "getView for position = " + pos);
                 view = recycler.getViewForPosition(pos);
                 addView(view, 0);
                 measureChildWithMargins(view, 0, 0);
@@ -90,33 +95,6 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 int viewWidth = getDecoratedMeasuredWidth(view);
 
                 if (!(viewRight == getWidth() || viewRight - viewWidth >= 0)) {
-                    //go to next row, increase top coordinate, reset left
-                    viewRight = getWidth();
-                    viewBottom = maxTop;
-                    fillNext = viewBottom >= 0;
-                }
-
-                if (fillNext) {
-                    /*view can be placed in current row, but we can't determine real position, until row will be filled,
-                    so generate rect for the view and layout it in the end of the row
-                     */
-                    int left = viewRight - viewWidth;
-                    Rect viewRect = new Rect(left, viewBottom - viewHeight, viewRight, viewBottom);
-
-                    rowViews.add(new Pair<>(viewRect, view));
-
-                    viewRight = left;
-                    maxTop = Math.max(maxTop, getDecoratedTop(view));
-                    rowViewsWidth += viewWidth;
-                } else {
-                    removeView(view);
-                    recycler.recycleView(view);
-                }
-
-                if (!fillNext || pos == 0) {
-
-                    int offset = getWidth() - rowViewsWidth;
-
                     //align left row
                     for (int i = 0; i < rowViews.size(); i++) {
                         Pair<Rect, View> rowViewRectPair = rowViews.get(i);
@@ -130,7 +108,33 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
                     rowViewsWidth = 0;
                     rowViews.clear();
+
+                    if (viewBottom < 0) {
+                        /* reached end of visible bounds, exit.
+                        remove previously added view
+                         */
+                        removeView(view);
+                        recycler.recycleView(view);
+                        break;
+                    }
+                    //go to next row, increase top coordinate, reset left
+                    viewRight = getWidth();
+                    viewBottom = maxTop;
                 }
+
+                /*view can be placed in current row, but we can't determine real position, until row will be filled,
+                so generate rect for the view and layout it in the end of the row
+                 */
+                int left = viewRight - viewWidth;
+                Rect viewRect = new Rect(left, viewBottom - viewHeight, viewRight, viewBottom);
+
+                rowViews.add(new Pair<>(viewRect, view));
+
+                viewRight = left;
+                maxTop = Math.max(maxTop, getDecoratedTop(view));
+                rowViewsWidth += viewWidth;
+
+                offset = getWidth() - rowViewsWidth;
 
                 pos--;
 
@@ -146,13 +150,21 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 maxTop = Math.max(maxTop, getDecoratedTop(view));
                 viewBottom = maxTop;
 
-                fillNext = viewBottom > 0 || viewRight < getWidth();
-
-                viewRight = 0;
                 pos--;
-
             }
         }
+
+        for (int i = 0; i < rowViews.size(); i++) {
+            Pair<Rect, View> rowViewRectPair = rowViews.get(i);
+            Rect viewRect = rowViewRectPair.first;
+            viewRect.left = viewRect.left - offset;
+            viewRect.right = viewRect.right - offset;
+
+            //layout whole views in a row
+            layoutDecorated(rowViewRectPair.second, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
+        }
+
+        rowViews.clear();
     }
 
 
@@ -178,6 +190,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         while (fillNext && pos < itemCount) {
             View view = viewCache.get(pos);
             if (view == null) {
+//                Log.d("fillDown", "getView for position = " + pos);
                 view = recycler.getViewForPosition(pos);
                 //try to add view in current row
                 addView(view);
@@ -206,6 +219,12 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
             } else {
 
+                int cachedTop = getDecoratedTop(view);
+                if (getHeight() < cachedTop) {
+                    //we reached bottom of visible children
+                    break;
+                }
+
                 int viewRight = getDecoratedRight(view);
 
                 attachView(view);
@@ -216,7 +235,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
                 fillNext = viewTop <= height || viewRight < getWidth();
 
-                viewLeft = 0;
+                viewLeft = getDecoratedRight(view);
                 pos++;
 
             }
