@@ -6,10 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.View;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
 public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
     private SparseArray<View> viewCache = new SparseArray<>();
@@ -32,7 +28,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
     private void fill(RecyclerView.Recycler recycler) {
 
-        View anchorView = getAnchorTopLeftView();
+        View anchorView = getAnchorVisibleTopLeftView();
         viewCache.clear();
 
         //Помещаем вьюшки в кэш и...
@@ -48,7 +44,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         }
 
         fillDown(anchorView, recycler);
-        fillUp(anchorView, recycler);
+//        fillUp(anchorView, recycler);
 
         //отправляем в корзину всё, что не потребовалось в этом цикле лэйаута
         //эти вьюшки или ушли за экран или не понадобились, потому что соответствующие элементы
@@ -63,12 +59,10 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         int anchorPos = 0;
         int anchorTop = 0;
         int anchorBottom = 0;
-        int anchorRight = 0;
         if (anchorView != null){
             anchorPos = getPosition(anchorView);
             anchorTop = getDecoratedTop(anchorView);
             anchorBottom = getDecoratedBottom(anchorView);
-            anchorRight = getDecoratedRight(anchorView);
         }
 
         int viewLeft = 0;
@@ -78,9 +72,13 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         int pos = anchorPos - 1;
         int viewBottom = anchorTop; //нижняя граница следующей вьюшки будет начитаться от верхней границы предыдущей
 
-        while (fillNext && pos >= 0){
+        while (fillNext && pos >= 0 && viewBottom >0 ){
             View view = viewCache.get(pos); //проверяем кэш
             if (view == null){
+                view = recycler.getViewForPosition(pos);
+                addView(view);
+                measureChildWithMargins(view, 0, 0);
+
                 int viewHeight = getDecoratedMeasuredHeight(view);
                 int viewWidth = getDecoratedMeasuredWidth(view);
 
@@ -125,12 +123,10 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         int anchorPos = 0;
         int anchorTop = 0;
         int anchorBottom = 0;
-        int anchorRight = 0;
         if (anchorView != null){
             anchorPos = getPosition(anchorView);
             anchorTop = getDecoratedTop(anchorView);
             anchorBottom = getDecoratedBottom(anchorView);
-            anchorRight = getDecoratedRight(anchorView);
         }
 
         int pos = anchorPos;
@@ -152,20 +148,25 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 int viewHeight = getDecoratedMeasuredHeight(view);
                 int viewWidth = getDecoratedMeasuredWidth(view);
 
-                if (viewLeft == 0 || viewLeft + viewWidth <= getWidth()) {
+                if (!(viewLeft == 0 || viewLeft + viewWidth <= getWidth())) {
+                    //go to next row, increase top coordinate, reset left
+                    viewLeft = 0;
+                    viewTop = maxBottom;
+                }
+
+                fillNext = viewTop <= height;
+
+                if (fillNext) {
                     //view can be placed in current row, layout it
                     layoutDecorated(view, viewLeft, viewTop, viewLeft + viewWidth, viewTop + viewHeight);
                     viewLeft = getDecoratedRight(view);
                     maxBottom = Math.max(maxBottom, getDecoratedBottom(view));
-                    pos++;
                 } else {
-                    //view can't be placed in current row, remove
                     removeView(view);
-                    //go to next row, increase top coordinate, reset left
-                    viewLeft = 0;
-                    viewTop = maxBottom;
-                    fillNext = viewTop <= height;
+                    recycler.recycleView(view);
                 }
+
+                pos++;
 
             } else {
 
@@ -236,11 +237,11 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         return delta;
     }
 
-    private View getAnchorTopLeftView() {
+    /** @return View, which is highest visible left view  */
+    private View getAnchorVisibleTopLeftView() {
         int childCount = getChildCount();
         View topLeft = null;
 
-        Set<View> viewsOnScreen = new HashSet<>();
         Rect mainRect = new Rect(0, 0, getWidth(), getHeight());
         for (int i = 0; i < childCount; i++) {
             View view = getChildAt(i);
@@ -251,22 +252,8 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
             Rect viewRect = new Rect(left, top, right, bottom);
             boolean intersect = viewRect.intersect(mainRect);
             if (intersect){
-                viewsOnScreen.add(view);
-            }
-        }
-        if (viewsOnScreen.isEmpty()){
-            return null;
-        }
-
-        int top = 0;
-        int left = 0;
-        for (View visibleView : viewsOnScreen) {
-            int topNew = getDecoratedTop(visibleView);
-            int leftNew = getDecoratedLeft(visibleView);
-            if (topLeft == null || (topNew < top && leftNew < left)) {
-                topLeft = visibleView;
-                top = topNew;
-                left = leftNew;
+                topLeft = view;
+                break;
             }
         }
 
