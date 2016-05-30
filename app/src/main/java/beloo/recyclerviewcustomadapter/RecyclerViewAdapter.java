@@ -23,7 +23,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_simple, parent, false);
         viewHolderCount++;
-        Log.d(TAG, "created holders = " + viewHolderCount);
+        Log.w(TAG, "created holders = " + viewHolderCount);
         return new ViewHolder(itemView);
     }
 
