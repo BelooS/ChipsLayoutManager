@@ -5,17 +5,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.List;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
     private static String TAG = RecyclerViewAdapter.class.getSimpleName();
-    public int viewHolderCount;
+    private int viewHolderCount;
 
     private List<String> items;
 
-    public RecyclerViewAdapter(List<String> items) {
+    RecyclerViewAdapter(List<String> items) {
         this.items = items;
     }
 
@@ -37,14 +38,29 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return items.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ViewHolder(View itemView) {
+        private TextView tvText;
+        private ImageButton ibClose;
+
+        ViewHolder(View itemView) {
             super(itemView);
+            tvText = (TextView) itemView.findViewById(R.id.tvText);
+            ibClose = (ImageButton) itemView.findViewById(R.id.ibClose);
+            ibClose.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if (position != -1) {
+                        items.remove(position);
+                        notifyItemRemoved(position);
+                    }
+                }
+            });
         }
 
-        public void bindItem(String text) {
-            ((TextView)itemView).setText(text);
+        void bindItem(String text) {
+            tvText.setText(text);
         }
      }
 }

@@ -301,7 +301,8 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         final View topView = getChildAt(0);
         final View bottomView = getChildAt(childCount - 1);
 
-        if (getPosition(topView) == 0 && getPosition(bottomView) == getItemCount() - 1) {
+        int viewSpan = getDecoratedBottom(bottomView) - getDecoratedTop(topView);
+        if (getPosition(topView) == 0 && getPosition(bottomView) == getItemCount() - 1 && viewSpan <= getHeight()) {
             //where all objects fit on screen, no scrolling needed
             return 0;
         }
