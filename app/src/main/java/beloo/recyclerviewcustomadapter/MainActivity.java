@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2) {
             @Override
             public boolean canScrollVertically() {
-                return false;
+                return true;
             }
         };
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this) {

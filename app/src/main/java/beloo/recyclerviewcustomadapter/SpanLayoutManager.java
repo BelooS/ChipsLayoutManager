@@ -14,7 +14,7 @@ import java.util.List;
 public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
     /** coefficient to support fast scrolling, caching views only for one row may not be enough */
-    public static final float FAST_SCROLLING_COEFFICIENT = 3;
+    public static final float FAST_SCROLLING_COEFFICIENT = 2;
     private SparseArray<View> viewCache = new SparseArray<>();
     private int maxViewsInRow = 2;
 
@@ -64,7 +64,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         //удалились из адаптера
         int recycledSize = viewCache.size();
         for (int i = 0; i < viewCache.size(); i++) {
-            recycler.recycleView(viewCache.valueAt(i));
+            removeAndRecycleView(viewCache.valueAt(i), recycler);
             Log.d("fill", "recycle position =" + viewCache.keyAt(i));
         }
 
