@@ -13,6 +13,8 @@ import java.util.List;
 
 public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
+    /** coefficient to support fast scrolling, caching views only for one row may not be enough */
+    public static final float FAST_SCROLLING_COEFFICIENT = 3;
     private SparseArray<View> viewCache = new SparseArray<>();
     private int maxViewsInRow = 2;
 
@@ -191,8 +193,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     /** recycler should contain all recycled views from a longest row, not just 2 holders by default*/
     private void calcRecyclerCacheSize(RecyclerView.Recycler recycler, int rowSize) {
         maxViewsInRow = Math.max(rowSize, maxViewsInRow);
-        //coefficient to support fast scrolling, caching views only for one row may not be enough
-        recycler.setViewCacheSize(maxViewsInRow * 2);
+        recycler.setViewCacheSize((int) (maxViewsInRow * FAST_SCROLLING_COEFFICIENT));
     }
 
     private void fillDown(@Nullable View anchorView, RecyclerView.Recycler recycler) {
@@ -218,7 +219,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         int requestedItems = 0;
         int recycledItems = 0;
         int startCacheSize = viewCache.size();
-        Log.d("fillUp", "cached items = " + startCacheSize);
+        Log.d("fillDown", "cached items = " + startCacheSize);
 
         while (fillNext && pos < itemCount) {
             View view = viewCache.get(pos);
@@ -300,14 +301,13 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         final View topView = getChildAt(0);
         final View bottomView = getChildAt(childCount - 1);
 
-        //Случай, когда все вьюшки поместились на экране
-        int viewSpan = getDecoratedBottom(bottomView) - getDecoratedTop(topView);
-        if (viewSpan <= getHeight()) {
+        if (getPosition(topView) == 0 && getPosition(bottomView) == getItemCount() - 1) {
+            //where all objects fit on screen, no scrolling needed
             return 0;
         }
 
         int delta = 0;
-        //если контент уезжает вниз
+        //if content scrolled down
         if (dy < 0) {
             View firstView = getChildAt(0);
             int firstViewAdapterPos = getPosition(firstView);
@@ -317,7 +317,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 int viewTop = getDecoratedTop(firstView);
                 delta = Math.max(viewTop, dy);
             }
-        } else if (dy > 0) { //если контент уезжает вверх
+        } else if (dy > 0) { //if content scrolled up
             View lastView = getChildAt(childCount - 1);
             int lastViewAdapterPos = getPosition(lastView);
             if (lastViewAdapterPos < itemCount - 1) { //если нижняя вюшка не самая последняя в адаптере
