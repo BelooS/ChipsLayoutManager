@@ -5,17 +5,43 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.SimpleAdapter;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView rvTest;
+    private RecyclerViewAdapter adapter;
+    private Spinner spinnerPosition;
+    private List<String> positions;
+    private List<String> items;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         rvTest = (RecyclerView) findViewById(R.id.rvTest);
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(new ItemsFactory().getItems());
+        spinnerPosition = (Spinner) findViewById(R.id.spinnerPosition);
+
+        items = new ItemsFactory().getItems();
+
+        positions = new LinkedList<>();
+        for (int i = 0; i< items.size(); i++) {
+            positions.add(String.valueOf(i));
+        }
+
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, positions);
+        spinnerPosition.setAdapter(spinnerAdapter);
+
+        adapter = new RecyclerViewAdapter(items);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2) {
             @Override
             public boolean canScrollVertically() {
@@ -39,5 +65,39 @@ public class MainActivity extends AppCompatActivity {
 
         rvTest.setLayoutManager(spanLayoutManager);
         rvTest.setAdapter(adapter);
+    }
+
+    private void updateSpinner() {
+        positions = new LinkedList<>();
+        for (int i = 0; i< items.size(); i++) {
+            positions.add(String.valueOf(i));
+        }
+
+        int selectedPosition = spinnerPosition.getSelectedItemPosition();
+
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, positions);
+        spinnerPosition.setAdapter(spinnerAdapter);
+        selectedPosition = Math.min(spinnerAdapter.getCount() -1 , selectedPosition);
+        spinnerPosition.setSelection(selectedPosition);
+    }
+
+    public void onDeleteClicked(View view) {
+        int position = spinnerPosition.getSelectedItemPosition();
+        if (position == Spinner.INVALID_POSITION)
+            return;
+        items.remove(position);
+        Log.i("activity", "delete at " + position);
+        adapter.notifyItemRemoved(position);
+        updateSpinner();
+    }
+
+    public void onInsertClicked(View view) {
+        int position = spinnerPosition.getSelectedItemPosition();
+        if (position == Spinner.INVALID_POSITION)
+            position = 0;
+        items.add(position, "inserted item." + position);
+        Log.i("activity", "insert at " + position);
+        adapter.notifyItemInserted(position);
+        updateSpinner();
     }
 }

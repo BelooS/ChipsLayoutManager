@@ -17,4 +17,31 @@
         android:layout_height="180dp"
         />
 
+    <Spinner
+        android:id="@+id/spinnerPosition"
+        android:layout_below="@id/rvTest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+    <Button
+        android:id="@+id/btnDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onDeleteClicked"
+        android:layout_below="@id/spinnerPosition"
+        android:layout_toRightOf="@+id/btnInsert"
+        android:layout_toEndOf="@+id/btnInsert"
+        android:text="@string/delete"
+        />
+
+    <Button
+        android:id="@+id/btnInsert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/spinnerPosition"
+        android:onClick="onInsertClicked"
+        android:text="@string/insert"
+        />
+
 </RelativeLayout>

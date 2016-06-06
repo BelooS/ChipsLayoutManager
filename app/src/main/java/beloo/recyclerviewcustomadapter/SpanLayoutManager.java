@@ -24,10 +24,24 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     }
 
     @Override
+    public void onAdapterChanged(RecyclerView.Adapter oldAdapter,
+                                 RecyclerView.Adapter newAdapter) {
+        //Completely scrap the existing layout
+        removeAllViews();
+    }
+
+    @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+        //We have nothing to show for an empty data set but clear any existing views
+        if (getItemCount() == 0) {
+            detachAndScrapAttachedViews(recycler);
+            return;
+        }
+
+        View anchorView = getAnchorVisibleTopLeftView();
         detachAndScrapAttachedViews(recycler);
         calcRecyclerCacheSize(recycler, 2);
-        fill(recycler);
+        fill(recycler, anchorView);
     }
 
     @Override
@@ -35,9 +49,8 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         return true;
     }
 
-    private void fill(RecyclerView.Recycler recycler) {
+    private void fill(RecyclerView.Recycler recycler, @Nullable View anchorView) {
 
-        View anchorView = getAnchorVisibleTopLeftView();
         viewCache.clear();
 
         //Помещаем вьюшки в кэш и...
@@ -287,7 +300,8 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
         dy = scrollVerticallyInternal(dy);
         offsetChildrenVertical(-dy);
-        fill(recycler);
+        View anchorView = getAnchorVisibleTopLeftView();
+        fill(recycler, anchorView);
         return dy;
     }
 
@@ -335,6 +349,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     /**
      * @return View, which is highest visible left view
      */
+    @Nullable
     private View getAnchorVisibleTopLeftView() {
         int childCount = getChildCount();
         View topLeft = null;
@@ -349,8 +364,10 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
             Rect viewRect = new Rect(left, top, right, bottom);
             boolean intersect = viewRect.intersect(mainRect);
             if (intersect) {
-                topLeft = view;
-                break;
+                if (getPosition(view) != -1) {
+                    topLeft = view;
+                    break;
+                }
             }
         }
 
