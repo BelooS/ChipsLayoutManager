@@ -17,6 +17,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     public static final float FAST_SCROLLING_COEFFICIENT = 2;
     private SparseArray<View> viewCache = new SparseArray<>();
     private int maxViewsInRow = 2;
+    private Integer anchorViewPosition = null;
 
     @Override
     public RecyclerView.LayoutParams generateDefaultLayoutParams() {
@@ -39,9 +40,24 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         }
 
         View anchorView = getAnchorVisibleTopLeftView();
-        detachAndScrapAttachedViews(recycler);
-        calcRecyclerCacheSize(recycler, 2);
-        fill(recycler, anchorView);
+        if (!state.isPreLayout()) {
+            detachAndScrapAttachedViews(recycler);
+            calcRecyclerCacheSize(recycler, 2);
+
+            if (anchorView != null && anchorViewPosition != null && anchorViewPosition == 0) {
+                //we can't add view in a hidden area if added view inserted on a zero position. so needed workaround here, we reset anchor position to 0
+                int anchorTop = getDecoratedTop(anchorView);
+                int anchorBottom = getDecoratedBottom(anchorView);
+                fill(recycler, anchorTop, anchorBottom, anchorViewPosition);
+                anchorViewPosition = null;
+            } else {
+                fill(recycler, anchorView);
+            }
+        } else {
+            if (anchorView != null)
+                anchorViewPosition = getPosition(anchorView);
+
+        }
     }
 
     @Override
@@ -49,7 +65,26 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         return true;
     }
 
+    @Override
+    public boolean supportsPredictiveItemAnimations() {
+        return true;
+    }
+
     private void fill(RecyclerView.Recycler recycler, @Nullable View anchorView) {
+
+        int anchorPos = 0;
+        int anchorTop = 0;
+        int anchorBottom = 0;
+        if (anchorView != null) {
+            anchorPos = getPosition(anchorView);
+            anchorTop = getDecoratedTop(anchorView);
+            anchorBottom = getDecoratedBottom(anchorView);
+        }
+
+        fill(recycler, anchorTop, anchorBottom, anchorPos);
+    }
+
+    private void fill(RecyclerView.Recycler recycler, int topOffset, int bottomOffset, int startingPos) {
 
         viewCache.clear();
 
@@ -69,8 +104,9 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 //            Log.d("cachedViews", "from " + viewCache.keyAt(0) + " to " + viewCache.keyAt(viewCache.size() - 1));
 //        }
 
-        fillUp(anchorView, recycler);
-        fillDown(anchorView, recycler);
+
+        fillUp(recycler, topOffset, startingPos - 1);
+        fillDown(recycler, topOffset, bottomOffset, startingPos);
 
         //отправляем в корзину всё, что не потребовалось в этом цикле лэйаута
         //эти вьюшки или ушли за экран или не понадобились, потому что соответствующие элементы
@@ -84,19 +120,13 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         Log.d("fill", "recycled count = " + recycledSize);
     }
 
-    private void fillUp(@Nullable View anchorView, RecyclerView.Recycler recycler) {
-        int anchorPos = 0;
-        int anchorTop = 0;
-        if (anchorView != null) {
-            anchorPos = getPosition(anchorView);
-            anchorTop = getDecoratedTop(anchorView);
-        }
-
+    private void fillUp(RecyclerView.Recycler recycler, int bottomOffset, int startingPos) {
         int viewRight = getWidth();
-        int minTop = anchorTop;
+        int minTop = bottomOffset;
 
-        int pos = anchorPos - 1;
-        int viewBottom = anchorTop; //нижняя граница следующей вьюшки будет начитаться от верхней границы предыдущей
+        int pos = startingPos;
+
+        int viewBottom = bottomOffset; //нижняя граница следующей вьюшки будет начитаться от верхней границы предыдущей
 
         //in case we don't need fillup
         if (viewBottom < 0) return;
@@ -209,22 +239,14 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         recycler.setViewCacheSize((int) (maxViewsInRow * FAST_SCROLLING_COEFFICIENT));
     }
 
-    private void fillDown(@Nullable View anchorView, RecyclerView.Recycler recycler) {
-        int anchorPos = 0;
-        int anchorTop = 0;
-        int anchorBottom = 0;
-        if (anchorView != null) {
-            anchorPos = getPosition(anchorView);
-            anchorTop = getDecoratedTop(anchorView);
-            anchorBottom = getDecoratedBottom(anchorView);
-        }
+    private void fillDown(RecyclerView.Recycler recycler, int topOffset, int bottomOffset, int startingPos) {
 
-        int pos = anchorPos;
+        int pos = startingPos;
         boolean fillNext = true;
         int height = getHeight();
-        int viewTop = anchorTop;
+        int viewTop = topOffset;
         int viewLeft = 0;
-        int maxBottom = anchorBottom;
+        int maxBottom = bottomOffset;
 
         int itemCount = getItemCount();
         int rowSize = 0;
@@ -297,10 +319,19 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     }
 
     @Override
+    public void onItemsAdded(RecyclerView recyclerView, int positionStart, int itemCount) {
+        super.onItemsAdded(recyclerView, positionStart, itemCount);
+    }
+
+    @Override
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
         dy = scrollVerticallyInternal(dy);
         offsetChildrenVertical(-dy);
         View anchorView = getAnchorVisibleTopLeftView();
+        if (anchorView != null && getPosition(anchorView) == 0) {
+            //todo fix that. currently instant position correction after scrolling to first view
+            detachAndScrapAttachedViews(recycler);
+        }
         fill(recycler, anchorView);
         return dy;
     }
