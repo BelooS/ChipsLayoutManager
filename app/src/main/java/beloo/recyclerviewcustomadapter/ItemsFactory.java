@@ -36,6 +36,11 @@ public class ItemsFactory {
         list.add("Item10011.27");
         list.add("Item10012.28");
         list.add("Item10013.29");
+        list.add("I");
+        list.add("A");
+        list.add("C");
+        list.add("long item here");
+        list.add("long item here 2");
         return list;
     }
 }

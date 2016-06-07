@@ -123,7 +123,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     private void fillUp(RecyclerView.Recycler recycler, int bottomOffset, int startingPos) {
         int viewRight = getWidth();
         int viewLeft = 0;
-        int minTop = bottomOffset;
+        int minTop = Integer.MAX_VALUE;
 
         int pos = startingPos;
 
@@ -156,7 +156,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 if (bufLeft < 0) {
                     //if previously row finished and we have to fill it
 
-                    layoutRow(rowViews, viewLeft);
+                    minTop = layoutRow(rowViews, viewLeft);
 
                     //clear row data
                     rowViews.clear();
@@ -164,9 +164,12 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                     //go to next row, increase top coordinate, reset left
                     viewRight = getWidth();
                     viewBottom = minTop;
+//                    Log.i("layout row", "new bottom = " + viewBottom);
+//                    Log.i("layout row", "next position = " + pos);
                 }
 
                 if (viewBottom < 0) {
+//                    Log.w("fill up", "reached end of visible bounds");
                     /* reached end of visible bounds, exit.
                     recycle view, which was requested previously
                      */
@@ -187,7 +190,6 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
                 viewRight = left;
                 viewLeft = left;
-                minTop = Math.min(minTop, getDecoratedTop(view));
 
                 pos--;
 
@@ -219,18 +221,24 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         layoutRow(rowViews, viewLeft);
     }
 
-    private void layoutRow(List<Pair<Rect, View>> rowViews, int leftOffsetOfRow) {
-
+    /** returns minTop */
+    private int layoutRow(List<Pair<Rect, View>> rowViews, int leftOffsetOfRow) {
+        int minTop = Integer.MAX_VALUE;
         for (int i = 0; i < rowViews.size(); i++) {
             Pair<Rect, View> rowViewRectPair = rowViews.get(i);
             Rect viewRect = rowViewRectPair.first;
+            View view = rowViewRectPair.second;
             viewRect.left = viewRect.left - leftOffsetOfRow;
             viewRect.right = viewRect.right - leftOffsetOfRow;
 
-            addView(rowViewRectPair.second, 0);
+            addView(view, 0);
             //layout whole views in a row
-            layoutDecorated(rowViewRectPair.second, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
+            layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
+
+            minTop = Math.min(minTop, getDecoratedTop(view));
         }
+
+        return minTop;
     }
 
     /** recycler should contain all recycled views from a longest row, not just 2 holders by default*/
@@ -329,8 +337,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         offsetChildrenVertical(-dy);
         View anchorView = getAnchorVisibleTopLeftView();
         if (anchorView != null && getPosition(anchorView) == 0) {
-            //todo fix that. currently instant position correction after scrolling to first view
-//            detachAndScrapAttachedViews(recycler);
+            detachAndScrapAttachedViews(recycler);
         }
         fill(recycler, anchorView);
         return dy;
