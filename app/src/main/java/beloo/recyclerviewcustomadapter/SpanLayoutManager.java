@@ -420,4 +420,14 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         return topLeft;
     }
 
+    public void scrollToPosition(int position) {
+        if (position >= getItemCount()) {
+            Log.e("span layout manager", "Cannot scroll to " + position + ", item count "+getItemCount());
+            return;
+        }
+
+        //Trigger a new view layout
+        requestLayout();
+    }
+
 }
