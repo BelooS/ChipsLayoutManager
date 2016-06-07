@@ -43,4 +43,19 @@ public class ItemsFactory {
         list.add("long item here 2");
         return list;
     }
+
+    public List<String> getALotOfItems() {
+        List<String> list = new LinkedList<>();
+        list.add("START item");
+        for (int i =0; i< 200; i++) {
+            if (i%2 == 0) {
+                list.add("a span");
+            } else if (i%3 == 0) {
+                list.add("long item here");
+            } else if (i % 5 == 0) {
+                list.add("S");
+            }
+        }
+        return list;
+    }
 }

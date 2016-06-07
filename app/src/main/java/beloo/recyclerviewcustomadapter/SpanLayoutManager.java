@@ -21,7 +21,9 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
     @Override
     public RecyclerView.LayoutParams generateDefaultLayoutParams() {
-        return null;
+        return new RecyclerView.LayoutParams(
+                RecyclerView.LayoutParams.WRAP_CONTENT,
+                RecyclerView.LayoutParams.WRAP_CONTENT);
     }
 
     @Override
@@ -142,7 +144,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         while (pos >= 0) {
             View view = viewCache.get(pos); //проверяем кэш
             if (view == null) {
-//                Log.d("fillUp", "getView for position = " + pos);
+                Log.i("fillUp", "getView for position = " + pos);
                 view = recycler.getViewForPosition(pos);
                 requestedItems ++;
 
@@ -267,7 +269,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         while (fillNext && pos < itemCount) {
             View view = viewCache.get(pos);
             if (view == null) {
-//                Log.d("fillDown", "getView for position = " + pos);
+                Log.i("fillDown", "getView for position = " + pos);
                 view = recycler.getViewForPosition(pos);
                 requestedItems++;
                 measureChildWithMargins(view, 0, 0);
@@ -337,6 +339,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         offsetChildrenVertical(-dy);
         View anchorView = getAnchorVisibleTopLeftView();
         if (anchorView != null && getPosition(anchorView) == 0) {
+            //todo refactor it, blinking now without animation. Workaround to fix start position of items if some items have been added after initialization
             detachAndScrapAttachedViews(recycler);
         }
         fill(recycler, anchorView);
