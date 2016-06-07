@@ -19,6 +19,9 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     private int maxViewsInRow = 2;
     private Integer anchorViewPosition = null;
 
+    /** highest top position of attached views*/
+    private int highestViewTop = Integer.MAX_VALUE;
+
     @Override
     public RecyclerView.LayoutParams generateDefaultLayoutParams() {
         return new RecyclerView.LayoutParams(
@@ -88,6 +91,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
     private void fill(RecyclerView.Recycler recycler, int topOffset, int bottomOffset, int startingPos) {
 
+        highestViewTop = Integer.MAX_VALUE;
         viewCache.clear();
 
         //Помещаем вьюшки в кэш и...
@@ -107,8 +111,8 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 //        }
 
 
-        fillUp(recycler, topOffset, startingPos - 1);
         fillDown(recycler, topOffset, bottomOffset, startingPos);
+        fillUp(recycler, Math.min(highestViewTop, topOffset), startingPos - 1);
 
         //отправляем в корзину всё, что не потребовалось в этом цикле лэйаута
         //эти вьюшки или ушли за экран или не понадобились, потому что соответствующие элементы
@@ -210,7 +214,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 attachView(view);
                 viewCache.remove(pos);
 
-                minTop = Math.max(minTop, getDecoratedTop(view));
+                minTop = Math.min(minTop, getDecoratedTop(view));
                 viewBottom = minTop;
 
                 pos--;
@@ -310,6 +314,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 int viewRight = getDecoratedRight(view);
 
                 attachView(view);
+                highestViewTop = Math.min(highestViewTop, cachedTop);
 
                 viewCache.remove(pos);
 
