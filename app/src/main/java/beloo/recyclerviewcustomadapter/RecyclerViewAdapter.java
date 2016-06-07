@@ -14,6 +14,9 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewH
     private static String TAG = RecyclerViewAdapter.class.getSimpleName();
     private int viewHolderCount;
 
+    private final int ITEM_TYPE_DEFAULT = 0;
+    private final int ITEM_TYPE_INCREASED = 1;
+
     private List<String> items;
 
     RecyclerViewAdapter(List<String> items) {
@@ -22,7 +25,16 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewH
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_simple, parent, false);
+        View itemView;
+        switch (viewType) {
+            case ITEM_TYPE_INCREASED:
+                itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_increased, parent, false);
+                break;
+
+            default:
+                itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_simple, parent, false);
+                break;
+        }
         viewHolderCount++;
         Log.w(TAG, "created holders = " + viewHolderCount);
         return new ViewHolder(itemView);
@@ -31,6 +43,16 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewH
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.bindItem(items.get(position));
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        String item = items.get(position);
+        if (item.startsWith("!")) {
+            return ITEM_TYPE_INCREASED;
+        }
+
+        return ITEM_TYPE_DEFAULT;
     }
 
     @Override
