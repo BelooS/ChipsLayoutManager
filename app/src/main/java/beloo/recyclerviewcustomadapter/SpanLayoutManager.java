@@ -122,6 +122,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
     private void fillUp(RecyclerView.Recycler recycler, int bottomOffset, int startingPos) {
         int viewRight = getWidth();
+        int viewLeft = 0;
         int minTop = bottomOffset;
 
         int pos = startingPos;
@@ -132,7 +133,6 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         if (viewBottom < 0) return;
 
         List<Pair<Rect, View>> rowViews = new LinkedList<>();
-        int rowViewsWidth = 0;
 
         int startCacheSize = viewCache.size();
         int requestedItems = 0;
@@ -151,13 +151,14 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 int viewHeight = getDecoratedMeasuredHeight(view);
                 int viewWidth = getDecoratedMeasuredWidth(view);
 
-                if (rowViewsWidth + viewWidth > getWidth()) {
+                int bufLeft = viewRight - viewWidth;
+
+                if (bufLeft < 0) {
                     //if previously row finished and we have to fill it
 
-                    layoutRow(rowViews, rowViewsWidth);
+                    layoutRow(rowViews, viewLeft);
 
                     //clear row data
-                    rowViewsWidth = 0;
                     rowViews.clear();
 
                     //go to next row, increase top coordinate, reset left
@@ -185,8 +186,8 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 rowViews.add(new Pair<>(viewRect, view));
 
                 viewRight = left;
+                viewLeft = left;
                 minTop = Math.min(minTop, getDecoratedTop(view));
-                rowViewsWidth += viewWidth;
 
                 pos--;
 
@@ -215,17 +216,16 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         Log.d("fillUp", "reattached items = " + (startCacheSize - viewCache.size() + " : requested items = " + requestedItems + " recycledItems = " + recycledItems));
 
         //layout last row
-        layoutRow(rowViews, rowViewsWidth);
+        layoutRow(rowViews, viewLeft);
     }
 
-    private void layoutRow(List<Pair<Rect, View>> rowViews, int rowViewsWidth) {
-        int offset = getWidth() - rowViewsWidth;
+    private void layoutRow(List<Pair<Rect, View>> rowViews, int leftOffsetOfRow) {
 
         for (int i = 0; i < rowViews.size(); i++) {
             Pair<Rect, View> rowViewRectPair = rowViews.get(i);
             Rect viewRect = rowViewRectPair.first;
-            viewRect.left = viewRect.left - offset;
-            viewRect.right = viewRect.right - offset;
+            viewRect.left = viewRect.left - leftOffsetOfRow;
+            viewRect.right = viewRect.right - leftOffsetOfRow;
 
             addView(rowViewRectPair.second, 0);
             //layout whole views in a row
@@ -330,7 +330,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         View anchorView = getAnchorVisibleTopLeftView();
         if (anchorView != null && getPosition(anchorView) == 0) {
             //todo fix that. currently instant position correction after scrolling to first view
-            detachAndScrapAttachedViews(recycler);
+//            detachAndScrapAttachedViews(recycler);
         }
         fill(recycler, anchorView);
         return dy;
