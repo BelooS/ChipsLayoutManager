@@ -166,7 +166,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 if (bufLeft < 0) {
                     //if previously row finished and we have to fill it
 
-                    minTop = layoutRow(rowViews, minTop, viewLeft);
+                    minTop = layoutRow(rowViews, minTop, viewLeft, true);
 
                     //clear row data
                     rowViews.clear();
@@ -228,11 +228,11 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         Log.d("fillUp", "reattached items = " + (startCacheSize - viewCache.size() + " : requested items = " + requestedItems + " recycledItems = " + recycledItems));
 
         //layout last row
-        layoutRow(rowViews, minTop, viewLeft);
+        layoutRow(rowViews, minTop, viewLeft, true);
     }
 
     /** returns minTop */
-    private int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int leftOffsetOfRow) {
+    private int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int leftOffsetOfRow, boolean isReverseOrder) {
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
             viewRect.left = viewRect.left - leftOffsetOfRow;
@@ -251,7 +251,11 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 viewRect.top = minTop;
             }
 
-            addView(view, 0);
+            if (isReverseOrder) {
+                addView(view, 0);
+            } else {
+                addView(view);
+            }
             //layout whole views in a row
             layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
         }
@@ -282,6 +286,8 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         int startCacheSize = viewCache.size();
         Log.d("fillDown", "cached items = " + startCacheSize);
 
+        List<Pair<Rect, View>> rowViews = new LinkedList<>();
+
         while (fillNext && pos < itemCount) {
             View view = viewCache.get(pos);
             if (view == null) {
@@ -293,21 +299,30 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 int viewWidth = getDecoratedMeasuredWidth(view);
 
                 if (!(viewLeft == 0 || viewLeft + viewWidth <= getWidth())) {
+
+                    //layout previously calculated row
+                    layoutRow(rowViews, viewTop, 0, false);
+
                     //go to next row, increase top coordinate, reset left
                     viewLeft = 0;
                     viewTop = maxBottom;
                     fillNext = viewTop <= height;
+
                     calcRecyclerCacheSize(recycler, rowSize);
+
+                    //clear row data
+                    rowViews.clear();
                     rowSize = 0;
                 }
 
                 if (fillNext) {
-                    addView(view);
                     rowSize++;
-                    //view can be placed in current row, layout it
-                    layoutDecorated(view, viewLeft, viewTop, viewLeft + viewWidth, viewTop + viewHeight);
-                    viewLeft = getDecoratedRight(view);
-                    maxBottom = Math.max(maxBottom, getDecoratedBottom(view));
+
+                    Rect viewRect = new Rect(viewLeft, viewTop, viewLeft + viewWidth, viewTop + viewHeight);
+                    rowViews.add(new Pair<>(viewRect, view));
+
+                    viewLeft = viewRect.right;
+                    maxBottom = Math.max(maxBottom, viewRect.bottom);
                 } else {
                     recycledItems++;
                     recycler.recycleView(view);
@@ -343,6 +358,9 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         }
 
         Log.d("fillDown", "reattached items = " + (startCacheSize - viewCache.size() + " : requested items = " + requestedItems + " recycledItems = " + recycledItems));
+
+        //layout last row
+        layoutRow(rowViews, viewTop, 0, false);
     }
 
     @Override
