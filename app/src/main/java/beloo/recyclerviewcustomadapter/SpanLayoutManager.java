@@ -124,7 +124,9 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 //        }
 
 
-        fillDown(recycler, anchorTop, anchorBottom, startingPos);
+        //we should include anchor view here, so anchorLeft is a leftOffset
+        fillDown(recycler, anchorTop, anchorBottom, anchorLeft, startingPos);
+        //we shouldn't include anchor view here, so anchorLeft is a rightOffset
         fillUp(recycler, Math.min(anchorTop, highestViewTop), anchorLeft, anchorBottom, startingPos - 1);
 
         //отправляем в корзину всё, что не потребовалось в этом цикле лэйаута
@@ -174,7 +176,6 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
                 if (bufLeft < 0) {
                     //if previously row finished and we have to fill it
-
                     minTop = layoutRow(rowViews, minTop, viewBottom, viewLeft, true);
 
                     //clear row data
@@ -275,13 +276,13 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         return minTop;
     }
 
-    private void fillDown(RecyclerView.Recycler recycler, int topOffset, int bottomOffset, int startingPos) {
+    private void fillDown(RecyclerView.Recycler recycler, int topOffset, int bottomOffset, int leftOffset, int startingPos) {
 
         int pos = startingPos;
         boolean fillNext = true;
         int height = getHeight();
         int viewTop = topOffset;
-        int viewLeft = 0;
+        int viewLeft = leftOffset;
         int maxBottom = bottomOffset;
 
         int itemCount = getItemCount();
