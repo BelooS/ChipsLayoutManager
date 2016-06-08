@@ -2,6 +2,7 @@ package beloo.recyclerviewcustomadapter;
 
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.Pair;
@@ -139,6 +140,10 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         }
 
         Log.d("fill", "recycled count = " + recycledSize);
+    }
+
+    protected boolean isLayoutRTL() {
+        return getLayoutDirection() == ViewCompat.LAYOUT_DIRECTION_RTL;
     }
 
     /**
@@ -281,7 +286,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
         int pos = startingPos;
         int viewTop = topOffset;
-        int viewLeft = leftOffset;
+        int viewLeft = 0;
         int maxBottom = bottomOffset;
 
         int itemCount = getItemCount();
@@ -394,6 +399,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
             //todo refactor it, blinking now without animation. Workaround to fix start position of items if some items have been added after initialization
             detachAndScrapAttachedViews(recycler);
         }
+
         fill(recycler, anchorView);
         return dy;
     }
