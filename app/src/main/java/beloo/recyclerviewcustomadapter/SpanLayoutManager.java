@@ -11,12 +11,21 @@ import android.view.View;
 import java.util.LinkedList;
 import java.util.List;
 
+import beloo.recyclerviewcustomadapter.gravityModifier.GravityModifiersFactory;
+import beloo.recyclerviewcustomadapter.gravityModifier.IGravityModifier;
+
 public class SpanLayoutManager extends RecyclerView.LayoutManager {
+
+    private IChildGravityResolver childGravityResolver = new CenterChildGravity();
+    private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
 
     /** coefficient to support fast scrolling, caching views only for one row may not be enough */
     public static final float FAST_SCROLLING_COEFFICIENT = 2;
-    private SparseArray<View> viewCache = new SparseArray<>();
     private int maxViewsInRow = 2;
+
+
+    private SparseArray<View> viewCache = new SparseArray<>();
+
     private Integer anchorViewPosition = null;
 
     /** highest top position of attached views*/
@@ -166,7 +175,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 if (bufLeft < 0) {
                     //if previously row finished and we have to fill it
 
-                    minTop = layoutRow(rowViews, minTop, viewLeft, true);
+                    minTop = layoutRow(rowViews, minTop, viewBottom, viewLeft, true);
 
                     //clear row data
                     rowViews.clear();
@@ -228,45 +237,42 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         Log.d("fillUp", "reattached items = " + (startCacheSize - viewCache.size() + " : requested items = " + requestedItems + " recycledItems = " + recycledItems));
 
         //layout last row
-        layoutRow(rowViews, minTop, viewLeft, true);
+        layoutRow(rowViews, minTop, viewBottom, viewLeft, true);
     }
 
-    /** returns minTop */
-    private int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int leftOffsetOfRow, boolean isReverseOrder) {
+    /** layout pre-calculated row on a recyclerView canvas
+     * @param isReverseOrder if fill views from the end this flag have to be true to not break child position in recyclerView
+     * returns minTop */
+    private int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int maxBottom, int leftOffsetOfRow, boolean isReverseOrder) {
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
             viewRect.left = viewRect.left - leftOffsetOfRow;
             viewRect.right = viewRect.right - leftOffsetOfRow;
 
             minTop = Math.min(minTop, viewRect.top);
+            maxBottom = Math.max(maxBottom, viewRect.bottom);
         }
 
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
             View view = rowViewRectPair.second;
 
-            if (viewRect.top > minTop) {
-                //todo make depends on view gravity
-                viewRect.bottom -= (viewRect.top - minTop);
-                viewRect.top = minTop;
-            }
+            @SpanLayoutChildGravity
+            int viewGravity = childGravityResolver.getItemGravity(getPosition(view));
+            IGravityModifier gravityModifier = gravityModifiersFactory.getGravityModifier(viewGravity);
+            gravityModifier.modifyChildRect(minTop, maxBottom, viewRect);
 
             if (isReverseOrder) {
                 addView(view, 0);
             } else {
                 addView(view);
             }
+
             //layout whole views in a row
             layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
         }
 
         return minTop;
-    }
-
-    /** recycler should contain all recycled views from a longest row, not just 2 holders by default*/
-    private void calcRecyclerCacheSize(RecyclerView.Recycler recycler, int rowSize) {
-        maxViewsInRow = Math.max(rowSize, maxViewsInRow);
-        recycler.setViewCacheSize((int) (maxViewsInRow * FAST_SCROLLING_COEFFICIENT));
     }
 
     private void fillDown(RecyclerView.Recycler recycler, int topOffset, int bottomOffset, int startingPos) {
@@ -301,7 +307,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 if (!(viewLeft == 0 || viewLeft + viewWidth <= getWidth())) {
 
                     //layout previously calculated row
-                    layoutRow(rowViews, viewTop, 0, false);
+                    layoutRow(rowViews, viewTop, maxBottom, 0, false);
 
                     //go to next row, increase top coordinate, reset left
                     viewLeft = 0;
@@ -360,7 +366,13 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         Log.d("fillDown", "reattached items = " + (startCacheSize - viewCache.size() + " : requested items = " + requestedItems + " recycledItems = " + recycledItems));
 
         //layout last row
-        layoutRow(rowViews, viewTop, 0, false);
+        layoutRow(rowViews, viewTop, maxBottom, 0, false);
+    }
+
+    /** recycler should contain all recycled views from a longest row, not just 2 holders by default*/
+    private void calcRecyclerCacheSize(RecyclerView.Recycler recycler, int rowSize) {
+        maxViewsInRow = Math.max(rowSize, maxViewsInRow);
+        recycler.setViewCacheSize((int) (maxViewsInRow * FAST_SCROLLING_COEFFICIENT));
     }
 
     @Override
