@@ -51,9 +51,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
             if (anchorView != null && anchorViewPosition != null && anchorViewPosition == 0) {
                 //we can't add view in a hidden area if added view inserted on a zero position. so needed workaround here, we reset anchor position to 0
-                int anchorTop = getDecoratedTop(anchorView);
-                int anchorBottom = getDecoratedBottom(anchorView);
-                fill(recycler, anchorTop, anchorBottom, anchorViewPosition);
+                fill(recycler, anchorView, anchorViewPosition);
                 anchorViewPosition = null;
             } else {
                 fill(recycler, anchorView);
@@ -76,20 +74,26 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     }
 
     private void fill(RecyclerView.Recycler recycler, @Nullable View anchorView) {
-
         int anchorPos = 0;
-        int anchorTop = 0;
-        int anchorBottom = 0;
         if (anchorView != null) {
             anchorPos = getPosition(anchorView);
-            anchorTop = getDecoratedTop(anchorView);
-            anchorBottom = getDecoratedBottom(anchorView);
         }
 
-        fill(recycler, anchorTop, anchorBottom, anchorPos);
+        fill(recycler, anchorView, anchorPos);
     }
 
-    private void fill(RecyclerView.Recycler recycler, int topOffset, int bottomOffset, int startingPos) {
+    private void fill(RecyclerView.Recycler recycler, @Nullable View anchorView, int startingPos) {
+
+        int anchorTop = 0;
+        int anchorBottom = 0;
+        int anchorLeft = 0;
+        int anchorRight = 0;
+        if (anchorView != null) {
+            anchorTop = getDecoratedTop(anchorView);
+            anchorBottom = getDecoratedBottom(anchorView);
+            anchorLeft = getDecoratedLeft(anchorView);
+            anchorRight = getDecoratedRight(anchorView);
+        }
 
         highestViewTop = Integer.MAX_VALUE;
         viewCache.clear();
@@ -111,8 +115,8 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 //        }
 
 
-        fillDown(recycler, topOffset, bottomOffset, startingPos);
-        fillUp(recycler, Math.min(highestViewTop, topOffset), startingPos - 1);
+        fillDown(recycler, anchorTop, anchorBottom, startingPos);
+        fillUp(recycler, Math.min(anchorTop, highestViewTop), anchorLeft, anchorBottom, startingPos - 1);
 
         //отправляем в корзину всё, что не потребовалось в этом цикле лэйаута
         //эти вьюшки или ушли за экран или не понадобились, потому что соответствующие элементы
@@ -126,17 +130,17 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         Log.d("fill", "recycled count = " + recycledSize);
     }
 
-    private void fillUp(RecyclerView.Recycler recycler, int bottomOffset, int startingPos) {
-        int viewRight = getWidth();
+    /**
+     * @param rightOffset left border of anchor view. Needed to try fill row to left of it.
+     * */
+    private void fillUp(RecyclerView.Recycler recycler, int topOffset, int rightOffset, int bottomOffset, int startingPos) {
+        int viewRight = rightOffset;
         int viewLeft = 0;
-        int minTop = Integer.MAX_VALUE;
+        int minTop = topOffset;
 
         int pos = startingPos;
 
         int viewBottom = bottomOffset; //нижняя граница следующей вьюшки будет начитаться от верхней границы предыдущей
-
-        //in case we don't need fillup
-        if (viewBottom < 0) return;
 
         List<Pair<Rect, View>> rowViews = new LinkedList<>();
 
@@ -162,7 +166,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 if (bufLeft < 0) {
                     //if previously row finished and we have to fill it
 
-                    minTop = layoutRow(rowViews, viewLeft);
+                    minTop = layoutRow(rowViews, minTop, viewLeft);
 
                     //clear row data
                     rowViews.clear();
@@ -224,12 +228,11 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         Log.d("fillUp", "reattached items = " + (startCacheSize - viewCache.size() + " : requested items = " + requestedItems + " recycledItems = " + recycledItems));
 
         //layout last row
-        layoutRow(rowViews, viewLeft);
+        layoutRow(rowViews, minTop, viewLeft);
     }
 
     /** returns minTop */
-    private int layoutRow(List<Pair<Rect, View>> rowViews, int leftOffsetOfRow) {
-        int minTop = Integer.MAX_VALUE;
+    private int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int leftOffsetOfRow) {
         for (int i = 0; i < rowViews.size(); i++) {
             Pair<Rect, View> rowViewRectPair = rowViews.get(i);
             Rect viewRect = rowViewRectPair.first;
