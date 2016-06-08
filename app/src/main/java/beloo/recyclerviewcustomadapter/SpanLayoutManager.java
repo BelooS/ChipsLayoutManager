@@ -174,7 +174,8 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
                 int bufLeft = viewRight - viewWidth;
 
-                if (bufLeft < 0) {
+                //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
+                if (bufLeft < 0 && viewRight < getWidth()) {
                     //if previously row finished and we have to fill it
                     minTop = layoutRow(rowViews, minTop, viewBottom, viewLeft, true);
 
@@ -303,7 +304,8 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 int viewHeight = getDecoratedMeasuredHeight(view);
                 int viewWidth = getDecoratedMeasuredWidth(view);
 
-                if (!(viewLeft == 0 || viewLeft + viewWidth <= getWidth())) {
+                //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
+                if (viewLeft > 0 && viewLeft + viewWidth > getWidth()) {
 
                     //layout previously calculated row
                     layoutRow(rowViews, viewTop, maxBottom, 0, false);
