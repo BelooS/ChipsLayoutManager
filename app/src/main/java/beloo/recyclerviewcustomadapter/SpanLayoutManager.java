@@ -233,18 +233,27 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
     /** returns minTop */
     private int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int leftOffsetOfRow) {
-        for (int i = 0; i < rowViews.size(); i++) {
-            Pair<Rect, View> rowViewRectPair = rowViews.get(i);
+        for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
-            View view = rowViewRectPair.second;
             viewRect.left = viewRect.left - leftOffsetOfRow;
             viewRect.right = viewRect.right - leftOffsetOfRow;
+
+            minTop = Math.min(minTop, viewRect.top);
+        }
+
+        for (Pair<Rect, View> rowViewRectPair : rowViews) {
+            Rect viewRect = rowViewRectPair.first;
+            View view = rowViewRectPair.second;
+
+            if (viewRect.top > minTop) {
+                //todo make depends on view gravity
+                viewRect.bottom -= (viewRect.top - minTop);
+                viewRect.top = minTop;
+            }
 
             addView(view, 0);
             //layout whole views in a row
             layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
-
-            minTop = Math.min(minTop, getDecoratedTop(view));
         }
 
         return minTop;
