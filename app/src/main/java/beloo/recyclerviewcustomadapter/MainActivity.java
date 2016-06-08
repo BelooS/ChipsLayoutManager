@@ -65,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
 
         rvTest.setLayoutManager(spanLayoutManager);
         rvTest.setAdapter(adapter);
+        rvTest.getRecycledViewPool().setMaxRecycledViews(0, 10);
+        rvTest.getRecycledViewPool().setMaxRecycledViews(1, 10);
 
     }
 
