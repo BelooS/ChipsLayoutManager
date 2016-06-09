@@ -1,6 +1,7 @@
 package beloo.recyclerviewcustomadapter;
 
 import android.graphics.Rect;
+import android.support.annotation.CallSuper;
 import android.support.v7.widget.RecyclerView;
 import android.util.Pair;
 import android.view.View;
@@ -8,21 +9,21 @@ import android.view.View;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class AbstractLayouter implements ILayouter {
+abstract class AbstractLayouter implements ILayouter {
     protected int canvasWidth;
     protected int canvasHeight;
     protected int currentViewWidth;
     protected int currentViewHeight;
     protected int currentViewBottom;
     protected List<Pair<Rect, View>> rowViews = new LinkedList<>();
-    protected int viewRight;
     protected int viewBottom;
     protected int viewTop;
+    protected int rowSize = 0;
+    protected int previousRowSize;
 
-    public AbstractLayouter(int canvasHeight, int canvasWidth, int rightOffset, int topOffset, int bottomOffset) {
+    public AbstractLayouter(int canvasHeight, int canvasWidth, int topOffset, int bottomOffset) {
         this.canvasHeight = canvasHeight;
         this.canvasWidth = canvasWidth;
-        this.viewRight = rightOffset;
         this.viewTop = topOffset;
         this.viewBottom = bottomOffset;
     }
@@ -48,5 +49,23 @@ public abstract class AbstractLayouter implements ILayouter {
         currentViewWidth = layoutManager.getDecoratedMeasuredWidth(view);
 
         currentViewBottom = layoutManager.getDecoratedBottom(view);
+    }
+
+    @Override
+    public int getPreviousRowSize() {
+        return previousRowSize;
+    }
+
+    @CallSuper
+    @Override
+    public void onAttachView(View view, RecyclerView.LayoutManager layoutManager) {
+        rowSize++;
+    }
+
+    @CallSuper
+    @Override
+    public void layoutRow(SpanLayoutManager layoutManager) {
+        previousRowSize = rowSize;
+        this.rowSize = 0;
     }
 }

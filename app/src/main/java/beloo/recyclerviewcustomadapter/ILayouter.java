@@ -15,4 +15,6 @@ interface ILayouter {
 
     //todo ref this
     boolean shouldLayoutRow();
+
+    int getPreviousRowSize();
 }
