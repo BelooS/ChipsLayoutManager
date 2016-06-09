@@ -12,4 +12,7 @@ interface ILayouter {
     void onAttachView(View view, RecyclerView.LayoutManager layoutManager);
 
     boolean isFinishedLayouting();
+
+    //todo ref this
+    boolean shouldLayoutRow();
 }

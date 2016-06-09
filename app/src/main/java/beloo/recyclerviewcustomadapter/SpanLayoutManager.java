@@ -9,7 +9,6 @@ import android.util.Pair;
 import android.util.SparseArray;
 import android.view.View;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import beloo.recyclerviewcustomadapter.gravityModifier.GravityModifiersFactory;
@@ -150,7 +149,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
      * @param rightOffset left border of anchor view. Needed to try fill row to left of it.
      * */
     private void fillUp(RecyclerView.Recycler recycler, int topOffset, int rightOffset, int bottomOffset, int startingPos) {
-        LTRLayouter layouter = new LTRLayouter(getWidth(), getHeight(), rightOffset, topOffset, bottomOffset);
+        LTRUpLayouter layouter = new LTRUpLayouter(getWidth(), getHeight(), rightOffset, topOffset, bottomOffset);
 
         int pos = startingPos;
 
@@ -170,7 +169,9 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
                 layouter.calculateView(view, this);
 
-                layouter.layoutRow(this);
+                if (layouter.shouldLayoutRow()) {
+                    layouter.layoutRow(this);
+                }
 
                 if (layouter.isFinishedLayouting()) {
                     /* reached end of visible bounds, exit.
@@ -246,21 +247,16 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     }
 
     private void fillDown(RecyclerView.Recycler recycler, int topOffset, int bottomOffset, int leftOffset, int startingPos) {
+        ILayouter layouter = new LTRDownLayouter(getHeight(), getWidth(), 0, topOffset, bottomOffset);
 
         int pos = startingPos;
-        int viewTop = topOffset;
-        int viewLeft = 0;
-        int maxBottom = bottomOffset;
 
         int itemCount = getItemCount();
-        int rowSize = 0;
 
         int requestedItems = 0;
         int recycledItems = 0;
         int startCacheSize = viewCache.size();
         Log.d("fillDown", "cached items = " + startCacheSize);
-
-        List<Pair<Rect, View>> rowViews = new LinkedList<>();
 
         while (pos < itemCount) {
             View view = viewCache.get(pos);
@@ -269,28 +265,14 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 view = recycler.getViewForPosition(pos);
                 requestedItems++;
                 measureChildWithMargins(view, 0, 0);
-                int viewHeight = getDecoratedMeasuredHeight(view);
-                int viewWidth = getDecoratedMeasuredWidth(view);
 
-                //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
-                if (viewLeft > 0 && viewLeft + viewWidth > getWidth()) {
+                layouter.calculateView(view, this);
 
-                    //layout previously calculated row
-                    layoutRow(rowViews, viewTop, maxBottom, 0, false);
-
-                    //go to next row, increase top coordinate, reset left
-                    viewLeft = 0;
-                    viewTop = maxBottom;
-
-                    calcRecyclerCacheSize(recycler, rowSize);
-
-                    //clear row data
-                    rowViews.clear();
-                    rowSize = 0;
+                if (layouter.shouldLayoutRow()) {
+                    layouter.layoutRow(this);
                 }
 
-                if (viewTop > getHeight()) {
-//                    Log.w("fill up", "reached end of visible bounds");
+                if (layouter.isFinishedLayouting()) {
                     /* reached end of visible bounds, exit.
                     recycle view, which was requested previously
                      */
@@ -299,13 +281,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                     break;
                 }
 
-                rowSize++;
-
-                Rect viewRect = new Rect(viewLeft, viewTop, viewLeft + viewWidth, viewTop + viewHeight);
-                rowViews.add(new Pair<>(viewRect, view));
-
-                viewLeft = viewRect.right;
-                maxBottom = Math.max(maxBottom, viewRect.bottom);
+                layouter.placeView(view, this);
 
                 pos++;
 
@@ -322,14 +298,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
                 viewCache.remove(pos);
 
-                maxBottom = Math.max(maxBottom, getDecoratedBottom(view));
-
-                viewLeft = getDecoratedRight(view);
-
-                if (!(viewLeft == 0 || viewLeft + getDecoratedMeasuredWidth(view) <= getWidth())) {
-                    //new row in cached views
-                    viewTop = maxBottom;
-                }
+                layouter.onAttachView(view, this);
 
                 pos++;
             }
@@ -338,8 +307,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
         Log.d("fillDown", "reattached items = " + (startCacheSize - viewCache.size() + " : requested items = " + requestedItems + " recycledItems = " + recycledItems));
 
-        //layout last row
-        layoutRow(rowViews, viewTop, maxBottom, 0, false);
+        layouter.layoutRow(this);
     }
 
     /** recycler should contain all recycled views from a longest row, not just 2 holders by default*/
