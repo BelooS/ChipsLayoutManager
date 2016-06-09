@@ -150,15 +150,9 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
      * @param rightOffset left border of anchor view. Needed to try fill row to left of it.
      * */
     private void fillUp(RecyclerView.Recycler recycler, int topOffset, int rightOffset, int bottomOffset, int startingPos) {
-        int viewRight = rightOffset;
-        int viewLeft = 0;
-        int minTop = topOffset;
+        LTRLayouter layouter = new LTRLayouter(getWidth(), getHeight(), rightOffset, topOffset, bottomOffset);
 
         int pos = startingPos;
-
-        int viewBottom = bottomOffset; //нижняя граница следующей вьюшки будет начитаться от верхней границы предыдущей
-
-        List<Pair<Rect, View>> rowViews = new LinkedList<>();
 
         int startCacheSize = viewCache.size();
         int requestedItems = 0;
@@ -174,28 +168,11 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
                 measureChildWithMargins(view, 0, 0);
 
-                int viewHeight = getDecoratedMeasuredHeight(view);
-                int viewWidth = getDecoratedMeasuredWidth(view);
+                layouter.calculateView(view, this);
 
-                int bufLeft = viewRight - viewWidth;
+                layouter.layoutRow(this);
 
-                //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
-                if (bufLeft < 0 && viewRight < getWidth()) {
-                    //if previously row finished and we have to fill it
-                    minTop = layoutRow(rowViews, minTop, viewBottom, viewLeft, true);
-
-                    //clear row data
-                    rowViews.clear();
-
-                    //go to next row, increase top coordinate, reset left
-                    viewRight = getWidth();
-                    viewBottom = minTop;
-//                    Log.i("layout row", "new bottom = " + viewBottom);
-//                    Log.i("layout row", "next position = " + pos);
-                }
-
-                if (viewBottom < 0) {
-//                    Log.w("fill up", "reached end of visible bounds");
+                if (layouter.isFinishedLayouting()) {
                     /* reached end of visible bounds, exit.
                     recycle view, which was requested previously
                      */
@@ -204,26 +181,13 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                     break;
                 }
 
-                /* view can be placed in current row, but we can't determine real position, until row will be filled,
-                so generate rect for the view and layout it in the end of the row
-                 */
-
-                int left = viewRight - viewWidth;
-                int viewTop = viewBottom - viewHeight;
-                Rect viewRect = new Rect(left, viewTop, viewRight, viewBottom);
-
-                rowViews.add(new Pair<>(viewRect, view));
-
-                viewRight = left;
-                viewLeft = left;
+                layouter.placeView(view, this);
 
                 pos--;
 
             } else {
                 //если вьюшка есть в кэше - просто аттачим её обратно
                 //нет необходимости проводить measure/layout цикл.
-
-                viewRight = getDecoratedRight(view);
 
                 //todo in case all views have same height
                 int curViewBottom = getDecoratedBottom(view);
@@ -234,8 +198,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 attachView(view);
                 viewCache.remove(pos);
 
-                minTop = Math.min(minTop, getDecoratedTop(view));
-                viewBottom = minTop;
+                layouter.onAttachView(view, this);
 
                 pos--;
             }
@@ -243,16 +206,16 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
         Log.d("fillUp", "reattached items = " + (startCacheSize - viewCache.size() + " : requested items = " + requestedItems + " recycledItems = " + recycledItems));
 
-        //layout last row
-        layoutRow(rowViews, minTop, viewBottom, viewLeft, true);
+        layouter.layoutRow(this);
     }
 
     /** layout pre-calculated row on a recyclerView canvas
      * @param isReverseOrder if fill views from the end this flag have to be true to not break child position in recyclerView
      * returns minTop */
-    private int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int maxBottom, int leftOffsetOfRow, boolean isReverseOrder) {
+    int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int maxBottom, int leftOffsetOfRow, boolean isReverseOrder) {
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
+            //todo rtl
             viewRect.left = viewRect.left - leftOffsetOfRow;
             viewRect.right = viewRect.right - leftOffsetOfRow;
 
