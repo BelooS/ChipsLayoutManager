@@ -247,7 +247,8 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     }
 
     private void fillDown(RecyclerView.Recycler recycler, int topOffset, int bottomOffset, int leftOffset, int startingPos) {
-        ILayouter layouter = new LTRDownLayouter(getHeight(), getWidth(), 0, topOffset, bottomOffset);
+//        ILayouter layouter = new LTRDownLayouter(getHeight(), getWidth(), 0, topOffset, bottomOffset);
+        ILayouter layouter = new RTLDownLayouter(getHeight(), getWidth(), getWidth(), topOffset, bottomOffset);
 
         int pos = startingPos;
 
