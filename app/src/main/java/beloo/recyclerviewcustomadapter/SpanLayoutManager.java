@@ -127,7 +127,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         //we should include anchor view here, so anchorLeft is a leftOffset
         fillDown(recycler, anchorTop, anchorBottom, anchorLeft, startingPos);
         //we shouldn't include anchor view here, so anchorLeft is a rightOffset
-        fillUp(recycler, Math.min(anchorTop, highestViewTop), anchorLeft, anchorBottom, startingPos - 1);
+        fillUp(recycler, Math.min(anchorTop, highestViewTop), anchorRight, anchorLeft, anchorBottom, startingPos - 1);
 
         //отправляем в корзину всё, что не потребовалось в этом цикле лэйаута
         //эти вьюшки или ушли за экран или не понадобились, потому что соответствующие элементы
@@ -148,8 +148,9 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     /**
      * @param rightOffset left border of anchor view. Needed to try fill row to left of it.
      * */
-    private void fillUp(RecyclerView.Recycler recycler, int topOffset, int rightOffset, int bottomOffset, int startingPos) {
-        LTRUpLayouter layouter = new LTRUpLayouter(getWidth(), getHeight(), rightOffset, topOffset, bottomOffset);
+    private void fillUp(RecyclerView.Recycler recycler, int topOffset, int leftOffset, int rightOffset, int bottomOffset, int startingPos) {
+        ILayouter layouter = new LTRUpLayouter(getWidth(), getHeight(), rightOffset, topOffset, bottomOffset);
+//        ILayouter layouter = new RTLUpLayouter(getWidth(), getHeight(), 0, topOffset, bottomOffset);
 
         int pos = startingPos;
 
@@ -247,8 +248,8 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     }
 
     private void fillDown(RecyclerView.Recycler recycler, int topOffset, int bottomOffset, int leftOffset, int startingPos) {
-//        ILayouter layouter = new LTRDownLayouter(getHeight(), getWidth(), 0, topOffset, bottomOffset);
-        ILayouter layouter = new RTLDownLayouter(getHeight(), getWidth(), getWidth(), topOffset, bottomOffset);
+        ILayouter layouter = new LTRDownLayouter(getHeight(), getWidth(), 0, topOffset, bottomOffset);
+//        ILayouter layouter = new RTLDownLayouter(getHeight(), getWidth(), getWidth(), topOffset, bottomOffset);
 
         int pos = startingPos;
 
@@ -329,7 +330,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         View anchorView = getAnchorVisibleTopLeftView();
         if (anchorView != null && getPosition(anchorView) == 0) {
             //todo refactor it, blinking now without animation. Workaround to fix start position of items if some items have been added after initialization
-            detachAndScrapAttachedViews(recycler);
+//            detachAndScrapAttachedViews(recycler);
         }
 
         fill(recycler, anchorView);
