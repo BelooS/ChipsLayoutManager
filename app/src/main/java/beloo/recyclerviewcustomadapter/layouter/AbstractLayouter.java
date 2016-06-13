@@ -1,17 +1,16 @@
-package beloo.recyclerviewcustomadapter;
+package beloo.recyclerviewcustomadapter.layouter;
 
 import android.graphics.Rect;
 import android.support.annotation.CallSuper;
-import android.support.v7.widget.RecyclerView;
 import android.util.Pair;
 import android.view.View;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import beloo.recyclerviewcustomadapter.SpanLayoutManager;
+
 abstract class AbstractLayouter implements ILayouter {
-    protected int canvasWidth;
-    protected int canvasHeight;
     protected int currentViewWidth;
     protected int currentViewHeight;
     protected int currentViewBottom;
@@ -21,30 +20,24 @@ abstract class AbstractLayouter implements ILayouter {
     protected int rowSize = 0;
     protected int previousRowSize;
 
-    public AbstractLayouter(int canvasHeight, int canvasWidth, int topOffset, int bottomOffset) {
-        this.canvasHeight = canvasHeight;
-        this.canvasWidth = canvasWidth;
+    protected SpanLayoutManager layoutManager;
+
+    AbstractLayouter(SpanLayoutManager layoutManager, int topOffset, int bottomOffset) {
+        this.layoutManager = layoutManager;
         this.viewTop = topOffset;
         this.viewBottom = bottomOffset;
     }
 
-    public void setCanvasWidth(int canvasWidth) {
-        this.canvasWidth = canvasWidth;
+    int getCanvasWidth() {
+        return layoutManager.getWidth();
     }
 
-    public void setCanvasHeight(int canvasHeight) {
-        this.canvasHeight = canvasHeight;
+    int getCanvasHeight() {
+        return layoutManager.getHeight();
     }
 
-    public int getCanvasWidth() {
-        return canvasWidth;
-    }
-
-    public int getCanvasHeight() {
-        return canvasHeight;
-    }
-
-    public void calculateView(View view, RecyclerView.LayoutManager layoutManager) {
+    @Override
+    public void calculateView(View view) {
         currentViewHeight = layoutManager.getDecoratedMeasuredHeight(view);
         currentViewWidth = layoutManager.getDecoratedMeasuredWidth(view);
 
@@ -58,13 +51,13 @@ abstract class AbstractLayouter implements ILayouter {
 
     @CallSuper
     @Override
-    public void onAttachView(View view, RecyclerView.LayoutManager layoutManager) {
+    public void onAttachView(View view) {
         rowSize++;
     }
 
     @CallSuper
     @Override
-    public void layoutRow(SpanLayoutManager layoutManager) {
+    public void layoutRow() {
         previousRowSize = rowSize;
         this.rowSize = 0;
     }

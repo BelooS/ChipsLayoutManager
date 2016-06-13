@@ -13,6 +13,8 @@ import java.util.List;
 
 import beloo.recyclerviewcustomadapter.gravityModifier.GravityModifiersFactory;
 import beloo.recyclerviewcustomadapter.gravityModifier.IGravityModifier;
+import beloo.recyclerviewcustomadapter.layouter.ILayouter;
+import beloo.recyclerviewcustomadapter.layouter.LayouterFactory;
 
 public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
@@ -20,9 +22,9 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
 
     /** coefficient to support fast scrolling, caching views only for one row may not be enough */
-    public static final float FAST_SCROLLING_COEFFICIENT = 2;
+    private static final float FAST_SCROLLING_COEFFICIENT = 2;
     private int maxViewsInRow = 2;
-
+    private LayouterFactory layouterFactory = new LayouterFactory(this);
 
     private SparseArray<View> viewCache = new SparseArray<>();
 
@@ -125,9 +127,11 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
 
         //we should include anchor view here, so anchorLeft is a leftOffset
-        fillDown(recycler, anchorTop, anchorBottom, anchorLeft, startingPos);
+        ILayouter downLayouter = layouterFactory.getDownLayouter(anchorTop, anchorLeft, anchorBottom, anchorRight, false);
+        fillDown(recycler, downLayouter, startingPos);
         //we shouldn't include anchor view here, so anchorLeft is a rightOffset
-        fillUp(recycler, Math.min(anchorTop, highestViewTop), anchorRight, anchorLeft, anchorBottom, startingPos - 1);
+        ILayouter upLayouter = layouterFactory.getUpLayouter(anchorTop, anchorLeft, anchorBottom, anchorRight, false);
+        fillUp(recycler, upLayouter, startingPos - 1);
 
         //отправляем в корзину всё, что не потребовалось в этом цикле лэйаута
         //эти вьюшки или ушли за экран или не понадобились, потому что соответствующие элементы
@@ -145,13 +149,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         return getLayoutDirection() == ViewCompat.LAYOUT_DIRECTION_RTL;
     }
 
-    /**
-     * @param rightOffset left border of anchor view. Needed to try fill row to left of it.
-     * */
-    private void fillUp(RecyclerView.Recycler recycler, int topOffset, int leftOffset, int rightOffset, int bottomOffset, int startingPos) {
-        ILayouter layouter = new LTRUpLayouter(getWidth(), getHeight(), rightOffset, topOffset, bottomOffset);
-//        ILayouter layouter = new RTLUpLayouter(getWidth(), getHeight(), 0, topOffset, bottomOffset);
-
+    private void fillUp(RecyclerView.Recycler recycler, ILayouter layouter, int startingPos) {
         int pos = startingPos;
 
         int startCacheSize = viewCache.size();
@@ -168,10 +166,10 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
                 measureChildWithMargins(view, 0, 0);
 
-                layouter.calculateView(view, this);
+                layouter.calculateView(view);
 
                 if (layouter.shouldLayoutRow()) {
-                    layouter.layoutRow(this);
+                    layouter.layoutRow();
                 }
 
                 if (layouter.isFinishedLayouting()) {
@@ -183,7 +181,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                     break;
                 }
 
-                layouter.placeView(view, this);
+                layouter.placeView(view);
 
                 pos--;
 
@@ -200,7 +198,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 attachView(view);
                 viewCache.remove(pos);
 
-                layouter.onAttachView(view, this);
+                layouter.onAttachView(view);
 
                 pos--;
             }
@@ -208,13 +206,13 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
         Log.d("fillUp", "reattached items = " + (startCacheSize - viewCache.size() + " : requested items = " + requestedItems + " recycledItems = " + recycledItems));
 
-        layouter.layoutRow(this);
+        layouter.layoutRow();
     }
 
     /** layout pre-calculated row on a recyclerView canvas
      * @param isReverseOrder if fill views from the end this flag have to be true to not break child position in recyclerView
      * returns minTop */
-    int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int maxBottom, int leftOffsetOfRow, boolean isReverseOrder) {
+    public int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int maxBottom, int leftOffsetOfRow, boolean isReverseOrder) {
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
             //todo rtl
@@ -247,10 +245,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         return minTop;
     }
 
-    private void fillDown(RecyclerView.Recycler recycler, int topOffset, int bottomOffset, int leftOffset, int startingPos) {
-        ILayouter layouter = new LTRDownLayouter(getHeight(), getWidth(), 0, topOffset, bottomOffset);
-//        ILayouter layouter = new RTLDownLayouter(getHeight(), getWidth(), getWidth(), topOffset, bottomOffset);
-
+    private void fillDown(RecyclerView.Recycler recycler, ILayouter layouter, int startingPos) {
         int pos = startingPos;
 
         int itemCount = getItemCount();
@@ -268,10 +263,10 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 requestedItems++;
                 measureChildWithMargins(view, 0, 0);
 
-                layouter.calculateView(view, this);
+                layouter.calculateView(view);
 
                 if (layouter.shouldLayoutRow()) {
-                    layouter.layoutRow(this);
+                    layouter.layoutRow();
                 }
 
                 if (layouter.isFinishedLayouting()) {
@@ -283,7 +278,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                     break;
                 }
 
-                layouter.placeView(view, this);
+                layouter.placeView(view);
 
                 pos++;
 
@@ -300,7 +295,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
                 viewCache.remove(pos);
 
-                layouter.onAttachView(view, this);
+                layouter.onAttachView(view);
 
                 pos++;
             }
@@ -309,7 +304,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
         Log.d("fillDown", "reattached items = " + (startCacheSize - viewCache.size() + " : requested items = " + requestedItems + " recycledItems = " + recycledItems));
 
-        layouter.layoutRow(this);
+        layouter.layoutRow();
     }
 
     /** recycler should contain all recycled views from a longest row, not just 2 holders by default*/
