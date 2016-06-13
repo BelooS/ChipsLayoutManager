@@ -130,7 +130,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         ILayouter downLayouter = layouterFactory.getDownLayouter(anchorTop, anchorLeft, anchorBottom, anchorRight, false);
         fillDown(recycler, downLayouter, startingPos);
         //we shouldn't include anchor view here, so anchorLeft is a rightOffset
-        ILayouter upLayouter = layouterFactory.getUpLayouter(anchorTop, anchorLeft, anchorBottom, anchorRight, false);
+        ILayouter upLayouter = layouterFactory.getUpLayouter(Math.min(anchorTop, highestViewTop), anchorLeft, anchorBottom, anchorRight, false);
         fillUp(recycler, upLayouter, startingPos - 1);
 
         //отправляем в корзину всё, что не потребовалось в этом цикле лэйаута

@@ -12,8 +12,8 @@ public class LayouterFactory {
 
     public ILayouter getUpLayouter(int anchorTop, int anchorLeft, int anchorBottom, int anchorRight, boolean isRTL) {
         return isRTL ?
-                new RTLUpLayouter(layoutManager, anchorTop, anchorLeft, anchorBottom) :
-                new LTRUpLayouter(layoutManager, anchorTop, anchorBottom, anchorRight);
+                new RTLUpLayouter(layoutManager, anchorTop, anchorRight, anchorBottom) :
+                new LTRUpLayouter(layoutManager, anchorTop, anchorBottom, anchorLeft);
     }
 
     public ILayouter getDownLayouter(int anchorTop, int anchorLeft, int anchorBottom, int anchorRight, boolean isRTL) {
