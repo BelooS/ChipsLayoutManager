@@ -69,4 +69,9 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
         return bufRight > getCanvasWidth() && viewLeft > 0;
     }
 
+    @Override
+    public AbstractPositionIterator positionIterator() {
+        return new DecrementalPositionIterator();
+    }
+
 }

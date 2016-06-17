@@ -4,6 +4,8 @@ import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import java.util.Iterator;
+
 import beloo.recyclerviewcustomadapter.SpanLayoutManager;
 
 public interface ILayouter {
@@ -19,4 +21,6 @@ public interface ILayouter {
     boolean shouldLayoutRow();
 
     int getPreviousRowSize();
+
+    AbstractPositionIterator positionIterator();
 }

@@ -38,6 +38,11 @@ class LTRDownLayouter extends AbstractLayouter {
     }
 
     @Override
+    public AbstractPositionIterator positionIterator() {
+        return new IncrementalPositionIterator(layoutManager.getItemCount());
+    }
+
+    @Override
     public void placeView(View view) {
         Rect viewRect = new Rect(viewLeft, viewTop, viewLeft + currentViewWidth, viewTop + currentViewHeight);
         rowViews.add(new Pair<>(viewRect, view));

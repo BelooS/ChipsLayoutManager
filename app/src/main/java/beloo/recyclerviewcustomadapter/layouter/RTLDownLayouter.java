@@ -38,6 +38,11 @@ class RTLDownLayouter extends AbstractLayouter {
     }
 
     @Override
+    public AbstractPositionIterator positionIterator() {
+        return new IncrementalPositionIterator(layoutManager.getItemCount());
+    }
+
+    @Override
     public void placeView(View view) {
         Rect viewRect = new Rect(viewRight - currentViewWidth, viewTop, viewRight, viewTop + currentViewHeight);
         rowViews.add(new Pair<>(viewRect, view));

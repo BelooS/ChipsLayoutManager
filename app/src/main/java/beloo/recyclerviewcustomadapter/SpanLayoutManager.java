@@ -13,6 +13,7 @@ import java.util.List;
 
 import beloo.recyclerviewcustomadapter.gravityModifier.GravityModifiersFactory;
 import beloo.recyclerviewcustomadapter.gravityModifier.IGravityModifier;
+import beloo.recyclerviewcustomadapter.layouter.AbstractPositionIterator;
 import beloo.recyclerviewcustomadapter.layouter.ILayouter;
 import beloo.recyclerviewcustomadapter.layouter.LayouterFactory;
 
@@ -150,14 +151,16 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     }
 
     private void fillUp(RecyclerView.Recycler recycler, ILayouter layouter, int startingPos) {
-        int pos = startingPos;
+        AbstractPositionIterator iterator = layouter.positionIterator();
+        iterator.move(startingPos);
 
         int startCacheSize = viewCache.size();
         int requestedItems = 0;
         int recycledItems = 0;
         Log.d("fillUp", "cached items = " + startCacheSize);
 
-        while (pos >= 0) {
+        while (iterator.hasNext()) {
+            int pos = iterator.next();
             View view = viewCache.get(pos); //проверяем кэш
             if (view == null) {
                 Log.i("fillUp", "getView for position = " + pos);
@@ -183,8 +186,6 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
                 layouter.placeView(view);
 
-                pos--;
-
             } else {
                 //если вьюшка есть в кэше - просто аттачим её обратно
                 //нет необходимости проводить measure/layout цикл.
@@ -199,8 +200,6 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 viewCache.remove(pos);
 
                 layouter.onAttachView(view);
-
-                pos--;
             }
         }
 
@@ -246,16 +245,17 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     }
 
     private void fillDown(RecyclerView.Recycler recycler, ILayouter layouter, int startingPos) {
-        int pos = startingPos;
 
-        int itemCount = getItemCount();
+        AbstractPositionIterator iterator = layouter.positionIterator();
+        iterator.move(startingPos);
 
         int requestedItems = 0;
         int recycledItems = 0;
         int startCacheSize = viewCache.size();
         Log.d("fillDown", "cached items = " + startCacheSize);
 
-        while (pos < itemCount) {
+        while (iterator.hasNext()) {
+            int pos = iterator.next();
             View view = viewCache.get(pos);
             if (view == null) {
                 Log.i("fillDown", "getView for position = " + pos);
@@ -279,9 +279,6 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 }
 
                 layouter.placeView(view);
-
-                pos++;
-
             } else {
 
                 int cachedTop = getDecoratedTop(view);
@@ -296,8 +293,6 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 viewCache.remove(pos);
 
                 layouter.onAttachView(view);
-
-                pos++;
             }
 
         }

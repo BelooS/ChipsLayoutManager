@@ -24,6 +24,7 @@ public class LayouterFactory {
                 new RTLDownLayouter(layoutManager, anchorTop, anchorBottom, anchorRight) :
                 //down layouting should start from right point of anchor view to right point of container
                 //we should include anchor view here, so anchorLeft is a leftOffset
+                //todo not working removing zero item
                 new LTRDownLayouter(layoutManager, anchorTop, anchorLeft, anchorBottom);
     }
 }
