@@ -253,6 +253,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         super.onItemsAdded(recyclerView, positionStart, itemCount);
     }
 
+    /** calculate offset of views while scrolling, layout items on new places*/
     @Override
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
         dy = scrollVerticallyInternal(dy);

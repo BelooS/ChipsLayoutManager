@@ -2,6 +2,7 @@ package beloo.recyclerviewcustomadapter;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 public class ItemsFactory {
     public List<String> getItems() {
@@ -55,6 +56,30 @@ public class ItemsFactory {
             } else if (i % 5 == 0) {
                 list.add("S." + (i+1));
             }
+        }
+        return list;
+    }
+
+    public List<String> getALotOfRandomItems() {
+        List<String> list = new LinkedList<>();
+        list.add("START item.0");
+        for (int i =0; i< 1000; i++) {
+
+            Random random = new Random();
+
+            int rand = random.nextInt(3);
+            switch (rand) {
+                case 1:
+                    list.add("a span." + (i+1));
+                    break;
+                case 2:
+                    list.add("!long item here." + (i+1));
+                    break;
+                default:
+                    list.add("S." + (i+1));
+                    break;
+            }
+
         }
         return list;
     }
