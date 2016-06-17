@@ -125,42 +125,42 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         }
 
         ILayouter downLayouter = layouterFactory.getDownLayouter(anchorTop, anchorLeft, anchorBottom, anchorRight, isLayoutRTL());
-        fillDown(recycler, downLayouter, startingPos);
+        fillWithLayouter(recycler, downLayouter, startingPos);
         ILayouter upLayouter = layouterFactory.getUpLayouter(Math.min(anchorTop, highestViewTop), anchorLeft, anchorBottom, anchorRight, isLayoutRTL());
-        fillUp(recycler, upLayouter, startingPos - 1);
+        fillWithLayouter(recycler, upLayouter, startingPos - 1);
 
         //move to trash everything, which haven't used in this layout cycle
         //that views gone from a screen or was removed outside from adapter
         int recycledSize = viewCache.size();
         for (int i = 0; i < viewCache.size(); i++) {
             removeAndRecycleView(viewCache.valueAt(i), recycler);
-            Log.d("fill", "recycle position =" + viewCache.keyAt(i));
+            Log.d("fillWithLayouter", "recycle position =" + viewCache.keyAt(i));
         }
 
-        Log.d("fill", "recycled count = " + recycledSize);
+        Log.d("fillWithLayouter", "recycled count = " + recycledSize);
     }
 
     protected boolean isLayoutRTL() {
         return getLayoutDirection() == ViewCompat.LAYOUT_DIRECTION_RTL;
     }
 
-    private void fillUp(RecyclerView.Recycler recycler, ILayouter layouter, int startingPos) {
+    private void fillWithLayouter(RecyclerView.Recycler recycler, ILayouter layouter, int startingPos) {
+
         AbstractPositionIterator iterator = layouter.positionIterator();
         iterator.move(startingPos);
 
-        int startCacheSize = viewCache.size();
         int requestedItems = 0;
         int recycledItems = 0;
-        Log.d("fillUp", "cached items = " + startCacheSize);
+        int startCacheSize = viewCache.size();
+        Log.d("fillWithLayouter", "cached items = " + startCacheSize);
 
         while (iterator.hasNext()) {
             int pos = iterator.next();
-            View view = viewCache.get(pos); //проверяем кэш
+            View view = viewCache.get(pos);
             if (view == null) {
-                Log.i("fillUp", "getView for position = " + pos);
+                Log.i("fillWithLayouter", "getView for position = " + pos);
                 view = recycler.getViewForPosition(pos);
-                requestedItems ++;
-
+                requestedItems++;
                 measureChildWithMargins(view, 0, 0);
 
                 layouter.calculateView(view);
@@ -179,28 +179,31 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 }
 
                 layouter.placeView(view);
-
             } else {
                 layouter.onAttachView(view);
+
                 if (layouter.isFinishedLayouting()) {
                     break;
                 }
 
-                //fillup
-                // if view in a cache it is not necessary to perform measure/resize cycle. just attach it back
                 attachView(view);
+
+                //fillWithLayouter down
+                highestViewTop = Math.min(highestViewTop, getDecoratedTop(view));
+
                 viewCache.remove(pos);
 
             }
+
         }
 
-        Log.d("fillUp", "reattached items = " + (startCacheSize - viewCache.size() + " : requested items = " + requestedItems + " recycledItems = " + recycledItems));
+        Log.d("fillWithLayouter", "reattached items = " + (startCacheSize - viewCache.size() + " : requested items = " + requestedItems + " recycledItems = " + recycledItems));
 
         layouter.layoutRow();
     }
 
     /** layout pre-calculated row on a recyclerView canvas
-     * @param isReverseOrder if fill views from the end this flag have to be true to not break child position in recyclerView
+     * @param isReverseOrder if fillWithLayouter views from the end this flag have to be true to not break child position in recyclerView
      * returns viewTop */
     public int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int maxBottom, int leftOffsetOfRow, boolean isReverseOrder) {
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
@@ -233,64 +236,6 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         }
 
         return minTop;
-    }
-
-    private void fillDown(RecyclerView.Recycler recycler, ILayouter layouter, int startingPos) {
-
-        AbstractPositionIterator iterator = layouter.positionIterator();
-        iterator.move(startingPos);
-
-        int requestedItems = 0;
-        int recycledItems = 0;
-        int startCacheSize = viewCache.size();
-        Log.d("fillDown", "cached items = " + startCacheSize);
-
-        while (iterator.hasNext()) {
-            int pos = iterator.next();
-            View view = viewCache.get(pos);
-            if (view == null) {
-                Log.i("fillDown", "getView for position = " + pos);
-                view = recycler.getViewForPosition(pos);
-                requestedItems++;
-                measureChildWithMargins(view, 0, 0);
-
-                layouter.calculateView(view);
-
-                if (layouter.canNotBePlacedInCurrentRow()) {
-                    layouter.layoutRow();
-                }
-
-                if (layouter.isFinishedLayouting()) {
-                    /* reached end of visible bounds, exit.
-                    recycle view, which was requested previously
-                     */
-                    recycler.recycleView(view);
-                    recycledItems++;
-                    break;
-                }
-
-                layouter.placeView(view);
-            } else {
-                layouter.onAttachView(view);
-
-                if (layouter.isFinishedLayouting()) {
-                    break;
-                }
-
-                attachView(view);
-
-                //fill down
-                highestViewTop = Math.min(highestViewTop, getDecoratedTop(view));
-
-                viewCache.remove(pos);
-
-            }
-
-        }
-
-        Log.d("fillDown", "reattached items = " + (startCacheSize - viewCache.size() + " : requested items = " + requestedItems + " recycledItems = " + recycledItems));
-
-        layouter.layoutRow();
     }
 
     /** recycler should contain all recycled views from a longest row, not just 2 holders by default*/
