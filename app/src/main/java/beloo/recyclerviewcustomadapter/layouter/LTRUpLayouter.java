@@ -59,7 +59,7 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
-    public boolean shouldLayoutRow() {
+    public boolean canNotBePlacedInCurrentRow() {
         int bufLeft = viewRight - currentViewWidth;
         return bufLeft < 0 && viewRight < getCanvasWidth();
     }

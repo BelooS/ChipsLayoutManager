@@ -17,8 +17,8 @@ public interface ILayouter {
 
     boolean isFinishedLayouting();
 
-    //todo ref this
-    boolean shouldLayoutRow();
+    /** check if we can not add current view to row*/
+    boolean canNotBePlacedInCurrentRow();
 
     int getPreviousRowSize();
 

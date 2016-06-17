@@ -64,7 +64,7 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
-    public boolean shouldLayoutRow() {
+    public boolean canNotBePlacedInCurrentRow() {
         int bufRight = viewLeft + currentViewWidth;
         return bufRight > getCanvasWidth() && viewLeft > 0;
     }

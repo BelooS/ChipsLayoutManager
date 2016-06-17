@@ -1,6 +1,7 @@
 package beloo.recyclerviewcustomadapter.layouter;
 
 import android.graphics.Rect;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
@@ -33,7 +34,7 @@ class LTRDownLayouter extends AbstractLayouter {
     }
 
     @Override
-    public boolean shouldLayoutRow() {
+    public boolean canNotBePlacedInCurrentRow() {
         return viewLeft > 0 && viewLeft + currentViewWidth > getCanvasWidth();
     }
 
@@ -54,14 +55,17 @@ class LTRDownLayouter extends AbstractLayouter {
     @Override
     public void onAttachView(View view) {
         super.onAttachView(view);
-        maxBottom = Math.max(maxBottom, layoutManager.getDecoratedBottom(view));
+        viewTop = layoutManager.getDecoratedTop(view);
 
-        viewLeft = layoutManager.getDecoratedRight(view);
-
-        if (!(viewLeft == 0 || viewLeft + layoutManager.getDecoratedMeasuredWidth(view) <= getCanvasWidth())) {
+        if (viewLeft != 0 && viewLeft + layoutManager.getDecoratedMeasuredWidth(view) > getCanvasWidth()) {
             //new row in cached views
             viewTop = maxBottom;
+            viewLeft = 0;
+        } else {
+            viewLeft = layoutManager.getDecoratedRight(view);
         }
+
+        maxBottom = Math.max(maxBottom, layoutManager.getDecoratedBottom(view));
     }
 
     @Override

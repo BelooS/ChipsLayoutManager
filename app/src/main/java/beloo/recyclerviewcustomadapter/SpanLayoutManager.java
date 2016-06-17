@@ -171,7 +171,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
                 layouter.calculateView(view);
 
-                if (layouter.shouldLayoutRow()) {
+                if (layouter.canNotBePlacedInCurrentRow()) {
                     layouter.layoutRow();
                 }
 
@@ -187,19 +187,17 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 layouter.placeView(view);
 
             } else {
-                //если вьюшка есть в кэше - просто аттачим её обратно
-                //нет необходимости проводить measure/layout цикл.
-
+                layouter.onAttachView(view);
                 //todo in case all views have same height
                 int curViewBottom = getDecoratedBottom(view);
                 //we reach invisible views, so stop drawing
                 if (curViewBottom < 0) break;
 
                 //fillup
+                // if view in a cache it is not necessary to perform measure/resize cycle. just attach it back
                 attachView(view);
                 viewCache.remove(pos);
 
-                layouter.onAttachView(view);
             }
         }
 
@@ -265,7 +263,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
                 layouter.calculateView(view);
 
-                if (layouter.shouldLayoutRow()) {
+                if (layouter.canNotBePlacedInCurrentRow()) {
                     layouter.layoutRow();
                 }
 
@@ -280,19 +278,19 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
                 layouter.placeView(view);
             } else {
+                layouter.onAttachView(view);
 
-                int cachedTop = getDecoratedTop(view);
-                if (getHeight() < cachedTop) {
-                    //we reached bottom of visible children
+                if (layouter.isFinishedLayouting()) {
                     break;
                 }
 
                 attachView(view);
-                highestViewTop = Math.min(highestViewTop, cachedTop);
+
+                //fill down
+                highestViewTop = Math.min(highestViewTop, getDecoratedTop(view));
 
                 viewCache.remove(pos);
 
-                layouter.onAttachView(view);
             }
 
         }
