@@ -112,31 +112,25 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         highestViewTop = Integer.MAX_VALUE;
         viewCache.clear();
 
-        //Помещаем вьюшки в кэш и...
+        //place all added views to cache...
         for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
             View view = getChildAt(i);
             int pos = getPosition(view);
             viewCache.put(pos, view);
         }
 
-        //... и удалям из лэйаута
+        //... and remove from layout
         for (int i = 0; i < viewCache.size(); i++) {
             detachView(viewCache.valueAt(i));
         }
-
-//        if (viewCache.size() > 0) {
-//            Log.d("cachedViews", "from " + viewCache.keyAt(0) + " to " + viewCache.keyAt(viewCache.size() - 1));
-//        }
-
 
         ILayouter downLayouter = layouterFactory.getDownLayouter(anchorTop, anchorLeft, anchorBottom, anchorRight, isLayoutRTL());
         fillDown(recycler, downLayouter, startingPos);
         ILayouter upLayouter = layouterFactory.getUpLayouter(Math.min(anchorTop, highestViewTop), anchorLeft, anchorBottom, anchorRight, isLayoutRTL());
         fillUp(recycler, upLayouter, startingPos - 1);
 
-        //отправляем в корзину всё, что не потребовалось в этом цикле лэйаута
-        //эти вьюшки или ушли за экран или не понадобились, потому что соответствующие элементы
-        //удалились из адаптера
+        //move to trash everything, which haven't used in this layout cycle
+        //that views gone from a screen or was removed outside from adapter
         int recycledSize = viewCache.size();
         for (int i = 0; i < viewCache.size(); i++) {
             removeAndRecycleView(viewCache.valueAt(i), recycler);
@@ -188,10 +182,9 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
             } else {
                 layouter.onAttachView(view);
-                //todo in case all views have same height
-                int curViewBottom = getDecoratedBottom(view);
-                //we reach invisible views, so stop drawing
-                if (curViewBottom < 0) break;
+                if (layouter.isFinishedLayouting()) {
+                    break;
+                }
 
                 //fillup
                 // if view in a cache it is not necessary to perform measure/resize cycle. just attach it back
@@ -208,7 +201,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
     /** layout pre-calculated row on a recyclerView canvas
      * @param isReverseOrder if fill views from the end this flag have to be true to not break child position in recyclerView
-     * returns minTop */
+     * returns viewTop */
     public int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int maxBottom, int leftOffsetOfRow, boolean isReverseOrder) {
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;

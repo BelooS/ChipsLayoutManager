@@ -1,7 +1,6 @@
 package beloo.recyclerviewcustomadapter.layouter;
 
 import android.graphics.Rect;
-import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 

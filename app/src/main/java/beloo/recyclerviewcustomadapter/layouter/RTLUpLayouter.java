@@ -53,9 +53,16 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     @Override
     public void onAttachView(View view) {
         super.onAttachView(view);
-        viewLeft = 0;
+
+        if (viewLeft != 0 && viewLeft + layoutManager.getDecoratedMeasuredWidth(view) > getCanvasWidth()) {
+            viewLeft = 0;
+            viewBottom = viewTop;
+        } else {
+            viewLeft = layoutManager.getDecoratedRight(view);
+        }
+
         viewTop = Math.min(viewTop, layoutManager.getDecoratedTop(view));
-        viewBottom = viewTop;
+
     }
 
     @Override

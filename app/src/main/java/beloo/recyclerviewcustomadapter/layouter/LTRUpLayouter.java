@@ -48,9 +48,16 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     @Override
     public void onAttachView(View view) {
         super.onAttachView(view);
-        viewRight = layoutManager.getDecoratedRight(view);
+
+        if (viewRight != getCanvasWidth() && viewRight - layoutManager.getDecoratedMeasuredWidth(view) < 0) {
+            //new row
+            viewRight = getCanvasWidth();
+            viewBottom = viewTop;
+        } else {
+            viewRight = layoutManager.getDecoratedLeft(view);
+        }
+
         viewTop = Math.min(viewTop, layoutManager.getDecoratedTop(view));
-        viewBottom = viewTop;
     }
 
     @Override
