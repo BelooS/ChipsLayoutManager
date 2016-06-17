@@ -55,13 +55,15 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
             return;
         }
 
+        calcRecyclerCacheSize(recycler, 2);
+
         View anchorView = getAnchorVisibleTopLeftView();
         if (!state.isPreLayout()) {
             detachAndScrapAttachedViews(recycler);
-            calcRecyclerCacheSize(recycler, 2);
 
             if (anchorView != null && anchorViewPosition != null && anchorViewPosition == 0) {
                 //we can't add view in a hidden area if added view inserted on a zero position. so needed workaround here, we reset anchor position to 0
+                //for properly insertion only
                 fill(recycler, anchorView, anchorViewPosition);
                 anchorViewPosition = null;
             } else {
@@ -126,11 +128,9 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 //        }
 
 
-        //we should include anchor view here, so anchorLeft is a leftOffset
-        ILayouter downLayouter = layouterFactory.getDownLayouter(anchorTop, anchorLeft, anchorBottom, anchorRight, false);
+        ILayouter downLayouter = layouterFactory.getDownLayouter(anchorTop, anchorLeft, anchorBottom, anchorRight, isLayoutRTL());
         fillDown(recycler, downLayouter, startingPos);
-        //we shouldn't include anchor view here, so anchorLeft is a rightOffset
-        ILayouter upLayouter = layouterFactory.getUpLayouter(Math.min(anchorTop, highestViewTop), anchorLeft, anchorBottom, anchorRight, false);
+        ILayouter upLayouter = layouterFactory.getUpLayouter(Math.min(anchorTop, highestViewTop), anchorLeft, anchorBottom, anchorRight, isLayoutRTL());
         fillUp(recycler, upLayouter, startingPos - 1);
 
         //отправляем в корзину всё, что не потребовалось в этом цикле лэйаута
@@ -325,7 +325,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         View anchorView = getAnchorVisibleTopLeftView();
         if (anchorView != null && getPosition(anchorView) == 0) {
             //todo refactor it, blinking now without animation. Workaround to fix start position of items if some items have been added after initialization
-//            detachAndScrapAttachedViews(recycler);
+            detachAndScrapAttachedViews(recycler);
         }
 
         fill(recycler, anchorView);
