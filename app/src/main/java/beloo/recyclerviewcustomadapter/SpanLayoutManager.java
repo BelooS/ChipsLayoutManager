@@ -34,6 +34,10 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     /** highest top position of attached views*/
     private int highestViewTop = Integer.MAX_VALUE;
 
+    public void setChildGravityResolver(IChildGravityResolver childGravityResolver) {
+        this.childGravityResolver = childGravityResolver;
+    }
+
     @Override
     public RecyclerView.LayoutParams generateDefaultLayoutParams() {
         return new RecyclerView.LayoutParams(
