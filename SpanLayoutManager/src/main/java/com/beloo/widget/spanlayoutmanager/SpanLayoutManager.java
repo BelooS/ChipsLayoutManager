@@ -2,6 +2,7 @@ package com.beloo.widget.spanlayoutmanager;
 
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
+import android.support.v4.BuildConfig;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -208,11 +209,12 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
     /** layout pre-calculated row on a recyclerView canvas
      * @param isReverseOrder if fillWithLayouter views from the end this flag have to be true to not break child position in recyclerView
+     * @param leftOffsetOfRow How much row have to be shifted before placing. Should be negative on RTL
      * returns viewTop */
     public int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int maxBottom, int leftOffsetOfRow, boolean isReverseOrder) {
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
-            //todo rtl
+
             viewRect.left = viewRect.left - leftOffsetOfRow;
             viewRect.right = viewRect.right - leftOffsetOfRow;
 
