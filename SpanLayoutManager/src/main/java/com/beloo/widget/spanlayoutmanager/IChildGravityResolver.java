@@ -1,6 +1,6 @@
 package com.beloo.widget.spanlayoutmanager;
 
-public interface IChildGravityResolver {
+interface IChildGravityResolver {
     @SpanLayoutChildGravity
     int getItemGravity(int position);
 }

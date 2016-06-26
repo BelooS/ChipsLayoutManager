@@ -10,6 +10,10 @@ import android.util.Pair;
 import android.util.SparseArray;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import com.beloo.widget.spanlayoutmanager.gravityModifier.GravityModifiersFactory;
@@ -207,6 +211,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         layouter.layoutRow();
     }
 
+
     /** layout pre-calculated row on a recyclerView canvas
      * @param isReverseOrder if fillWithLayouter views from the end this flag have to be true to not break child position in recyclerView
      * @param leftOffsetOfRow How much row have to be shifted before placing. Should be negative on RTL
@@ -236,6 +241,9 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
             } else {
                 addView(view);
             }
+
+            List<? super String> list = new ArrayList<Object>();
+            list.add("");
 
             //layout whole views in a row
             layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
