@@ -208,6 +208,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
         Log.d("fillWithLayouter", "reattached items = " + (startCacheSize - viewCache.size() + " : requested items = " + requestedItems + " recycledItems = " + recycledItems));
 
+        //layout last row
         layouter.layoutRow();
     }
 
@@ -241,9 +242,6 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
             } else {
                 addView(view);
             }
-
-            List<? super String> list = new ArrayList<Object>();
-            list.add("");
 
             //layout whole views in a row
             layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);

@@ -55,14 +55,7 @@ class RTLDownLayouter extends AbstractLayouter {
     public void onAttachView(View view) {
         super.onAttachView(view);
         viewTop = layoutManager.getDecoratedTop(view);
-
-        if (!(viewRight == getCanvasWidth() || viewRight - layoutManager.getDecoratedMeasuredWidth(view) >= 0)) {
-            //new row in cached views
-            viewTop = maxBottom;
-            viewRight = getCanvasWidth();
-        } else {
-            viewRight = layoutManager.getDecoratedLeft(view);
-        }
+        viewRight = layoutManager.getDecoratedLeft(view);
 
         maxBottom = Math.max(maxBottom, layoutManager.getDecoratedBottom(view));
     }

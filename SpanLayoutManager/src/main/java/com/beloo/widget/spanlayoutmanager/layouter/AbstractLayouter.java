@@ -36,6 +36,14 @@ abstract class AbstractLayouter implements ILayouter {
         return layoutManager.getHeight();
     }
 
+    public int getViewTop() {
+        return viewTop;
+    }
+
+    public int getViewBottom() {
+        return viewBottom;
+    }
+
     @Override
     public void calculateView(View view) {
         currentViewHeight = layoutManager.getDecoratedMeasuredHeight(view);
@@ -51,6 +59,9 @@ abstract class AbstractLayouter implements ILayouter {
 
     @CallSuper
     @Override
+    /** Read layouter state from current attached view. We need only last of it, but we can't determine here which is last.
+     * Based on characteristics of last attached view, layouter algorithm will be able to continue placing from it.
+     * This method have to be called on attaching view*/
     public void onAttachView(View view) {
         rowSize++;
     }
@@ -61,4 +72,6 @@ abstract class AbstractLayouter implements ILayouter {
         previousRowSize = rowSize;
         this.rowSize = 0;
     }
+
+
 }

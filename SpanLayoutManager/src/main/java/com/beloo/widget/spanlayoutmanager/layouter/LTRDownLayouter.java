@@ -55,15 +55,7 @@ class LTRDownLayouter extends AbstractLayouter {
     public void onAttachView(View view) {
         super.onAttachView(view);
         viewTop = layoutManager.getDecoratedTop(view);
-
-        if (viewLeft != 0 && viewLeft + layoutManager.getDecoratedMeasuredWidth(view) > getCanvasWidth()) {
-            //new row in cached views
-            viewTop = maxBottom;
-            viewLeft = 0;
-        } else {
-            viewLeft = layoutManager.getDecoratedRight(view);
-        }
-
+        viewLeft = layoutManager.getDecoratedRight(view);
         maxBottom = Math.max(maxBottom, layoutManager.getDecoratedBottom(view));
     }
 
