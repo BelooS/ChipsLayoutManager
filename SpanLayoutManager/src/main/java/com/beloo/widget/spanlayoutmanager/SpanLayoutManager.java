@@ -1,8 +1,8 @@
 package com.beloo.widget.spanlayoutmanager;
 
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.BuildConfig;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,10 +10,6 @@ import android.util.Pair;
 import android.util.SparseArray;
 import android.view.View;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import com.beloo.widget.spanlayoutmanager.gravityModifier.GravityModifiersFactory;
@@ -67,11 +63,11 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
         calcRecyclerCacheSize(recycler, 2);
 
-        View anchorView = getAnchorVisibleTopLeftView();
+        AnchorViewState anchorView = getAnchorVisibleTopLeftView();
         if (!state.isPreLayout()) {
             detachAndScrapAttachedViews(recycler);
 
-            if (anchorView != null && anchorViewPosition != null && anchorViewPosition == 0) {
+            if (!anchorView.isNotFoundState() && anchorViewPosition != null && anchorViewPosition == 0) {
                 //we can't add view in a hidden area if added view inserted on a zero position. so needed workaround here, we reset anchor position to 0
                 //for properly insertion only
                 fill(recycler, anchorView, anchorViewPosition);
@@ -80,9 +76,8 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 fill(recycler, anchorView);
             }
         } else {
-            if (anchorView != null)
-                anchorViewPosition = getPosition(anchorView);
-
+            if (!anchorView.isNotFoundState())
+                anchorViewPosition = anchorView.getPosition();
         }
     }
 
@@ -93,30 +88,21 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
     @Override
     public boolean supportsPredictiveItemAnimations() {
-        return true;
+        return false;
     }
 
-    private void fill(RecyclerView.Recycler recycler, @Nullable View anchorView) {
+    private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView) {
         int anchorPos = 0;
-        if (anchorView != null) {
-            anchorPos = getPosition(anchorView);
+        if (!anchorView.isNotFoundState()) {
+            anchorPos = anchorView.getPosition();
         }
 
         fill(recycler, anchorView, anchorPos);
     }
 
-    private void fill(RecyclerView.Recycler recycler, @Nullable View anchorView, int startingPos) {
+    private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView, int startingPos) {
 
-        int anchorTop = 0;
-        int anchorBottom = 0;
-        int anchorLeft = 0;
-        int anchorRight = 0;
-        if (anchorView != null) {
-            anchorTop = getDecoratedTop(anchorView);
-            anchorBottom = getDecoratedBottom(anchorView);
-            anchorLeft = getDecoratedLeft(anchorView);
-            anchorRight = getDecoratedRight(anchorView);
-        }
+        Rect anchorRect = anchorView.getAnchorViewRect();
 
         highestViewTop = Integer.MAX_VALUE;
         viewCache.clear();
@@ -133,9 +119,9 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
             detachView(viewCache.valueAt(i));
         }
 
-        ILayouter downLayouter = layouterFactory.getDownLayouter(anchorTop, anchorLeft, anchorBottom, anchorRight, isLayoutRTL());
+        ILayouter downLayouter = layouterFactory.getDownLayouter(anchorRect.top, anchorRect.left, anchorRect.bottom, anchorRect.right, isLayoutRTL());
         fillWithLayouter(recycler, downLayouter, startingPos);
-        ILayouter upLayouter = layouterFactory.getUpLayouter(Math.min(anchorTop, highestViewTop), anchorLeft, anchorBottom, anchorRight, isLayoutRTL());
+        ILayouter upLayouter = layouterFactory.getUpLayouter(Math.min(anchorRect.top, highestViewTop), anchorRect.left, anchorRect.bottom, anchorRect.right, isLayoutRTL());
         fillWithLayouter(recycler, upLayouter, startingPos - 1);
 
         //move to trash everything, which haven't used in this layout cycle
@@ -266,8 +252,9 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
         dy = scrollVerticallyInternal(dy);
         offsetChildrenVertical(-dy);
-        View anchorView = getAnchorVisibleTopLeftView();
-        if (anchorView != null && getPosition(anchorView) == 0) {
+        AnchorViewState anchorView = getAnchorVisibleTopLeftView();
+
+        if (!anchorView.isNotFoundState() && anchorView.getPosition() == 0) {
             //todo refactor it, blinking now without animation. Workaround to fix start position of items if some items have been added after initialization
             detachAndScrapAttachedViews(recycler);
         }
@@ -295,12 +282,21 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         int delta = 0;
         //if content scrolled down
         if (dy < 0) {
-            View firstView = getChildAt(0);
-            int firstViewAdapterPos = getPosition(firstView);
-            if (firstViewAdapterPos > 0) { //если верхняя вюшка не самая первая в адаптере
+
+            //todo workaround. somehow in the first row view in getChildAt(0) can have position 1
+            boolean isZeroAdded = false;
+            for (int i =0; i < childCount; i ++) {
+                View test = getChildAt(i);
+                if (getPosition(test) == 0) {
+                    isZeroAdded = true;
+                }
+            }
+
+            if (!isZeroAdded) { //если 0я позиция все еще не добавлена в адаптер
                 delta = dy;
             } else { //если верхняя вьюшка самая первая в адаптере и выше вьюшек больше быть не может
-                int viewTop = getDecoratedTop(firstView);
+                View view = findTopView();
+                int viewTop = getDecoratedTop(view);
                 delta = Math.max(viewTop, dy);
             }
         } else if (dy > 0) { //if content scrolled up
@@ -317,15 +313,27 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         return delta;
     }
 
-    /**
-     * @return View, which is highest visible left view
-     */
-    @Nullable
-    private View getAnchorVisibleTopLeftView() {
+    private View findTopView() {
+        View topView = getChildAt(0);
+        int minTop = getDecoratedTop(topView);
         int childCount = getChildCount();
-        View topLeft = null;
+        for (int i = 1; i < childCount; i++) {
+            View view = getChildAt(i);
+            int top = getDecoratedTop(view);
+            if (top < minTop) {
+                topView = view;
+            }
+        }
+        return topView;
+    }
+
+    @NonNull
+    private AnchorViewState getAnchorVisibleTopLeftView() {
+        int childCount = getChildCount();
+        AnchorViewState topLeft = AnchorViewState.getNotFoundState();
 
         Rect mainRect = new Rect(0, 0, getWidth(), getHeight());
+        int minTop = Integer.MAX_VALUE;
         for (int i = 0; i < childCount; i++) {
             View view = getChildAt(i);
             int top = getDecoratedTop(view);
@@ -335,11 +343,17 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
             Rect viewRect = new Rect(left, top, right, bottom);
             boolean intersect = viewRect.intersect(mainRect);
             if (intersect) {
-                if (getPosition(view) != -1) {
-                    topLeft = view;
-                    break;
+                if (getPosition(view) != -1 ) {
+                    if (topLeft.isNotFoundState()) {
+                        topLeft = new AnchorViewState(getPosition(view), new Rect(left, top, right, bottom));
+                    }
+                    minTop = Math.min(minTop, top);
                 }
             }
+        }
+
+        if (!topLeft.isNotFoundState()) {
+            topLeft.getAnchorViewRect().top = minTop;
         }
 
         return topLeft;
