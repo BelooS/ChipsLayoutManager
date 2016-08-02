@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         rvTest = (RecyclerView) findViewById(R.id.rvTest);
         spinnerPosition = (Spinner) findViewById(R.id.spinnerPosition);
 
-        items = new ItemsFactory().getALotOfRandomItems();
+        items = new ItemsFactory().getALotOfItems();
 
         positions = new LinkedList<>();
         for (int i = 0; i< items.size(); i++) {
@@ -63,9 +63,9 @@ public class MainActivity extends AppCompatActivity {
                 getResources().getDimensionPixelOffset(R.dimen.item_space)));
 
         rvTest.setLayoutManager(spanLayoutManager);
-        rvTest.setAdapter(adapter);
         rvTest.getRecycledViewPool().setMaxRecycledViews(0, 10);
         rvTest.getRecycledViewPool().setMaxRecycledViews(1, 10);
+        rvTest.setAdapter(adapter);
 
     }
 
