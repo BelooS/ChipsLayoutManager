@@ -2,7 +2,6 @@ package com.beloo.widget.spanlayoutmanager;
 
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,15 +11,18 @@ import android.view.View;
 
 import java.util.List;
 
-import com.beloo.widget.spanlayoutmanager.gravityModifier.GravityModifiersFactory;
-import com.beloo.widget.spanlayoutmanager.gravityModifier.IGravityModifier;
+import com.beloo.widget.spanlayoutmanager.gravity.CenterChildGravity;
+import com.beloo.widget.spanlayoutmanager.gravity.CustomGravityResolver;
+import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
+import com.beloo.widget.spanlayoutmanager.gravity.GravityModifiersFactory;
+import com.beloo.widget.spanlayoutmanager.gravity.IGravityModifier;
 import com.beloo.widget.spanlayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.spanlayoutmanager.layouter.ILayouter;
 import com.beloo.widget.spanlayoutmanager.layouter.LayouterFactory;
 
 public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
-    private IChildGravityResolver childGravityResolver = new CenterChildGravity();
+    private IChildGravityResolver childGravityResolver;
     private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
 
     /** coefficient to support fast scrolling, caching views only for one row may not be enough */
@@ -35,8 +37,41 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     /** highest top position of attached views*/
     private int highestViewTop = Integer.MAX_VALUE;
 
-    public void setChildGravityResolver(IChildGravityResolver childGravityResolver) {
-        this.childGravityResolver = childGravityResolver;
+    private SpanLayoutManager() {}
+
+    public static Builder newBuilder() {
+        return new SpanLayoutManager() .new Builder();
+    }
+
+    public class Builder {
+
+        private @SpanLayoutChildGravity Integer gravity;
+
+        /** set vertical gravity in a row for all children. Default = CENTER_VERTICAL*/
+        public Builder setChildGravity(@SpanLayoutChildGravity int gravity) {
+            this.gravity = gravity;
+            return this;
+        }
+
+        /** set gravity resolver in case you need special gravity for items. This method have priority over {@link #setChildGravity(int)}*/
+        public Builder setGravityResolver(IChildGravityResolver gravityResolver) {
+            childGravityResolver = gravityResolver;
+            return this;
+        }
+
+        /** create SpanLayoutManager*/
+        public SpanLayoutManager build() {
+            // setGravityResolver always have priority
+            if (childGravityResolver == null) {
+                if (gravity != null) {
+                    childGravityResolver = new CustomGravityResolver(gravity);
+                } else {
+                    childGravityResolver = new CenterChildGravity();
+                }
+            }
+            return SpanLayoutManager.this;
+        }
+
     }
 
     @Override
@@ -135,10 +170,12 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         Log.d("fillWithLayouter", "recycled count = " + recycledSize);
     }
 
+    /** @return true if RTL mode enabled in RecyclerView*/
     protected boolean isLayoutRTL() {
         return getLayoutDirection() == ViewCompat.LAYOUT_DIRECTION_RTL;
     }
 
+    /** place views in layout started from chosen position with chosen layouter*/
     private void fillWithLayouter(RecyclerView.Recycler recycler, ILayouter layouter, int startingPos) {
 
         AbstractPositionIterator iterator = layouter.positionIterator();
@@ -292,9 +329,9 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 }
             }
 
-            if (!isZeroAdded) { //если 0я позиция все еще не добавлена в адаптер
+            if (!isZeroAdded) { //in case 0 position haven't added in layout yet
                 delta = dy;
-            } else { //если верхняя вьюшка самая первая в адаптере и выше вьюшек больше быть не может
+            } else { //in case top view is a first view in adapter and wouldn't be any other view above
                 View view = findTopView();
                 int viewTop = getDecoratedTop(view);
                 delta = Math.max(viewTop, dy);
@@ -302,9 +339,9 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         } else if (dy > 0) { //if content scrolled up
             View lastView = getChildAt(childCount - 1);
             int lastViewAdapterPos = getPosition(lastView);
-            if (lastViewAdapterPos < itemCount - 1) { //если нижняя вюшка не самая последняя в адаптере
+            if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
                 delta = dy;
-            } else { //если нижняя вьюшка самая последняя в адаптере и ниже вьюшек больше быть не может
+            } else { //in case lower view is the last view in adapter and wouldn't be any other view below
                 int viewBottom = getDecoratedBottom(lastView);
                 int parentBottom = getHeight();
                 delta = Math.min(viewBottom - parentBottom, dy);
@@ -313,6 +350,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         return delta;
     }
 
+    /** find top view in layout*/
     private View findTopView() {
         View topView = getChildAt(0);
         int minTop = getDecoratedTop(topView);
@@ -328,6 +366,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     }
 
     @NonNull
+    /** find the view in a higher row which is closest to the left border*/
     private AnchorViewState getAnchorVisibleTopLeftView() {
         int childCount = getChildCount();
         AnchorViewState topLeft = AnchorViewState.getNotFoundState();

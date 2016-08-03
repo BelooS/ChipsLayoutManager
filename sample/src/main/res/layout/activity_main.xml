@@ -11,17 +11,15 @@
     tools:context="beloo.recyclerviewcustomadapter.MainActivity"
     >
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rvTest"
-        android:layout_width="match_parent"
-        android:layout_height="180dp"
-        />
-
-    <Spinner
-        android:id="@+id/spinnerPosition"
-        android:layout_below="@id/rvTest"
+    <Button
+        android:id="@+id/btnInsert"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="onInsertClicked"
+        android:text="@string/insert"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         />
 
     <Button
@@ -29,19 +27,30 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onDeleteClicked"
-        android:layout_below="@id/spinnerPosition"
+        android:text="@string/delete"
         android:layout_toRightOf="@+id/btnInsert"
         android:layout_toEndOf="@+id/btnInsert"
-        android:text="@string/delete"
+        android:layout_alignParentBottom="true"
         />
 
-    <Button
-        android:id="@+id/btnInsert"
+    <Spinner
+        android:id="@+id/spinnerPosition"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/spinnerPosition"
-        android:onClick="onInsertClicked"
-        android:text="@string/insert"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@id/btnInsert"
+        />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvTest"
+        android:padding="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/spinnerPosition"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         />
 
 </RelativeLayout>

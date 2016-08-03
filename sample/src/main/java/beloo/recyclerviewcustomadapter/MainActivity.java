@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         FixedGridLayoutManager fixedGridLayoutManager = new FixedGridLayoutManager();
         fixedGridLayoutManager.setTotalColumnCount(10);
 
-        SpanLayoutManager spanLayoutManager = new SpanLayoutManager();
+        SpanLayoutManager spanLayoutManager = SpanLayoutManager.newBuilder().build();
 
         rvTest.addItemDecoration(new SpacingItemDecoration(getResources().getDimensionPixelOffset(R.dimen.item_space),
                 getResources().getDimensionPixelOffset(R.dimen.item_space)));

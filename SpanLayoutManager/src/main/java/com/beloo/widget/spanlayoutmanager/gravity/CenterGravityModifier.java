@@ -1,4 +1,4 @@
-package com.beloo.widget.spanlayoutmanager.gravityModifier;
+package com.beloo.widget.spanlayoutmanager.gravity;
 
 import android.graphics.Rect;
 
