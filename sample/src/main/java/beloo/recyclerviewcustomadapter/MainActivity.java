@@ -6,11 +6,13 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.beloo.widget.spanlayoutmanager.SpanLayoutManager;
+import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -57,7 +59,15 @@ public class MainActivity extends AppCompatActivity {
         FixedGridLayoutManager fixedGridLayoutManager = new FixedGridLayoutManager();
         fixedGridLayoutManager.setTotalColumnCount(10);
 
-        SpanLayoutManager spanLayoutManager = SpanLayoutManager.newBuilder().build();
+        SpanLayoutManager spanLayoutManager = SpanLayoutManager.newBuilder()
+                .setChildGravity(Gravity.TOP)
+                .setGravityResolver(new IChildGravityResolver() {
+                    @Override
+                    public int getItemGravity(int position) {
+                        return Gravity.CENTER;
+                    }
+                })
+                .build();
 
         rvTest.addItemDecoration(new SpacingItemDecoration(getResources().getDimensionPixelOffset(R.dimen.item_space),
                 getResources().getDimensionPixelOffset(R.dimen.item_space)));
