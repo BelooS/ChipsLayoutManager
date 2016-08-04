@@ -60,6 +60,7 @@ I appreciate any help and contributors will be mentioned here.
 
  * RecyclerView's padding haven't supported yet. Please use margin instead until new version will be released
  * Reconstruction of items when scrolled down and scrolled up again in case scrolling up drawing algorithm can't place some views in a places as scrolling down algorithm did
+ http://stackoverflow.com/questions/37889636/recyclers-view-custom-layout-manager-animation
  This is connected with that items are recycled and theirs positions aren't remembered and there haven't any cache support yet.
 
 This issues are going to be fixed in next versions soon.
