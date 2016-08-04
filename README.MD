@@ -26,6 +26,10 @@ Layout manager represents spanned or "bubble" structure of list items and is a g
 * LTR and RTL support
 * activity orientation change support
 
+<p align="center">
+    <img src="/images/animations.gif" alt="Span layout manager animations">
+</p>
+
 ### Usage
 
 ```JAVA 
@@ -42,11 +46,8 @@ SpanLayoutManager spanLayoutManager = SpanLayoutManager.newBuilder()
         .build();
 rv.setLayoutManager(spanLayoutManager);
 ```
-
 For example look at sample application.
-
 <br />
-
 ## Support
 
 If you have any other questions regarding the use of this library, please contact me on github or create an issue on the tracking board
