@@ -1,6 +1,8 @@
 package com.beloo.widget.spanlayoutmanager;
 
 import android.graphics.Rect;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
@@ -86,6 +88,17 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                                  RecyclerView.Adapter newAdapter) {
         //Completely scrap the existing layout
         removeAllViews();
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        SLMParcelableContainer container = (SLMParcelableContainer) state;
+        anchorView = container.getAnchorViewState();
+    }
+
+    @Override
+    public Parcelable onSaveInstanceState() {
+        return new SLMParcelableContainer(getAnchorVisibleTopLeftView());
     }
 
     /** this field processed only in {@link #onLayoutChildren(RecyclerView.Recycler, RecyclerView.State)}
