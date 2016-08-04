@@ -39,6 +39,9 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     /** highest top position of attached views*/
     private int highestViewTop = Integer.MAX_VALUE;
 
+    /** stored current anchor view due to scroll state changes*/
+    private AnchorViewState anchorView = AnchorViewState.getNotFoundState();
+
     private SpanLayoutManager() {}
 
     public static Builder newBuilder() {
@@ -101,10 +104,6 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         return new SLMParcelableContainer(getAnchorVisibleTopLeftView());
     }
 
-    /** this field processed only in {@link #onLayoutChildren(RecyclerView.Recycler, RecyclerView.State)}
-     * find anchor view in pre-layout state and use it in layout state*/
-    private AnchorViewState anchorView = AnchorViewState.getNotFoundState();
-
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
         //We have nothing to show for an empty data set but clear any existing views
@@ -116,6 +115,10 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         calcRecyclerCacheSize(recycler, 2);
 
         if (!state.isPreLayout()) {
+            if (anchorView.isNotFoundState()) {
+                //try to found anchorView here
+                anchorView = getAnchorVisibleTopLeftView();
+            }
             detachAndScrapAttachedViews(recycler);
 
             if (!anchorView.isNotFoundState() && anchorViewPosition != null && anchorViewPosition == 0) {
@@ -311,7 +314,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
         dy = scrollVerticallyInternal(dy);
         offsetChildrenVertical(-dy);
-        AnchorViewState anchorView = getAnchorVisibleTopLeftView();
+        anchorView = getAnchorVisibleTopLeftView();
 
         if (!anchorView.isNotFoundState() && anchorView.getPosition() == 0) {
             //todo refactor it, blinking now without animation. Workaround to fix start position of items if some items have been added after initialization
