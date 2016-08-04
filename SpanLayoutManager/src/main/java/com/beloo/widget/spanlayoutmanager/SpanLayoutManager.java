@@ -88,6 +88,10 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         removeAllViews();
     }
 
+    /** this field processed only in {@link #onLayoutChildren(RecyclerView.Recycler, RecyclerView.State)}
+     * find anchor view in pre-layout state and use it in layout state*/
+    private AnchorViewState anchorView = AnchorViewState.getNotFoundState();
+
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
         //We have nothing to show for an empty data set but clear any existing views
@@ -98,7 +102,6 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
         calcRecyclerCacheSize(recycler, 2);
 
-        AnchorViewState anchorView = getAnchorVisibleTopLeftView();
         if (!state.isPreLayout()) {
             detachAndScrapAttachedViews(recycler);
 
@@ -111,9 +114,15 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                 fill(recycler, anchorView);
             }
         } else {
+            anchorView = getAnchorVisibleTopLeftView();
             if (!anchorView.isNotFoundState())
                 anchorViewPosition = anchorView.getPosition();
         }
+    }
+
+    @Override
+    public void onItemsRemoved(RecyclerView recyclerView, int positionStart, int itemCount) {
+        super.onItemsRemoved(recyclerView, positionStart, itemCount);
     }
 
     @Override
@@ -123,7 +132,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
     @Override
     public boolean supportsPredictiveItemAnimations() {
-        return false;
+        return true;
     }
 
     private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView) {
