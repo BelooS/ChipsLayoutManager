@@ -6,7 +6,9 @@
 As an android developer i see that google isn't so polite to support all our wishes, and when i faced with such common task like create spannable list
 but with support of CRUD animations i decided to make such stuff and share it.
 
-![Demo image](/images/demo.gif)
+<p align="center">
+    <img src="/images/demo.gif" alt="Span layout manager demo">
+</p>
 
 ## Setup and usage
 ### Installation
@@ -24,6 +26,10 @@ Layout manager represents spanned or "bubble" structure of list items and is a g
 * LTR and RTL support
 * activity orientation change support
 
+<p align="center">
+    <img src="/images/animations.gif" alt="Span layout manager animations">
+</p>
+
 ### Usage
 
 ```JAVA 
@@ -40,11 +46,8 @@ SpanLayoutManager spanLayoutManager = SpanLayoutManager.newBuilder()
         .build();
 rv.setLayoutManager(spanLayoutManager);
 ```
-
 For example look at sample application.
-
 <br />
-
 ## Support
 
 If you have any other questions regarding the use of this library, please contact me on github or create an issue on the tracking board
