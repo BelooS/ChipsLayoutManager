@@ -2,9 +2,10 @@ package com.beloo.widget.spanlayoutmanager.gravity;
 
 import android.graphics.Rect;
 
-class CenterGravityModifier implements IGravityModifier {
+class CenterGravityModifier extends AbstractGravityModifier implements IGravityModifier {
     @Override
-    public void modifyChildRect(int minTop, int maxBottom, Rect childRect) {
+    public Rect modifyChildRect(int minTop, int maxBottom, Rect childRect) {
+        childRect = super.modifyChildRect(minTop, maxBottom, childRect);
         int placeHeight = maxBottom - minTop;
         int rectHeight = childRect.bottom - childRect.top;
         //calculate needed offset
@@ -12,5 +13,6 @@ class CenterGravityModifier implements IGravityModifier {
 
         childRect.top = minTop + halfOffset;
         childRect.bottom = maxBottom - halfOffset;
+        return childRect;
     }
 }

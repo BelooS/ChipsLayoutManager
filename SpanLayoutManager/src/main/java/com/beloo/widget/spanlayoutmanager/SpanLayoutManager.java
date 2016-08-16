@@ -283,7 +283,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
             @SpanLayoutChildGravity
             int viewGravity = childGravityResolver.getItemGravity(getPosition(view));
             IGravityModifier gravityModifier = gravityModifiersFactory.getGravityModifier(viewGravity);
-            gravityModifier.modifyChildRect(minTop, maxBottom, viewRect);
+            viewRect = gravityModifier.modifyChildRect(minTop, maxBottom, viewRect);
 
             if (isReverseOrder) {
                 addView(view, 0);
