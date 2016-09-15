@@ -17,6 +17,29 @@ public class CenterGravityModifierTest {
 
     private CenterGravityModifier gravityModifier = new CenterGravityModifier();
 
+    private static class InvalidDataHolder {
+        private int minTop;
+        private int maxBottom;
+        private Rect childRect;
+
+        public InvalidDataHolder(int minTop, int maxBottom, Rect childRect) {
+            this.minTop = minTop;
+            this.maxBottom = maxBottom;
+            this.childRect = childRect;
+        }
+    }
+
+    public static Object[] invalidData() {
+        return new Object[][] {
+                {new InvalidDataHolder(-20, 100, new Rect(0,0,0,0))},
+                {new InvalidDataHolder(0, -100, new Rect(0,0,0,0))},
+                {new InvalidDataHolder(0, 100, new Rect(0,-50,0,0))},
+                {new InvalidDataHolder(0, 100, new Rect(0,0,0,-50))},
+                {new InvalidDataHolder(20, 100, new Rect(0,10,0,0))},
+                {new InvalidDataHolder(20, 100, new Rect(0,20,0,120))}
+        };
+    }
+
     public static Object[] data() {
         return new Object[][] {
                 {0, 100, new Rect(0, 20, 0, 100), new Rect(0, 10, 0, 90)},
