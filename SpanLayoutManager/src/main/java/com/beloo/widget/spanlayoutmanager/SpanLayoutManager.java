@@ -1,7 +1,6 @@
 package com.beloo.widget.spanlayoutmanager;
 
 import android.graphics.Rect;
-import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
@@ -18,7 +17,7 @@ import com.beloo.widget.spanlayoutmanager.gravity.CustomGravityResolver;
 import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
 import com.beloo.widget.spanlayoutmanager.gravity.GravityModifiersFactory;
 import com.beloo.widget.spanlayoutmanager.gravity.IGravityModifier;
-import com.beloo.widget.spanlayoutmanager.layouter.AbstractPositionIterator;
+import com.beloo.widget.spanlayoutmanager.layouter.position_iterator.AbstractPositionIterator;
 import com.beloo.widget.spanlayoutmanager.layouter.ILayouter;
 import com.beloo.widget.spanlayoutmanager.layouter.LayouterFactory;
 

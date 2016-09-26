@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.beloo.widget.spanlayoutmanager.SpanLayoutManager;
+import com.beloo.widget.spanlayoutmanager.layouter.position_iterator.PositionIteratorFactory;
 
 abstract class AbstractLayouter implements ILayouter {
     protected int currentViewWidth;
@@ -19,6 +20,7 @@ abstract class AbstractLayouter implements ILayouter {
     protected int viewTop;
     protected int rowSize = 0;
     protected int previousRowSize;
+    protected PositionIteratorFactory positionIteratorFactory;
 
     protected SpanLayoutManager layoutManager;
 
@@ -26,6 +28,7 @@ abstract class AbstractLayouter implements ILayouter {
         this.layoutManager = layoutManager;
         this.viewTop = topOffset;
         this.viewBottom = bottomOffset;
+        positionIteratorFactory = new PositionIteratorFactory();
     }
 
     int getCanvasWidth() {

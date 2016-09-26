@@ -1,4 +1,4 @@
-package com.beloo.widget.spanlayoutmanager.layouter;
+package com.beloo.widget.spanlayoutmanager.layouter.position_iterator;
 
 class DecrementalPositionIterator extends AbstractPositionIterator {
 
@@ -9,6 +9,7 @@ class DecrementalPositionIterator extends AbstractPositionIterator {
 
     @Override
     public Integer next() {
+        if (!hasNext()) throw new IllegalStateException("position out of bounds reached");
         return pos--;
     }
 

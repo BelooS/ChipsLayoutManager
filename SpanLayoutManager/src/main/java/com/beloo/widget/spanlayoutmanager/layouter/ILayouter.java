@@ -1,7 +1,8 @@
 package com.beloo.widget.spanlayoutmanager.layouter;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
+
+import com.beloo.widget.spanlayoutmanager.layouter.position_iterator.AbstractPositionIterator;
 
 public interface ILayouter {
     void calculateView(View view);

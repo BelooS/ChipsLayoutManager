@@ -5,6 +5,7 @@ import android.util.Pair;
 import android.view.View;
 
 import com.beloo.widget.spanlayoutmanager.SpanLayoutManager;
+import com.beloo.widget.spanlayoutmanager.layouter.position_iterator.AbstractPositionIterator;
 
 class LTRDownLayouter extends AbstractLayouter {
 
@@ -39,7 +40,7 @@ class LTRDownLayouter extends AbstractLayouter {
 
     @Override
     public AbstractPositionIterator positionIterator() {
-        return new IncrementalPositionIterator(layoutManager.getItemCount());
+        return positionIteratorFactory.getIncrementalPositionIterator(layoutManager.getItemCount());
     }
 
     @Override

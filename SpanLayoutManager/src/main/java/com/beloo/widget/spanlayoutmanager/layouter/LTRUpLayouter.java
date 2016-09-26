@@ -5,6 +5,7 @@ import android.util.Pair;
 import android.view.View;
 
 import com.beloo.widget.spanlayoutmanager.SpanLayoutManager;
+import com.beloo.widget.spanlayoutmanager.layouter.position_iterator.AbstractPositionIterator;
 
 class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
@@ -73,7 +74,7 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
     @Override
     public AbstractPositionIterator positionIterator() {
-        return new DecrementalPositionIterator();
+        return positionIteratorFactory.getDecrementalPositionIterator();
     }
 
 }

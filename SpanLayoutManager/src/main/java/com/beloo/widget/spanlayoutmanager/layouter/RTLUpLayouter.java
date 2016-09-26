@@ -6,6 +6,7 @@ import android.util.Pair;
 import android.view.View;
 
 import com.beloo.widget.spanlayoutmanager.SpanLayoutManager;
+import com.beloo.widget.spanlayoutmanager.layouter.position_iterator.AbstractPositionIterator;
 
 class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     private static final String TAG = RTLUpLayouter.class.getSimpleName();
@@ -78,7 +79,7 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
 
     @Override
     public AbstractPositionIterator positionIterator() {
-        return new DecrementalPositionIterator();
+        return positionIteratorFactory.getDecrementalPositionIterator();
     }
 
 }
