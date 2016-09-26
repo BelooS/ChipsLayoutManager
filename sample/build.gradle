@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "24.0.0 rc4"
+    buildToolsVersion "24.0.2"
 
     defaultConfig {
         applicationId "beloo.recyclerviewcustomadapter"
