@@ -2,8 +2,15 @@ package com.beloo.widget.spanlayoutmanager.gravity;
 
 import android.view.Gravity;
 
+import com.beloo.widget.spanlayoutmanager.gravity.BottomGravityModifier;
+import com.beloo.widget.spanlayoutmanager.gravity.CenterGravityModifier;
+import com.beloo.widget.spanlayoutmanager.gravity.GravityModifiersFactory;
+import com.beloo.widget.spanlayoutmanager.gravity.IGravityModifier;
+import com.beloo.widget.spanlayoutmanager.gravity.TopGravityModifier;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertTrue;
 
 public class GravityModifiersFactoryTest {
 
