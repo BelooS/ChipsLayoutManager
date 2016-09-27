@@ -11,8 +11,8 @@ public class PositionIteratorFactory {
     }
 
     /** creates decremental position iterator. Zero is min value*/
-    public AbstractPositionIterator getDecrementalPositionIterator() {
-        return new DecrementalPositionIterator();
+    public AbstractPositionIterator getDecrementalPositionIterator(@IntRange(from = 0) int itemCount) {
+        return new DecrementalPositionIterator(itemCount);
     }
 
 }

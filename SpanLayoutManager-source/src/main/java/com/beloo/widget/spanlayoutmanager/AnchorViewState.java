@@ -37,6 +37,7 @@ class AnchorViewState implements Parcelable {
         return position;
     }
 
+    @NonNull
     public Rect getAnchorViewRect() {
         return anchorViewRect;
     }

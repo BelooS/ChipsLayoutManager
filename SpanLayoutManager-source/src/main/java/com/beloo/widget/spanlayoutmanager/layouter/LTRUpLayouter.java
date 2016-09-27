@@ -1,22 +1,19 @@
 package com.beloo.widget.spanlayoutmanager.layouter;
 
 import android.graphics.Rect;
-import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
 import com.beloo.widget.spanlayoutmanager.SpanLayoutManager;
 import com.beloo.widget.spanlayoutmanager.layouter.position_iterator.AbstractPositionIterator;
 
-class RTLUpLayouter extends AbstractLayouter implements ILayouter {
-    private static final String TAG = RTLUpLayouter.class.getSimpleName();
+class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
-    protected int viewLeft;
+    private int viewRight;
 
-    RTLUpLayouter(SpanLayoutManager spanLayoutManager, int topOffset, int leftOffset, int bottomOffset) {
-        super(spanLayoutManager, topOffset, bottomOffset);
-        Log.d(TAG, "start bottom offset = " + bottomOffset);
-        this.viewLeft = leftOffset;
+    LTRUpLayouter(SpanLayoutManager layoutManager, int topOffset, int bottomOffset, int rightOffset) {
+        super(layoutManager, topOffset, bottomOffset);
+        this.viewRight = rightOffset;
     }
 
     @Override
@@ -25,15 +22,13 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
 
         //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
         //if previously row finished and we have to fill it
-        Log.d(TAG, "row bottom " + viewBottom);
-        Log.d(TAG, "row top " + viewTop);
-        viewTop = layoutManager.layoutRow(rowViews, viewTop, viewBottom, -(getCanvasWidth() - viewLeft), true);
+        viewTop = layoutManager.layoutRow(rowViews, viewTop, viewBottom, viewRight, true);
 
         //clear row data
         rowViews.clear();
 
         //go to next row, increase top coordinate, reset left
-        viewLeft = 0;
+        viewRight = getCanvasWidth();
         viewBottom = viewTop;
     }
 
@@ -43,10 +38,10 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
         so generate rect for the view and layout it in the end of the row
          */
 
-        int right = viewLeft + currentViewWidth;
+        int left = viewRight - currentViewWidth;
         int viewTop = viewBottom - currentViewHeight;
-        Rect viewRect = new Rect(viewLeft, viewTop, right, viewBottom);
-        viewLeft = right;
+        Rect viewRect = new Rect(left, viewTop, viewRight, viewBottom);
+        viewRight = left;
 
         rowViews.add(new Pair<>(viewRect, view));
     }
@@ -55,15 +50,15 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     public void onAttachView(View view) {
         super.onAttachView(view);
 
-        if (viewLeft != 0 && viewLeft + layoutManager.getDecoratedMeasuredWidth(view) > getCanvasWidth()) {
-            viewLeft = 0;
+        if (viewRight != getCanvasWidth() && viewRight - layoutManager.getDecoratedMeasuredWidth(view) < 0) {
+            //new row
+            viewRight = getCanvasWidth();
             viewBottom = viewTop;
         } else {
-            viewLeft = layoutManager.getDecoratedRight(view);
+            viewRight = layoutManager.getDecoratedLeft(view);
         }
 
         viewTop = Math.min(viewTop, layoutManager.getDecoratedTop(view));
-
     }
 
     @Override
@@ -73,13 +68,13 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
 
     @Override
     public boolean canNotBePlacedInCurrentRow() {
-        int bufRight = viewLeft + currentViewWidth;
-        return bufRight > getCanvasWidth() && viewLeft > 0;
+        int bufLeft = viewRight - currentViewWidth;
+        return bufLeft < 0 && viewRight < getCanvasWidth();
     }
 
     @Override
     public AbstractPositionIterator positionIterator() {
-        return positionIteratorFactory.getDecrementalPositionIterator();
+        return positionIteratorFactory.getDecrementalPositionIterator(layoutManager.getItemCount());
     }
 
 }

@@ -1,6 +1,12 @@
 package com.beloo.widget.spanlayoutmanager.layouter.position_iterator;
 
+import android.support.annotation.IntRange;
+
 class DecrementalPositionIterator extends AbstractPositionIterator {
+
+    DecrementalPositionIterator(@IntRange(from = 0) int itemCount) {
+        super(itemCount);
+    }
 
     @Override
     public boolean hasNext() {
