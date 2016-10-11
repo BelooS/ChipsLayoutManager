@@ -19,7 +19,7 @@ Import SpanLayoutManager module to your project. Maven support will be added soo
 Layout manager represents spanned or "bubble" structure of list items and is a good replace for typical implementations of such issue based on spans in TextView.
 
 * supports RecyclerView's features, such as default animations while CRUD items & custom ItemAnimators, ItemDecorators etc.
-* vertical scrolling support. Horizontal scrolling are NOT supported
+* vertical scrolling support. Horizontal scrolling are NOT supported. It is possible to disable vertical scrolling as well.
 * supports views with different height and width
 * recycling items support (another advantage over TextView approach)
 * items gravity inside row support. For all items or only for required ones
@@ -36,6 +36,8 @@ Layout manager represents spanned or "bubble" structure of list items and is a g
 SpanLayoutManager spanLayoutManager = SpanLayoutManager.newBuilder()
         //set vertical gravity for all items in a row. Default = Gravity.CENTER_VERTICAL
         .setChildGravity(Gravity.TOP)
+        //whether RecyclerView can scroll
+        .setScrollingEnabled(true)
         //set gravity resolver where you can determite gravity for item in position. This method have priority over previous one
         .setGravityResolver(new IChildGravityResolver() {
             @Override

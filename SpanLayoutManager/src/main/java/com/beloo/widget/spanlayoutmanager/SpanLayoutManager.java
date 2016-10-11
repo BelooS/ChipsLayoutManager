@@ -42,10 +42,16 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
     /** stored current anchor view due to scroll state changes*/
     private AnchorViewState anchorView = AnchorViewState.getNotFoundState();
 
+    private boolean isScrollingEnabled = true;
+
     private SpanLayoutManager() {}
 
     public static Builder newBuilder() {
         return new SpanLayoutManager() .new Builder();
+    }
+
+    public void setScrollingEnabled(boolean isEnabled) {
+        isScrollingEnabled = isEnabled;
     }
 
     public class Builder {
@@ -61,6 +67,11 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         /** set gravity resolver in case you need special gravity for items. This method have priority over {@link #setChildGravity(int)}*/
         public Builder setGravityResolver(IChildGravityResolver gravityResolver) {
             childGravityResolver = gravityResolver;
+            return this;
+        }
+
+        public Builder setScrollingEnabled(boolean isEnabled) {
+            SpanLayoutManager.this.setScrollingEnabled(isEnabled);
             return this;
         }
 
@@ -143,7 +154,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
     @Override
     public boolean canScrollVertically() {
-        return true;
+        return isScrollingEnabled;
     }
 
     @Override
