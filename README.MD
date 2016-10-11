@@ -1,7 +1,7 @@
 # ChipsLayoutManager <img src="https://www.cleveroad.com/public/comercial/label-android.svg" height="19">
 ![Header image](/images/header.png)
 
-## This is ChipsLayoutManager - custom Recycler View's LayoutManager maintained by me for community. 
+## This is ChipsLayoutManager - custom Recycler View's LayoutManager which move item to the next line when no space left on the current 
 This layout manager could represent [Google Chips material design pattern](https://material.google.com/components/chips.html#)
 
 As an android developer i see that google isn't so polite to support all our wishes, and when i faced with such common task like create spannable list
