@@ -56,8 +56,8 @@ If you have any other questions regarding the use of this library, please contac
 All pull requests are welcome. 
 I appreciate any help and contributors will be mentioned here. 
 
-### Known problems
-
+### Known limitations
+ * wrap_content on RecyclerView height haven't supported yet
  * RecyclerView's padding haven't supported yet. Please use margin instead until new version will be released
  * Reconstruction of items when scrolled down and scrolled up again in case scrolling up drawing algorithm can't place some views in a places as scrolling down algorithm did
  http://stackoverflow.com/questions/37889636/recyclers-view-custom-layout-manager-animation
