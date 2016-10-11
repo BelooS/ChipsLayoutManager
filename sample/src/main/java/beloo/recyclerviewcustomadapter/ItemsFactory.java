@@ -45,6 +45,15 @@ public class ItemsFactory {
         return list;
     }
 
+    public List<String> getFewItems() {
+        List<String> list = new LinkedList<>();
+        list.add("Item0.0");
+        list.add("Item1.1");
+        list.add("Item2.2");
+        list.add("Item3.3");
+        return list;
+    }
+
     public List<String> getALotOfItems() {
         List<String> list = new LinkedList<>();
         list.add("START item.0");
