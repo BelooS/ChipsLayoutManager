@@ -1,7 +1,8 @@
-# SpanLayoutManager <img src="https://www.cleveroad.com/public/comercial/label-android.svg" height="19">
+# ChipsLayoutManager <img src="https://www.cleveroad.com/public/comercial/label-android.svg" height="19">
 ![Header image](/images/header.png)
 
-## This is SpanLayoutManager - custom Recycler View's LayoutManager maintained by me for community
+## This is ChipsLayoutManager - custom Recycler View's LayoutManager maintained by me for community. 
+This layout manager could represent [Google Chips material design pattern](https://material.google.com/components/chips.html#)
 
 As an android developer i see that google isn't so polite to support all our wishes, and when i faced with such common task like create spannable list
 but with support of CRUD animations i decided to make such stuff and share it.
@@ -13,10 +14,10 @@ but with support of CRUD animations i decided to make such stuff and share it.
 ## Setup and usage
 ### Installation
 
-Import SpanLayoutManager module to your project. Maven support will be added soon
+Import ChipsLayoutManager module to your project. Maven support will be added soon
 
 ### Features
-Layout manager represents spanned or "bubble" structure of list items and is a good replace for typical implementations of such issue based on spans in TextView.
+Layout manager represents chips or spanned or "bubble" structure of list items and is a good replace for typical implementations of such issue based on spans in TextView.
 
 * supports RecyclerView's features, such as default animations while CRUD items & custom ItemAnimators, ItemDecorators etc.
 * vertical scrolling support. Horizontal scrolling are NOT supported. It is possible to disable vertical scrolling as well.
@@ -33,7 +34,7 @@ Layout manager represents spanned or "bubble" structure of list items and is a g
 ### Usage
 
 ```JAVA 
-SpanLayoutManager spanLayoutManager = SpanLayoutManager.newBuilder()
+ChipsLayoutManager ChipsLayoutManager = ChipsLayoutManager.newBuilder()
         //set vertical gravity for all items in a row. Default = Gravity.CENTER_VERTICAL
         .setChildGravity(Gravity.TOP)
         //whether RecyclerView can scroll
@@ -46,7 +47,7 @@ SpanLayoutManager spanLayoutManager = SpanLayoutManager.newBuilder()
             }
         })
         .build();
-rv.setLayoutManager(spanLayoutManager);
+rv.setLayoutManager(ChipsLayoutManager);
 ```
 For example look at sample application.
 <br />
@@ -59,7 +60,7 @@ All pull requests are welcome.
 I appreciate any help and contributors will be mentioned here. 
 
 ### Known limitations
- * wrap_content on RecyclerView height haven't supported yet
+ * wrap_content on RecyclerView height haven't supported yet. You should set fixed or related height.
  * RecyclerView's padding haven't supported yet. Please use margin instead until new version will be released
  * Reconstruction of items when scrolled down and scrolled up again in case scrolling up drawing algorithm can't place some views in a places as scrolling down algorithm did
  http://stackoverflow.com/questions/37889636/recyclers-view-custom-layout-manager-animation
