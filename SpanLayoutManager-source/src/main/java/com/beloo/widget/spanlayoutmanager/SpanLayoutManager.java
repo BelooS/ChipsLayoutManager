@@ -44,7 +44,9 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
     private boolean isScrollingEnabled = true;
 
-    private SpanLayoutManager() {}
+    private SpanLayoutManager() {
+        setAutoMeasureEnabled(true);
+    }
 
     public static Builder newBuilder() {
         return new SpanLayoutManager() .new Builder();
