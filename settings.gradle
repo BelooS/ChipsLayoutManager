@@ -1,1 +1,1 @@
-include ':sample', ':SpanLayoutManager'
+include ':sample', ':SpanLayoutManager-source'
