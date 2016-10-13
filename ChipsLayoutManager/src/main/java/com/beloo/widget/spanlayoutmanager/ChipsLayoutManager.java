@@ -9,6 +9,7 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
+import com.beloo.widget.spanlayoutmanager.cache.ViewCacheFactory;
 import com.beloo.widget.spanlayoutmanager.gravity.CenterChildGravity;
 import com.beloo.widget.spanlayoutmanager.gravity.CustomGravityResolver;
 import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
@@ -25,7 +26,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
      */
     private static final float FAST_SCROLLING_COEFFICIENT = 2;
     private int maxViewsInRow = 2;
-    private LayouterFactory layouterFactory = new LayouterFactory(this);
+    private LayouterFactory layouterFactory = new LayouterFactory(this, new ViewCacheFactory().createCacheStorage());
 
     private SparseArray<View> viewCache = new SparseArray<>();
 

@@ -1,17 +1,22 @@
 package com.beloo.widget.spanlayoutmanager.layouter;
 
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.spanlayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
 
 class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
     private int viewRight;
 
-    LTRUpLayouter(ChipsLayoutManager layoutManager, IChildGravityResolver childGravityResolver, int topOffset, int bottomOffset, int rightOffset) {
-        super(layoutManager, topOffset, bottomOffset, childGravityResolver);
+    LTRUpLayouter(ChipsLayoutManager layoutManager,
+                  IChildGravityResolver childGravityResolver,
+                  IViewCacheStorage cacheStorage,
+                  int topOffset, int bottomOffset, int rightOffset) {
+        super(layoutManager, topOffset, bottomOffset, cacheStorage, childGravityResolver);
         this.viewRight = rightOffset;
     }
 
@@ -37,12 +42,19 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
+    void loadFromCache(@NonNull Rect rect) {
+        viewRight = rect.left;
+        viewTop = rect.top;
+        viewBottom = rect.bottom;
+    }
+
+    @Override
     Rect createViewRect(View view) {
         int left = viewRight - currentViewWidth;
         int viewTop = viewBottom - currentViewHeight;
 
         Rect viewRect = new Rect(left, viewTop, viewRight, viewBottom);
-        viewRight = left;
+        viewRight = viewRect.left;
         return viewRect;
     }
 

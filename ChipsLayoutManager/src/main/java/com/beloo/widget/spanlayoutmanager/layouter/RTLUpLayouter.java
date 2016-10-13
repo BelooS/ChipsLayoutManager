@@ -1,10 +1,12 @@
 package com.beloo.widget.spanlayoutmanager.layouter;
 
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 
 import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.spanlayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
 
 class RTLUpLayouter extends AbstractLayouter implements ILayouter {
@@ -12,8 +14,11 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
 
     protected int viewLeft;
 
-    RTLUpLayouter(ChipsLayoutManager spanLayoutManager, IChildGravityResolver childGravityResolver, int topOffset, int leftOffset, int bottomOffset) {
-        super(spanLayoutManager, topOffset, bottomOffset, childGravityResolver);
+    RTLUpLayouter(ChipsLayoutManager spanLayoutManager,
+                  IChildGravityResolver childGravityResolver,
+                  IViewCacheStorage cacheStorage,
+                  int topOffset, int leftOffset, int bottomOffset) {
+        super(spanLayoutManager, topOffset, bottomOffset, cacheStorage, childGravityResolver);
         Log.d(TAG, "start bottom offset = " + bottomOffset);
         this.viewLeft = leftOffset;
     }
@@ -42,11 +47,18 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
+    void loadFromCache(@NonNull Rect rect) {
+        viewLeft = rect.right;
+        viewBottom = rect.bottom;
+        viewTop = rect.top;
+    }
+
+    @Override
     Rect createViewRect(View view) {
         int right = viewLeft + currentViewWidth;
         int viewTop = viewBottom - currentViewHeight;
         Rect viewRect = new Rect(viewLeft, viewTop, right, viewBottom);
-        viewLeft = right;
+        viewLeft = viewRect.right;
         return viewRect;
     }
 

@@ -2,6 +2,7 @@ package com.beloo.widget.spanlayoutmanager.layouter;
 
 import android.graphics.Rect;
 import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.view.View;
 
@@ -24,6 +25,7 @@ abstract class AbstractLayouter implements ILayouter {
     /** max bottom of current row views*/
     int viewBottom;
     int viewTop;
+
     int rowSize = 0;
     int previousRowSize;
 
@@ -33,10 +35,11 @@ abstract class AbstractLayouter implements ILayouter {
     private IChildGravityResolver childGravityResolver;
     private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
 
-    AbstractLayouter(ChipsLayoutManager layoutManager, int topOffset, int bottomOffset, IChildGravityResolver childGravityResolver) {
+    AbstractLayouter(ChipsLayoutManager layoutManager, int topOffset, int bottomOffset, IViewCacheStorage cacheStorage, IChildGravityResolver childGravityResolver) {
         this.layoutManager = layoutManager;
         this.viewTop = topOffset;
         this.viewBottom = bottomOffset;
+        this.cacheStorage = cacheStorage;
         this.childGravityResolver = childGravityResolver;
     }
 
@@ -48,24 +51,19 @@ abstract class AbstractLayouter implements ILayouter {
         return layoutManager.getHeight();
     }
 
-    public int getViewTop() {
-        return viewTop;
-    }
-
-    public int getViewBottom() {
-        return viewBottom;
-    }
-
     public int getCurrentViewPosition() {
         return currentViewPosition;
     }
 
+    /** read view params to memory */
     private void calculateView(View view) {
         currentViewHeight = layoutManager.getDecoratedMeasuredHeight(view);
         currentViewWidth = layoutManager.getDecoratedMeasuredWidth(view);
         currentViewBottom = layoutManager.getDecoratedBottom(view);
         currentViewPosition = layoutManager.getPosition(view);
     }
+
+    abstract void loadFromCache(@NonNull Rect rect);
 
     @Override
     @CallSuper
@@ -74,16 +72,22 @@ abstract class AbstractLayouter implements ILayouter {
     public final boolean placeView(View view) {
         calculateView(view);
 
-//        Rect cacheRect = cacheStorage.getRect(currentViewPosition);
-
         if (canNotBePlacedInCurrentRow()) {
             layoutRow();
         }
+
         if (isFinishedLayouting()) return false;
-        Rect rect = createViewRect(view);
+
+        Rect rect = cacheStorage.getRect(currentViewPosition);
+        if (rect != null) {
+            loadFromCache(rect);
+        } else {
+            rect = createViewRect(view);
+        }
+
         rowViews.add(new Pair<>(rect, view));
 
-//        cacheStorage.put(cacheRect, currentViewPosition);
+        cacheStorage.put(rect, currentViewPosition);
 
         return true;
     }

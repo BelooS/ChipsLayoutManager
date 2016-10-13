@@ -1,18 +1,23 @@
 package com.beloo.widget.spanlayoutmanager.layouter;
 
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.view.View;
 
 import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.spanlayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
 
 class LTRDownLayouter extends AbstractLayouter {
 
     private int viewLeft;
 
-    LTRDownLayouter(ChipsLayoutManager layoutManager, IChildGravityResolver childGravityResolver, int topOffset, int leftOffset, int bottomOffset) {
-        super(layoutManager, topOffset, bottomOffset, childGravityResolver);
+    LTRDownLayouter(ChipsLayoutManager layoutManager,
+                    IChildGravityResolver childGravityResolver,
+                    IViewCacheStorage cacheStorage,
+                    int topOffset, int leftOffset, int bottomOffset) {
+        super(layoutManager, topOffset, bottomOffset, cacheStorage, childGravityResolver);
         viewLeft = leftOffset;
     }
 
@@ -39,12 +44,19 @@ class LTRDownLayouter extends AbstractLayouter {
 
     @Override
     public boolean canNotBePlacedInCurrentRow() {
-        return viewLeft > 0 && viewLeft + currentViewWidth > getCanvasWidth();
+        return (viewLeft > 0 && viewLeft + currentViewWidth > getCanvasWidth());
     }
 
     @Override
     public AbstractPositionIterator positionIterator() {
         return new IncrementalPositionIterator(getLayoutManager().getItemCount());
+    }
+
+    @Override
+    void loadFromCache(@NonNull Rect rect) {
+        viewLeft = rect.right;
+        viewBottom = Math.max(viewBottom, rect.bottom);
+        viewTop = rect.top;
     }
 
     @Override
