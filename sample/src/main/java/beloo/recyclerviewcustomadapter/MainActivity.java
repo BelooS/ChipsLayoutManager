@@ -32,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
         rvTest = (RecyclerView) findViewById(R.id.rvTest);
         spinnerPosition = (Spinner) findViewById(R.id.spinnerPosition);
 
-        items = new ItemsFactory().getFewItems();
-//        items = new ItemsFactory().getALotOfItems();
+//        items = new ItemsFactory().getFewItems();
+        items = new ItemsFactory().getALotOfItems();
 
         positions = new LinkedList<>();
         for (int i = 0; i< items.size(); i++) {

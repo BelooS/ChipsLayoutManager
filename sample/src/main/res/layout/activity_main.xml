@@ -11,6 +11,19 @@
     tools:context="beloo.recyclerviewcustomadapter.MainActivity"
     >
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvTest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignTop="@+id/spinnerPosition"
+        android:background="@android:color/white"
+        />
+
     <Button
         android:id="@+id/btnInsert"
         android:layout_width="wrap_content"
@@ -37,15 +50,8 @@
         android:id="@+id/spinnerPosition"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/btnInsert"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_above="@id/btnInsert"
-        />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rvTest"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

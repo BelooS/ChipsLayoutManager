@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="sample" type="AndroidRunConfigurationType" factoryName="Android App">
+  <configuration default="false" name="sample" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
     <module name="sample" />
     <option name="DEPLOY" value="true" />
     <option name="ARTIFACT_NAME" value="" />

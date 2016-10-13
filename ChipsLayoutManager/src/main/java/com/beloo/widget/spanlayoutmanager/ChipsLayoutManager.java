@@ -45,6 +45,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
 
     private ChipsLayoutManager() {
         setAutoMeasureEnabled(true);
+        setMeasurementCacheEnabled(true);
     }
 
     public static Builder newBuilder() {
@@ -329,8 +330,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
         anchorView = getAnchorVisibleTopLeftView();
 
         if (!anchorView.isNotFoundState() && anchorView.getPosition() == 0) {
-            //todo refactor it, blinking now without animation. Workaround to fix start position of items if some items have been added after initialization
-            detachAndScrapAttachedViews(recycler);
+            postOnAnimation(new Runnable() {
+                @Override
+                public void run() {
+                    requestLayout();
+                    requestSimpleAnimationsInNextLayout();
+                }
+            });
+
         }
 
         fill(recycler, anchorView);
