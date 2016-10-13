@@ -9,7 +9,6 @@ import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
 
 class LTRDownLayouter extends AbstractLayouter {
 
-    private int maxBottom;
     private int viewLeft;
 
     LTRDownLayouter(ChipsLayoutManager layoutManager, IChildGravityResolver childGravityResolver, int topOffset, int leftOffset, int bottomOffset) {
@@ -23,11 +22,11 @@ class LTRDownLayouter extends AbstractLayouter {
         //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
 
         //layout previously calculated row
-        layoutRow(rowViews, viewTop, maxBottom, 0);
+        layoutRow(rowViews, viewTop, viewBottom, 0);
 
         //go to next row, increase top coordinate, reset left
         viewLeft = 0;
-        viewTop = maxBottom;
+        viewTop = viewBottom;
 
         //clear row data
         rowViews.clear();
@@ -35,7 +34,7 @@ class LTRDownLayouter extends AbstractLayouter {
 
     @Override
     void addView(View view) {
-        layoutManager.addView(view);
+        getLayoutManager().addView(view);
     }
 
     @Override
@@ -45,7 +44,7 @@ class LTRDownLayouter extends AbstractLayouter {
 
     @Override
     public AbstractPositionIterator positionIterator() {
-        return new IncrementalPositionIterator(layoutManager.getItemCount());
+        return new IncrementalPositionIterator(getLayoutManager().getItemCount());
     }
 
     @Override
@@ -54,15 +53,15 @@ class LTRDownLayouter extends AbstractLayouter {
         rowViews.add(new Pair<>(viewRect, view));
 
         viewLeft = viewRect.right;
-        maxBottom = Math.max(maxBottom, viewRect.bottom);
+        viewBottom = Math.max(viewBottom, viewRect.bottom);
         return viewRect;
     }
 
     @Override
     public boolean onAttachView(View view) {
-        viewTop = layoutManager.getDecoratedTop(view);
-        viewLeft = layoutManager.getDecoratedRight(view);
-        maxBottom = Math.max(maxBottom, layoutManager.getDecoratedBottom(view));
+        viewTop = getLayoutManager().getDecoratedTop(view);
+        viewLeft = getLayoutManager().getDecoratedRight(view);
+        viewBottom = Math.max(viewBottom, getLayoutManager().getDecoratedBottom(view));
         return super.onAttachView(view);
     }
 

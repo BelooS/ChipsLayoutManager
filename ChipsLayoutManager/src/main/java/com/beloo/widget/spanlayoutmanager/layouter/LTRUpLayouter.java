@@ -1,7 +1,6 @@
 package com.beloo.widget.spanlayoutmanager.layouter;
 
 import android.graphics.Rect;
-import android.util.Pair;
 import android.view.View;
 
 import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
@@ -19,7 +18,6 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     @Override
     public void layoutRow() {
         super.layoutRow();
-        String str;
 
         //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
         //if previously row finished and we have to fill it
@@ -35,13 +33,14 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
     @Override
     void addView(View view) {
-        layoutManager.addView(view, 0);
+        getLayoutManager().addView(view, 0);
     }
 
     @Override
     Rect createViewRect(View view) {
         int left = viewRight - currentViewWidth;
         int viewTop = viewBottom - currentViewHeight;
+
         Rect viewRect = new Rect(left, viewTop, viewRight, viewBottom);
         viewRight = left;
         return viewRect;
@@ -50,15 +49,15 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     @Override
     public boolean onAttachView(View view) {
 
-        if (viewRight != getCanvasWidth() && viewRight - layoutManager.getDecoratedMeasuredWidth(view) < 0) {
+        if (viewRight != getCanvasWidth() && viewRight - getLayoutManager().getDecoratedMeasuredWidth(view) < 0) {
             //new row
             viewRight = getCanvasWidth();
             viewBottom = viewTop;
         } else {
-            viewRight = layoutManager.getDecoratedLeft(view);
+            viewRight = getLayoutManager().getDecoratedLeft(view);
         }
 
-        viewTop = Math.min(viewTop, layoutManager.getDecoratedTop(view));
+        viewTop = Math.min(viewTop, getLayoutManager().getDecoratedTop(view));
 
         return super.onAttachView(view);
     }

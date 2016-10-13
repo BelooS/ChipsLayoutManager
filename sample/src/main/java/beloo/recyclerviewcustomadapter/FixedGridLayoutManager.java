@@ -530,7 +530,7 @@ public class FixedGridLayoutManager extends RecyclerView.LayoutManager {
         LinearSmoothScroller scroller = new LinearSmoothScroller(recyclerView.getContext()) {
             /*
              * LinearSmoothScroller, at a minimum, just need to know the vector
-             * (x/y distance) to travel in order to get from the current positioning
+             * (x/y distance) to travel in order to getRect from the current positioning
              * to the target.
              */
             @Override
@@ -560,7 +560,7 @@ public class FixedGridLayoutManager extends RecyclerView.LayoutManager {
     /*
      * This method describes how far RecyclerView thinks the contents should scroll horizontally.
      * You are responsible for verifying edge boundaries, and determining if this scroll
-     * event somehow requires that new views be added or old views get recycled.
+     * event somehow requires that new views be added or old views getRect recycled.
      */
     @Override
     public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
@@ -641,7 +641,7 @@ public class FixedGridLayoutManager extends RecyclerView.LayoutManager {
     /*
      * This method describes how far RecyclerView thinks the contents should scroll vertically.
      * You are responsible for verifying edge boundaries, and determining if this scroll
-     * event somehow requires that new views be added or old views get recycled.
+     * event somehow requires that new views be added or old views getRect recycled.
      */
     @Override
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {

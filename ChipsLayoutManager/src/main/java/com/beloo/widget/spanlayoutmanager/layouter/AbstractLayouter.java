@@ -2,7 +2,6 @@ package com.beloo.widget.spanlayoutmanager.layouter;
 
 import android.graphics.Rect;
 import android.support.annotation.CallSuper;
-import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
@@ -11,6 +10,7 @@ import java.util.List;
 
 import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.spanlayoutmanager.SpanLayoutChildGravity;
+import com.beloo.widget.spanlayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.spanlayoutmanager.gravity.GravityModifiersFactory;
 import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
 import com.beloo.widget.spanlayoutmanager.gravity.IGravityModifier;
@@ -19,13 +19,16 @@ abstract class AbstractLayouter implements ILayouter {
     int currentViewWidth;
     int currentViewHeight;
     int currentViewBottom;
+    private int currentViewPosition;
     List<Pair<Rect, View>> rowViews = new LinkedList<>();
+    /** max bottom of current row views*/
     int viewBottom;
     int viewTop;
     int rowSize = 0;
     int previousRowSize;
 
-    protected ChipsLayoutManager layoutManager;
+    private ChipsLayoutManager layoutManager;
+    private IViewCacheStorage cacheStorage;
 
     private IChildGravityResolver childGravityResolver;
     private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
@@ -53,10 +56,15 @@ abstract class AbstractLayouter implements ILayouter {
         return viewBottom;
     }
 
+    public int getCurrentViewPosition() {
+        return currentViewPosition;
+    }
+
     private void calculateView(View view) {
         currentViewHeight = layoutManager.getDecoratedMeasuredHeight(view);
         currentViewWidth = layoutManager.getDecoratedMeasuredWidth(view);
         currentViewBottom = layoutManager.getDecoratedBottom(view);
+        currentViewPosition = layoutManager.getPosition(view);
     }
 
     @Override
@@ -65,12 +73,18 @@ abstract class AbstractLayouter implements ILayouter {
      * @return true if view successfully placed, false if view can't be placed because out of space on screen and have to be recycled */
     public final boolean placeView(View view) {
         calculateView(view);
+
+//        Rect cacheRect = cacheStorage.getRect(currentViewPosition);
+
         if (canNotBePlacedInCurrentRow()) {
             layoutRow();
         }
         if (isFinishedLayouting()) return false;
         Rect rect = createViewRect(view);
         rowViews.add(new Pair<>(rect, view));
+
+//        cacheStorage.put(cacheRect, currentViewPosition);
+
         return true;
     }
 
@@ -123,7 +137,7 @@ abstract class AbstractLayouter implements ILayouter {
             View view = rowViewRectPair.second;
 
             @SpanLayoutChildGravity
-            int viewGravity = childGravityResolver.getItemGravity(layoutManager.getPosition(view));
+            int viewGravity = childGravityResolver.getItemGravity(getLayoutManager().getPosition(view));
             IGravityModifier gravityModifier = gravityModifiersFactory.getGravityModifier(viewGravity);
             gravityModifier.modifyChildRect(minTop, maxBottom, viewRect);
 
@@ -139,4 +153,7 @@ abstract class AbstractLayouter implements ILayouter {
     abstract void addView(View view);
 
 
+    ChipsLayoutManager getLayoutManager() {
+        return layoutManager;
+    }
 }

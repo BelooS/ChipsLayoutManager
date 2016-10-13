@@ -2,7 +2,6 @@ package com.beloo.widget.spanlayoutmanager.layouter;
 
 import android.graphics.Rect;
 import android.util.Log;
-import android.util.Pair;
 import android.view.View;
 
 import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
@@ -39,7 +38,7 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
 
     @Override
     void addView(View view) {
-        layoutManager.addView(view, 0);
+        getLayoutManager().addView(view, 0);
     }
 
     @Override
@@ -54,14 +53,14 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     @Override
     public boolean onAttachView(View view) {
 
-        if (viewLeft != 0 && viewLeft + layoutManager.getDecoratedMeasuredWidth(view) > getCanvasWidth()) {
+        if (viewLeft != 0 && viewLeft + getLayoutManager().getDecoratedMeasuredWidth(view) > getCanvasWidth()) {
             viewLeft = 0;
             viewBottom = viewTop;
         } else {
-            viewLeft = layoutManager.getDecoratedRight(view);
+            viewLeft = getLayoutManager().getDecoratedRight(view);
         }
 
-        viewTop = Math.min(viewTop, layoutManager.getDecoratedTop(view));
+        viewTop = Math.min(viewTop, getLayoutManager().getDecoratedTop(view));
 
         return super.onAttachView(view);
     }
