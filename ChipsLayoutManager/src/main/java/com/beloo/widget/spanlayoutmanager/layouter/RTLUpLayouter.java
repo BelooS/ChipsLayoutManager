@@ -6,14 +6,15 @@ import android.util.Pair;
 import android.view.View;
 
 import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
 
 class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     private static final String TAG = RTLUpLayouter.class.getSimpleName();
 
     protected int viewLeft;
 
-    RTLUpLayouter(ChipsLayoutManager spanLayoutManager, int topOffset, int leftOffset, int bottomOffset) {
-        super(spanLayoutManager, topOffset, bottomOffset);
+    RTLUpLayouter(ChipsLayoutManager spanLayoutManager, IChildGravityResolver childGravityResolver, int topOffset, int leftOffset, int bottomOffset) {
+        super(spanLayoutManager, topOffset, bottomOffset, childGravityResolver);
         Log.d(TAG, "start bottom offset = " + bottomOffset);
         this.viewLeft = leftOffset;
     }
@@ -26,7 +27,7 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
         //if previously row finished and we have to fill it
         Log.d(TAG, "row bottom " + viewBottom);
         Log.d(TAG, "row top " + viewTop);
-        viewTop = layoutManager.layoutRow(rowViews, viewTop, viewBottom, -(getCanvasWidth() - viewLeft), true);
+        viewTop = layoutRow(rowViews, viewTop, viewBottom, -(getCanvasWidth() - viewLeft));
 
         //clear row data
         rowViews.clear();
@@ -34,6 +35,11 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
         //go to next row, increase top coordinate, reset left
         viewLeft = 0;
         viewBottom = viewTop;
+    }
+
+    @Override
+    void addView(View view) {
+        layoutManager.addView(view, 0);
     }
 
     public void placeView(View view) {

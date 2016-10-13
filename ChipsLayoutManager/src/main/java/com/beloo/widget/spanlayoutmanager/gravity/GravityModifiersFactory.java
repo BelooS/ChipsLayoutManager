@@ -1,5 +1,6 @@
 package com.beloo.widget.spanlayoutmanager.gravity;
 
+import android.util.SparseArray;
 import android.view.Gravity;
 
 import com.beloo.widget.spanlayoutmanager.SpanLayoutChildGravity;
@@ -9,10 +10,10 @@ import java.util.Map;
 
 public class GravityModifiersFactory {
 
-    public Map<Integer, IGravityModifier> gravityModifierMap;
+    private SparseArray<IGravityModifier> gravityModifierMap;
 
     public GravityModifiersFactory() {
-        gravityModifierMap = new HashMap<>();
+        gravityModifierMap = new SparseArray<>();
 
         CenterGravityModifier centerGravityModifier = new CenterGravityModifier();
         TopGravityModifier topGravityModifier = new TopGravityModifier();

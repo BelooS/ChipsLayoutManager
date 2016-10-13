@@ -9,23 +9,31 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.spanlayoutmanager.SpanLayoutChildGravity;
+import com.beloo.widget.spanlayoutmanager.gravity.GravityModifiersFactory;
+import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
+import com.beloo.widget.spanlayoutmanager.gravity.IGravityModifier;
 
 abstract class AbstractLayouter implements ILayouter {
-    protected int currentViewWidth;
-    protected int currentViewHeight;
-    protected int currentViewBottom;
-    protected List<Pair<Rect, View>> rowViews = new LinkedList<>();
-    protected int viewBottom;
-    protected int viewTop;
-    protected int rowSize = 0;
-    protected int previousRowSize;
+    int currentViewWidth;
+    int currentViewHeight;
+    int currentViewBottom;
+    List<Pair<Rect, View>> rowViews = new LinkedList<>();
+    int viewBottom;
+    int viewTop;
+    int rowSize = 0;
+    int previousRowSize;
 
     protected ChipsLayoutManager layoutManager;
 
-    AbstractLayouter(ChipsLayoutManager layoutManager, int topOffset, int bottomOffset) {
+    private IChildGravityResolver childGravityResolver;
+    private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
+
+    AbstractLayouter(ChipsLayoutManager layoutManager, int topOffset, int bottomOffset, IChildGravityResolver childGravityResolver) {
         this.layoutManager = layoutManager;
         this.viewTop = topOffset;
         this.viewBottom = bottomOffset;
+        this.childGravityResolver = childGravityResolver;
     }
 
     int getCanvasWidth() {
@@ -72,6 +80,40 @@ abstract class AbstractLayouter implements ILayouter {
         previousRowSize = rowSize;
         this.rowSize = 0;
     }
+
+    /** layout pre-calculated row on a recyclerView canvas
+     * @param leftOffsetOfRow How much row have to be shifted before placing. Should be negative on RTL
+     * returns viewTop */
+    int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int maxBottom, int leftOffsetOfRow) {
+        for (Pair<Rect, View> rowViewRectPair : rowViews) {
+            Rect viewRect = rowViewRectPair.first;
+
+            viewRect.left = viewRect.left - leftOffsetOfRow;
+            viewRect.right = viewRect.right - leftOffsetOfRow;
+
+            minTop = Math.min(minTop, viewRect.top);
+            maxBottom = Math.max(maxBottom, viewRect.bottom);
+        }
+
+        for (Pair<Rect, View> rowViewRectPair : rowViews) {
+            Rect viewRect = rowViewRectPair.first;
+            View view = rowViewRectPair.second;
+
+            @SpanLayoutChildGravity
+            int viewGravity = childGravityResolver.getItemGravity(layoutManager.getPosition(view));
+            IGravityModifier gravityModifier = gravityModifiersFactory.getGravityModifier(viewGravity);
+            gravityModifier.modifyChildRect(minTop, maxBottom, viewRect);
+
+            addView(view);
+
+            //layout whole views in a row
+            layoutManager.layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
+        }
+
+        return minTop;
+    }
+
+    abstract void addView(View view);
 
 
 }

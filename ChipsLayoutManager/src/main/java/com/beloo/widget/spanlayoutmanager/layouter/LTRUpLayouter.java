@@ -5,13 +5,14 @@ import android.util.Pair;
 import android.view.View;
 
 import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
 
 class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
     protected int viewRight;
 
-    LTRUpLayouter(ChipsLayoutManager layoutManager, int topOffset, int bottomOffset, int rightOffset) {
-        super(layoutManager, topOffset, bottomOffset);
+    LTRUpLayouter(ChipsLayoutManager layoutManager, IChildGravityResolver childGravityResolver, int topOffset, int bottomOffset, int rightOffset) {
+        super(layoutManager, topOffset, bottomOffset, childGravityResolver);
         this.viewRight = rightOffset;
     }
 
@@ -21,7 +22,7 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
         //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
         //if previously row finished and we have to fill it
-        viewTop = layoutManager.layoutRow(rowViews, viewTop, viewBottom, viewRight, true);
+        viewTop = layoutRow(rowViews, viewTop, viewBottom, viewRight);
 
         //clear row data
         rowViews.clear();
@@ -31,6 +32,12 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
         viewBottom = viewTop;
     }
 
+    @Override
+    void addView(View view) {
+        layoutManager.addView(view, 0);
+    }
+
+    /** calculate view positions, view won't be actually added to layout when calling this method */
     public void placeView(View view) {
 
         /* view can be placed in current row, but we can't determine real position, until row will be filled,

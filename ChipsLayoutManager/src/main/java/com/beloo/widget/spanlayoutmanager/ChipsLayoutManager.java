@@ -6,17 +6,12 @@ import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.Pair;
 import android.util.SparseArray;
 import android.view.View;
-
-import java.util.List;
 
 import com.beloo.widget.spanlayoutmanager.gravity.CenterChildGravity;
 import com.beloo.widget.spanlayoutmanager.gravity.CustomGravityResolver;
 import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
-import com.beloo.widget.spanlayoutmanager.gravity.GravityModifiersFactory;
-import com.beloo.widget.spanlayoutmanager.gravity.IGravityModifier;
 import com.beloo.widget.spanlayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.spanlayoutmanager.layouter.ILayouter;
 import com.beloo.widget.spanlayoutmanager.layouter.LayouterFactory;
@@ -24,9 +19,10 @@ import com.beloo.widget.spanlayoutmanager.layouter.LayouterFactory;
 public class ChipsLayoutManager extends RecyclerView.LayoutManager {
 
     private IChildGravityResolver childGravityResolver;
-    private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
 
-    /** coefficient to support fast scrolling, caching views only for one row may not be enough */
+    /**
+     * coefficient to support fast scrolling, caching views only for one row may not be enough
+     */
     private static final float FAST_SCROLLING_COEFFICIENT = 2;
     private int maxViewsInRow = 2;
     private LayouterFactory layouterFactory = new LayouterFactory(this);
@@ -35,10 +31,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
 
     private Integer anchorViewPosition = null;
 
-    /** highest top position of attached views*/
+    /**
+     * highest top position of attached views
+     */
     private int highestViewTop = Integer.MAX_VALUE;
 
-    /** stored current anchor view due to scroll state changes*/
+    /**
+     * stored current anchor view due to scroll state changes
+     */
     private AnchorViewState anchorView = AnchorViewState.getNotFoundState();
 
     private boolean isScrollingEnabled = true;
@@ -49,7 +49,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
     }
 
     public static Builder newBuilder() {
-        return new ChipsLayoutManager() .new Builder();
+        return new ChipsLayoutManager().new Builder();
+    }
+
+    public IChildGravityResolver getChildGravityResolver() {
+        return childGravityResolver;
     }
 
     public void setScrollingEnabled(boolean isEnabled) {
@@ -58,15 +62,21 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
 
     public class Builder {
 
-        private @SpanLayoutChildGravity Integer gravity;
+        private
+        @SpanLayoutChildGravity
+        Integer gravity;
 
-        /** set vertical gravity in a row for all children. Default = CENTER_VERTICAL*/
+        /**
+         * set vertical gravity in a row for all children. Default = CENTER_VERTICAL
+         */
         public Builder setChildGravity(@SpanLayoutChildGravity int gravity) {
             this.gravity = gravity;
             return this;
         }
 
-        /** set gravity resolver in case you need special gravity for items. This method have priority over {@link #setChildGravity(int)}*/
+        /**
+         * set gravity resolver in case you need special gravity for items. This method have priority over {@link #setChildGravity(int)}
+         */
         public Builder setGravityResolver(IChildGravityResolver gravityResolver) {
             childGravityResolver = gravityResolver;
             return this;
@@ -77,7 +87,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
             return this;
         }
 
-        /** create SpanLayoutManager*/
+        /**
+         * create SpanLayoutManager
+         */
         public ChipsLayoutManager build() {
             // setGravityResolver always have priority
             if (childGravityResolver == null) {
@@ -208,12 +220,16 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
         Log.d("fillWithLayouter", "recycled count = " + recycledSize);
     }
 
-    /** @return true if RTL mode enabled in RecyclerView*/
+    /**
+     * @return true if RTL mode enabled in RecyclerView
+     */
     protected boolean isLayoutRTL() {
         return getLayoutDirection() == ViewCompat.LAYOUT_DIRECTION_RTL;
     }
 
-    /** place views in layout started from chosen position with chosen layouter*/
+    /**
+     * place views in layout started from chosen position with chosen layouter
+     */
     private void fillWithLayouter(RecyclerView.Recycler recycler, ILayouter layouter, int startingPos) {
 
         AbstractPositionIterator iterator = layouter.positionIterator();
@@ -273,45 +289,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
         layouter.layoutRow();
     }
 
-
-    /** layout pre-calculated row on a recyclerView canvas
-     * @param isReverseOrder if fillWithLayouter views from the end this flag have to be true to not break child position in recyclerView
-     * @param leftOffsetOfRow How much row have to be shifted before placing. Should be negative on RTL
-     * returns viewTop */
-    public int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int maxBottom, int leftOffsetOfRow, boolean isReverseOrder) {
-        for (Pair<Rect, View> rowViewRectPair : rowViews) {
-            Rect viewRect = rowViewRectPair.first;
-
-            viewRect.left = viewRect.left - leftOffsetOfRow;
-            viewRect.right = viewRect.right - leftOffsetOfRow;
-
-            minTop = Math.min(minTop, viewRect.top);
-            maxBottom = Math.max(maxBottom, viewRect.bottom);
-        }
-
-        for (Pair<Rect, View> rowViewRectPair : rowViews) {
-            Rect viewRect = rowViewRectPair.first;
-            View view = rowViewRectPair.second;
-
-            @SpanLayoutChildGravity
-            int viewGravity = childGravityResolver.getItemGravity(getPosition(view));
-            IGravityModifier gravityModifier = gravityModifiersFactory.getGravityModifier(viewGravity);
-            gravityModifier.modifyChildRect(minTop, maxBottom, viewRect);
-
-            if (isReverseOrder) {
-                addView(view, 0);
-            } else {
-                addView(view);
-            }
-
-            //layout whole views in a row
-            layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
-        }
-
-        return minTop;
-    }
-
-    /** recycler should contain all recycled views from a longest row, not just 2 holders by default*/
+    /**
+     * recycler should contain all recycled views from a longest row, not just 2 holders by default
+     */
     private void calcRecyclerCacheSize(RecyclerView.Recycler recycler, int rowSize) {
         maxViewsInRow = Math.max(rowSize, maxViewsInRow);
         recycler.setViewCacheSize((int) (maxViewsInRow * FAST_SCROLLING_COEFFICIENT));
@@ -322,7 +302,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
         super.onItemsAdded(recyclerView, positionStart, itemCount);
     }
 
-    /** calculate offset of views while scrolling, layout items on new places*/
+    /**
+     * calculate offset of views while scrolling, layout items on new places
+     */
     @Override
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
         dy = scrollVerticallyInternal(dy);
@@ -366,7 +348,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
 
             //todo workaround. somehow in the first row view in getChildAt(0) can have position 1
             boolean isZeroAdded = false;
-            for (int i =0; i < childCount; i ++) {
+            for (int i = 0; i < childCount; i++) {
                 View test = getChildAt(i);
                 if (getPosition(test) == 0) {
                     isZeroAdded = true;
@@ -394,7 +376,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
         return delta;
     }
 
-    /** find top view in layout*/
+    /**
+     * find top view in layout
+     */
     private View findTopView() {
         View topView = getChildAt(0);
         int minTop = getDecoratedTop(topView);
@@ -426,7 +410,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
             Rect viewRect = new Rect(left, top, right, bottom);
             boolean intersect = viewRect.intersect(mainRect);
             if (intersect) {
-                if (getPosition(view) != -1 ) {
+                if (getPosition(view) != -1) {
                     if (topLeft.isNotFoundState()) {
                         topLeft = new AnchorViewState(getPosition(view), new Rect(left, top, right, bottom));
                     }
@@ -444,7 +428,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
 
     public void scrollToPosition(int position) {
         if (position >= getItemCount()) {
-            Log.e("span layout manager", "Cannot scroll to " + position + ", item count "+getItemCount());
+            Log.e("span layout manager", "Cannot scroll to " + position + ", item count " + getItemCount());
             return;
         }
 

@@ -5,14 +5,15 @@ import android.util.Pair;
 import android.view.View;
 
 import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
 
 class RTLDownLayouter extends AbstractLayouter {
 
     private int maxBottom;
     private int viewRight;
 
-    RTLDownLayouter(ChipsLayoutManager layoutManager, int topOffset, int bottomOffset, int rightOffset) {
-        super(layoutManager, topOffset, bottomOffset);
+    RTLDownLayouter(ChipsLayoutManager layoutManager, IChildGravityResolver childGravityResolver, int topOffset, int bottomOffset, int rightOffset) {
+        super(layoutManager, topOffset, bottomOffset, childGravityResolver);
         viewRight = rightOffset;
     }
 
@@ -22,7 +23,7 @@ class RTLDownLayouter extends AbstractLayouter {
         //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
 
         //layout previously calculated row
-        layoutManager.layoutRow(rowViews, viewTop, maxBottom, 0, false);
+        layoutRow(rowViews, viewTop, maxBottom, 0);
 
         //go to next row, increase top coordinate, reset left
         viewRight = getCanvasWidth();
@@ -30,6 +31,11 @@ class RTLDownLayouter extends AbstractLayouter {
 
         //clear row data
         rowViews.clear();
+    }
+
+    @Override
+    void addView(View view) {
+        layoutManager.addView(view, 0);
     }
 
     @Override
