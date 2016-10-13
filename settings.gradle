@@ -1,1 +1,1 @@
-include ':sample', ':ChipsLayoutManager-source'
+include ':sample', ':ChipsLayoutManager'
