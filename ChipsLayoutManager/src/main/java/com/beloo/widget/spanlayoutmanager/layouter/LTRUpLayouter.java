@@ -9,7 +9,7 @@ import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
 
 class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
-    protected int viewRight;
+    private int viewRight;
 
     LTRUpLayouter(ChipsLayoutManager layoutManager, IChildGravityResolver childGravityResolver, int topOffset, int bottomOffset, int rightOffset) {
         super(layoutManager, topOffset, bottomOffset, childGravityResolver);
@@ -19,6 +19,7 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     @Override
     public void layoutRow() {
         super.layoutRow();
+        String str;
 
         //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
         //if previously row finished and we have to fill it
@@ -47,8 +48,7 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
-    public void onAttachView(View view) {
-        super.onAttachView(view);
+    public boolean onAttachView(View view) {
 
         if (viewRight != getCanvasWidth() && viewRight - layoutManager.getDecoratedMeasuredWidth(view) < 0) {
             //new row
@@ -59,6 +59,8 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
         }
 
         viewTop = Math.min(viewTop, layoutManager.getDecoratedTop(view));
+
+        return super.onAttachView(view);
     }
 
     @Override

@@ -249,23 +249,17 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
                 requestedItems++;
                 measureChildWithMargins(view, 0, 0);
 
-                layouter.placeView(view);
-
-                if (layouter.isFinishedLayouting()) {
-
-                    /* reached end of visible bounds, exit.
+                if (!layouter.placeView(view)) {
+                     /* reached end of visible bounds, exit.
                     recycle view, which was requested previously
                      */
                     recycler.recycleView(view);
                     recycledItems++;
-
                     break;
                 }
 
             } else {
-                layouter.onAttachView(view);
-
-                if (layouter.isFinishedLayouting()) {
+                if (!layouter.onAttachView(view)) {
                     break;
                 }
 

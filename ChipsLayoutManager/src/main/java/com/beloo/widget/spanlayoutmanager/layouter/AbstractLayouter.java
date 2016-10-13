@@ -61,15 +61,17 @@ abstract class AbstractLayouter implements ILayouter {
 
     @Override
     @CallSuper
-    /** calculate view positions, view won't be actually added to layout when calling this method */
-    public final void placeView(View view) {
+    /** calculate view positions, view won't be actually added to layout when calling this method
+     * @return true if view successfully placed, false if view can't be placed because out of space on screen and have to be recycled */
+    public final boolean placeView(View view) {
         calculateView(view);
         if (canNotBePlacedInCurrentRow()) {
             layoutRow();
         }
-        if (isFinishedLayouting()) return;
+        if (isFinishedLayouting()) return false;
         Rect rect = createViewRect(view);
         rowViews.add(new Pair<>(rect, view));
+        return true;
     }
 
     /** factory method for Rect, where view will be placed. Creation based on inner layouter parameters */
@@ -85,11 +87,13 @@ abstract class AbstractLayouter implements ILayouter {
     /** Read layouter state from current attached view. We need only last of it, but we can't determine here which is last.
      * Based on characteristics of last attached view, layouter algorithm will be able to continue placing from it.
      * This method have to be called on attaching view*/
-    public void onAttachView(View view) {
+    public boolean onAttachView(View view) {
         rowSize++;
-        if (!isFinishedLayouting()) {
-            layoutManager.attachView(view);
-        }
+
+        if (isFinishedLayouting()) return false;
+
+        layoutManager.attachView(view);
+        return true;
     }
 
     @CallSuper
