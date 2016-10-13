@@ -8,7 +8,7 @@ import android.view.View;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.beloo.widget.spanlayoutmanager.SpanLayoutManager;
+import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
 
 abstract class AbstractLayouter implements ILayouter {
     protected int currentViewWidth;
@@ -20,9 +20,9 @@ abstract class AbstractLayouter implements ILayouter {
     protected int rowSize = 0;
     protected int previousRowSize;
 
-    protected SpanLayoutManager layoutManager;
+    protected ChipsLayoutManager layoutManager;
 
-    AbstractLayouter(SpanLayoutManager layoutManager, int topOffset, int bottomOffset) {
+    AbstractLayouter(ChipsLayoutManager layoutManager, int topOffset, int bottomOffset) {
         this.layoutManager = layoutManager;
         this.viewTop = topOffset;
         this.viewBottom = bottomOffset;

@@ -1,11 +1,11 @@
 package com.beloo.widget.spanlayoutmanager.layouter;
 
-import com.beloo.widget.spanlayoutmanager.SpanLayoutManager;
+import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
 
 public class LayouterFactory {
-    private SpanLayoutManager layoutManager;
+    private ChipsLayoutManager layoutManager;
 
-    public LayouterFactory(SpanLayoutManager layoutManager) {
+    public LayouterFactory(ChipsLayoutManager layoutManager) {
         this.layoutManager = layoutManager;
     }
 

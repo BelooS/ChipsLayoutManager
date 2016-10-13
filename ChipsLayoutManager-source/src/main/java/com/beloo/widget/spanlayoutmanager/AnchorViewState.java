@@ -61,7 +61,7 @@ class AnchorViewState implements Parcelable {
     }
 
     public static final Parcelable.Creator<AnchorViewState> CREATOR = new Parcelable.Creator<AnchorViewState>() {
-        // распаковываем объект из Parcel
+        // unpack Object from Parcel
         public AnchorViewState createFromParcel(Parcel in) {
             return new AnchorViewState(in);
         }

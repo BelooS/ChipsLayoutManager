@@ -5,14 +5,14 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
-import com.beloo.widget.spanlayoutmanager.SpanLayoutManager;
+import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
 
 class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     private static final String TAG = RTLUpLayouter.class.getSimpleName();
 
     protected int viewLeft;
 
-    RTLUpLayouter(SpanLayoutManager spanLayoutManager, int topOffset, int leftOffset, int bottomOffset) {
+    RTLUpLayouter(ChipsLayoutManager spanLayoutManager, int topOffset, int leftOffset, int bottomOffset) {
         super(spanLayoutManager, topOffset, bottomOffset);
         Log.d(TAG, "start bottom offset = " + bottomOffset);
         this.viewLeft = leftOffset;

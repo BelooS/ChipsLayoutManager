@@ -4,14 +4,14 @@ import android.graphics.Rect;
 import android.util.Pair;
 import android.view.View;
 
-import com.beloo.widget.spanlayoutmanager.SpanLayoutManager;
+import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
 
 class LTRDownLayouter extends AbstractLayouter {
 
     private int maxBottom;
     private int viewLeft;
 
-    LTRDownLayouter(SpanLayoutManager layoutManager, int topOffset, int leftOffset, int bottomOffset) {
+    LTRDownLayouter(ChipsLayoutManager layoutManager, int topOffset, int leftOffset, int bottomOffset) {
         super(layoutManager, topOffset, bottomOffset);
         viewLeft = leftOffset;
     }

@@ -4,13 +4,13 @@ import android.graphics.Rect;
 import android.util.Pair;
 import android.view.View;
 
-import com.beloo.widget.spanlayoutmanager.SpanLayoutManager;
+import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
 
 class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
     protected int viewRight;
 
-    LTRUpLayouter(SpanLayoutManager layoutManager, int topOffset, int bottomOffset, int rightOffset) {
+    LTRUpLayouter(ChipsLayoutManager layoutManager, int topOffset, int bottomOffset, int rightOffset) {
         super(layoutManager, topOffset, bottomOffset);
         this.viewRight = rightOffset;
     }

@@ -1,7 +1,6 @@
 package com.beloo.widget.spanlayoutmanager;
 
 import android.graphics.Rect;
-import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
@@ -22,7 +21,7 @@ import com.beloo.widget.spanlayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.spanlayoutmanager.layouter.ILayouter;
 import com.beloo.widget.spanlayoutmanager.layouter.LayouterFactory;
 
-public class SpanLayoutManager extends RecyclerView.LayoutManager {
+public class ChipsLayoutManager extends RecyclerView.LayoutManager {
 
     private IChildGravityResolver childGravityResolver;
     private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
@@ -44,12 +43,12 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
 
     private boolean isScrollingEnabled = true;
 
-    private SpanLayoutManager() {
+    private ChipsLayoutManager() {
         setAutoMeasureEnabled(true);
     }
 
     public static Builder newBuilder() {
-        return new SpanLayoutManager() .new Builder();
+        return new ChipsLayoutManager() .new Builder();
     }
 
     public void setScrollingEnabled(boolean isEnabled) {
@@ -73,12 +72,12 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
         }
 
         public Builder setScrollingEnabled(boolean isEnabled) {
-            SpanLayoutManager.this.setScrollingEnabled(isEnabled);
+            ChipsLayoutManager.this.setScrollingEnabled(isEnabled);
             return this;
         }
 
         /** create SpanLayoutManager*/
-        public SpanLayoutManager build() {
+        public ChipsLayoutManager build() {
             // setGravityResolver always have priority
             if (childGravityResolver == null) {
                 if (gravity != null) {
@@ -87,7 +86,7 @@ public class SpanLayoutManager extends RecyclerView.LayoutManager {
                     childGravityResolver = new CenterChildGravity();
                 }
             }
-            return SpanLayoutManager.this;
+            return ChipsLayoutManager.this;
         }
 
     }

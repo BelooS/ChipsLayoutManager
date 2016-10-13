@@ -34,7 +34,7 @@ Layout manager represents chips or spanned or "bubble" structure of list items a
 ### Usage
 
 ```JAVA 
-ChipsLayoutManager ChipsLayoutManager = ChipsLayoutManager.newBuilder()
+ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
         //set vertical gravity for all items in a row. Default = Gravity.CENTER_VERTICAL
         .setChildGravity(Gravity.TOP)
         //whether RecyclerView can scroll
@@ -47,7 +47,7 @@ ChipsLayoutManager ChipsLayoutManager = ChipsLayoutManager.newBuilder()
             }
         })
         .build();
-rv.setLayoutManager(ChipsLayoutManager);
+rv.setLayoutManager(chipsLayoutManager);
 ```
 For example look at sample application.
 <br />

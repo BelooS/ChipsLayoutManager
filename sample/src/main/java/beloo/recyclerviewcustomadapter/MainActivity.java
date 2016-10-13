@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.beloo.widget.spanlayoutmanager.SpanLayoutManager;
+import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
 
 import java.util.LinkedList;
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         FixedGridLayoutManager fixedGridLayoutManager = new FixedGridLayoutManager();
         fixedGridLayoutManager.setTotalColumnCount(10);
 
-        SpanLayoutManager spanLayoutManager = SpanLayoutManager.newBuilder()
+        ChipsLayoutManager spanLayoutManager = ChipsLayoutManager.newBuilder()
                 .setChildGravity(Gravity.TOP)
                 .setGravityResolver(new IChildGravityResolver() {
                     @Override
