@@ -1,5 +1,29 @@
 apply plugin: 'com.android.library'
 
+//upload settings to bintray
+ext {
+    bintrayRepo = 'widget'
+    bintrayName = 'ChipsLayoutManager'
+
+    libraryName = 'ChipsLayoutManager'
+    publishedGroupId = 'com.beloo.widget'
+    artifact = 'chipsLayoutManager'
+    libraryVersion = '0.0.1-beta'
+
+    libraryDescription = 'Android. A custom layout manager for RecyclerView which mimicric TextView span behaviour, flow layouts behaviour with support of amazing recyclerView features'
+
+    siteUrl = 'https://github.com/BelooS/ChipsLayoutManager'
+    gitUrl = 'https://github.com/BelooS/ChipsLayoutManager.git'
+
+    developerId = 'beloo'
+    developerName = 'Beloy Oleg'
+    developerEmail = 'beloyoleg@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.3"
@@ -8,7 +32,7 @@ android {
         minSdkVersion 11
         targetSdkVersion 24
         versionCode 1
-        versionName "0.1.0"
+        versionName libraryVersion
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -24,6 +48,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:24.2.1'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support:support-annotations:24.2.1'
@@ -32,10 +57,5 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:24.2.1'
 }
 
-ext {
-    PUBLISH_GROUP_ID = 'com.beloo.widget'
-    PUBLISH_ARTIFACT_ID = 'chipsLayoutManager'
-    PUBLISH_VERSION = '0.0.1'
-}
-
-apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
