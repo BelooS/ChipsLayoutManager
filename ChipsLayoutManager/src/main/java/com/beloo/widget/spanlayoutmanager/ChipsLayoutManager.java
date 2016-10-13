@@ -249,30 +249,25 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
                 requestedItems++;
                 measureChildWithMargins(view, 0, 0);
 
-                layouter.calculateView(view);
-
-                if (layouter.canNotBePlacedInCurrentRow()) {
-                    layouter.layoutRow();
-                }
+                layouter.placeView(view);
 
                 if (layouter.isFinishedLayouting()) {
+
                     /* reached end of visible bounds, exit.
                     recycle view, which was requested previously
                      */
                     recycler.recycleView(view);
                     recycledItems++;
+
                     break;
                 }
 
-                layouter.placeView(view);
             } else {
                 layouter.onAttachView(view);
 
                 if (layouter.isFinishedLayouting()) {
                     break;
                 }
-
-                attachView(view);
 
                 //fillWithLayouter down
                 highestViewTop = Math.min(highestViewTop, getDecoratedTop(view));

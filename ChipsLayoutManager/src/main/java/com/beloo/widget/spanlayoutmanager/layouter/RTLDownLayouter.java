@@ -49,12 +49,11 @@ class RTLDownLayouter extends AbstractLayouter {
     }
 
     @Override
-    public void placeView(View view) {
+    Rect createViewRect(View view) {
         Rect viewRect = new Rect(viewRight - currentViewWidth, viewTop, viewRight, viewTop + currentViewHeight);
-        rowViews.add(new Pair<>(viewRect, view));
-
         viewRight = viewRect.left;
         maxBottom = Math.max(maxBottom, viewRect.bottom);
+        return viewRect;
     }
 
     @Override

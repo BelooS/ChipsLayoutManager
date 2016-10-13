@@ -2,6 +2,7 @@ package com.beloo.widget.spanlayoutmanager.layouter;
 
 import android.graphics.Rect;
 import android.support.annotation.CallSuper;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
@@ -52,13 +53,27 @@ abstract class AbstractLayouter implements ILayouter {
         return viewBottom;
     }
 
-    @Override
-    public void calculateView(View view) {
+    private void calculateView(View view) {
         currentViewHeight = layoutManager.getDecoratedMeasuredHeight(view);
         currentViewWidth = layoutManager.getDecoratedMeasuredWidth(view);
-
         currentViewBottom = layoutManager.getDecoratedBottom(view);
     }
+
+    @Override
+    @CallSuper
+    /** calculate view positions, view won't be actually added to layout when calling this method */
+    public final void placeView(View view) {
+        calculateView(view);
+        if (canNotBePlacedInCurrentRow()) {
+            layoutRow();
+        }
+        if (isFinishedLayouting()) return;
+        Rect rect = createViewRect(view);
+        rowViews.add(new Pair<>(rect, view));
+    }
+
+    /** factory method for Rect, where view will be placed. Creation based on inner layouter parameters */
+    abstract Rect createViewRect(View view);
 
     @Override
     public int getPreviousRowSize() {
@@ -72,10 +87,14 @@ abstract class AbstractLayouter implements ILayouter {
      * This method have to be called on attaching view*/
     public void onAttachView(View view) {
         rowSize++;
+        if (!isFinishedLayouting()) {
+            layoutManager.attachView(view);
+        }
     }
 
     @CallSuper
     @Override
+    /** add views from current row to layout*/
     public void layoutRow() {
         previousRowSize = rowSize;
         this.rowSize = 0;

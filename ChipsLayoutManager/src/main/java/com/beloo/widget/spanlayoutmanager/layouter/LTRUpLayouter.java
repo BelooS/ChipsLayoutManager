@@ -37,19 +37,13 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
         layoutManager.addView(view, 0);
     }
 
-    /** calculate view positions, view won't be actually added to layout when calling this method */
-    public void placeView(View view) {
-
-        /* view can be placed in current row, but we can't determine real position, until row will be filled,
-        so generate rect for the view and layout it in the end of the row
-         */
-
+    @Override
+    Rect createViewRect(View view) {
         int left = viewRight - currentViewWidth;
         int viewTop = viewBottom - currentViewHeight;
         Rect viewRect = new Rect(left, viewTop, viewRight, viewBottom);
         viewRight = left;
-
-        rowViews.add(new Pair<>(viewRect, view));
+        return viewRect;
     }
 
     @Override
