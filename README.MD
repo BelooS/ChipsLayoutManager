@@ -14,7 +14,20 @@ but with support of CRUD animations i decided to make such stuff and share it.
 ## Setup and usage
 ### Installation
 
-Import ChipsLayoutManager module to your project. Maven support will be added soon
+```GRADLE 
+compile 'com.beloo.widget:ChipsLayoutManager:0.0.1-beta'
+```
+
+Assuming you have installed jCenter provider:
+```GRADLE
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+```
+
+or just import ChipsLayoutManager module to your project.
 
 ### Features
 Layout manager represents chips or spanned or "bubble" structure of list items and is a good replace for typical implementations of such issue based on spans in TextView.
