@@ -9,16 +9,24 @@ import android.util.SparseArray;
 import android.view.View;
 
 import java.util.List;
+import java.util.NavigableSet;
+import java.util.Set;
 import java.util.TreeSet;
 
 class ViewCacheStorage implements IViewCacheStorage {
+    private static final int SIZE_MAX_CACHE = 1000;
 
     private RecyclerView.LayoutManager layoutManager;
-    private TreeSet<Integer> startsRow = new TreeSet<>();
-    private TreeSet<Integer> endsRow = new TreeSet<>();
+    private NavigableSet<Integer> startsRow = new TreeSet<>();
+    private NavigableSet<Integer> endsRow = new TreeSet<>();
+    private int maxCacheSize = SIZE_MAX_CACHE;
 
     ViewCacheStorage(RecyclerView.LayoutManager layoutManager) {
         this.layoutManager = layoutManager;
+    }
+
+    public void setMaxCacheSize(int maxCacheSize) {
+        this.maxCacheSize = maxCacheSize;
     }
 
     @Override
@@ -31,6 +39,16 @@ class ViewCacheStorage implements IViewCacheStorage {
         return startsRow.contains(position);
     }
 
+    //todo test max size cache reached
+    private void checkCacheSizeReached() {
+        if (startsRow.size() > maxCacheSize) {
+            startsRow.remove(startsRow.first());
+        }
+        if (endsRow.size() > maxCacheSize) {
+            endsRow.remove(endsRow.first());
+        }
+    }
+
     @Override
     public void storeRow(List<Pair<Rect, View>> row) {
         if (!row.isEmpty()) {
@@ -40,6 +58,8 @@ class ViewCacheStorage implements IViewCacheStorage {
 
             int startPosition = layoutManager.getPosition(firstPair.second);
             int endPosition = layoutManager.getPosition(secondPair.second);
+
+            checkCacheSizeReached();
 
             startsRow.add(startPosition);
             endsRow.add(endPosition);
