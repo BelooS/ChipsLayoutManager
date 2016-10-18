@@ -8,6 +8,7 @@ import android.util.Pair;
 import android.util.SparseArray;
 import android.view.View;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.Set;
@@ -79,7 +80,17 @@ class ViewCacheStorage implements IViewCacheStorage {
 
     @Override
     public void purgeCacheFromPosition(int position) {
-        throw new UnsupportedOperationException("not implemented");
+        Iterator<Integer> removeIterator = startsRow.tailSet(position, true).iterator();
+        while (removeIterator.hasNext()) {
+            removeIterator.next();
+            removeIterator.remove();
+        }
+
+        removeIterator = endsRow.tailSet(position, true).iterator();
+        while (removeIterator.hasNext()) {
+            removeIterator.next();
+            removeIterator.remove();
+        }
     }
 
     @Override

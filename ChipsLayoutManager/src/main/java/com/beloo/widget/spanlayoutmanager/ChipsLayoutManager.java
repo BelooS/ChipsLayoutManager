@@ -9,6 +9,7 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
+import com.beloo.widget.spanlayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.spanlayoutmanager.cache.ViewCacheFactory;
 import com.beloo.widget.spanlayoutmanager.gravity.CenterChildGravity;
 import com.beloo.widget.spanlayoutmanager.gravity.CustomGravityResolver;
@@ -26,7 +27,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     private static final float FAST_SCROLLING_COEFFICIENT = 2;
     private int maxViewsInRow = 2;
-    private LayouterFactory layouterFactory = new LayouterFactory(this, new ViewCacheFactory(this).createCacheStorage());
+    private LayouterFactory layouterFactory;
+    private IViewCacheStorage viewPositionsStorage;
 
     private SparseArray<View> viewCache = new SparseArray<>();
 
@@ -45,6 +47,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private boolean isScrollingEnabled = true;
 
     private ChipsLayoutManager() {
+        viewPositionsStorage = new ViewCacheFactory(this).createCacheStorage();
+        layouterFactory = new LayouterFactory(this, viewPositionsStorage);
+
         setAutoMeasureEnabled(true);
         setMeasurementCacheEnabled(true);
     }
@@ -166,6 +171,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public void onItemsRemoved(RecyclerView recyclerView, int positionStart, int itemCount) {
         super.onItemsRemoved(recyclerView, positionStart, itemCount);
+        viewPositionsStorage.purgeCacheFromPosition(positionStart);
+    }
+
+    @Override
+    public void onItemsAdded(RecyclerView recyclerView, int positionStart, int itemCount) {
+        super.onItemsAdded(recyclerView, positionStart, itemCount);
+        viewPositionsStorage.purgeCacheFromPosition(positionStart);
     }
 
     @Override
@@ -286,11 +298,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private void calcRecyclerCacheSize(RecyclerView.Recycler recycler, int rowSize) {
         maxViewsInRow = Math.max(rowSize, maxViewsInRow);
         recycler.setViewCacheSize((int) (maxViewsInRow * FAST_SCROLLING_COEFFICIENT));
-    }
-
-    @Override
-    public void onItemsAdded(RecyclerView recyclerView, int positionStart, int itemCount) {
-        super.onItemsAdded(recyclerView, positionStart, itemCount);
     }
 
     /**
