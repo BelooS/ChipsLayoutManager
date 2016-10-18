@@ -42,13 +42,6 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
-    void loadFromCache(@NonNull Rect rect) {
-        viewRight = rect.left;
-        viewTop = rect.top;
-        viewBottom = rect.bottom;
-    }
-
-    @Override
     Rect createViewRect(View view) {
         int left = viewRight - currentViewWidth;
         int viewTop = viewBottom - currentViewHeight;
@@ -81,6 +74,10 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
     @Override
     public boolean canNotBePlacedInCurrentRow() {
+        //when go up, check cache to layout according previous down algorithm
+        boolean stopDueToCache = getCacheStorage().isPositionEndsRow(getCurrentViewPosition());
+        if (stopDueToCache) return true;
+
         int bufLeft = viewRight - currentViewWidth;
         return bufLeft < 0 && viewRight < getCanvasWidth();
     }

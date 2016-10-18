@@ -24,6 +24,8 @@ class LTRDownLayouter extends AbstractLayouter {
     @Override
     public void layoutRow() {
         super.layoutRow();
+        //cache only when go down
+        getCacheStorage().storeRow(rowViews);
         //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
 
         //layout previously calculated row
@@ -53,16 +55,8 @@ class LTRDownLayouter extends AbstractLayouter {
     }
 
     @Override
-    void loadFromCache(@NonNull Rect rect) {
-        viewLeft = rect.right;
-        viewBottom = Math.max(viewBottom, rect.bottom);
-        viewTop = rect.top;
-    }
-
-    @Override
     Rect createViewRect(View view) {
         Rect viewRect = new Rect(viewLeft, viewTop, viewLeft + currentViewWidth, viewTop + currentViewHeight);
-        rowViews.add(new Pair<>(viewRect, view));
 
         viewLeft = viewRect.right;
         viewBottom = Math.max(viewBottom, viewRect.bottom);

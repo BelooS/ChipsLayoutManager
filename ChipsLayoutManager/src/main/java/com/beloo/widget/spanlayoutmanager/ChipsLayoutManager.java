@@ -26,7 +26,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
      */
     private static final float FAST_SCROLLING_COEFFICIENT = 2;
     private int maxViewsInRow = 2;
-    private LayouterFactory layouterFactory = new LayouterFactory(this, new ViewCacheFactory().createCacheStorage());
+    private LayouterFactory layouterFactory = new LayouterFactory(this, new ViewCacheFactory(this).createCacheStorage());
 
     private SparseArray<View> viewCache = new SparseArray<>();
 

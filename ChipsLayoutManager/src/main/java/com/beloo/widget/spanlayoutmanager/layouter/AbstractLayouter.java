@@ -51,8 +51,12 @@ abstract class AbstractLayouter implements ILayouter {
         return layoutManager.getHeight();
     }
 
-    public int getCurrentViewPosition() {
+    int getCurrentViewPosition() {
         return currentViewPosition;
+    }
+
+    IViewCacheStorage getCacheStorage() {
+        return cacheStorage;
     }
 
     /** read view params to memory */
@@ -62,8 +66,6 @@ abstract class AbstractLayouter implements ILayouter {
         currentViewBottom = layoutManager.getDecoratedBottom(view);
         currentViewPosition = layoutManager.getPosition(view);
     }
-
-    abstract void loadFromCache(@NonNull Rect rect);
 
     @Override
     @CallSuper
@@ -78,16 +80,8 @@ abstract class AbstractLayouter implements ILayouter {
 
         if (isFinishedLayouting()) return false;
 
-        Rect rect = cacheStorage.getRect(currentViewPosition);
-        if (rect != null) {
-            loadFromCache(rect);
-        } else {
-            rect = createViewRect(view);
-        }
-
+        Rect rect = createViewRect(view);
         rowViews.add(new Pair<>(rect, view));
-
-        cacheStorage.put(rect, currentViewPosition);
 
         return true;
     }

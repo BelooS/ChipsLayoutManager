@@ -3,31 +3,54 @@ package com.beloo.widget.spanlayoutmanager.cache;
 import android.graphics.Rect;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.util.SparseArray;
+import android.view.View;
+
+import java.util.List;
+import java.util.TreeSet;
 
 class ViewCacheStorage implements IViewCacheStorage {
 
-    private SparseArray<Rect> viewPositionRectArray;
+    private RecyclerView.LayoutManager layoutManager;
+    private TreeSet<Integer> startsRow = new TreeSet<>();
+    private TreeSet<Integer> endsRow = new TreeSet<>();
 
-    ViewCacheStorage() {
-        viewPositionRectArray = new SparseArray<>();
-    }
-
-    @Nullable
-    @Override
-    public Rect getRect(int position) {
-        return viewPositionRectArray.get(position);
+    ViewCacheStorage(RecyclerView.LayoutManager layoutManager) {
+        this.layoutManager = layoutManager;
     }
 
     @Override
-    public void put(Rect rect, int position) {
-        viewPositionRectArray.put(position, rect);
+    public boolean isPositionEndsRow(int position) {
+        return endsRow.contains(position);
+    }
+
+    @Override
+    public boolean isPositionStartsRow(int position) {
+        return startsRow.contains(position);
+    }
+
+    @Override
+    public void storeRow(List<Pair<Rect, View>> row) {
+        if (!row.isEmpty()) {
+
+            Pair<Rect, View> firstPair = row.get(0);
+            Pair<Rect, View> secondPair = row.get(row.size()-1);
+
+            int startPosition = layoutManager.getPosition(firstPair.second);
+            int endPosition = layoutManager.getPosition(secondPair.second);
+
+            startsRow.add(startPosition);
+            endsRow.add(endPosition);
+        }
     }
 
     @Override
     public void purge() {
-        viewPositionRectArray.clear();
+        throw new UnsupportedOperationException("not implemented");
     }
+
 
     @Override
     public void purgeCacheToPosition(int position) {

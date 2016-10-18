@@ -3,15 +3,18 @@ package com.beloo.widget.spanlayoutmanager.cache;
 import android.graphics.Rect;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.util.Pair;
+import android.view.View;
+
+import java.util.List;
 
 public interface IViewCacheStorage {
 
-    /** @return rect of view position stored in cache. Could be null
-     * @param position position of view, which rect could stored in cache */
-    @Nullable
-    Rect getRect(int position);
+    boolean isPositionEndsRow(int position);
 
-    void put(Rect rect, int position);
+    boolean isPositionStartsRow(int position);
+
+    void storeRow(List<Pair<Rect, View>> row);
 
     /** purge whole cache*/
     void purge();
