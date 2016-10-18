@@ -17,7 +17,7 @@ import com.beloo.widget.spanlayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.spanlayoutmanager.layouter.ILayouter;
 import com.beloo.widget.spanlayoutmanager.layouter.LayouterFactory;
 
-public class ChipsLayoutManager extends RecyclerView.LayoutManager {
+public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
 
     private IChildGravityResolver childGravityResolver;
 
@@ -63,9 +63,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
 
     public class Builder {
 
-        private
         @SpanLayoutChildGravity
-        Integer gravity;
+        private Integer gravity;
+
+        private Builder(){}
 
         /**
          * set vertical gravity in a row for all children. Default = CENTER_VERTICAL
@@ -224,7 +225,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager {
     /**
      * @return true if RTL mode enabled in RecyclerView
      */
-    protected boolean isLayoutRTL() {
+    private boolean isLayoutRTL() {
         return getLayoutDirection() == ViewCompat.LAYOUT_DIRECTION_RTL;
     }
 
