@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RecyclerViewCustomAdapter</string>
+    <string name="app_name">ChipsLayoutManager</string>
     <string name="delete">Delete</string>
     <string name="insert">Insert</string>
 </resources>
