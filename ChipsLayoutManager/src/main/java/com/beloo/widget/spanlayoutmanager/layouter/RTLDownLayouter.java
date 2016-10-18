@@ -35,7 +35,7 @@ class RTLDownLayouter extends AbstractLayouter {
 
     @Override
     void addView(View view) {
-        layoutManager.addView(view, 0);
+        layoutManager.addView(view);
     }
 
     @Override
