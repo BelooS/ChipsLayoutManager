@@ -58,13 +58,13 @@ public class ItemsFactory {
         List<String> list = new LinkedList<>();
         list.add("START item.0");
         list.add("!long item here. 1");
-        for (int i = 1; i< 1000; i++) {
-            if (i%2 == 0) {
-                list.add("a span." + (i+2));
-            } else if (i%3 == 0) {
-                list.add("!long item here." + (i+2));
+        for (int i = 2; i< 1000; i++) {
+            if (i%3 == 0) {
+                list.add("!long item here." + i);
             } else if (i % 5 == 0) {
-                list.add("S." + (i+2));
+                list.add("S." + i);
+            } else {
+                list.add("a span." + i);
             }
         }
         return list;
