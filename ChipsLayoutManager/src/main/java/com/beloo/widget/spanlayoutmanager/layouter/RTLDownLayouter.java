@@ -5,6 +5,7 @@ import android.util.Pair;
 import android.view.View;
 
 import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.spanlayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
 
 class RTLDownLayouter extends AbstractLayouter {
@@ -12,14 +13,17 @@ class RTLDownLayouter extends AbstractLayouter {
     private int maxBottom;
     private int viewRight;
 
-    RTLDownLayouter(ChipsLayoutManager layoutManager, IChildGravityResolver childGravityResolver, int topOffset, int bottomOffset, int rightOffset) {
-        super(layoutManager, topOffset, bottomOffset, childGravityResolver);
+    RTLDownLayouter(ChipsLayoutManager layoutManager, IChildGravityResolver childGravityResolver, IViewCacheStorage cacheStorage, int topOffset, int bottomOffset, int rightOffset) {
+        super(layoutManager, topOffset, bottomOffset, cacheStorage, childGravityResolver);
         viewRight = rightOffset;
     }
 
     @Override
     public void layoutRow() {
         super.layoutRow();
+
+        getCacheStorage().storeRow(rowViews);
+
         //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
 
         //layout previously calculated row
@@ -45,7 +49,7 @@ class RTLDownLayouter extends AbstractLayouter {
 
     @Override
     public AbstractPositionIterator positionIterator() {
-        return new IncrementalPositionIterator(layoutManager.getItemCount());
+        return new IncrementalPositionIterator(getLayoutManager().getItemCount());
     }
 
     @Override
@@ -58,10 +62,10 @@ class RTLDownLayouter extends AbstractLayouter {
 
     @Override
     public boolean onAttachView(View view) {
-        viewTop = layoutManager.getDecoratedTop(view);
-        viewRight = layoutManager.getDecoratedLeft(view);
+        viewTop = getLayoutManager().getDecoratedTop(view);
+        viewRight = getLayoutManager().getDecoratedLeft(view);
 
-        maxBottom = Math.max(maxBottom, layoutManager.getDecoratedBottom(view));
+        maxBottom = Math.max(maxBottom, getLayoutManager().getDecoratedBottom(view));
 
         return super.onAttachView(view);
     }
