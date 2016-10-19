@@ -21,6 +21,7 @@ class ViewCacheStorage implements IViewCacheStorage {
     private NavigableSet<Integer> startsRow = new TreeSet<>();
     private NavigableSet<Integer> endsRow = new TreeSet<>();
     private int maxCacheSize = SIZE_MAX_CACHE;
+    private boolean isCachingEnabled;
 
     ViewCacheStorage(RecyclerView.LayoutManager layoutManager) {
         this.layoutManager = layoutManager;
@@ -40,6 +41,11 @@ class ViewCacheStorage implements IViewCacheStorage {
         return startsRow.contains(position);
     }
 
+    @Override
+    public void setCachingEnabled(boolean isEnabled) {
+        isCachingEnabled = isEnabled;
+    }
+
     //todo test max size cache reached
     private void checkCacheSizeReached() {
         if (startsRow.size() > maxCacheSize) {
@@ -52,7 +58,7 @@ class ViewCacheStorage implements IViewCacheStorage {
 
     @Override
     public void storeRow(List<Pair<Rect, View>> row) {
-        if (!row.isEmpty()) {
+        if (isCachingEnabled && !row.isEmpty()) {
 
             Pair<Rect, View> firstPair = row.get(0);
             Pair<Rect, View> secondPair = row.get(row.size()-1);
@@ -68,14 +74,30 @@ class ViewCacheStorage implements IViewCacheStorage {
     }
 
     @Override
+    public boolean isInCache(int position) {
+        return startsRow.ceiling(position) != null || endsRow.ceiling(position) != null;
+    }
+
+    @Override
     public void purge() {
-        throw new UnsupportedOperationException("not implemented");
+        startsRow.clear();
+        endsRow.clear();
     }
 
 
     @Override
     public void purgeCacheToPosition(int position) {
-        throw new UnsupportedOperationException("not implemented");
+        Iterator<Integer> removeIterator = startsRow.headSet(position).iterator();
+        while (removeIterator.hasNext()) {
+            removeIterator.next();
+            removeIterator.remove();
+        }
+
+        removeIterator = endsRow.headSet(position).iterator();
+        while (removeIterator.hasNext()) {
+            removeIterator.next();
+            removeIterator.remove();
+        }
     }
 
     @Override

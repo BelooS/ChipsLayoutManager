@@ -172,12 +172,42 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public void onItemsRemoved(RecyclerView recyclerView, int positionStart, int itemCount) {
         super.onItemsRemoved(recyclerView, positionStart, itemCount);
         viewPositionsStorage.purgeCacheFromPosition(positionStart);
+        viewPositionsStorage.setCachingEnabled(false);
     }
 
     @Override
     public void onItemsAdded(RecyclerView recyclerView, int positionStart, int itemCount) {
         super.onItemsAdded(recyclerView, positionStart, itemCount);
         viewPositionsStorage.purgeCacheFromPosition(positionStart);
+        viewPositionsStorage.setCachingEnabled(false);
+    }
+
+    @Override
+    public void onItemsChanged(RecyclerView recyclerView) {
+        super.onItemsChanged(recyclerView);
+        viewPositionsStorage.purge();
+        viewPositionsStorage.setCachingEnabled(false);
+    }
+
+    @Override
+    public void onItemsUpdated(RecyclerView recyclerView, int positionStart, int itemCount) {
+        super.onItemsUpdated(recyclerView, positionStart, itemCount);
+        viewPositionsStorage.purgeCacheFromPosition(positionStart);
+        viewPositionsStorage.setCachingEnabled(false);
+    }
+
+    //todo test with moving
+    @Override
+    public void onItemsMoved(RecyclerView recyclerView, int from, int to, int itemCount) {
+        super.onItemsMoved(recyclerView, from, to, itemCount);
+        viewPositionsStorage.purgeCacheFromPosition(from);
+        viewPositionsStorage.purgeCacheFromPosition(to);
+        viewPositionsStorage.setCachingEnabled(false);
+    }
+
+    @Override
+    public void onItemsUpdated(RecyclerView recyclerView, int positionStart, int itemCount, Object payload) {
+        onItemsUpdated(recyclerView, positionStart, itemCount);
     }
 
     @Override
@@ -308,8 +338,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         dy = scrollVerticallyInternal(dy);
         offsetChildrenVertical(-dy);
         anchorView = getAnchorVisibleTopLeftView();
+        View topView = getChildAt(0);
 
-        if (!anchorView.isNotFoundState() && anchorView.getPosition() == 0) {
+        if (!anchorView.isNotFoundState() && getPosition(topView) == 0) {
+            viewPositionsStorage.purge();
             postOnAnimation(new Runnable() {
                 @Override
                 public void run() {
@@ -332,6 +364,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
 
         final View topView = getChildAt(0);
+        int topViewPosition = getPosition(topView);
         final View bottomView = getChildAt(childCount - 1);
 
         int viewSpan = getDecoratedBottom(bottomView) - getDecoratedTop(topView);
@@ -341,8 +374,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
 
         int delta = 0;
-        //if content scrolled down
-        if (dy < 0) {
+        if (dy < 0) {   //if content scrolled down
+            if (viewPositionsStorage.isInCache(topViewPosition) || topViewPosition == 0) {
+                viewPositionsStorage.setCachingEnabled(true);
+            }
 
             //todo workaround. somehow in the first row view in getChildAt(0) can have position 1
             boolean isZeroAdded = false;

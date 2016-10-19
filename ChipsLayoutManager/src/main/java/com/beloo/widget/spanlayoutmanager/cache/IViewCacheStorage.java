@@ -14,17 +14,21 @@ public interface IViewCacheStorage {
 
     boolean isPositionStartsRow(int position);
 
+    void setCachingEnabled(boolean isEnabled);
+
     void storeRow(List<Pair<Rect, View>> row);
+
+    boolean isInCache(int position);
 
     /** purge whole cache*/
     void purge();
 
     /** all cache to selected position will be purged
-     * @param position the end position, excluded */
+     * @param position the end position, exclusive */
     void purgeCacheToPosition(int position);
 
     /** all cache from selected position will be purged
-     * @param position the start position, included */
+     * @param position the start position, inclusive */
     void purgeCacheFromPosition(int position);
 
     /** persist cache storage content to {@link Parcelable}*/
