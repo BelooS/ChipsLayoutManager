@@ -16,6 +16,8 @@ public interface IViewCacheStorage {
 
     void setCachingEnabled(boolean isEnabled);
 
+    boolean isCachingEnabled();
+
     void storeRow(List<Pair<Rect, View>> row);
 
     boolean isInCache(int position);

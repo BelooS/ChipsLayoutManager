@@ -342,18 +342,21 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         if (!anchorView.isNotFoundState() && getPosition(topView) == 0) {
             viewPositionsStorage.purge();
-            postOnAnimation(new Runnable() {
-                @Override
-                public void run() {
-                    requestLayout();
-                    requestSimpleAnimationsInNextLayout();
-                }
-            });
-
+            requestLayoutWithAnimations();
         }
 
         fill(recycler, anchorView);
         return dy;
+    }
+
+    private void requestLayoutWithAnimations() {
+        postOnAnimation(new Runnable() {
+            @Override
+            public void run() {
+                requestLayout();
+                requestSimpleAnimationsInNextLayout();
+            }
+        });
     }
 
     private int scrollVerticallyInternal(int dy) {
@@ -375,7 +378,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         int delta = 0;
         if (dy < 0) {   //if content scrolled down
-            if (viewPositionsStorage.isInCache(topViewPosition) || topViewPosition == 0) {
+            if (!viewPositionsStorage.isCachingEnabled() && viewPositionsStorage.isInCache(topViewPosition) || topViewPosition == 0) {
+                requestLayoutWithAnimations();
                 viewPositionsStorage.setCachingEnabled(true);
             }
 

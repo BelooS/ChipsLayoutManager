@@ -32,6 +32,11 @@ class ViewCacheStorage implements IViewCacheStorage {
     }
 
     @Override
+    public boolean isCachingEnabled() {
+        return isCachingEnabled;
+    }
+
+    @Override
     public boolean isPositionEndsRow(int position) {
         return endsRow.contains(position);
     }
