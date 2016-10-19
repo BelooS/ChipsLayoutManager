@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView rvTest;
     private RecyclerViewAdapter adapter;
     private Spinner spinnerPosition;
+    private Spinner spinnerMoveTo;
     private List<String> positions;
     private List<String> items;
 
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         rvTest = (RecyclerView) findViewById(R.id.rvTest);
         spinnerPosition = (Spinner) findViewById(R.id.spinnerPosition);
+        spinnerMoveTo = (Spinner) findViewById(R.id.spinnerMoveTo);
 
 //        items = new ItemsFactory().getFewItems();
         items = new ItemsFactory().getALotOfItems();
@@ -41,7 +43,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, positions);
+        ArrayAdapter<String> spinnerAdapterMoveTo = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, positions);
         spinnerPosition.setAdapter(spinnerAdapter);
+        spinnerMoveTo.setAdapter(spinnerAdapterMoveTo);
 
         adapter = new RecyclerViewAdapter(items);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2) {
@@ -94,6 +98,21 @@ public class MainActivity extends AppCompatActivity {
         spinnerPosition.setSelection(selectedPosition);
     }
 
+    public void onRevertClicked(View view) {
+        int position = spinnerPosition.getSelectedItemPosition();
+        if (position == Spinner.INVALID_POSITION)
+            return;
+
+        int positionMoveTo = spinnerMoveTo.getSelectedItemPosition();
+        if (positionMoveTo == Spinner.INVALID_POSITION)
+            return;
+
+        if (position == positionMoveTo) return;
+
+        spinnerPosition.setSelection(positionMoveTo);
+        spinnerMoveTo.setSelection(position);
+    }
+
     public void onDeleteClicked(View view) {
         int position = spinnerPosition.getSelectedItemPosition();
         if (position == Spinner.INVALID_POSITION)
@@ -102,6 +121,23 @@ public class MainActivity extends AppCompatActivity {
         Log.i("activity", "delete at " + position);
         adapter.notifyItemRemoved(position);
         updateSpinner();
+    }
+
+    public void onMoveClicked(View view) {
+        int position = spinnerPosition.getSelectedItemPosition();
+        if (position == Spinner.INVALID_POSITION)
+            return;
+
+        int positionMoveTo = spinnerMoveTo.getSelectedItemPosition();
+        if (positionMoveTo == Spinner.INVALID_POSITION)
+            return;
+
+        if (position == positionMoveTo) return;
+
+        String item = items.remove(position);
+        items.add(positionMoveTo, item);
+
+        adapter.notifyItemMoved(position, positionMoveTo);
     }
 
     public void onInsertClicked(View view) {

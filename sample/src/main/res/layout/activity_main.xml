@@ -46,6 +46,17 @@
         android:layout_alignParentBottom="true"
         />
 
+    <Button
+        android:id="@+id/btnMove"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onMoveClicked"
+        android:text="@string/move"
+        android:layout_toRightOf="@+id/btnDelete"
+        android:layout_toEndOf="@+id/btnDelete"
+        android:layout_alignParentBottom="true"
+        />
+
     <Spinner
         android:id="@+id/spinnerPosition"
         android:layout_width="wrap_content"
@@ -53,5 +64,38 @@
         android:layout_above="@+id/btnInsert"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
+    <ImageButton
+        android:id="@+id/btnRevert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btnInsert"
+        android:layout_toRightOf="@id/spinnerPosition"
+        android:layout_toEndOf="@id/spinnerPosition"
+        android:src="@drawable/vector_sync_black_24dp"
+        android:onClick="onRevertClicked"
+        />
+
+    <TextView
+        android:id='@+id/tvMoveTo'
+        android:layout_above="@+id/btnInsert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/btnRevert"
+        android:layout_toEndOf="@id/btnRevert"
+        android:layout_alignBaseline="@+id/spinnerMoveTo"
+        android:text="@string/move_to"
+        />
+
+    <Spinner
+        android:id="@+id/spinnerMoveTo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btnInsert"
+        android:layout_toRightOf="@id/tvMoveTo"
+        android:layout_toEndOf="@id/tvMoveTo"
+
+        />
+
 
 </RelativeLayout>
