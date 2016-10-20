@@ -143,13 +143,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public void onRestoreInstanceState(Parcelable state) {
         container = (ParcelableContainer) state;
         anchorView = container.getAnchorViewState();
-//        viewPositionsStorage.onRestoreInstanceState(container.getPositionsCache(orientation));
+        viewPositionsStorage.onRestoreInstanceState(container.getPositionsCache(orientation));
     }
 
     @Override
     public Parcelable onSaveInstanceState() {
         container.putAnchorViewState(getAnchorVisibleTopLeftView());
-//        container.putPositionsCache(orientation, viewPositionsStorage.onSaveInstanceState());
+        container.putPositionsCache(orientation, viewPositionsStorage.onSaveInstanceState());
         return container;
     }
 

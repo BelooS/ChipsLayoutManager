@@ -18,9 +18,11 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewH
     private final int ITEM_TYPE_INCREASED = 1;
 
     private List<String> items;
+    private OnRemoveListener onRemoveListener;
 
-    RecyclerViewAdapter(List<String> items) {
+    RecyclerViewAdapter(List<String> items, OnRemoveListener onRemoveListener) {
         this.items = items;
+        this.onRemoveListener = onRemoveListener;
     }
 
     @Override
@@ -74,8 +76,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewH
                 public void onClick(View v) {
                     int position = getAdapterPosition();
                     if (position != -1) {
-                        items.remove(position);
-                        notifyItemRemoved(position);
+                        onRemoveListener.onItemRemoved(position);
                     }
                 }
             });

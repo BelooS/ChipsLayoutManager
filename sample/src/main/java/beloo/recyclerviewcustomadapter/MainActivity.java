@@ -14,11 +14,12 @@ import android.widget.Spinner;
 import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
+    private static final String EXTRA = "data";
     private RecyclerView rvTest;
     private RecyclerViewAdapter adapter;
     private Spinner spinnerPosition;
@@ -36,7 +37,11 @@ public class MainActivity extends AppCompatActivity {
         spinnerMoveTo = (Spinner) findViewById(R.id.spinnerMoveTo);
 
 //        items = new ItemsFactory().getFewItems();
-        items = new ItemsFactory().getALotOfItems();
+        if (savedInstanceState == null) {
+            items = new ItemsFactory().getALotOfItems();
+        } else {
+            items = savedInstanceState.getStringArrayList(EXTRA);
+        }
 
         positions = new LinkedList<>();
         for (int i = 0; i< items.size(); i++) {
@@ -48,7 +53,15 @@ public class MainActivity extends AppCompatActivity {
         spinnerPosition.setAdapter(spinnerAdapter);
         spinnerMoveTo.setAdapter(spinnerAdapterMoveTo);
 
-        adapter = new RecyclerViewAdapter(items);
+        adapter = new RecyclerViewAdapter(items, new OnRemoveListener() {
+            @Override
+            public void onItemRemoved(int position) {
+                items.remove(position);
+                Log.i("activity", "delete at " + position);
+                adapter.notifyItemRemoved(position);
+                updateSpinner();
+            }
+        });
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2) {
             @Override
             public boolean canScrollVertically() {
@@ -87,6 +100,12 @@ public class MainActivity extends AppCompatActivity {
         rvTest.getRecycledViewPool().setMaxRecycledViews(1, 10);
         rvTest.setAdapter(adapter);
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putStringArrayList(EXTRA, new ArrayList<>(items));
     }
 
     private void updateSpinner() {
