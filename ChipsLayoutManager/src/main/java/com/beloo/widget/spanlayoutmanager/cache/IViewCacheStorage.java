@@ -33,6 +33,8 @@ public interface IViewCacheStorage {
      * @param position the start position, inclusive */
     void purgeCacheFromPosition(int position);
 
-    /** persist cache storage content to {@link Parcelable}*/
-    Parcelable persist();
+    /** onSaveInstanceState cache storage content to {@link Parcelable}*/
+    Parcelable onSaveInstanceState();
+
+    void onRestoreInstanceState(@Nullable Parcelable parcelable);
 }

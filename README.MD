@@ -52,7 +52,7 @@ ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
         .setChildGravity(Gravity.TOP)
         //whether RecyclerView can scroll
         .setScrollingEnabled(true)
-        //set gravity resolver where you can determite gravity for item in position. This method have priority over previous one
+        //set gravity resolver where you can determine gravity for item in position. This method have priority over previous one
         .setGravityResolver(new IChildGravityResolver() {
             @Override
             public int getItemGravity(int position) {

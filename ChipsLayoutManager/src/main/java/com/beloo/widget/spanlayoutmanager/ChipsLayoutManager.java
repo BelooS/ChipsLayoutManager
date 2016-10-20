@@ -1,5 +1,6 @@
 package com.beloo.widget.spanlayoutmanager;
 
+import android.content.Context;
 import android.graphics.Rect;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -19,11 +20,6 @@ import com.beloo.widget.spanlayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.spanlayoutmanager.layouter.ILayouter;
 import com.beloo.widget.spanlayoutmanager.layouter.LayouterFactory;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
     private IChildGravityResolver childGravityResolver;
@@ -39,11 +35,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private SparseArray<View> viewCache = new SparseArray<>();
 
     private Integer anchorViewPosition = null;
+    private ParcelableContainer container = new ParcelableContainer();
 
     /**
      * highest top position of attached views
      */
     private int highestViewTop = Integer.MAX_VALUE;
+    @DeviceOrientation
+    private int orientation;
 
     /** when scrolling reached this position {@link ChipsLayoutManager} is able to restore items layout according to cached items with positions above.
      * That layout would exactly correspond to current item view situation */
@@ -57,7 +56,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     private boolean isScrollingEnabled = true;
 
-    private ChipsLayoutManager() {
+    private ChipsLayoutManager(Context context) {
+        @DeviceOrientation
+        int orientation = context.getResources().getConfiguration().orientation;
+        this.orientation = orientation;
+
         viewPositionsStorage = new ViewCacheFactory(this).createCacheStorage();
         layouterFactory = new LayouterFactory(this, viewPositionsStorage);
 
@@ -65,8 +68,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         setMeasurementCacheEnabled(true);
     }
 
-    public static Builder newBuilder() {
-        return new ChipsLayoutManager().new Builder();
+    public static Builder newBuilder(Context context) {
+        return new ChipsLayoutManager(context).new Builder();
     }
 
     public IChildGravityResolver getChildGravityResolver() {
@@ -138,13 +141,16 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public void onRestoreInstanceState(Parcelable state) {
-        SLMParcelableContainer container = (SLMParcelableContainer) state;
+        container = (ParcelableContainer) state;
         anchorView = container.getAnchorViewState();
+//        viewPositionsStorage.onRestoreInstanceState(container.getPositionsCache(orientation));
     }
 
     @Override
     public Parcelable onSaveInstanceState() {
-        return new SLMParcelableContainer(getAnchorVisibleTopLeftView());
+        container.putAnchorViewState(getAnchorVisibleTopLeftView());
+//        container.putPositionsCache(orientation, viewPositionsStorage.onSaveInstanceState());
+        return container;
     }
 
     @Override

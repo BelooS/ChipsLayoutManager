@@ -6,13 +6,11 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.Pair;
-import android.util.SparseArray;
 import android.view.View;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
-import java.util.Set;
 import java.util.TreeSet;
 
 class ViewCacheStorage implements IViewCacheStorage {
@@ -128,7 +126,15 @@ class ViewCacheStorage implements IViewCacheStorage {
     }
 
     @Override
-    public Parcelable persist() {
-        throw new UnsupportedOperationException("not implemented");
+    public Parcelable onSaveInstanceState() {
+        return new ParcelableContainer(startsRow, endsRow);
+    }
+
+    public void onRestoreInstanceState(@Nullable Parcelable parcelable) {
+        if (parcelable == null) return;
+        if (!(parcelable instanceof ParcelableContainer)) throw new IllegalStateException("wrong parcelable passed");
+        ParcelableContainer container = (ParcelableContainer) parcelable;
+        startsRow = container.getStartsRow();
+        endsRow = container.getEndsRow();
     }
 }
