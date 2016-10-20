@@ -112,6 +112,7 @@ class ViewCacheStorage implements IViewCacheStorage {
     @Override
     public void purgeCacheFromPosition(int position) {
         Log.d(TAG, "cache purged from position " + position);
+
         Iterator<Integer> removeIterator = startsRow.tailSet(position, true).iterator();
         while (removeIterator.hasNext()) {
             removeIterator.next();
