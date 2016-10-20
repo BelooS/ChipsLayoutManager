@@ -27,6 +27,7 @@ class ViewCacheStorage implements IViewCacheStorage {
 
     ViewCacheStorage(RecyclerView.LayoutManager layoutManager) {
         this.layoutManager = layoutManager;
+        isCachingEnabled = true;
     }
 
     public void setMaxCacheSize(int maxCacheSize) {
@@ -50,9 +51,8 @@ class ViewCacheStorage implements IViewCacheStorage {
 
     @Override
     public void setCachingEnabled(boolean isEnabled) {
-        if (isEnabled) {
-            Log.i(TAG, "caching enabled");
-        }
+        if (isCachingEnabled == isEnabled) return;
+        Log.i(TAG, isEnabled ? "caching enabled" : "caching disabled");
         isCachingEnabled = isEnabled;
     }
 
@@ -97,6 +97,7 @@ class ViewCacheStorage implements IViewCacheStorage {
 
     @Override
     public void purgeCacheToPosition(int position) {
+        Log.d(TAG, "cache purged to position " + position);
         Iterator<Integer> removeIterator = startsRow.headSet(position).iterator();
         while (removeIterator.hasNext()) {
             removeIterator.next();
@@ -112,6 +113,7 @@ class ViewCacheStorage implements IViewCacheStorage {
 
     @Override
     public void purgeCacheFromPosition(int position) {
+        Log.d(TAG, "cache purged from position " + position);
         Iterator<Integer> removeIterator = startsRow.tailSet(position, true).iterator();
         while (removeIterator.hasNext()) {
             removeIterator.next();

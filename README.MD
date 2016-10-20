@@ -74,7 +74,5 @@ I appreciate any help and contributors will be mentioned here.
 
 ### Known limitations
  * RecyclerView's padding haven't supported yet. Please use margin instead until new version will be released
- * Reconstruction of items with smooth animation when scrolled down and scrolled up again in case scrolling up drawing algorithm places views independently from scrolling down algorithm decisions.
- This is connected with that items are recycled and theirs positions aren't remembered and there haven't any cache support yet.
 
 This issues are going to be fixed in next versions soon.

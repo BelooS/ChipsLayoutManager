@@ -3,6 +3,7 @@ package com.beloo.widget.spanlayoutmanager;
 import android.graphics.Rect;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,9 +21,11 @@ import com.beloo.widget.spanlayoutmanager.layouter.LayouterFactory;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
-    public static final String TAG = ChipsLayoutManager.class.getSimpleName();
+    private static final String TAG = ChipsLayoutManager.class.getSimpleName();
     private IChildGravityResolver childGravityResolver;
 
     /**
@@ -41,6 +44,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      * highest top position of attached views
      */
     private int highestViewTop = Integer.MAX_VALUE;
+
+    /** when scrolling reached this position {@link ChipsLayoutManager} is able to restore items layout according to cached items with positions above.
+     * That layout would exactly correspond to current item view situation */
+    @Nullable
+    private Integer cacheNormalizationPosition = 0;
 
     /**
      * stored current anchor view due to scroll state changes
@@ -174,38 +182,37 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public void onItemsRemoved(RecyclerView recyclerView, int positionStart, int itemCount) {
         super.onItemsRemoved(recyclerView, positionStart, itemCount);
-        viewPositionsStorage.purgeCacheFromPosition(positionStart);
-        viewPositionsStorage.setCachingEnabled(false);
+        onLayoutUpdatedFromPosition(positionStart);
     }
 
     @Override
     public void onItemsAdded(RecyclerView recyclerView, int positionStart, int itemCount) {
         super.onItemsAdded(recyclerView, positionStart, itemCount);
-        viewPositionsStorage.purgeCacheFromPosition(positionStart);
-        viewPositionsStorage.setCachingEnabled(false);
+        onLayoutUpdatedFromPosition(positionStart);
     }
 
     @Override
     public void onItemsChanged(RecyclerView recyclerView) {
         super.onItemsChanged(recyclerView);
         viewPositionsStorage.purge();
-        viewPositionsStorage.setCachingEnabled(false);
+        onLayoutUpdatedFromPosition(0);
     }
 
     @Override
     public void onItemsUpdated(RecyclerView recyclerView, int positionStart, int itemCount) {
         super.onItemsUpdated(recyclerView, positionStart, itemCount);
-        viewPositionsStorage.purgeCacheFromPosition(positionStart);
-        viewPositionsStorage.setCachingEnabled(false);
+        onLayoutUpdatedFromPosition(positionStart);
     }
 
-    //todo test with moving
     @Override
     public void onItemsMoved(RecyclerView recyclerView, int from, int to, int itemCount) {
         super.onItemsMoved(recyclerView, from, to, itemCount);
-        viewPositionsStorage.purgeCacheFromPosition(from);
-        viewPositionsStorage.purgeCacheFromPosition(to);
-        viewPositionsStorage.setCachingEnabled(false);
+        onLayoutUpdatedFromPosition(from);
+    }
+
+    private void onLayoutUpdatedFromPosition(int position) {
+        viewPositionsStorage.purgeCacheFromPosition(position);
+        cacheNormalizationPosition = cacheNormalizationPosition == null? position : Math.min(cacheNormalizationPosition, position);
     }
 
     @Override
@@ -261,10 +268,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         int recycledSize = viewCache.size();
         for (int i = 0; i < viewCache.size(); i++) {
             removeAndRecycleView(viewCache.valueAt(i), recycler);
-            Log.d("fillWithLayouter", "recycle position =" + viewCache.keyAt(i));
+//            Log.d("fillWithLayouter", "recycle position =" + viewCache.keyAt(i));
         }
 
-        Log.d("fillWithLayouter", "recycled count = " + recycledSize);
+//        Log.d("fillWithLayouter", "recycled count = " + recycledSize);
     }
 
     /**
@@ -341,19 +348,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         dy = scrollVerticallyInternal(dy);
         offsetChildrenVertical(-dy);
         anchorView = getAnchorVisibleTopLeftView();
-        View topView = getChildAt(0);
-
-        if (!anchorView.isNotFoundState() && getPosition(topView) == 0) {
-            viewPositionsStorage.purge();
-            requestLayoutWithAnimations();
-        }
 
         fill(recycler, anchorView);
         return dy;
     }
 
     private void requestLayoutWithAnimations() {
-        Log.d(TAG, "normalization");
         postOnAnimation(new Runnable() {
             @Override
             public void run() {
@@ -417,9 +417,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         final View topView = getChildAt(0);
         int topViewPosition = getPosition(topView);
 
-        if (!viewPositionsStorage.isCachingEnabled() && viewPositionsStorage.isInCache(topViewPosition) || topViewPosition == 0) {
+        //perform normalization when we have reached previous position then normalization position
+        if (cacheNormalizationPosition!= null && (topViewPosition < cacheNormalizationPosition ||
+                (cacheNormalizationPosition == 0 && cacheNormalizationPosition == topViewPosition))) {
+            Log.d(TAG, "normalization, position = " + cacheNormalizationPosition + " top view position = " + topViewPosition);
+            viewPositionsStorage.purgeCacheFromPosition(cacheNormalizationPosition);
+            //reset normalization position
+            cacheNormalizationPosition = null;
             requestLayoutWithAnimations();
-            viewPositionsStorage.setCachingEnabled(true);
         }
 
         //todo workaround. somehow in the first row view in getChildAt(0) can have position 1
