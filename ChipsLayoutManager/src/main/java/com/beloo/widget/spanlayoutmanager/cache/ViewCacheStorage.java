@@ -4,6 +4,7 @@ import android.graphics.Rect;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.Pair;
 import android.util.SparseArray;
 import android.view.View;
@@ -15,6 +16,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 class ViewCacheStorage implements IViewCacheStorage {
+    private static final String TAG = ViewCacheStorage.class.getSimpleName();
     private static final int SIZE_MAX_CACHE = 1000;
 
     private RecyclerView.LayoutManager layoutManager;
@@ -48,6 +50,9 @@ class ViewCacheStorage implements IViewCacheStorage {
 
     @Override
     public void setCachingEnabled(boolean isEnabled) {
+        if (isEnabled) {
+            Log.i(TAG, "caching enabled");
+        }
         isCachingEnabled = isEnabled;
     }
 

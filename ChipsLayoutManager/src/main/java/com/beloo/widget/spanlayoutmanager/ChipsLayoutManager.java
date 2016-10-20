@@ -18,8 +18,11 @@ import com.beloo.widget.spanlayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.spanlayoutmanager.layouter.ILayouter;
 import com.beloo.widget.spanlayoutmanager.layouter.LayouterFactory;
 
-public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
+import java.util.HashSet;
+import java.util.Set;
 
+public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
+    public static final String TAG = ChipsLayoutManager.class.getSimpleName();
     private IChildGravityResolver childGravityResolver;
 
     /**
@@ -282,13 +285,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         int requestedItems = 0;
         int recycledItems = 0;
         int startCacheSize = viewCache.size();
-        Log.d("fillWithLayouter", "cached items = " + startCacheSize);
+//        Log.d("fillWithLayouter", "cached items = " + startCacheSize);
 
         while (iterator.hasNext()) {
             int pos = iterator.next();
             View view = viewCache.get(pos);
             if (view == null) {
-                Log.i("fillWithLayouter", "getView for position = " + pos);
+//                Log.i("fillWithLayouter", "getView for position = " + pos);
                 view = recycler.getViewForPosition(pos);
                 requestedItems++;
                 measureChildWithMargins(view, 0, 0);
@@ -316,7 +319,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         }
 
-        Log.d("fillWithLayouter", "reattached items = " + (startCacheSize - viewCache.size() + " : requested items = " + requestedItems + " recycledItems = " + recycledItems));
+//        Log.d("fillWithLayouter", "reattached items = " + (startCacheSize - viewCache.size() + " : requested items = " + requestedItems + " recycledItems = " + recycledItems));
 
         //layout last row
         layouter.layoutRow();
@@ -350,6 +353,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     private void requestLayoutWithAnimations() {
+        Log.d(TAG, "normalization");
         postOnAnimation(new Runnable() {
             @Override
             public void run() {
@@ -361,13 +365,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     private int scrollVerticallyInternal(int dy) {
         int childCount = getChildCount();
-        int itemCount = getItemCount();
         if (childCount == 0) {
             return 0;
         }
 
         final View topView = getChildAt(0);
-        int topViewPosition = getPosition(topView);
         final View bottomView = getChildAt(childCount - 1);
 
         int viewSpan = getDecoratedBottom(bottomView) - getDecoratedTop(topView);
@@ -378,38 +380,65 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         int delta = 0;
         if (dy < 0) {   //if content scrolled down
-            if (!viewPositionsStorage.isCachingEnabled() && viewPositionsStorage.isInCache(topViewPosition) || topViewPosition == 0) {
-                requestLayoutWithAnimations();
-                viewPositionsStorage.setCachingEnabled(true);
-            }
-
-            //todo workaround. somehow in the first row view in getChildAt(0) can have position 1
-            boolean isZeroAdded = false;
-            for (int i = 0; i < childCount; i++) {
-                View test = getChildAt(i);
-                if (getPosition(test) == 0) {
-                    isZeroAdded = true;
-                }
-            }
-
-            if (!isZeroAdded) { //in case 0 position haven't added in layout yet
-                delta = dy;
-            } else { //in case top view is a first view in adapter and wouldn't be any other view above
-                View view = findTopView();
-                int viewTop = getDecoratedTop(view);
-                delta = Math.max(viewTop, dy);
-            }
+           delta = onContentScrolledDown(dy);
         } else if (dy > 0) { //if content scrolled up
-            View lastView = getChildAt(childCount - 1);
-            int lastViewAdapterPos = getPosition(lastView);
-            if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
-                delta = dy;
-            } else { //in case lower view is the last view in adapter and wouldn't be any other view below
-                int viewBottom = getDecoratedBottom(lastView);
-                int parentBottom = getHeight();
-                delta = Math.min(viewBottom - parentBottom, dy);
+           delta = onContentScrolledUp(dy);
+        }
+        return delta;
+    }
+
+    /** invoked when content scrolled up (to newer items)
+     * @param dy not processed changing of y axis
+     * @return delta. Calculated changing of y axis*/
+    private int onContentScrolledUp(int dy) {
+        int childCount = getChildCount();
+        int itemCount = getItemCount();
+        int delta;
+
+        View lastView = getChildAt(childCount - 1);
+        int lastViewAdapterPos = getPosition(lastView);
+        if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
+            delta = dy;
+        } else { //in case lower view is the last view in adapter and wouldn't be any other view below
+            int viewBottom = getDecoratedBottom(lastView);
+            int parentBottom = getHeight();
+            delta = Math.min(viewBottom - parentBottom, dy);
+        }
+
+        return delta;
+    }
+
+    /** invoked when content scrolled down (return to older items)
+     * @param dy not processed changing of y axis
+     * @return delta. Calculated changing of y axis */
+    private int onContentScrolledDown(int dy) {
+        int childCount = getChildCount();
+        int delta;
+        final View topView = getChildAt(0);
+        int topViewPosition = getPosition(topView);
+
+        if (!viewPositionsStorage.isCachingEnabled() && viewPositionsStorage.isInCache(topViewPosition) || topViewPosition == 0) {
+            requestLayoutWithAnimations();
+            viewPositionsStorage.setCachingEnabled(true);
+        }
+
+        //todo workaround. somehow in the first row view in getChildAt(0) can have position 1
+        boolean isZeroAdded = false;
+        for (int i = 0; i < childCount; i++) {
+            View test = getChildAt(i);
+            if (getPosition(test) == 0) {
+                isZeroAdded = true;
             }
         }
+
+        if (!isZeroAdded) { //in case 0 position haven't added in layout yet
+            delta = dy;
+        } else { //in case top view is a first view in adapter and wouldn't be any other view above
+            View view = findTopView();
+            int viewTop = getDecoratedTop(view);
+            delta = Math.max(viewTop, dy);
+        }
+
         return delta;
     }
 
