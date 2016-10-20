@@ -118,8 +118,11 @@ class ViewCacheStorage implements IViewCacheStorage {
             removeIterator.next();
             removeIterator.remove();
         }
+        Integer previous = startsRow.lower(position);
+        previous = previous == null? position : previous;
 
-        removeIterator = endsRow.tailSet(position, true).iterator();
+        //we should also remove previous end row cache to guarantee consistency
+        removeIterator = endsRow.tailSet(previous, true).iterator();
         while (removeIterator.hasNext()) {
             removeIterator.next();
             removeIterator.remove();
