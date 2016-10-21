@@ -29,6 +29,10 @@ public interface IViewCacheStorage {
      * @param position the end position, exclusive */
     void purgeCacheToPosition(int position);
 
+    int getLastCachePosition();
+
+    boolean isCacheEmpty();
+
     /** all cache from selected position will be purged
      * @param position the start position, inclusive */
     void purgeCacheFromPosition(int position);

@@ -21,9 +21,6 @@ class RTLDownLayouter extends AbstractLayouter {
     @Override
     public void layoutRow() {
         super.layoutRow();
-
-        getCacheStorage().storeRow(rowViews);
-
         //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
 
         //layout previously calculated row
