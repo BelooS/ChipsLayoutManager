@@ -47,7 +47,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /** when scrolling reached this position {@link ChipsLayoutManager} is able to restore items layout according to cached items with positions above.
      * That layout would exactly correspond to current item view situation */
     @Nullable
-    private Integer cacheNormalizationPosition = 0;
+    private Integer cacheNormalizationPosition = null;
 
     /**
      * stored current anchor view due to scroll state changes
@@ -145,6 +145,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         anchorView = container.getAnchorViewState();
         viewPositionsStorage.onRestoreInstanceState(container.getPositionsCache(orientation));
         cacheNormalizationPosition = container.getNormalizationPosition(orientation);
+        Log.d(TAG, "RESTORE. orientation = " + orientation + " normalizationPos = " + cacheNormalizationPosition);
     }
 
     @Override
@@ -158,6 +159,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         } else {
             storedNormalizationPosition = cacheNormalizationPosition;
         }
+        Log.d(TAG, "STORE. orientation = " + orientation + " normalizationPos = " + storedNormalizationPosition);
+
         container.putNormalizationPosition(orientation, storedNormalizationPosition);
 
         return container;
@@ -228,7 +231,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     private void onLayoutUpdatedFromPosition(int position) {
         viewPositionsStorage.purgeCacheFromPosition(position);
-        cacheNormalizationPosition = cacheNormalizationPosition == null? position : Math.min(cacheNormalizationPosition, position);
+        int startRowPos = viewPositionsStorage.getStartOfRow(position);
+        cacheNormalizationPosition = cacheNormalizationPosition == null?
+                startRowPos : Math.min(cacheNormalizationPosition, startRowPos);
     }
 
     @Override
@@ -286,6 +291,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             removeAndRecycleView(viewCache.valueAt(i), recycler);
 //            Log.d("fillWithLayouter", "recycle position =" + viewCache.keyAt(i));
         }
+
+        performNormalizationIfNeeded();
 
 //        Log.d("fillWithLayouter", "recycled count = " + recycledSize);
     }
@@ -424,17 +431,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return delta;
     }
 
-    /** invoked when content scrolled down (return to older items)
-     * @param dy not processed changing of y axis
-     * @return delta. Calculated changing of y axis */
-    private int onContentScrolledDown(int dy) {
-        int childCount = getChildCount();
-        int delta;
+    private void performNormalizationIfNeeded() {
         final View topView = getChildAt(0);
         int topViewPosition = getPosition(topView);
-
         //perform normalization when we have reached previous position then normalization position
-        if (cacheNormalizationPosition!= null && (topViewPosition < cacheNormalizationPosition ||
+        if (cacheNormalizationPosition != null && (topViewPosition < cacheNormalizationPosition ||
                 (cacheNormalizationPosition == 0 && cacheNormalizationPosition == topViewPosition))) {
             Log.d(TAG, "normalization, position = " + cacheNormalizationPosition + " top view position = " + topViewPosition);
             viewPositionsStorage.purgeCacheFromPosition(cacheNormalizationPosition);
@@ -442,6 +443,16 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             cacheNormalizationPosition = null;
             requestLayoutWithAnimations();
         }
+    }
+
+    /** invoked when content scrolled down (return to older items)
+     * @param dy not processed changing of y axis
+     * @return delta. Calculated changing of y axis */
+    private int onContentScrolledDown(int dy) {
+        int childCount = getChildCount();
+        int delta;
+
+        performNormalizationIfNeeded();
 
         //todo workaround. somehow in the first row view in getChildAt(0) can have position 1
         boolean isZeroAdded = false;

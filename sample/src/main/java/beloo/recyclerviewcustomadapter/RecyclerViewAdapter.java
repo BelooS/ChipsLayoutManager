@@ -38,7 +38,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewH
                 break;
         }
         viewHolderCount++;
-        Log.w(TAG, "created holders = " + viewHolderCount);
+//        Log.w(TAG, "created holders = " + viewHolderCount);
         return new ViewHolder(itemView);
     }
 

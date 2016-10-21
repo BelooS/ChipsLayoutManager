@@ -18,6 +18,8 @@ public interface IViewCacheStorage {
 
     boolean isCachingEnabled();
 
+    int getStartOfRow(int endRow);
+
     void storeRow(List<Pair<Rect, View>> row);
 
     boolean isInCache(int position);
