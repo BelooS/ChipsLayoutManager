@@ -113,7 +113,6 @@ abstract class AbstractLayouter implements ILayouter {
     /** add views from current row to layout*/
     public void layoutRow() {
         previousRowSize = rowSize;
-        cacheStorage.storeRow(rowViews);
         this.rowSize = 0;
     }
 
