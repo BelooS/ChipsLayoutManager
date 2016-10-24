@@ -1,6 +1,7 @@
 package com.beloo.widget.spanlayoutmanager.layouter;
 
 import android.graphics.Rect;
+import android.util.Pair;
 import android.view.View;
 
 import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
@@ -23,15 +24,26 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     public void layoutRow() {
         super.layoutRow();
 
+        int leftOffsetOfRow = viewRight;
+        for (Pair<Rect, View> rowViewRectPair : rowViews) {
+            Rect viewRect = rowViewRectPair.first;
+
+            viewRect.left = viewRect.left - leftOffsetOfRow;
+            viewRect.right = viewRect.right - leftOffsetOfRow;
+
+            rowTop = Math.min(rowTop, viewRect.top);
+            rowBottom = Math.max(rowBottom, viewRect.bottom);
+        }
+
         //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
         //if previously row finished and we have to fill it
-        rowTop = layoutRow(rowViews, rowTop, rowBottom, viewRight);
+        rowTop = layoutRow(rowViews, rowTop, rowBottom);
 
         //clear row data
         rowViews.clear();
 
         //go to next row, increase top coordinate, reset left
-        viewRight = getCanvasWidth();
+        viewRight = getCanvasRightBorder();
         rowBottom = rowTop;
     }
 
@@ -53,9 +65,9 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     @Override
     public boolean onAttachView(View view) {
 
-        if (viewRight != getCanvasWidth() && viewRight - getLayoutManager().getDecoratedMeasuredWidth(view) < 0) {
+        if (viewRight != getCanvasRightBorder() && viewRight - getLayoutManager().getDecoratedMeasuredWidth(view) < getCanvasLeftBorder()) {
             //new row
-            viewRight = getCanvasWidth();
+            viewRight = getCanvasRightBorder();
             rowBottom = rowTop;
         } else {
             viewRight = getLayoutManager().getDecoratedLeft(view);
@@ -68,7 +80,7 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
     @Override
     public boolean isFinishedLayouting() {
-        return rowBottom < 0;
+        return rowBottom < getCanvasTopBorder();
     }
 
     @Override
@@ -78,7 +90,7 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
         if (stopDueToCache) return true;
 
         int bufLeft = viewRight - currentViewWidth;
-        return super.canNotBePlacedInCurrentRow() || (bufLeft < 0 && viewRight < getCanvasWidth());
+        return super.canNotBePlacedInCurrentRow() || (bufLeft < getCanvasLeftBorder() && viewRight < getCanvasRightBorder());
     }
 
     @Override

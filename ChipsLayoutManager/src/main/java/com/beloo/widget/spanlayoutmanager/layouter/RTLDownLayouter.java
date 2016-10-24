@@ -26,10 +26,10 @@ class RTLDownLayouter extends AbstractLayouter {
         //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
 
         //layout previously calculated row
-        layoutRow(rowViews, rowTop, maxBottom, 0);
+        layoutRow(rowViews, rowTop, maxBottom);
 
         //go to next row, increase top coordinate, reset left
-        viewRight = getCanvasWidth();
+        viewRight = getCanvasRightBorder();
         rowTop = maxBottom;
 
         //clear row data
@@ -43,7 +43,7 @@ class RTLDownLayouter extends AbstractLayouter {
 
     @Override
     public boolean canNotBePlacedInCurrentRow() {
-        return super.canNotBePlacedInCurrentRow() || (viewRight < getCanvasWidth() && viewRight - currentViewWidth < 0);
+        return super.canNotBePlacedInCurrentRow() || (viewRight < getCanvasRightBorder() && viewRight - currentViewWidth < 0);
     }
 
     @Override
@@ -71,7 +71,7 @@ class RTLDownLayouter extends AbstractLayouter {
 
     @Override
     public boolean isFinishedLayouting() {
-        return rowTop > getCanvasHeight();
+        return rowTop > getCanvasBottomBorder();
     }
 
 }

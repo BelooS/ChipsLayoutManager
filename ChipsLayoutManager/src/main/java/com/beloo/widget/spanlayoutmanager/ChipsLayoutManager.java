@@ -58,7 +58,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /**
      * stored current anchor view due to scroll state changes
      */
-    private AnchorViewState anchorView = AnchorViewState.getNotFoundState();
+    private AnchorViewState anchorView = AnchorViewState.getNotFoundState(this);
 
     private ChipsLayoutManager(Context context) {
         @DeviceOrientation
@@ -518,7 +518,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /** find the view in a higher row which is closest to the left border*/
     private AnchorViewState getAnchorVisibleTopLeftView() {
         int childCount = getChildCount();
-        AnchorViewState topLeft = AnchorViewState.getNotFoundState();
+        AnchorViewState topLeft = AnchorViewState.getNotFoundState(this);
 
         Rect mainRect = new Rect(0, 0, getWidth(), getHeight());
         int minTop = Integer.MAX_VALUE;

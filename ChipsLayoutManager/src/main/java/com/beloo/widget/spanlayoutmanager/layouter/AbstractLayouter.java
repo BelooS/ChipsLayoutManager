@@ -50,12 +50,20 @@ abstract class AbstractLayouter implements ILayouter {
         this.childGravityResolver = childGravityResolver;
     }
 
-    int getCanvasWidth() {
-        return layoutManager.getWidth();
+    int getCanvasRightBorder() {
+        return layoutManager.getWidth() - layoutManager.getPaddingRight();
     }
 
-    int getCanvasHeight() {
+    int getCanvasBottomBorder() {
         return layoutManager.getHeight();
+    }
+
+    int getCanvasLeftBorder() {
+        return layoutManager.getPaddingLeft();
+    }
+
+    int getCanvasTopBorder() {
+        return layoutManager.getPaddingTop();
     }
 
     int getCurrentViewPosition() {
@@ -148,19 +156,8 @@ abstract class AbstractLayouter implements ILayouter {
     }
 
     /** layout pre-calculated row on a recyclerView canvas
-     * @param leftOffsetOfRow How much row have to be shifted before placing. Should be negative on RTL
      * returns rowTop */
-    int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int maxBottom, int leftOffsetOfRow) {
-        for (Pair<Rect, View> rowViewRectPair : rowViews) {
-            Rect viewRect = rowViewRectPair.first;
-
-            viewRect.left = viewRect.left - leftOffsetOfRow;
-            viewRect.right = viewRect.right - leftOffsetOfRow;
-
-            minTop = Math.min(minTop, viewRect.top);
-            maxBottom = Math.max(maxBottom, viewRect.bottom);
-        }
-
+    int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int maxBottom) {
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
             View view = rowViewRectPair.second;

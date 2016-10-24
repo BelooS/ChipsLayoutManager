@@ -90,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
                         return Gravity.CENTER;
                     }
                 })
-                .setMaxViewsInRow(2)
                 .build();
 
         rvTest.addItemDecoration(new SpacingItemDecoration(getResources().getDimensionPixelOffset(R.dimen.item_space),

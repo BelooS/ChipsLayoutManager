@@ -2,6 +2,7 @@ package com.beloo.widget.spanlayoutmanager.layouter;
 
 import android.graphics.Rect;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 
 import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
@@ -30,7 +31,19 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
         //if previously row finished and we have to fill it
         Log.d(TAG, "row bottom " + rowBottom);
         Log.d(TAG, "row top " + rowTop);
-        rowTop = layoutRow(rowViews, rowTop, rowBottom, -(getCanvasWidth() - viewLeft));
+        int leftOffsetOfRow = -(getCanvasRightBorder() - viewLeft);
+
+        for (Pair<Rect, View> rowViewRectPair : rowViews) {
+            Rect viewRect = rowViewRectPair.first;
+
+            viewRect.left = viewRect.left - leftOffsetOfRow;
+            viewRect.right = viewRect.right - leftOffsetOfRow;
+
+            rowTop = Math.min(rowTop, viewRect.top);
+            rowBottom = Math.max(rowBottom, viewRect.bottom);
+        }
+
+        rowTop = layoutRow(rowViews, rowTop, rowBottom);
 
         //clear row data
         rowViews.clear();
@@ -57,7 +70,7 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     @Override
     public boolean onAttachView(View view) {
 
-        if (viewLeft != 0 && viewLeft + getLayoutManager().getDecoratedMeasuredWidth(view) > getCanvasWidth()) {
+        if (viewLeft != 0 && viewLeft + getLayoutManager().getDecoratedMeasuredWidth(view) > getCanvasRightBorder()) {
             viewLeft = 0;
             rowBottom = rowTop;
         } else {
@@ -81,7 +94,7 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
         if (stopDueToCache) return true;
 
         int bufRight = viewLeft + currentViewWidth;
-        return super.canNotBePlacedInCurrentRow() || (bufRight > getCanvasWidth() && viewLeft > 0);
+        return super.canNotBePlacedInCurrentRow() || (bufRight > getCanvasRightBorder() && viewLeft > 0);
     }
 
     @Override
