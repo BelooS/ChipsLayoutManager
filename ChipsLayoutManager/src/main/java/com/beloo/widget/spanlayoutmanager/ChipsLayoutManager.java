@@ -473,52 +473,30 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      * @param dy not processed changing of y axis
      * @return delta. Calculated changing of y axis */
     private int onContentScrolledDown(int dy) {
-        int childCount = getChildCount();
         int delta;
 
         performNormalizationIfNeeded();
 
-        //todo workaround. somehow in the first row view in getChildAt(0) can have position 1
-//        boolean isZeroAdded = false;
-//        for (int i = 0; i < childCount; i++) {
-//            View test = getChildAt(i);
-//            if (getPosition(test) == 0) {
-//                Rect mainRect = new Rect(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), getHeight() - getPaddingBottom());
-//                int top = getDecoratedTop(test);
-//                int bottom = getDecoratedBottom(test);
-//                int left = getDecoratedLeft(test);
-//                int right = getDecoratedRight(test);
-//                Rect viewRect = new Rect(left, top, right, bottom);
-//                isZeroAdded = viewRect.intersect(mainRect);
-//            }
-//        }
-
         AnchorViewState state = getAnchorVisibleTopLeftView();
+
         if (state.getPosition() != 0) { //in case 0 position haven't added in layout yet
             delta = dy;
         } else { //in case top view is a first view in adapter and wouldn't be any other view above
-            //todo properly calculate delta
-            delta = Math.max(dy, dy);
+            int topBorder = getPaddingTop();
+            int viewTop = state.getAnchorViewRect().top;
+            int distance;
+            distance = viewTop - topBorder;
+            if (viewTop - topBorder >= 0) {
+                // in case over scroll on top border
+                delta = distance;
+            } else {
+                //in case first child showed partially
+                distance = viewTop - topBorder;
+                delta = Math.max(distance, dy);
+            }
         }
 
         return delta;
-    }
-
-    /**
-     * find top view in layout
-     */
-    private View findTopView() {
-        View topView = getChildAt(0);
-        int minTop = getDecoratedTop(topView);
-        int childCount = getChildCount();
-        for (int i = 1; i < childCount; i++) {
-            View view = getChildAt(i);
-            int top = getDecoratedTop(view);
-            if (top < minTop) {
-                topView = view;
-            }
-        }
-        return topView;
     }
 
     @NonNull

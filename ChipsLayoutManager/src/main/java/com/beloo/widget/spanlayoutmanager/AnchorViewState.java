@@ -13,7 +13,6 @@ import android.support.v7.widget.RecyclerView;
 
 class AnchorViewState implements Parcelable {
     private Integer position = 0;
-    @Nullable
     private Rect anchorViewRect;
 
     private AnchorViewState() {
@@ -36,7 +35,6 @@ class AnchorViewState implements Parcelable {
         return position;
     }
 
-    @Nullable
     public Rect getAnchorViewRect() {
         return anchorViewRect;
     }
