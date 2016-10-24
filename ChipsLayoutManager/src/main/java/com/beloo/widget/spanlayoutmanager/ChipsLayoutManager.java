@@ -17,9 +17,11 @@ import com.beloo.widget.spanlayoutmanager.cache.ViewCacheFactory;
 import com.beloo.widget.spanlayoutmanager.gravity.CenterChildGravity;
 import com.beloo.widget.spanlayoutmanager.gravity.CustomGravityResolver;
 import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
+import com.beloo.widget.spanlayoutmanager.layouter.AbstractLayouterFactory;
 import com.beloo.widget.spanlayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.spanlayoutmanager.layouter.ILayouter;
-import com.beloo.widget.spanlayoutmanager.layouter.LayouterFactory;
+import com.beloo.widget.spanlayoutmanager.layouter.LTRLayouterFactory;
+import com.beloo.widget.spanlayoutmanager.layouter.RTLLayouterFactory;
 
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
@@ -35,7 +37,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      * coefficient to support fast scrolling, caching views only for one row may not be enough
      */
     private static final float FAST_SCROLLING_COEFFICIENT = 2;
-    private LayouterFactory layouterFactory;
+    private AbstractLayouterFactory layouterFactory;
     private IViewCacheStorage viewPositionsStorage;
 
     private SparseArray<View> viewCache = new SparseArray<>();
@@ -62,10 +64,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         this.orientation = orientation;
 
         viewPositionsStorage = new ViewCacheFactory(this).createCacheStorage();
-        layouterFactory = new LayouterFactory(this, viewPositionsStorage);
 
         setAutoMeasureEnabled(true);
         setMeasurementCacheEnabled(true);
+    }
+
+    private AbstractLayouterFactory createLayouterFactory() {
+        return isLayoutRTL() ? new RTLLayouterFactory(this, viewPositionsStorage) : new LTRLayouterFactory(this, viewPositionsStorage);
     }
 
     public static Builder newBuilder(Context context) {
@@ -188,6 +193,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
         //We have nothing to show for an empty data set but clear any existing views
+        if (layouterFactory == null)
+            //isLayoutRlt not ready in constructor, so factory initialization performed here
+            layouterFactory = createLayouterFactory();
+
         if (getItemCount() == 0) {
             detachAndScrapAttachedViews(recycler);
             return;
@@ -301,9 +310,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             detachView(viewCache.valueAt(i));
         }
 
-        ILayouter downLayouter = layouterFactory.getDownLayouter(anchorRect.top, anchorRect.left, anchorRect.bottom, anchorRect.right, isLayoutRTL());
+        ILayouter downLayouter = layouterFactory.getDownLayouter(anchorRect.top, anchorRect.left, anchorRect.bottom, anchorRect.right);
         fillWithLayouter(recycler, downLayouter, startingPos);
-        ILayouter upLayouter = layouterFactory.getUpLayouter(anchorRect.top, anchorRect.left, anchorRect.bottom, anchorRect.right, isLayoutRTL());
+        ILayouter upLayouter = layouterFactory.getUpLayouter(anchorRect.top, anchorRect.left, anchorRect.bottom, anchorRect.right);
         fillWithLayouter(recycler, upLayouter, startingPos - 1);
 
         //move to trash everything, which haven't used in this layout cycle
