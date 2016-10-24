@@ -37,7 +37,7 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
         //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
         //if previously row finished and we have to fill it
-        rowTop = layoutRow(rowViews, rowTop, rowBottom);
+        layoutRow(rowViews, rowTop, rowBottom);
 
         //clear row data
         rowViews.clear();

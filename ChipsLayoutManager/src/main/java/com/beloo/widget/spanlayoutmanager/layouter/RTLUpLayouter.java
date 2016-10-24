@@ -43,7 +43,7 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
             rowBottom = Math.max(rowBottom, viewRect.bottom);
         }
 
-        rowTop = layoutRow(rowViews, rowTop, rowBottom);
+        layoutRow(rowViews, rowTop, rowBottom);
 
         //clear row data
         rowViews.clear();

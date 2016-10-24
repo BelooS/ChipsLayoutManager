@@ -157,7 +157,7 @@ abstract class AbstractLayouter implements ILayouter {
 
     /** layout pre-calculated row on a recyclerView canvas
      * returns rowTop */
-    int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int maxBottom) {
+    void layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int maxBottom) {
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
             View view = rowViewRectPair.second;
@@ -172,8 +172,6 @@ abstract class AbstractLayouter implements ILayouter {
             //layout whole views in a row
             layoutManager.layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
         }
-
-        return minTop;
     }
 
     ChipsLayoutManager getLayoutManager() {
