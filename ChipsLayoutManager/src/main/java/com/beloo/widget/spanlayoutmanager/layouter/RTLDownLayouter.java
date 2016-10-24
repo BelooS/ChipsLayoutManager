@@ -17,23 +17,17 @@ class RTLDownLayouter extends AbstractLayouter {
     }
 
     @Override
-    public void layoutRow() {
-        super.layoutRow();
-
+    void onPreLayout() {
         getCacheStorage().storeRow(rowViews);
+    }
 
-        //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
-
-        //layout previously calculated row
-        layoutRow(rowViews, rowTop, rowBottom);
-
+    @Override
+    void onAfterLayout() {
         //go to next row, increase top coordinate, reset left
         viewRight = getCanvasRightBorder();
         rowTop = rowBottom;
-
-        //clear row data
-        rowViews.clear();
     }
+
 
     @Override
     void addView(View view) {

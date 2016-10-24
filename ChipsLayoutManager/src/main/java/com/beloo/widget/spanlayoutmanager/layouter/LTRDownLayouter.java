@@ -20,26 +20,21 @@ class LTRDownLayouter extends AbstractLayouter {
     }
 
     @Override
-    public void layoutRow() {
-        super.layoutRow();
-        //cache only when go down
-        getCacheStorage().storeRow(rowViews);
-        //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
-
-        //layout previously calculated row
-        layoutRow(rowViews, rowTop, rowBottom);
-
-        //go to next row, increase top coordinate, reset left
-        viewLeft = getCanvasLeftBorder();
-        rowTop = rowBottom;
-
-        //clear row data
-        rowViews.clear();
+    void addView(View view) {
+        getLayoutManager().addView(view);
     }
 
     @Override
-    void addView(View view) {
-        getLayoutManager().addView(view);
+    void onPreLayout() {
+        //cache only when go down
+        getCacheStorage().storeRow(rowViews);
+    }
+
+    @Override
+    void onAfterLayout() {
+        //go to next row, increase top coordinate, reset left
+        viewLeft = getCanvasLeftBorder();
+        rowTop = rowBottom;
     }
 
     @Override

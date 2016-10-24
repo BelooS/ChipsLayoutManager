@@ -24,13 +24,12 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
-    public void layoutRow() {
-        super.layoutRow();
+    void addView(View view) {
+        getLayoutManager().addView(view, 0);
+    }
 
-        //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
-        //if previously row finished and we have to fill it
-        Log.d(TAG, "row bottom " + rowBottom);
-        Log.d(TAG, "row top " + rowTop);
+    @Override
+    void onPreLayout() {
         int leftOffsetOfRow = -(getCanvasRightBorder() - viewLeft);
 
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
@@ -42,20 +41,13 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
             rowTop = Math.min(rowTop, viewRect.top);
             rowBottom = Math.max(rowBottom, viewRect.bottom);
         }
-
-        layoutRow(rowViews, rowTop, rowBottom);
-
-        //clear row data
-        rowViews.clear();
-
-        //go to next row, increase top coordinate, reset left
-        viewLeft = 0;
-        rowBottom = rowTop;
     }
 
     @Override
-    void addView(View view) {
-        getLayoutManager().addView(view, 0);
+    void onAfterLayout() {
+        //go to next row, increase top coordinate, reset left
+        viewLeft = 0;
+        rowBottom = rowTop;
     }
 
     @Override

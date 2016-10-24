@@ -31,10 +31,10 @@ abstract class AbstractLayouter implements ILayouter {
 
     /** Max items in row restriction. Layout of row should be stopped when this count of views reached*/
     @Nullable
-    Integer maxViewsInRow = null;
+    private Integer maxViewsInRow = null;
 
-    int rowSize = 0;
-    int previousRowSize;
+    private int rowSize = 0;
+    private int previousRowSize;
 
     private ChipsLayoutManager layoutManager;
     private IViewCacheStorage cacheStorage;
@@ -50,36 +50,36 @@ abstract class AbstractLayouter implements ILayouter {
         this.childGravityResolver = childGravityResolver;
     }
 
-    int getCanvasRightBorder() {
+    final int getCanvasRightBorder() {
         return layoutManager.getWidth() - layoutManager.getPaddingRight();
     }
 
-    int getCanvasBottomBorder() {
+    final int getCanvasBottomBorder() {
         return layoutManager.getHeight();
     }
 
-    int getCanvasLeftBorder() {
+    final int getCanvasLeftBorder() {
         return layoutManager.getPaddingLeft();
     }
 
-    int getCanvasTopBorder() {
+    final int getCanvasTopBorder() {
         return layoutManager.getPaddingTop();
     }
 
-    int getCurrentViewPosition() {
+    final int getCurrentViewPosition() {
         return currentViewPosition;
     }
 
-    IViewCacheStorage getCacheStorage() {
+    final IViewCacheStorage getCacheStorage() {
         return cacheStorage;
     }
 
     @Override
-    public int getPreviousRowSize() {
+    public final int getPreviousRowSize() {
         return previousRowSize;
     }
 
-    void setMaxViewsInRow(@Nullable Integer maxViewsInRow) {
+    final void setMaxViewsInRow(@Nullable Integer maxViewsInRow) {
         this.maxViewsInRow = maxViewsInRow;
     }
 
@@ -125,6 +125,12 @@ abstract class AbstractLayouter implements ILayouter {
     /** add view to layout manager */
     abstract void addView(View view);
 
+    /** called when layouter ready to add row to canvas. Children could perform normalization actions on created row*/
+    abstract void onPreLayout();
+
+    /** called after row have been layouted. Children should prepare new row here. */
+    abstract void onAfterLayout();
+
     @CallSuper
     @Override
     /** Read layouter state from current attached view. We need only last of it, but we can't determine here which is last.
@@ -147,17 +153,23 @@ abstract class AbstractLayouter implements ILayouter {
         return true;
     }
 
-    @CallSuper
     @Override
     /** add views from current row to layout*/
-    public void layoutRow() {
+    public final void layoutRow() {
         previousRowSize = rowSize;
         this.rowSize = 0;
+
+        onPreLayout();
+        layoutRow(rowViews, rowTop, rowBottom);
+        onAfterLayout();
+
+        //clear row data
+        rowViews.clear();
     }
 
     /** layout pre-calculated row on a recyclerView canvas
      * returns rowTop */
-    void layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int maxBottom) {
+    private void layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int maxBottom) {
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
             View view = rowViewRectPair.second;
