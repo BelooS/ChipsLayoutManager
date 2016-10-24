@@ -9,7 +9,6 @@ import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
 
 class RTLDownLayouter extends AbstractLayouter {
 
-    private int maxBottom;
     private int viewRight;
 
     RTLDownLayouter(ChipsLayoutManager layoutManager, IChildGravityResolver childGravityResolver, IViewCacheStorage cacheStorage, int topOffset, int bottomOffset, int rightOffset) {
@@ -26,11 +25,11 @@ class RTLDownLayouter extends AbstractLayouter {
         //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
 
         //layout previously calculated row
-        layoutRow(rowViews, rowTop, maxBottom);
+        layoutRow(rowViews, rowTop, rowBottom);
 
         //go to next row, increase top coordinate, reset left
         viewRight = getCanvasRightBorder();
-        rowTop = maxBottom;
+        rowTop = rowBottom;
 
         //clear row data
         rowViews.clear();
@@ -55,7 +54,7 @@ class RTLDownLayouter extends AbstractLayouter {
     Rect createViewRect(View view) {
         Rect viewRect = new Rect(viewRight - currentViewWidth, rowTop, viewRight, rowTop + currentViewHeight);
         viewRight = viewRect.left;
-        maxBottom = Math.max(maxBottom, viewRect.bottom);
+        rowBottom = Math.max(rowBottom, viewRect.bottom);
         return viewRect;
     }
 
@@ -64,7 +63,7 @@ class RTLDownLayouter extends AbstractLayouter {
         rowTop = getLayoutManager().getDecoratedTop(view);
         viewRight = getLayoutManager().getDecoratedLeft(view);
 
-        maxBottom = Math.max(maxBottom, getLayoutManager().getDecoratedBottom(view));
+        rowBottom = Math.max(rowBottom, getLayoutManager().getDecoratedBottom(view));
 
         return super.onAttachView(view);
     }
