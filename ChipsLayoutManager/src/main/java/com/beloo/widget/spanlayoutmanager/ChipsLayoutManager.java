@@ -144,24 +144,26 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         container = (ParcelableContainer) state;
         anchorView = container.getAnchorViewState();
         viewPositionsStorage.onRestoreInstanceState(container.getPositionsCache(orientation));
-        cacheNormalizationPosition = container.getNormalizationPosition(orientation);
+        cacheNormalizationPosition = 0;
+//        cacheNormalizationPosition = container.getNormalizationPosition(orientation);
         Log.d(TAG, "RESTORE. orientation = " + orientation + " normalizationPos = " + cacheNormalizationPosition);
     }
 
     @Override
     public Parcelable onSaveInstanceState() {
         container.putAnchorViewState(getAnchorVisibleTopLeftView());
-        container.putPositionsCache(orientation, viewPositionsStorage.onSaveInstanceState());
-
-        Integer storedNormalizationPosition;
-        if (!viewPositionsStorage.isCacheEmpty()) {
-            storedNormalizationPosition = cacheNormalizationPosition != null ? cacheNormalizationPosition : viewPositionsStorage.getLastCachePosition();
-        } else {
-            storedNormalizationPosition = cacheNormalizationPosition;
-        }
-        Log.d(TAG, "STORE. orientation = " + orientation + " normalizationPos = " + storedNormalizationPosition);
-
-        container.putNormalizationPosition(orientation, storedNormalizationPosition);
+        //todo not worked now. will be provided in next releases
+//        container.putPositionsCache(orientation, viewPositionsStorage.onSaveInstanceState());
+//
+//        Integer storedNormalizationPosition;
+//        if (!viewPositionsStorage.isCacheEmpty()) {
+//            storedNormalizationPosition = cacheNormalizationPosition != null ? cacheNormalizationPosition : viewPositionsStorage.getLastCachePosition();
+//        } else {
+//            storedNormalizationPosition = cacheNormalizationPosition;
+//        }
+//        Log.d(TAG, "STORE. orientation = " + orientation + " normalizationPos = " + storedNormalizationPosition);
+//
+//        container.putNormalizationPosition(orientation, storedNormalizationPosition);
 
         return container;
     }
