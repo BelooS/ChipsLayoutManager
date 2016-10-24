@@ -22,13 +22,18 @@ import com.beloo.widget.spanlayoutmanager.layouter.LayouterFactory;
 
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
+    private static final int INT_ROW_SIZE_APPROXIMATELY_FOR_CACHE = 10;
+
+    //---- contract parameters
     private IChildGravityResolver childGravityResolver;
+    private boolean isScrollingEnabled = true;
+    private Integer maxViewsInRow = null;
+    //--- end contract parameters
 
     /**
      * coefficient to support fast scrolling, caching views only for one row may not be enough
      */
     private static final float FAST_SCROLLING_COEFFICIENT = 2;
-    private int maxViewsInRow = 2;
     private LayouterFactory layouterFactory;
     private IViewCacheStorage viewPositionsStorage;
 
@@ -53,8 +58,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      * stored current anchor view due to scroll state changes
      */
     private AnchorViewState anchorView = AnchorViewState.getNotFoundState();
-
-    private boolean isScrollingEnabled = true;
 
     private ChipsLayoutManager(Context context) {
         @DeviceOrientation
@@ -176,7 +179,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return;
         }
 
-        calcRecyclerCacheSize(recycler, 2);
+        calcRecyclerCacheSize(recycler);
 
         if (!state.isPreLayout()) {
             if (anchorView.isNotFoundState()) {
@@ -360,9 +363,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /**
      * recycler should contain all recycled views from a longest row, not just 2 holders by default
      */
-    private void calcRecyclerCacheSize(RecyclerView.Recycler recycler, int rowSize) {
-        maxViewsInRow = Math.max(rowSize, maxViewsInRow);
-        recycler.setViewCacheSize((int) (maxViewsInRow * FAST_SCROLLING_COEFFICIENT));
+    private void calcRecyclerCacheSize(RecyclerView.Recycler recycler) {
+        int viewsInRow = maxViewsInRow == null? INT_ROW_SIZE_APPROXIMATELY_FOR_CACHE : maxViewsInRow;
+        recycler.setViewCacheSize((int) (viewsInRow * FAST_SCROLLING_COEFFICIENT));
     }
 
     /**
