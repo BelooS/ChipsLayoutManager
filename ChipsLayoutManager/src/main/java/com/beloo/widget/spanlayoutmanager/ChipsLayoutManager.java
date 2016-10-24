@@ -479,20 +479,26 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         performNormalizationIfNeeded();
 
         //todo workaround. somehow in the first row view in getChildAt(0) can have position 1
-        boolean isZeroAdded = false;
-        for (int i = 0; i < childCount; i++) {
-            View test = getChildAt(i);
-            if (getPosition(test) == 0) {
-                isZeroAdded = true;
-            }
-        }
+//        boolean isZeroAdded = false;
+//        for (int i = 0; i < childCount; i++) {
+//            View test = getChildAt(i);
+//            if (getPosition(test) == 0) {
+//                Rect mainRect = new Rect(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), getHeight() - getPaddingBottom());
+//                int top = getDecoratedTop(test);
+//                int bottom = getDecoratedBottom(test);
+//                int left = getDecoratedLeft(test);
+//                int right = getDecoratedRight(test);
+//                Rect viewRect = new Rect(left, top, right, bottom);
+//                isZeroAdded = viewRect.intersect(mainRect);
+//            }
+//        }
 
-        if (!isZeroAdded) { //in case 0 position haven't added in layout yet
+        AnchorViewState state = getAnchorVisibleTopLeftView();
+        if (state.getPosition() != 0) { //in case 0 position haven't added in layout yet
             delta = dy;
         } else { //in case top view is a first view in adapter and wouldn't be any other view above
-            View view = findTopView();
-            int viewTop = getDecoratedTop(view);
-            delta = Math.max(viewTop, dy);
+            //todo properly calculate delta
+            delta = Math.max(dy, dy);
         }
 
         return delta;
@@ -521,7 +527,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         int childCount = getChildCount();
         AnchorViewState topLeft = AnchorViewState.getNotFoundState();
 
-        Rect mainRect = new Rect(0, 0, getWidth(), getHeight());
+        Rect mainRect = new Rect(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), getHeight() - getPaddingBottom());
         int minTop = Integer.MAX_VALUE;
         for (int i = 0; i < childCount; i++) {
             View view = getChildAt(i);

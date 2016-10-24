@@ -61,6 +61,7 @@ class LTRDownLayouter extends AbstractLayouter {
         rowTop = getLayoutManager().getDecoratedTop(view);
         viewLeft = getLayoutManager().getDecoratedRight(view);
         rowBottom = Math.max(rowBottom, getLayoutManager().getDecoratedBottom(view));
+
         return super.onAttachView(view);
     }
 
