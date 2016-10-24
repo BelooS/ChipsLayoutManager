@@ -12,17 +12,15 @@ import android.support.v7.widget.RecyclerView;
  */
 
 class AnchorViewState implements Parcelable {
+    private Integer position = 0;
     @Nullable
-    private Integer position;
-    @NonNull
     private Rect anchorViewRect;
 
-    private AnchorViewState(@NonNull Rect rect) {
-        anchorViewRect = rect;
+    private AnchorViewState() {
     }
 
-    static AnchorViewState getNotFoundState(RecyclerView.LayoutManager layoutManager) {
-        return new AnchorViewState(new Rect(layoutManager.getPaddingLeft(), layoutManager.getPaddingTop(), 0, 0));
+    static AnchorViewState getNotFoundState() {
+        return new AnchorViewState();
     }
 
     AnchorViewState(int position, @NonNull Rect anchorViewRect) {
@@ -31,13 +29,14 @@ class AnchorViewState implements Parcelable {
     }
 
     boolean isNotFoundState() {
-        return position == null;
+        return anchorViewRect == null;
     }
 
-    public int getPosition() {
+    public Integer getPosition() {
         return position;
     }
 
+    @Nullable
     public Rect getAnchorViewRect() {
         return anchorViewRect;
     }

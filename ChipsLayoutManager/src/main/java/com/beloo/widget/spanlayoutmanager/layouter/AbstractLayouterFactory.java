@@ -1,5 +1,6 @@
 package com.beloo.widget.spanlayoutmanager.layouter;
 
+import android.graphics.Rect;
 import android.support.annotation.Nullable;
 
 import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
@@ -25,6 +26,6 @@ public abstract class AbstractLayouterFactory {
         return maxViewsInRow;
     }
 
-    public abstract ILayouter getUpLayouter(int anchorTop, int anchorLeft, int anchorBottom, int anchorRight);
-    public abstract ILayouter getDownLayouter(int anchorTop, int anchorLeft, int anchorBottom, int anchorRight);
+    public abstract ILayouter getUpLayouter(@Nullable Rect anchorRect);
+    public abstract ILayouter getDownLayouter(@Nullable Rect anchorRect);
 }

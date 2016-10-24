@@ -282,10 +282,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView) {
-        int anchorPos = 0;
-        if (!anchorView.isNotFoundState()) {
-            anchorPos = anchorView.getPosition();
-        }
+        int anchorPos = anchorView.getPosition();
 
         fill(recycler, anchorView, anchorPos);
     }
@@ -312,9 +309,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             detachView(viewCache.valueAt(i));
         }
 
-        ILayouter downLayouter = layouterFactory.getDownLayouter(anchorRect.top, anchorRect.left, anchorRect.bottom, anchorRect.right);
+        ILayouter downLayouter = layouterFactory.getDownLayouter(anchorRect);
         fillWithLayouter(recycler, downLayouter, startingPos);
-        ILayouter upLayouter = layouterFactory.getUpLayouter(anchorRect.top, anchorRect.left, anchorRect.bottom, anchorRect.right);
+        ILayouter upLayouter = layouterFactory.getUpLayouter(anchorRect);
         fillWithLayouter(recycler, upLayouter, startingPos - 1);
 
         //move to trash everything, which haven't used in this layout cycle
@@ -522,7 +519,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /** find the view in a higher row which is closest to the left border*/
     private AnchorViewState getAnchorVisibleTopLeftView() {
         int childCount = getChildCount();
-        AnchorViewState topLeft = AnchorViewState.getNotFoundState(this);
+        AnchorViewState topLeft = AnchorViewState.getNotFoundState();
 
         Rect mainRect = new Rect(0, 0, getWidth(), getHeight());
         int minTop = Integer.MAX_VALUE;
@@ -545,6 +542,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
 
         if (!topLeft.isNotFoundState()) {
+            assert topLeft.getAnchorViewRect()!= null;
             topLeft.getAnchorViewRect().top = minTop;
         }
 
