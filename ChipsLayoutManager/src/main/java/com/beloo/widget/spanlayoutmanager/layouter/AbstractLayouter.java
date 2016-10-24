@@ -156,34 +156,33 @@ abstract class AbstractLayouter implements ILayouter {
     @Override
     /** add views from current row to layout*/
     public final void layoutRow() {
-        previousRowSize = rowSize;
-        this.rowSize = 0;
-
         onPreLayout();
-        layoutRow(rowViews, rowTop, rowBottom);
-        onAfterLayout();
 
-        //clear row data
-        rowViews.clear();
-    }
-
-    /** layout pre-calculated row on a recyclerView canvas
-     * returns rowTop */
-    private void layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int maxBottom) {
+        /** layout pre-calculated row on a recyclerView canvas */
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
             View view = rowViewRectPair.second;
 
-            @SpanLayoutChildGravity
-            int viewGravity = childGravityResolver.getItemGravity(getLayoutManager().getPosition(view));
-            IGravityModifier gravityModifier = gravityModifiersFactory.getGravityModifier(viewGravity);
-            gravityModifier.modifyChildRect(minTop, maxBottom, viewRect);
-
+            applyChildGravity(view, viewRect, rowTop, rowBottom);
+            //add view to layout
             addView(view);
-
             //layout whole views in a row
             layoutManager.layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
         }
+
+        onAfterLayout();
+
+        previousRowSize = rowSize;
+        this.rowSize = 0;
+        //clear row data
+        rowViews.clear();
+    }
+
+    private void applyChildGravity(View view, Rect viewRect, int rowTop, int rowBottom) {
+        @SpanLayoutChildGravity
+        int viewGravity = childGravityResolver.getItemGravity(getLayoutManager().getPosition(view));
+        IGravityModifier gravityModifier = gravityModifiersFactory.getGravityModifier(viewGravity);
+        gravityModifier.modifyChildRect(rowTop, rowBottom, viewRect);
     }
 
     ChipsLayoutManager getLayoutManager() {
