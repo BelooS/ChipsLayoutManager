@@ -22,6 +22,8 @@ import com.beloo.widget.spanlayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.spanlayoutmanager.layouter.ILayouter;
 import com.beloo.widget.spanlayoutmanager.layouter.LTRLayouterFactory;
 import com.beloo.widget.spanlayoutmanager.layouter.RTLLayouterFactory;
+import com.beloo.widget.spanlayoutmanager.logger.EmptyLogger;
+import com.beloo.widget.spanlayoutmanager.logger.IFillWithLayouterLogger;
 
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
@@ -342,19 +344,16 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         AbstractPositionIterator iterator = layouter.positionIterator();
         iterator.move(startingPos);
-
-        int requestedItems = 0;
-        int recycledItems = 0;
-        int startCacheSize = viewCache.size();
-//        Log.d("fillWithLayouter", "cached items = " + startCacheSize);
+        IFillWithLayouterLogger logger = new EmptyLogger();
+        logger.onStart();
 
         while (iterator.hasNext()) {
             int pos = iterator.next();
             View view = viewCache.get(pos);
             if (view == null) {
-//                Log.i("fillWithLayouter", "getView for position = " + pos);
                 view = recycler.getViewForPosition(pos);
-                requestedItems++;
+                logger.onItemRequested();
+
                 measureChildWithMargins(view, 0, 0);
 
                 if (!layouter.placeView(view)) {
@@ -362,7 +361,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                     recycle view, which was requested previously
                      */
                     recycler.recycleView(view);
-                    recycledItems++;
+                    logger.onItemRecycled();
+
                     break;
                 }
 
@@ -376,7 +376,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         }
 
-//        Log.d("fillWithLayouter", "reattached items = " + (startCacheSize - viewCache.size() + " : requested items = " + requestedItems + " recycledItems = " + recycledItems));
+        logger.onFinishedLayouting();
 
         //layout last row
         layouter.layoutRow();
