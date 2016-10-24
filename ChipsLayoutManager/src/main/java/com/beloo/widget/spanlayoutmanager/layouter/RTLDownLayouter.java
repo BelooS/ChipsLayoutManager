@@ -1,7 +1,6 @@
 package com.beloo.widget.spanlayoutmanager.layouter;
 
 import android.graphics.Rect;
-import android.util.Pair;
 import android.view.View;
 
 import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
@@ -27,11 +26,11 @@ class RTLDownLayouter extends AbstractLayouter {
         //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
 
         //layout previously calculated row
-        layoutRow(rowViews, viewTop, maxBottom, 0);
+        layoutRow(rowViews, rowTop, maxBottom, 0);
 
         //go to next row, increase top coordinate, reset left
         viewRight = getCanvasWidth();
-        viewTop = maxBottom;
+        rowTop = maxBottom;
 
         //clear row data
         rowViews.clear();
@@ -54,7 +53,7 @@ class RTLDownLayouter extends AbstractLayouter {
 
     @Override
     Rect createViewRect(View view) {
-        Rect viewRect = new Rect(viewRight - currentViewWidth, viewTop, viewRight, viewTop + currentViewHeight);
+        Rect viewRect = new Rect(viewRight - currentViewWidth, rowTop, viewRight, rowTop + currentViewHeight);
         viewRight = viewRect.left;
         maxBottom = Math.max(maxBottom, viewRect.bottom);
         return viewRect;
@@ -62,7 +61,7 @@ class RTLDownLayouter extends AbstractLayouter {
 
     @Override
     public boolean onAttachView(View view) {
-        viewTop = getLayoutManager().getDecoratedTop(view);
+        rowTop = getLayoutManager().getDecoratedTop(view);
         viewRight = getLayoutManager().getDecoratedLeft(view);
 
         maxBottom = Math.max(maxBottom, getLayoutManager().getDecoratedBottom(view));
@@ -72,7 +71,7 @@ class RTLDownLayouter extends AbstractLayouter {
 
     @Override
     public boolean isFinishedLayouting() {
-        return viewTop > getCanvasHeight();
+        return rowTop > getCanvasHeight();
     }
 
 }

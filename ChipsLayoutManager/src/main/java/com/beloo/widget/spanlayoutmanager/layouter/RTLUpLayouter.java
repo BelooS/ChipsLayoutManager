@@ -1,7 +1,6 @@
 package com.beloo.widget.spanlayoutmanager.layouter;
 
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 
@@ -29,16 +28,16 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
 
         //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
         //if previously row finished and we have to fill it
-        Log.d(TAG, "row bottom " + viewBottom);
-        Log.d(TAG, "row top " + viewTop);
-        viewTop = layoutRow(rowViews, viewTop, viewBottom, -(getCanvasWidth() - viewLeft));
+        Log.d(TAG, "row bottom " + rowBottom);
+        Log.d(TAG, "row top " + rowTop);
+        rowTop = layoutRow(rowViews, rowTop, rowBottom, -(getCanvasWidth() - viewLeft));
 
         //clear row data
         rowViews.clear();
 
         //go to next row, increase top coordinate, reset left
         viewLeft = 0;
-        viewBottom = viewTop;
+        rowBottom = rowTop;
     }
 
     @Override
@@ -49,8 +48,8 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     @Override
     Rect createViewRect(View view) {
         int right = viewLeft + currentViewWidth;
-        int viewTop = viewBottom - currentViewHeight;
-        Rect viewRect = new Rect(viewLeft, viewTop, right, viewBottom);
+        int viewTop = rowBottom - currentViewHeight;
+        Rect viewRect = new Rect(viewLeft, viewTop, right, rowBottom);
         viewLeft = viewRect.right;
         return viewRect;
     }
@@ -60,19 +59,19 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
 
         if (viewLeft != 0 && viewLeft + getLayoutManager().getDecoratedMeasuredWidth(view) > getCanvasWidth()) {
             viewLeft = 0;
-            viewBottom = viewTop;
+            rowBottom = rowTop;
         } else {
             viewLeft = getLayoutManager().getDecoratedRight(view);
         }
 
-        viewTop = Math.min(viewTop, getLayoutManager().getDecoratedTop(view));
+        rowTop = Math.min(rowTop, getLayoutManager().getDecoratedTop(view));
 
         return super.onAttachView(view);
     }
 
     @Override
     public boolean isFinishedLayouting() {
-        return viewBottom < 0;
+        return rowBottom < 0;
     }
 
     @Override

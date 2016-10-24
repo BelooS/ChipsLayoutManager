@@ -1,7 +1,6 @@
 package com.beloo.widget.spanlayoutmanager.layouter;
 
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
@@ -26,14 +25,14 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
         //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
         //if previously row finished and we have to fill it
-        viewTop = layoutRow(rowViews, viewTop, viewBottom, viewRight);
+        rowTop = layoutRow(rowViews, rowTop, rowBottom, viewRight);
 
         //clear row data
         rowViews.clear();
 
         //go to next row, increase top coordinate, reset left
         viewRight = getCanvasWidth();
-        viewBottom = viewTop;
+        rowBottom = rowTop;
     }
 
     @Override
@@ -44,9 +43,9 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     @Override
     Rect createViewRect(View view) {
         int left = viewRight - currentViewWidth;
-        int viewTop = viewBottom - currentViewHeight;
+        int viewTop = rowBottom - currentViewHeight;
 
-        Rect viewRect = new Rect(left, viewTop, viewRight, viewBottom);
+        Rect viewRect = new Rect(left, viewTop, viewRight, rowBottom);
         viewRight = viewRect.left;
         return viewRect;
     }
@@ -57,19 +56,19 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
         if (viewRight != getCanvasWidth() && viewRight - getLayoutManager().getDecoratedMeasuredWidth(view) < 0) {
             //new row
             viewRight = getCanvasWidth();
-            viewBottom = viewTop;
+            rowBottom = rowTop;
         } else {
             viewRight = getLayoutManager().getDecoratedLeft(view);
         }
 
-        viewTop = Math.min(viewTop, getLayoutManager().getDecoratedTop(view));
+        rowTop = Math.min(rowTop, getLayoutManager().getDecoratedTop(view));
 
         return super.onAttachView(view);
     }
 
     @Override
     public boolean isFinishedLayouting() {
-        return viewBottom < 0;
+        return rowBottom < 0;
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.beloo.widget.spanlayoutmanager.layouter;
 
 import android.graphics.Rect;
 import android.support.annotation.CallSuper;
-import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.view.View;
 
@@ -19,12 +18,12 @@ import com.beloo.widget.spanlayoutmanager.gravity.IGravityModifier;
 abstract class AbstractLayouter implements ILayouter {
     int currentViewWidth;
     int currentViewHeight;
-    int currentViewBottom;
     private int currentViewPosition;
     List<Pair<Rect, View>> rowViews = new LinkedList<>();
-    /** max bottom of current row views*/
-    int viewBottom;
-    int viewTop;
+    /** bottom of current row*/
+    int rowBottom;
+    /** top of current row*/
+    int rowTop;
 
     int rowSize = 0;
     int previousRowSize;
@@ -37,8 +36,8 @@ abstract class AbstractLayouter implements ILayouter {
 
     AbstractLayouter(ChipsLayoutManager layoutManager, int topOffset, int bottomOffset, IViewCacheStorage cacheStorage, IChildGravityResolver childGravityResolver) {
         this.layoutManager = layoutManager;
-        this.viewTop = topOffset;
-        this.viewBottom = bottomOffset;
+        this.rowTop = topOffset;
+        this.rowBottom = bottomOffset;
         this.cacheStorage = cacheStorage;
         this.childGravityResolver = childGravityResolver;
     }
@@ -63,7 +62,6 @@ abstract class AbstractLayouter implements ILayouter {
     private void calculateView(View view) {
         currentViewHeight = layoutManager.getDecoratedMeasuredHeight(view);
         currentViewWidth = layoutManager.getDecoratedMeasuredWidth(view);
-        currentViewBottom = layoutManager.getDecoratedBottom(view);
         currentViewPosition = layoutManager.getPosition(view);
     }
 
@@ -118,7 +116,7 @@ abstract class AbstractLayouter implements ILayouter {
 
     /** layout pre-calculated row on a recyclerView canvas
      * @param leftOffsetOfRow How much row have to be shifted before placing. Should be negative on RTL
-     * returns viewTop */
+     * returns rowTop */
     int layoutRow(List<Pair<Rect, View>> rowViews, int minTop, int maxBottom, int leftOffsetOfRow) {
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;

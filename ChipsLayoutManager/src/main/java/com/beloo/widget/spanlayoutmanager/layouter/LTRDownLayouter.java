@@ -1,8 +1,6 @@
 package com.beloo.widget.spanlayoutmanager.layouter;
 
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
-import android.util.Pair;
 import android.view.View;
 
 import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
@@ -29,11 +27,11 @@ class LTRDownLayouter extends AbstractLayouter {
         //if new view doesn't fit in row and it isn't only one view (we have to layout views with big width somewhere)
 
         //layout previously calculated row
-        layoutRow(rowViews, viewTop, viewBottom, 0);
+        layoutRow(rowViews, rowTop, rowBottom, 0);
 
         //go to next row, increase top coordinate, reset left
         viewLeft = 0;
-        viewTop = viewBottom;
+        rowTop = rowBottom;
 
         //clear row data
         rowViews.clear();
@@ -56,24 +54,24 @@ class LTRDownLayouter extends AbstractLayouter {
 
     @Override
     Rect createViewRect(View view) {
-        Rect viewRect = new Rect(viewLeft, viewTop, viewLeft + currentViewWidth, viewTop + currentViewHeight);
+        Rect viewRect = new Rect(viewLeft, rowTop, viewLeft + currentViewWidth, rowTop + currentViewHeight);
 
         viewLeft = viewRect.right;
-        viewBottom = Math.max(viewBottom, viewRect.bottom);
+        rowBottom = Math.max(rowBottom, viewRect.bottom);
         return viewRect;
     }
 
     @Override
     public boolean onAttachView(View view) {
-        viewTop = getLayoutManager().getDecoratedTop(view);
+        rowTop = getLayoutManager().getDecoratedTop(view);
         viewLeft = getLayoutManager().getDecoratedRight(view);
-        viewBottom = Math.max(viewBottom, getLayoutManager().getDecoratedBottom(view));
+        rowBottom = Math.max(rowBottom, getLayoutManager().getDecoratedBottom(view));
         return super.onAttachView(view);
     }
 
     @Override
     public boolean isFinishedLayouting() {
-        return viewTop > getCanvasHeight();
+        return rowTop > getCanvasHeight();
     }
 
 }
