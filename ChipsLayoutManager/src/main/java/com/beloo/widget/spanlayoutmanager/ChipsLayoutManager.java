@@ -43,10 +43,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private Integer anchorViewPosition = null;
     private ParcelableContainer container = new ParcelableContainer();
 
-    /**
-     * highest top position of attached views
-     */
-    private int highestViewTop = Integer.MAX_VALUE;
     @DeviceOrientation
     private int orientation;
 
@@ -283,19 +279,22 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         fill(recycler, anchorView, anchorPos);
     }
 
-    private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView, int startingPos) {
-
-        Rect anchorRect = anchorView.getAnchorViewRect();
-
-        highestViewTop = Integer.MAX_VALUE;
-        viewCache.clear();
-
-        //place all added views to cache...
+    /*place all added views to cache... */
+    private void fillCache() {
         for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
             View view = getChildAt(i);
             int pos = getPosition(view);
             viewCache.put(pos, view);
         }
+    }
+
+    private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView, int startingPos) {
+
+        Rect anchorRect = anchorView.getAnchorViewRect();
+
+        viewCache.clear();
+
+        fillCache();
 
         //... and remove from layout
         for (int i = 0; i < viewCache.size(); i++) {
@@ -304,7 +303,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         ILayouter downLayouter = layouterFactory.getDownLayouter(anchorRect.top, anchorRect.left, anchorRect.bottom, anchorRect.right, isLayoutRTL());
         fillWithLayouter(recycler, downLayouter, startingPos);
-        ILayouter upLayouter = layouterFactory.getUpLayouter(Math.min(anchorRect.top, highestViewTop), anchorRect.left, anchorRect.bottom, anchorRect.right, isLayoutRTL());
+        ILayouter upLayouter = layouterFactory.getUpLayouter(anchorRect.top, anchorRect.left, anchorRect.bottom, anchorRect.right, isLayoutRTL());
         fillWithLayouter(recycler, upLayouter, startingPos - 1);
 
         //move to trash everything, which haven't used in this layout cycle
@@ -363,11 +362,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                     break;
                 }
 
-                //fillWithLayouter down
-                highestViewTop = Math.min(highestViewTop, getDecoratedTop(view));
-
                 viewCache.remove(pos);
-
             }
 
         }
