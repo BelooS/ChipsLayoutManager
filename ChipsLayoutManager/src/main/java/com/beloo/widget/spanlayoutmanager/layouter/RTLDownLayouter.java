@@ -11,7 +11,9 @@ class RTLDownLayouter extends AbstractLayouter {
 
     private int viewRight;
 
-    RTLDownLayouter(ChipsLayoutManager layoutManager, IChildGravityResolver childGravityResolver, IViewCacheStorage cacheStorage, int topOffset, int bottomOffset, int rightOffset) {
+    RTLDownLayouter(ChipsLayoutManager layoutManager, IChildGravityResolver childGravityResolver,
+                    IViewCacheStorage cacheStorage,
+                    int topOffset, int rightOffset, int bottomOffset) {
         super(layoutManager, topOffset, bottomOffset, cacheStorage, childGravityResolver);
         viewRight = rightOffset;
     }

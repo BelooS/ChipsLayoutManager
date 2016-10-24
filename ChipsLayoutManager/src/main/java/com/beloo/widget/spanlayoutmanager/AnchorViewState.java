@@ -17,8 +17,8 @@ class AnchorViewState implements Parcelable {
     @NonNull
     private Rect anchorViewRect;
 
-    AnchorViewState(Rect rect) {
-        anchorViewRect = new Rect(0, 0, 0, 0);
+    private AnchorViewState(@NonNull Rect rect) {
+        anchorViewRect = rect;
     }
 
     static AnchorViewState getNotFoundState(RecyclerView.LayoutManager layoutManager) {

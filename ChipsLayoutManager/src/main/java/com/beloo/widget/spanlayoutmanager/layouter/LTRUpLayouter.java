@@ -15,7 +15,7 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     LTRUpLayouter(ChipsLayoutManager layoutManager,
                   IChildGravityResolver childGravityResolver,
                   IViewCacheStorage cacheStorage,
-                  int topOffset, int bottomOffset, int rightOffset) {
+                  int topOffset,int rightOffset, int bottomOffset) {
         super(layoutManager, topOffset, bottomOffset, cacheStorage, childGravityResolver);
         this.viewRight = rightOffset;
     }

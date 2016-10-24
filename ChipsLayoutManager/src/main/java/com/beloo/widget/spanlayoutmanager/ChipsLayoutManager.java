@@ -58,7 +58,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /**
      * stored current anchor view due to scroll state changes
      */
-    private AnchorViewState anchorView = AnchorViewState.getNotFoundState(this);
+    private AnchorViewState anchorView;
 
     private ChipsLayoutManager(Context context) {
         @DeviceOrientation
@@ -200,7 +200,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         calcRecyclerCacheSize(recycler);
 
         if (!state.isPreLayout()) {
-            if (anchorView.isNotFoundState()) {
+            if (anchorView == null || anchorView.isNotFoundState()) {
                 //try to found anchorView here
                 anchorView = getAnchorVisibleTopLeftView();
             }

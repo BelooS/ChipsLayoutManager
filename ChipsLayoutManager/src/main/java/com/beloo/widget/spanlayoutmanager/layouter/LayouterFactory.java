@@ -24,7 +24,7 @@ public class LayouterFactory {
         AbstractLayouter layouter = isRTL ?
                 new RTLUpLayouter(layoutManager, layoutManager.getChildGravityResolver(), cacheStorage, anchorTop, anchorRight, anchorBottom) :
                 //we shouldn't include anchor view here, so anchorLeft is a rightOffset
-                new LTRUpLayouter(layoutManager, layoutManager.getChildGravityResolver(), cacheStorage, anchorTop, anchorBottom, anchorLeft);
+                new LTRUpLayouter(layoutManager, layoutManager.getChildGravityResolver(), cacheStorage, anchorTop, anchorLeft, anchorBottom);
         layouter.setMaxViewsInRow(maxViewsInRow);
         return layouter;
     }
@@ -32,7 +32,7 @@ public class LayouterFactory {
     public ILayouter getDownLayouter(int anchorTop, int anchorLeft, int anchorBottom, int anchorRight, boolean isRTL) {
         AbstractLayouter layouter = isRTL ?
                 //down layouting should start from left point of anchor view to left point of container
-                new RTLDownLayouter(layoutManager, layoutManager.getChildGravityResolver(), cacheStorage, anchorTop, anchorBottom, anchorRight) :
+                new RTLDownLayouter(layoutManager, layoutManager.getChildGravityResolver(), cacheStorage, anchorTop, anchorRight, anchorBottom) :
                 //down layouting should start from right point of anchor view to right point of container
                 //we should include anchor view here, so anchorLeft is a leftOffset
                 //todo not working removing zero item
