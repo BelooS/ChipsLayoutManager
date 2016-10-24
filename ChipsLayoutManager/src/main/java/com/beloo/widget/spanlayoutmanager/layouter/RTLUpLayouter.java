@@ -46,7 +46,7 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     @Override
     void onAfterLayout() {
         //go to next row, increase top coordinate, reset left
-        viewLeft = 0;
+        viewLeft = getCanvasLeftBorder();
         rowBottom = rowTop;
     }
 
@@ -62,8 +62,8 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     @Override
     public boolean onAttachView(View view) {
 
-        if (viewLeft != 0 && viewLeft + getLayoutManager().getDecoratedMeasuredWidth(view) > getCanvasRightBorder()) {
-            viewLeft = 0;
+        if (viewLeft != getCanvasLeftBorder() && viewLeft + getLayoutManager().getDecoratedMeasuredWidth(view) > getCanvasRightBorder()) {
+            viewLeft = getCanvasLeftBorder();
             rowBottom = rowTop;
         } else {
             viewLeft = getLayoutManager().getDecoratedRight(view);
@@ -76,7 +76,7 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
 
     @Override
     public boolean isFinishedLayouting() {
-        return rowBottom < 0;
+        return rowBottom < getCanvasTopBorder();
     }
 
     @Override
@@ -86,7 +86,7 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
         if (stopDueToCache) return true;
 
         int bufRight = viewLeft + currentViewWidth;
-        return super.canNotBePlacedInCurrentRow() || (bufRight > getCanvasRightBorder() && viewLeft > 0);
+        return super.canNotBePlacedInCurrentRow() || (bufRight > getCanvasRightBorder() && viewLeft > getCanvasLeftBorder());
     }
 
     @Override

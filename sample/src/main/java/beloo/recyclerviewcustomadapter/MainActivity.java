@@ -36,8 +36,9 @@ public class MainActivity extends AppCompatActivity {
         spinnerPosition = (Spinner) findViewById(R.id.spinnerPosition);
         spinnerMoveTo = (Spinner) findViewById(R.id.spinnerMoveTo);
 
-//        items = new ItemsFactory().getFewItems();
+
         if (savedInstanceState == null) {
+//            items = new ItemsFactory().getFewItems();
             items = new ItemsFactory().getALotOfItems();
         } else {
             items = savedInstanceState.getStringArrayList(EXTRA);

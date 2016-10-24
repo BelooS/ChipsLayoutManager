@@ -13,19 +13,22 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
     }
 
     public ILayouter getUpLayouter(@Nullable Rect anchorRect) {
-        //we shouldn't include anchor view here, so anchorLeft is a rightOffset
-//        AbstractLayouter layouter = new RTLUpLayouter(layoutManager, layoutManager.getChildGravityResolver(), cacheStorage, anchorTop, anchorRight, anchorBottom);
-//        layouter.setMaxViewsInRow(getMaxViewsInRow());
-//        return layouter;
-        return null;
+        AbstractLayouter layouter = new RTLUpLayouter(layoutManager, layoutManager.getChildGravityResolver(), cacheStorage,
+                anchorRect == null ? layoutManager.getPaddingTop() : anchorRect.top,
+                //we shouldn't include anchor view here, so anchorLeft is a rightOffset
+                anchorRect == null ? layoutManager.getPaddingLeft() : anchorRect.right,
+                anchorRect == null ? layoutManager.getPaddingBottom() : anchorRect.bottom);
+        layouter.setMaxViewsInRow(getMaxViewsInRow());
+        return layouter;
     }
 
     public ILayouter getDownLayouter(@Nullable Rect anchorRect) {
-          //down layouting should start from left point of anchor view to left point of container
-//        AbstractLayouter layouter = new RTLDownLayouter(layoutManager, layoutManager.getChildGravityResolver(), cacheStorage, anchorTop, anchorRight, anchorBottom) ;
-//        layouter.setMaxViewsInRow(getMaxViewsInRow());
-//        return layouter;
-        return null;
+        AbstractLayouter layouter = new RTLDownLayouter(layoutManager, layoutManager.getChildGravityResolver(), cacheStorage,
+                anchorRect == null ? layoutManager.getPaddingTop() : anchorRect.top,
+                anchorRect == null ? layoutManager.getPaddingRight() : anchorRect.right,
+                anchorRect == null ? layoutManager.getPaddingBottom() : anchorRect.bottom);
+        layouter.setMaxViewsInRow(getMaxViewsInRow());
+        return layouter;
     }
 
 }
