@@ -52,6 +52,8 @@ ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
         .setChildGravity(Gravity.TOP)
         //whether RecyclerView can scroll
         .setScrollingEnabled(true)
+        //set maximum views count in a particular row
+        .setMaxViewsInRow(2)
         //set gravity resolver where you can determine gravity for item in position. This method have priority over previous one
         .setGravityResolver(new IChildGravityResolver() {
             @Override

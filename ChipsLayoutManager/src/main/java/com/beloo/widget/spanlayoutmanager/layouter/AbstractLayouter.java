@@ -26,6 +26,8 @@ abstract class AbstractLayouter implements ILayouter {
     /** top of current row*/
     int rowTop;
 
+    @Nullable
+    private Integer leftBorderOfPreviouslyAttachedView = null;
 
     /** Max items in row restriction. Layout of row should be stopped when this count of views reached*/
     @Nullable
@@ -93,6 +95,7 @@ abstract class AbstractLayouter implements ILayouter {
 
         if (isFinishedLayouting()) return false;
 
+        rowSize++;
         Rect rect = createViewRect(view);
         rowViews.add(new Pair<>(rect, view));
 
@@ -103,7 +106,10 @@ abstract class AbstractLayouter implements ILayouter {
     abstract boolean isFinishedLayouting();
 
     /** check if we can not add current view to row*/
-    abstract boolean canNotBePlacedInCurrentRow();
+    @CallSuper
+    boolean canNotBePlacedInCurrentRow() {
+        return maxViewsInRow!= null && rowSize >= maxViewsInRow;
+    }
 
     /** factory method for Rect, where view will be placed. Creation based on inner layouter parameters */
     abstract Rect createViewRect(View view);
@@ -117,10 +123,18 @@ abstract class AbstractLayouter implements ILayouter {
      * Based on characteristics of last attached view, layouter algorithm will be able to continue placing from it.
      * This method have to be called on attaching view*/
     public boolean onAttachView(View view) {
-        rowSize++;
-
         if (isFinishedLayouting()) return false;
 
+        int leftBorderCurrentView = layoutManager.getDecoratedLeft(view);
+
+        if (leftBorderOfPreviouslyAttachedView == null || leftBorderOfPreviouslyAttachedView>= leftBorderCurrentView) {
+            //new row, reset row size
+            rowSize = 0;
+        }
+
+        leftBorderOfPreviouslyAttachedView = leftBorderCurrentView;
+
+        rowSize++;
         layoutManager.attachView(view);
         return true;
     }

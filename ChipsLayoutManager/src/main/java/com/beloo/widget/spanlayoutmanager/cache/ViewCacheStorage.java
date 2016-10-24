@@ -39,7 +39,11 @@ class ViewCacheStorage implements IViewCacheStorage {
 
     @Override
     public int getStartOfRow(int positionInRow) {
-        return startsRow.floor(positionInRow);
+        Integer integer = startsRow.floor(positionInRow);
+        if (integer == null) {
+            integer = positionInRow;
+        }
+        return integer;
     }
 
     @Override

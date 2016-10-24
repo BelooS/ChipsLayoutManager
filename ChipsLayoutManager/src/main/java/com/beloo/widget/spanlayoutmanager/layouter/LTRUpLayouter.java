@@ -78,7 +78,7 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
         if (stopDueToCache) return true;
 
         int bufLeft = viewRight - currentViewWidth;
-        return bufLeft < 0 && viewRight < getCanvasWidth();
+        return super.canNotBePlacedInCurrentRow() || (bufLeft < 0 && viewRight < getCanvasWidth());
     }
 
     @Override

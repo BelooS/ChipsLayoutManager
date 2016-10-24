@@ -44,7 +44,7 @@ class LTRDownLayouter extends AbstractLayouter {
 
     @Override
     public boolean canNotBePlacedInCurrentRow() {
-        return (viewLeft > 0 && viewLeft + currentViewWidth > getCanvasWidth());
+        return super.canNotBePlacedInCurrentRow() || (viewLeft > 0 && viewLeft + currentViewWidth > getCanvasWidth());
     }
 
     @Override

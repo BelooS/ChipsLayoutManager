@@ -66,7 +66,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         this.orientation = orientation;
 
         viewPositionsStorage = new ViewCacheFactory(this).createCacheStorage();
-        layouterFactory = new LayouterFactory(this, viewPositionsStorage, maxViewsInRow);
+        layouterFactory = new LayouterFactory(this, viewPositionsStorage);
 
         setAutoMeasureEnabled(true);
         setMeasurementCacheEnabled(true);
@@ -82,6 +82,16 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     public void setScrollingEnabled(boolean isEnabled) {
         isScrollingEnabled = isEnabled;
+    }
+
+    /** change max count of row views in runtime*/
+    public void setMaxViewsInRow(@IntRange(from = 1) Integer maxViewsInRow) {
+        if (maxViewsInRow < 1) throw new IllegalArgumentException("maxViewsInRow should be positive, but is = " + maxViewsInRow);
+        this.maxViewsInRow = maxViewsInRow;
+        layouterFactory.setMaxViewsInRow(maxViewsInRow);
+        cacheNormalizationPosition = 0;
+        viewPositionsStorage.purge();
+        requestLayoutWithAnimations();
     }
 
     public class Builder {
@@ -115,6 +125,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         public Builder setMaxViewsInRow(@IntRange(from = 1) int maxViewsInRow) {
             if (maxViewsInRow < 1) throw new IllegalArgumentException("maxViewsInRow should be positive, but is = " + maxViewsInRow);
             ChipsLayoutManager.this.maxViewsInRow = maxViewsInRow;
+            layouterFactory.setMaxViewsInRow(maxViewsInRow);
             return this;
         }
 

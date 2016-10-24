@@ -11,9 +11,12 @@ public class LayouterFactory {
     @Nullable
     private Integer maxViewsInRow = null;
 
-    public LayouterFactory(ChipsLayoutManager layoutManager, IViewCacheStorage cacheStorage, @Nullable Integer maxViewsInRow) {
+    public LayouterFactory(ChipsLayoutManager layoutManager, IViewCacheStorage cacheStorage) {
         this.layoutManager = layoutManager;
         this.cacheStorage = cacheStorage;
+    }
+
+    public void setMaxViewsInRow(@Nullable Integer maxViewsInRow) {
         this.maxViewsInRow = maxViewsInRow;
     }
 
