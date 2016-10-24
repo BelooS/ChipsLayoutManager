@@ -3,6 +3,7 @@ package com.beloo.widget.spanlayoutmanager;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.Parcelable;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
@@ -65,7 +66,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         this.orientation = orientation;
 
         viewPositionsStorage = new ViewCacheFactory(this).createCacheStorage();
-        layouterFactory = new LayouterFactory(this, viewPositionsStorage);
+        layouterFactory = new LayouterFactory(this, viewPositionsStorage, maxViewsInRow);
 
         setAutoMeasureEnabled(true);
         setMeasurementCacheEnabled(true);
@@ -108,6 +109,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         public Builder setScrollingEnabled(boolean isEnabled) {
             ChipsLayoutManager.this.setScrollingEnabled(isEnabled);
+            return this;
+        }
+
+        public Builder setMaxViewsInRow(@IntRange(from = 1) int maxViewsInRow) {
+            if (maxViewsInRow < 1) throw new IllegalArgumentException("maxViewsInRow should be positive, but is = " + maxViewsInRow);
+            ChipsLayoutManager.this.maxViewsInRow = maxViewsInRow;
             return this;
         }
 

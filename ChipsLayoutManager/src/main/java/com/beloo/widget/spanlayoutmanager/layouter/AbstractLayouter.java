@@ -2,6 +2,7 @@ package com.beloo.widget.spanlayoutmanager.layouter;
 
 import android.graphics.Rect;
 import android.support.annotation.CallSuper;
+import android.support.annotation.Nullable;
 import android.util.Pair;
 import android.view.View;
 
@@ -24,6 +25,11 @@ abstract class AbstractLayouter implements ILayouter {
     int rowBottom;
     /** top of current row*/
     int rowTop;
+
+
+    /** Max items in row restriction. Layout of row should be stopped when this count of views reached*/
+    @Nullable
+    Integer maxViewsInRow = null;
 
     int rowSize = 0;
     int previousRowSize;
@@ -58,6 +64,15 @@ abstract class AbstractLayouter implements ILayouter {
         return cacheStorage;
     }
 
+    @Override
+    public int getPreviousRowSize() {
+        return previousRowSize;
+    }
+
+    void setMaxViewsInRow(@Nullable Integer maxViewsInRow) {
+        this.maxViewsInRow = maxViewsInRow;
+    }
+
     /** read view params to memory */
     private void calculateView(View view) {
         currentViewHeight = layoutManager.getDecoratedMeasuredHeight(view);
@@ -84,13 +99,17 @@ abstract class AbstractLayouter implements ILayouter {
         return true;
     }
 
+    /** if all necessary view have placed*/
+    abstract boolean isFinishedLayouting();
+
+    /** check if we can not add current view to row*/
+    abstract boolean canNotBePlacedInCurrentRow();
+
     /** factory method for Rect, where view will be placed. Creation based on inner layouter parameters */
     abstract Rect createViewRect(View view);
 
-    @Override
-    public int getPreviousRowSize() {
-        return previousRowSize;
-    }
+    /** add view to layout manager */
+    abstract void addView(View view);
 
     @CallSuper
     @Override
@@ -145,9 +164,6 @@ abstract class AbstractLayouter implements ILayouter {
 
         return minTop;
     }
-
-    abstract void addView(View view);
-
 
     ChipsLayoutManager getLayoutManager() {
         return layoutManager;

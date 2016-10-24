@@ -14,12 +14,6 @@ public interface ILayouter {
      * @return * @return true if view successfully attached, false if view can't be attached because out of space on screen */
     boolean onAttachView(View view);
 
-    /** if all necessary view have placed*/
-    boolean isFinishedLayouting();
-
-    /** check if we can not add current view to row*/
-    boolean canNotBePlacedInCurrentRow();
-
     int getPreviousRowSize();
 
     AbstractPositionIterator positionIterator();
