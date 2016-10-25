@@ -448,7 +448,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             delta = dy;
         } else { //in case lower view is the last view in adapter and wouldn't be any other view below
             int viewBottom = getDecoratedBottom(lastView);
-            int parentBottom = getHeight();
+            int parentBottom = getHeight() - getPaddingBottom();
             delta = Math.min(viewBottom - parentBottom, dy);
         }
 
