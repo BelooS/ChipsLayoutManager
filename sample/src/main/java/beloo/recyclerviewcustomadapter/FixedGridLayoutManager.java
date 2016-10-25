@@ -2,6 +2,7 @@ package beloo.recyclerviewcustomadapter;
 
 import android.content.Context;
 import android.graphics.PointF;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;

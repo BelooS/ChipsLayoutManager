@@ -63,7 +63,7 @@ abstract class AbstractLayouter implements ILayouter {
     }
 
     final int getCanvasTopBorder() {
-        return layoutManager.getPaddingTop();
+        return 0;
     }
 
     final int getCurrentViewPosition() {

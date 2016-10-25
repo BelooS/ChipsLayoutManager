@@ -365,6 +365,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             } else {
                 if (!layouter.onAttachView(view)) {
+                    Log.d(TAG, "break attaching on position = " + pos);
                     break;
                 }
 
@@ -505,7 +506,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         int childCount = getChildCount();
         AnchorViewState topLeft = AnchorViewState.getNotFoundState();
 
-        Rect mainRect = new Rect(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), getHeight() - getPaddingBottom());
+        Rect mainRect = new Rect(0, 0, getWidth(), getHeight());
         int minTop = Integer.MAX_VALUE;
         for (int i = 0; i < childCount; i++) {
             View view = getChildAt(i);
