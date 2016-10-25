@@ -3,6 +3,7 @@ package com.beloo.widget.spanlayoutmanager.layouter;
 import android.graphics.Rect;
 import android.support.annotation.CallSuper;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
@@ -138,6 +139,9 @@ abstract class AbstractLayouter implements ILayouter {
      * This method have to be called on attaching view*/
     public boolean onAttachView(View view) {
         if (isFinishedLayouting()) return false;
+        if (layoutManager.getPosition(view) == 0) {
+            Log.d(this.getClass().getSimpleName(), "zero view attached");
+        }
 
         int leftBorderCurrentView = layoutManager.getDecoratedLeft(view);
 

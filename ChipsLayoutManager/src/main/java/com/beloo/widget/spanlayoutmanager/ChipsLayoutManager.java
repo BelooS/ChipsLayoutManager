@@ -31,7 +31,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     //---- contract parameters
     private IChildGravityResolver childGravityResolver;
-    private boolean isScrollingEnabled = true;
+    private boolean isScrollingEnabledContract = true;
     private Integer maxViewsInRow = null;
     //--- end contract parameters
 
@@ -83,8 +83,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return childGravityResolver;
     }
 
-    public void setScrollingEnabled(boolean isEnabled) {
-        isScrollingEnabled = isEnabled;
+    public void setScrollingEnabledContract(boolean isEnabled) {
+        isScrollingEnabledContract = isEnabled;
     }
 
     /** change max count of row views in runtime*/
@@ -121,7 +121,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
 
         public Builder setScrollingEnabled(boolean isEnabled) {
-            ChipsLayoutManager.this.setScrollingEnabled(isEnabled);
+            ChipsLayoutManager.this.setScrollingEnabledContract(isEnabled);
             return this;
         }
 
@@ -273,7 +273,28 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public boolean canScrollVertically() {
-        return isScrollingEnabled;
+        if (getChildCount() > 0) {
+            View view = getChildAt(0);
+            View lastChild = getChildAt(getChildCount() - 1);
+
+            int firstViewPosition = getPosition(view);
+            int lastViewPosition = getPosition(lastChild);
+
+            int top = getDecoratedTop(view);
+            int bottom = getDecoratedBottom(lastChild);
+
+            if (firstViewPosition == 0
+                    && lastViewPosition == getItemCount() - 1
+                    && top >= getPaddingTop()
+                    && bottom <= getHeight() - getPaddingBottom()) {
+                Log.d("TAG", "block scroll");
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+        return isScrollingEnabledContract;
     }
 
     @Override
@@ -309,10 +330,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             detachView(viewCache.valueAt(i));
         }
 
-        ILayouter downLayouter = layouterFactory.getDownLayouter(anchorRect);
-        fillWithLayouter(recycler, downLayouter, startingPos);
+        //up layouter should be invoked earlier than down layouter, because views with lower positions positioned above anchorView
         ILayouter upLayouter = layouterFactory.getUpLayouter(anchorRect);
         fillWithLayouter(recycler, upLayouter, startingPos - 1);
+        ILayouter downLayouter = layouterFactory.getDownLayouter(anchorRect);
+        fillWithLayouter(recycler, downLayouter, startingPos);
 
         //move to trash everything, which haven't used in this layout cycle
         //that views gone from a screen or was removed outside from adapter
@@ -416,15 +438,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return 0;
         }
 
-        final View topView = getChildAt(0);
-        final View bottomView = getChildAt(childCount - 1);
-
-        int viewSpan = getDecoratedBottom(bottomView) - getDecoratedTop(topView);
-        if (getPosition(topView) == 0 && getPosition(bottomView) == getItemCount() - 1 && viewSpan <= getHeight()) {
-            //where all objects fit on screen, no scrolling needed
-            return 0;
-        }
-
         int delta = 0;
         if (dy < 0) {   //if content scrolled down
            delta = onContentScrolledDown(dy);
@@ -432,41 +445,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
            delta = onContentScrolledUp(dy);
         }
         return delta;
-    }
-
-    /** invoked when content scrolled up (to newer items)
-     * @param dy not processed changing of y axis
-     * @return delta. Calculated changing of y axis*/
-    private int onContentScrolledUp(int dy) {
-        int childCount = getChildCount();
-        int itemCount = getItemCount();
-        int delta;
-
-        View lastView = getChildAt(childCount - 1);
-        int lastViewAdapterPos = getPosition(lastView);
-        if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
-            delta = dy;
-        } else { //in case lower view is the last view in adapter and wouldn't be any other view below
-            int viewBottom = getDecoratedBottom(lastView);
-            int parentBottom = getHeight() - getPaddingBottom();
-            delta = Math.min(viewBottom - parentBottom, dy);
-        }
-
-        return delta;
-    }
-
-    private void performNormalizationIfNeeded() {
-        final View topView = getChildAt(0);
-        int topViewPosition = getPosition(topView);
-        //perform normalization when we have reached previous position then normalization position
-        if (cacheNormalizationPosition != null && (topViewPosition < cacheNormalizationPosition ||
-                (cacheNormalizationPosition == 0 && cacheNormalizationPosition == topViewPosition))) {
-            Log.d(TAG, "normalization, position = " + cacheNormalizationPosition + " top view position = " + topViewPosition);
-            viewPositionsStorage.purgeCacheFromPosition(cacheNormalizationPosition);
-            //reset normalization position
-            cacheNormalizationPosition = null;
-            requestLayoutWithAnimations();
-        }
     }
 
     /** invoked when content scrolled down (return to older items)
@@ -499,13 +477,49 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return delta;
     }
 
+    /** invoked when content scrolled up (to newer items)
+     * @param dy not processed changing of y axis
+     * @return delta. Calculated changing of y axis*/
+    private int onContentScrolledUp(int dy) {
+        int childCount = getChildCount();
+        int itemCount = getItemCount();
+        int delta;
+
+        View lastView = getChildAt(childCount - 1);
+        int lastViewAdapterPos = getPosition(lastView);
+        if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
+            delta = dy;
+        } else { //in case lower view is the last view in adapter and wouldn't be any other view below
+            int viewBottom = getDecoratedBottom(lastView);
+            int parentBottom = getHeight() - getPaddingBottom();
+            delta = Math.min(viewBottom - parentBottom, dy);
+        }
+
+        return delta;
+    }
+
+    private void performNormalizationIfNeeded() {
+        final View topView = getChildAt(0);
+        if (topView == null) return;
+        int topViewPosition = getPosition(topView);
+        //perform normalization when we have reached previous position then normalization position
+        if (cacheNormalizationPosition != null && (topViewPosition < cacheNormalizationPosition ||
+                (cacheNormalizationPosition == 0 && cacheNormalizationPosition == topViewPosition))) {
+            Log.d(TAG, "normalization, position = " + cacheNormalizationPosition + " top view position = " + topViewPosition);
+            viewPositionsStorage.purgeCacheFromPosition(cacheNormalizationPosition);
+            //reset normalization position
+            cacheNormalizationPosition = null;
+            requestLayoutWithAnimations();
+        }
+    }
+
     @NonNull
     /** find the view in a higher row which is closest to the left border*/
     private AnchorViewState getAnchorVisibleTopLeftView() {
         int childCount = getChildCount();
         AnchorViewState topLeft = AnchorViewState.getNotFoundState();
 
-        Rect mainRect = new Rect(0, 0, getWidth(), getHeight());
+        Rect mainRect = new Rect(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), getHeight() - getPaddingBottom());
         int minTop = Integer.MAX_VALUE;
         for (int i = 0; i < childCount; i++) {
             View view = getChildAt(i);
