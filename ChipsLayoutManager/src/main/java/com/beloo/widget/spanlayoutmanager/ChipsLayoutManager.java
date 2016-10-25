@@ -196,7 +196,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
         //We have nothing to show for an empty data set but clear any existing views
         if (layouterFactory == null)
-            //isLayoutRlt not ready in constructor, so factory initialization performed here
+            //isLayoutRTL not ready in constructor, so factory initialization performed here
             layouterFactory = createLayouterFactory();
 
         if (getItemCount() == 0) {
@@ -338,7 +338,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      * place views in layout started from chosen position with chosen layouter
      */
     private void fillWithLayouter(RecyclerView.Recycler recycler, ILayouter layouter, int startingPos) {
-
         AbstractPositionIterator iterator = layouter.positionIterator();
         iterator.move(startingPos);
         IFillWithLayouterLogger logger = new EmptyLogger();

@@ -27,15 +27,15 @@ allprojects {
 }
 ```
 
-or just import ChipsLayoutManager module to your project.
+or just import `ChipsLayoutManager` module to your project.
 
 ### Features
 Layout manager represents chips or spanned or "bubble" structure of list items and is a good replace for typical implementations of such issue based on spans in TextView.
 
-* supports RecyclerView's features, such as default animations while CRUD items & custom ItemAnimators, ItemDecorators etc. wrap_content of height is supported
-* vertical scrolling support. Horizontal scrolling are NOT supported. It is possible to disable vertical scrolling as well.
+* supports `RecyclerView`'s features, such as default animations while CRUD items & custom `ItemAnimator`s, `ItemDecorator`s etc. `wrap_content` of height is supported
+* vertical scrolling support. Horizontal scrolling are NOT supported. It is possible to disable vertical scrolling as well. Supported padding/margin, clipToPadding parameter of `RecyclerView`
 * supports views with different height and width
-* recycling items support (another advantage over TextView approach)
+* recycling items support (another advantage over `TextView` approach)
 * items gravity inside row support. For all items or only for required ones
 * LTR and RTL support
 * activity orientation change support
@@ -64,6 +64,27 @@ ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
         .build();
 rv.setLayoutManager(chipsLayoutManager);
 ```
+
+**Left to Right** direction have chosen by default.
+You can manipulate with layout direction (**LTR** or **RTL**)
+_On Api >= 17:_
+```XML
+    <android.support.v7.widget.RecyclerView
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:layoutDirection="rtl"
+           />
+```
+or programmatically:
+```JAVA
+    recyclerView.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+```
+
+_On Api < 17:_
+```JAVA
+    ViewCompat.setLayoutDirection(recyclerView, ViewCompat.LAYOUT_DIRECTION_RTL);
+```
+
 For example look at sample application.
 <br />
 ## Support
