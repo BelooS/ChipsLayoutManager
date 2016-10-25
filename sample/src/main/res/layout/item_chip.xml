@@ -23,17 +23,18 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:src="@drawable/shape_oval"
+            android:scaleType="centerCrop"
             />
 
         <TextView
-            android:id="@+id/tvText"
+            android:id="@+id/tvName"
             android:tag="text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/ivPhoto"
             android:layout_toEndOf="@+id/ivPhoto"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginStart="4dp"
             tools:text="Trevor Hansen"
             android:textColor="@android:color/black"
             android:textSize="13sp"
@@ -44,26 +45,29 @@
             android:id="@+id/ibClose"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/tvName"
+            android:layout_toEndOf="@+id/tvName"
             android:layout_marginRight="4dp"
             android:layout_marginEnd="4dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginStart="4dp"
             android:src="@drawable/vector_cancel_24dp"
             android:background="@null"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/tvText"
-            android:layout_toEndOf="@id/tvText"
             />
 
     </RelativeLayout>
 
     <TextView
+        android:id="@+id/tvDescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/container"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="4dp"
-        android:layout_marginTop="8dp"
-        android:maxWidth="130dp"
+        android:layout_marginTop="4dp"
+        android:maxWidth="110dp"
         android:visibility="gone"
         tools:text="Trevor Hansen is our best friend"
         />

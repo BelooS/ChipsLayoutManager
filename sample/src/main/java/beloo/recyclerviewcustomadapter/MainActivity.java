@@ -2,8 +2,6 @@ package beloo.recyclerviewcustomadapter;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
@@ -18,14 +16,52 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import beloo.recyclerviewcustomadapter.adapter.ChipsAdapter;
+import beloo.recyclerviewcustomadapter.adapter.RecyclerViewAdapter;
+import beloo.recyclerviewcustomadapter.entity.ChipsEntity;
+
 public class MainActivity extends AppCompatActivity {
     private static final String EXTRA = "data";
     private RecyclerView rvTest;
-    private RecyclerViewAdapter adapter;
+    private RecyclerView.Adapter adapter;
     private Spinner spinnerPosition;
     private Spinner spinnerMoveTo;
     private List<String> positions;
-    private List<String> items;
+    private List<Object> items;
+
+    private RecyclerView.Adapter createChipsAdapter() {
+        List<ChipsEntity> items = new ChipsFactory().getChips(this);
+        this.items = new ArrayList<Object>(items);
+        return new ChipsAdapter(items);
+    }
+
+    private OnRemoveListener onRemoveListener = new OnRemoveListener() {
+        @Override
+        public void onItemRemoved(int position) {
+            items.remove(position);
+            Log.i("activity", "delete at " + position);
+            adapter.notifyItemRemoved(position);
+            updateSpinner();
+        }
+    };
+
+    private RecyclerView.Adapter createItemsAdapter(Bundle savedInstanceState) {
+
+        List<String> items;
+        if (savedInstanceState == null) {
+            items = new ItemsFactory().getFewItems();
+//            items = new ItemsFactory().getALotOfItems();
+//            items = new ItemsFactory().getItems();
+        } else {
+            items = savedInstanceState.getStringArrayList(EXTRA);
+        }
+
+        adapter = new RecyclerViewAdapter(items, onRemoveListener);
+        this.items = new ArrayList<Object>(items);
+
+        return adapter;
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,49 +72,8 @@ public class MainActivity extends AppCompatActivity {
         spinnerPosition = (Spinner) findViewById(R.id.spinnerPosition);
         spinnerMoveTo = (Spinner) findViewById(R.id.spinnerMoveTo);
 
-
-        if (savedInstanceState == null) {
-            items = new ItemsFactory().getFewItems();
-//            items = new ItemsFactory().getALotOfItems();
-//            items = new ItemsFactory().getItems();
-        } else {
-            items = savedInstanceState.getStringArrayList(EXTRA);
-        }
-
-        positions = new LinkedList<>();
-        for (int i = 0; i< items.size(); i++) {
-            positions.add(String.valueOf(i));
-        }
-
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, positions);
-        ArrayAdapter<String> spinnerAdapterMoveTo = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, positions);
-        spinnerPosition.setAdapter(spinnerAdapter);
-        spinnerMoveTo.setAdapter(spinnerAdapterMoveTo);
-
-        adapter = new RecyclerViewAdapter(items, new OnRemoveListener() {
-            @Override
-            public void onItemRemoved(int position) {
-                items.remove(position);
-                Log.i("activity", "delete at " + position);
-                adapter.notifyItemRemoved(position);
-                updateSpinner();
-            }
-        });
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2) {
-            @Override
-            public boolean canScrollVertically() {
-                return true;
-            }
-        };
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this) {
-            @Override
-            public boolean canScrollVertically() {
-                return true;
-            }
-        };
-
-        FixedGridLayoutManager fixedGridLayoutManager = new FixedGridLayoutManager();
-        fixedGridLayoutManager.setTotalColumnCount(10);
+        adapter = createChipsAdapter();
+//        adapter = createItemsAdapter(savedInstanceState);
 
         ChipsLayoutManager spanLayoutManager = ChipsLayoutManager.newBuilder(this)
                 //set vertical gravity for all items in a row. Default = Gravity.CENTER_VERTICAL
@@ -97,17 +92,26 @@ public class MainActivity extends AppCompatActivity {
         rvTest.addItemDecoration(new SpacingItemDecoration(getResources().getDimensionPixelOffset(R.dimen.item_space),
                 getResources().getDimensionPixelOffset(R.dimen.item_space)));
 
+        positions = new LinkedList<>();
+        for (int i = 0; i< items.size(); i++) {
+            positions.add(String.valueOf(i));
+        }
+
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, positions);
+        ArrayAdapter<String> spinnerAdapterMoveTo = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, positions);
+        spinnerPosition.setAdapter(spinnerAdapter);
+        spinnerMoveTo.setAdapter(spinnerAdapterMoveTo);
+
         rvTest.setLayoutManager(spanLayoutManager);
         rvTest.getRecycledViewPool().setMaxRecycledViews(0, 10);
         rvTest.getRecycledViewPool().setMaxRecycledViews(1, 10);
         rvTest.setAdapter(adapter);
-
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putStringArrayList(EXTRA, new ArrayList<>(items));
+//        outState.putStringArrayList(EXTRA, new ArrayList<>(items));
     }
 
     private void updateSpinner() {
@@ -160,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (position == positionMoveTo) return;
 
-        String item = items.remove(position);
+        Object item = items.remove(position);
         items.add(positionMoveTo, item);
 
         adapter.notifyItemMoved(position, positionMoveTo);

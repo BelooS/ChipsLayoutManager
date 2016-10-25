@@ -1,7 +1,6 @@
-package beloo.recyclerviewcustomadapter;
+package beloo.recyclerviewcustomadapter.adapter;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +9,10 @@ import android.widget.TextView;
 
 import java.util.List;
 
-class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+import beloo.recyclerviewcustomadapter.OnRemoveListener;
+import beloo.recyclerviewcustomadapter.R;
+
+public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
     private static String TAG = RecyclerViewAdapter.class.getSimpleName();
     private int viewHolderCount;
 
@@ -20,7 +22,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewH
     private List<String> items;
     private OnRemoveListener onRemoveListener;
 
-    RecyclerViewAdapter(List<String> items, OnRemoveListener onRemoveListener) {
+    public RecyclerViewAdapter(List<String> items, OnRemoveListener onRemoveListener) {
         this.items = items;
         this.onRemoveListener = onRemoveListener;
     }
