@@ -4,21 +4,22 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
-public class FillWithLayouterLogger implements IFillWithLayouterLogger {
+public class FillLogger implements IFillLogger {
     private SparseArray<View> viewCache;
     private int requestedItems;
     private int recycledItems;
     private int startCacheSize;
+    private int recycledSize;
 
-    public FillWithLayouterLogger(SparseArray<View> viewCache) {
+    public FillLogger(SparseArray<View> viewCache) {
         this.viewCache = viewCache;
     }
 
     @Override
-    public void onStart() {
+    public void onStartLayouter() {
         requestedItems = 0;
         recycledItems = 0;
-        int startCacheSize = viewCache.size();
+        startCacheSize = viewCache.size();
 
         Log.d("fillWithLayouter", "cached items = " + startCacheSize);
     }
@@ -34,7 +35,23 @@ public class FillWithLayouterLogger implements IFillWithLayouterLogger {
     }
 
     @Override
-    public void onFinishedLayouting() {
+    public void onFinishedLayouter() {
         Log.d("fillWithLayouter", "reattached items = " + (startCacheSize - viewCache.size() + " : requested items = " + requestedItems + " recycledItems = " + recycledItems));
+    }
+
+    @Override
+    public void onAfterLayouter() {
+        recycledSize = viewCache.size();
+    }
+
+    @Override
+    public void onRemovedAndRecycled(int position) {
+        Log.d("fillWithLayouter", "recycle position =" + viewCache.keyAt(position));
+        recycledSize++;
+    }
+
+    @Override
+    public void onAfterRemovingViews() {
+        Log.d("fillWithLayouter", "recycled count = " + recycledSize);
     }
 }

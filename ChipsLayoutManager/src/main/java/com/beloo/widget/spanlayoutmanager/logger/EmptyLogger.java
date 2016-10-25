@@ -1,8 +1,8 @@
 package com.beloo.widget.spanlayoutmanager.logger;
 
-public class EmptyLogger implements IFillWithLayouterLogger {
+public class EmptyLogger implements IFillLogger {
     @Override
-    public void onStart() {
+    public void onStartLayouter() {
 
     }
 
@@ -17,7 +17,22 @@ public class EmptyLogger implements IFillWithLayouterLogger {
     }
 
     @Override
-    public void onFinishedLayouting() {
+    public void onFinishedLayouter() {
+
+    }
+
+    @Override
+    public void onAfterLayouter() {
+
+    }
+
+    @Override
+    public void onRemovedAndRecycled(int position) {
+
+    }
+
+    @Override
+    public void onAfterRemovingViews() {
 
     }
 }

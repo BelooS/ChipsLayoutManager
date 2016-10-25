@@ -23,7 +23,7 @@ import com.beloo.widget.spanlayoutmanager.layouter.ILayouter;
 import com.beloo.widget.spanlayoutmanager.layouter.LTRLayouterFactory;
 import com.beloo.widget.spanlayoutmanager.layouter.RTLLayouterFactory;
 import com.beloo.widget.spanlayoutmanager.logger.EmptyLogger;
-import com.beloo.widget.spanlayoutmanager.logger.IFillWithLayouterLogger;
+import com.beloo.widget.spanlayoutmanager.logger.IFillLogger;
 
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
@@ -46,6 +46,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     private Integer anchorViewPosition = null;
     private ParcelableContainer container = new ParcelableContainer();
+
+    private IFillLogger logger = new EmptyLogger();
 
     @DeviceOrientation
     private int orientation;
@@ -287,7 +289,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                     && lastViewPosition == getItemCount() - 1
                     && top >= getPaddingTop()
                     && bottom <= getHeight() - getPaddingBottom()) {
-                Log.d("TAG", "block scroll");
                 return false;
             }
         } else {
@@ -310,10 +311,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     /*place all added views to cache... */
     private void fillCache() {
+        viewCache.clear();
         for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
             View view = getChildAt(i);
             int pos = getPosition(view);
             viewCache.put(pos, view);
+
+            // detach cached views from layout
+            detachView(view);
         }
     }
 
@@ -321,14 +326,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         Rect anchorRect = anchorView.getAnchorViewRect();
 
-        viewCache.clear();
-
         fillCache();
-
-        //... and remove from layout
-        for (int i = 0; i < viewCache.size(); i++) {
-            detachView(viewCache.valueAt(i));
-        }
 
         //up layouter should be invoked earlier than down layouter, because views with lower positions positioned above anchorView
         ILayouter upLayouter = layouterFactory.getUpLayouter(anchorRect);
@@ -336,17 +334,16 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         ILayouter downLayouter = layouterFactory.getDownLayouter(anchorRect);
         fillWithLayouter(recycler, downLayouter, startingPos);
 
+        logger.onAfterLayouter();
         //move to trash everything, which haven't used in this layout cycle
         //that views gone from a screen or was removed outside from adapter
-        int recycledSize = viewCache.size();
         for (int i = 0; i < viewCache.size(); i++) {
             removeAndRecycleView(viewCache.valueAt(i), recycler);
-//            Log.d("fillWithLayouter", "recycle position =" + viewCache.keyAt(i));
+            logger.onRemovedAndRecycled(i);
         }
 
         performNormalizationIfNeeded();
-
-//        Log.d("fillWithLayouter", "recycled count = " + recycledSize);
+        logger.onAfterRemovingViews();
     }
 
     /**
@@ -362,8 +359,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private void fillWithLayouter(RecyclerView.Recycler recycler, ILayouter layouter, int startingPos) {
         AbstractPositionIterator iterator = layouter.positionIterator();
         iterator.move(startingPos);
-        IFillWithLayouterLogger logger = new EmptyLogger();
-        logger.onStart();
+        logger.onStartLayouter();
 
         while (iterator.hasNext()) {
             int pos = iterator.next();
@@ -395,7 +391,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         }
 
-        logger.onFinishedLayouting();
+        logger.onFinishedLayouter();
 
         //layout last row
         layouter.layoutRow();
