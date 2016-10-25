@@ -38,9 +38,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (savedInstanceState == null) {
-//            items = new ItemsFactory().getFewItems();
+            items = new ItemsFactory().getFewItems();
 //            items = new ItemsFactory().getALotOfItems();
-            items = new ItemsFactory().getItems();
+//            items = new ItemsFactory().getItems();
         } else {
             items = savedInstanceState.getStringArrayList(EXTRA);
         }
