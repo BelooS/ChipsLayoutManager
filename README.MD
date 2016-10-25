@@ -71,10 +71,12 @@ For example look at sample application.
 If you have any other questions regarding the use of this library, please contact me on github or create an issue on the tracking board
 
 ### Contributors
-All pull requests are welcome. 
+BETA is going. I respond to your founded issues. Just create a ticket if you found something goes wrong. <br/><br/>
+All pull requests are welcome. I've tried to make code clean & readable, so the next is up to you. 
 I appreciate any help and contributors will be mentioned here. 
 
-### Known limitations
- * RecyclerView's padding haven't supported yet. Please use margin instead until new version will be released
+### Known issues
+* Cache of view positions is cleared on orientation change. But it wouldn't be so critical, because views are going to be properly repositioned 
+when user will scroll to start again.
 
-This issues are going to be fixed in next versions soon.
+This issues are going to be fixed in next versions.
