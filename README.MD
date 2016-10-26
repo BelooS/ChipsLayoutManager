@@ -33,7 +33,7 @@ or just import `ChipsLayoutManager` module to your project.
 Layout manager represents chips or spanned or "bubble" structure of list items and is a good replace for typical implementations of such issue based on spans in TextView.
 
 * supports `RecyclerView`'s features, such as default animations while CRUD items & custom `ItemAnimator`s, `ItemDecorator`s etc. `wrap_content` of height is supported
-* vertical scrolling support. Horizontal scrolling are NOT supported. It is possible to disable vertical scrolling as well. Supported padding/margin, clipToPadding parameter of `RecyclerView`
+* vertical scrolling is supported. Horizontal scrolling isn't supported. It is possible to disable vertical scrolling as well. Supported padding/margin, clipToPadding parameter of `RecyclerView`
 * supports views with different height and width
 * recycling items support (another advantage over `TextView` approach)
 * items gravity inside row support. For all items or only for required ones
