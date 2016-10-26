@@ -66,33 +66,32 @@ rv.setLayoutManager(chipsLayoutManager);
 ```
 
 **Left to Right** direction have chosen by default.
-You can manipulate with layout direction (**LTR** or **RTL**)
+You can manipulate with layout direction (**LTR** or **RTL**)<br/>
 _On Api >= 17:_
 ```XML
-    <android.support.v7.widget.RecyclerView
-           android:layout_width="match_parent"
-           android:layout_height="match_parent"
-           android:layoutDirection="rtl"
-           />
+<android.support.v7.widget.RecyclerView
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:layoutDirection="rtl"
+       />
 ```
 or programmatically:
 ```JAVA
-    recyclerView.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+recyclerView.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
 ```
 
 _On Api < 17:_
 ```JAVA
-    ViewCompat.setLayoutDirection(recyclerView, ViewCompat.LAYOUT_DIRECTION_RTL);
+ViewCompat.setLayoutDirection(recyclerView, ViewCompat.LAYOUT_DIRECTION_RTL);
 ```
 
 For example look at sample application.
 <br />
 ## Support
-
-If you have any other questions regarding the use of this library, please contact me on github or create an issue on the tracking board
+BETA is going.
+I respond to your founded issues. Just create a ticket if you found something goes wrong.
 
 ### Contributors
-BETA is going. I respond to your founded issues. Just create a ticket if you found something goes wrong. <br/><br/>
 All pull requests are welcome. I've tried to make code clean & readable, so the next is up to you. 
 I appreciate any help and contributors will be mentioned here. 
 
