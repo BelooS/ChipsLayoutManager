@@ -44,10 +44,10 @@ public class ItemsFactory {
     public List<String> getALotOfItems() {
         List<String> list = new LinkedList<>();
         list.add("START item.0");
-        list.add("!long item here. 1");
+        list.add("!tall item here. 1");
         for (int i = 2; i< 1000; i++) {
             if (i%3 == 0) {
-                list.add("!long item here." + i);
+                list.add("!tall item here." + i);
             } else if (i % 5 == 0) {
                 list.add("S." + i);
             } else {
@@ -70,7 +70,7 @@ public class ItemsFactory {
                     list.add("a span." + (i+1));
                     break;
                 case 2:
-                    list.add("!long item here." + (i+1));
+                    list.add("!tall item here." + (i+1));
                     break;
                 default:
                     list.add("S." + (i+1));
