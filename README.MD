@@ -41,7 +41,7 @@ Layout manager represents chips or spanned or "bubble" structure of list items a
 * activity orientation change support
 
 <p align="center">
-    <img src="/images/animations.gif" alt="Span layout manager animations">
+    <img src="/images/animations.gif" alt="ChipsLayoutManager. Default RecyclerView animations support">
 </p>
 
 ###Layout Directions
