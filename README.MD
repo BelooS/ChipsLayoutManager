@@ -1,5 +1,5 @@
 # ChipsLayoutManager <img src="https://www.cleveroad.com/public/comercial/label-android.svg" height="19">
-![Header image](/images/header.png)
+![ChipsLayoutManager for RecyclerView. Custom layout manager for RecyclerView](/images/header.png)
 
 ## This is ChipsLayoutManager - custom Recycler View's LayoutManager which move item to the next line when no space left on the current 
 This layout manager could represent [Google Chips material design pattern](https://material.google.com/components/chips.html#)
@@ -43,6 +43,12 @@ Layout manager represents chips or spanned or "bubble" structure of list items a
 <p align="center">
     <img src="/images/animations.gif" alt="Span layout manager animations">
 </p>
+
+###Layout Directions
+
+| Left to Right  | Right to Left  |
+|---|---|
+|![Left to Right implementation of ChipsLayoutManager](/images/ltr.png) |![Right to Left implementation of ChipsLayoutManager](/images/ltr.png)|
 
 ### Usage
 
