@@ -28,6 +28,7 @@ import com.beloo.widget.spanlayoutmanager.logger.IFillLogger;
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
     private static final int INT_ROW_SIZE_APPROXIMATELY_FOR_CACHE = 10;
+    private static final float FAST_SCROLLING_COEFFICIENT = 2;
 
     //---- contract parameters
     private IChildGravityResolver childGravityResolver;
@@ -38,16 +39,17 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /**
      * coefficient to support fast scrolling, caching views only for one row may not be enough
      */
-    private static final float FAST_SCROLLING_COEFFICIENT = 2;
-    private AbstractLayouterFactory layouterFactory;
-    private IViewCacheStorage viewPositionsStorage;
 
+    private IViewCacheStorage viewPositionsStorage;
     private SparseArray<View> viewCache = new SparseArray<>();
 
     private Integer anchorViewPosition = null;
+
     private ParcelableContainer container = new ParcelableContainer();
 
     private IFillLogger logger = new EmptyLogger();
+
+    private boolean isLayoutRTL = false;
 
     private View highestView;
     private View lowestView;
@@ -77,7 +79,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     private AbstractLayouterFactory createLayouterFactory() {
-        return isLayoutRTL() ? new RTLLayouterFactory(this, viewPositionsStorage) : new LTRLayouterFactory(this, viewPositionsStorage);
+        AbstractLayouterFactory layouterFactory = isLayoutRTL() ? new RTLLayouterFactory(this, viewPositionsStorage) : new LTRLayouterFactory(this, viewPositionsStorage);
+        layouterFactory.setMaxViewsInRow(maxViewsInRow);
+        return layouterFactory;
     }
 
     public static Builder newBuilder(Context context) {
@@ -96,7 +100,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public void setMaxViewsInRow(@IntRange(from = 1) Integer maxViewsInRow) {
         if (maxViewsInRow < 1) throw new IllegalArgumentException("maxViewsInRow should be positive, but is = " + maxViewsInRow);
         this.maxViewsInRow = maxViewsInRow;
-        layouterFactory.setMaxViewsInRow(maxViewsInRow);
         cacheNormalizationPosition = 0;
         viewPositionsStorage.purge();
         requestLayoutWithAnimations();
@@ -133,7 +136,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         public Builder setMaxViewsInRow(@IntRange(from = 1) int maxViewsInRow) {
             if (maxViewsInRow < 1) throw new IllegalArgumentException("maxViewsInRow should be positive, but is = " + maxViewsInRow);
             ChipsLayoutManager.this.maxViewsInRow = maxViewsInRow;
-            layouterFactory.setMaxViewsInRow(maxViewsInRow);
             return this;
         }
 
@@ -209,13 +211,16 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
         //We have nothing to show for an empty data set but clear any existing views
-        if (layouterFactory == null)
-            //isLayoutRTL not ready in constructor, so factory initialization performed here
-            layouterFactory = createLayouterFactory();
-
         if (getItemCount() == 0) {
             detachAndScrapAttachedViews(recycler);
             return;
+        }
+
+        if (isLayoutRTL() != isLayoutRTL) {
+            //if layout direction changed programmatically we should clear anchors
+            isLayoutRTL = isLayoutRTL();
+            viewPositionsStorage.purge();
+            detachAndScrapAttachedViews(recycler);
         }
 
         calcRecyclerCacheSize(recycler);
@@ -364,6 +369,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         for (int i = 0; i < viewCache.size(); i++) {
             detachView(viewCache.valueAt(i));
         }
+
+        AbstractLayouterFactory layouterFactory = createLayouterFactory();
 
         //up layouter should be invoked earlier than down layouter, because views with lower positions positioned above anchorView
         ILayouter upLayouter = layouterFactory.getUpLayouter(anchorRect);

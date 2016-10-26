@@ -72,7 +72,7 @@ ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
 rv.setLayoutManager(chipsLayoutManager);
 ```
 
-**Left to Right** direction have chosen by default.
+**Device current direction** have chosen by default.
 You can manipulate with layout direction (**LTR** or **RTL**)<br/>
 _On Api >= 17:_
 ```XML
@@ -82,12 +82,7 @@ _On Api >= 17:_
        android:layoutDirection="rtl"
        />
 ```
-or programmatically:
-```JAVA
-recyclerView.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-```
-
-_On Api < 17:_
+or programmatically (_on all supported Api:_):
 ```JAVA
 ViewCompat.setLayoutDirection(recyclerView, ViewCompat.LAYOUT_DIRECTION_RTL);
 ```

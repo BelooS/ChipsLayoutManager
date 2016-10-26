@@ -26,6 +26,15 @@ public class ItemsFactory {
         list.add("!Item1004.16");
         list.add("!Item10001.17");
         list.add("Item10002.18");
+        list.add("Item19");
+        list.add("Item20");
+        list.add("Item21");
+        list.add("Item22");
+        list.add("Item23");
+        list.add("Item24");
+        list.add("Item25");
+        list.add("Item26");
+        list.add("Item27");
         return list;
     }
 

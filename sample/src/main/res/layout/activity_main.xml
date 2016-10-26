@@ -22,7 +22,6 @@
         android:layout_height="90dp"
         android:layout_alignParentBottom="true"
         android:background="@android:color/white"
-        android:visibility="gone"
         >
 
         <Button
