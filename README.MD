@@ -48,7 +48,7 @@ Layout manager represents chips or spanned or "bubble" structure of list items a
 
 | Left to Right  | Right to Left  |
 |---|---|
-|![Left to Right implementation of ChipsLayoutManager](/images/ltr.png) |![Right to Left implementation of ChipsLayoutManager](/images/ltr.png)|
+|![Left to Right implementation of ChipsLayoutManager](/images/ltr.png) |![Right to Left implementation of ChipsLayoutManager](/images/rtl.png)|
 
 ### Usage
 
