@@ -49,6 +49,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     private IFillLogger logger = new EmptyLogger();
 
+    private View highestView;
+    private View lowestView;
+
     @DeviceOrientation
     private int orientation;
 
@@ -177,7 +180,16 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public Parcelable onSaveInstanceState() {
-        container.putAnchorViewState(getAnchorVisibleTopLeftView());
+        AnchorViewState anchorViewState = getAnchorVisibleTopLeftView();
+
+        //make anchor view show fully after rotation. Because concrete positions of other views will be changed anyway
+        Rect rect = anchorViewState.getAnchorViewRect();
+        if (rect.top < 0) {
+            rect.bottom += -rect.top;
+            rect.top = 0;
+        }
+
+        container.putAnchorViewState(anchorViewState);
         //todo not worked now. will be provided in next releases
 //        container.putPositionsCache(orientation, viewPositionsStorage.onSaveInstanceState());
 //
@@ -275,6 +287,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public boolean canScrollVertically() {
+        findHighestAndLowestViews();
         if (getChildCount() > 0) {
             View view = getChildAt(0);
             View lastChild = getChildAt(getChildCount() - 1);
@@ -282,8 +295,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             int firstViewPosition = getPosition(view);
             int lastViewPosition = getPosition(lastChild);
 
-            int top = getDecoratedTop(view);
-            int bottom = getDecoratedBottom(lastChild);
+            int top = getDecoratedTop(highestView);
+            int bottom = getDecoratedBottom(lowestView);
 
             if (firstViewPosition == 0
                     && lastViewPosition == getItemCount() - 1
@@ -319,6 +332,28 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
     }
 
+    /** find highest & lowest views */
+    private void findHighestAndLowestViews() {
+        highestView = null;
+        lowestView = null;
+
+        if (getChildCount() > 0) {
+            highestView = getChildAt(0);
+            lowestView = highestView;
+            for (int i = 1; i < getChildCount(); i++) {
+                View view = getChildAt(i);
+                if (getDecoratedTop(view) < getDecoratedTop(highestView)) {
+                    highestView = view;
+                }
+
+                if (getDecoratedBottom(view) > getDecoratedBottom(lowestView)) {
+                    lowestView = view;
+                }
+            }
+        }
+    }
+
+
     private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView, int startingPos) {
 
         Rect anchorRect = anchorView.getAnchorViewRect();
@@ -335,6 +370,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         fillWithLayouter(recycler, upLayouter, startingPos - 1);
         ILayouter downLayouter = layouterFactory.getDownLayouter(anchorRect);
         fillWithLayouter(recycler, downLayouter, startingPos);
+
+        findHighestAndLowestViews();
 
         logger.onAfterLayouter();
         //move to trash everything, which haven't used in this layout cycle
@@ -488,7 +525,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
             delta = dy;
         } else { //in case lower view is the last view in adapter and wouldn't be any other view below
-            int viewBottom = getDecoratedBottom(lastView);
+            int viewBottom = getDecoratedBottom(lowestView);
             int parentBottom = getHeight() - getPaddingBottom();
             delta = Math.min(viewBottom - parentBottom, dy);
         }

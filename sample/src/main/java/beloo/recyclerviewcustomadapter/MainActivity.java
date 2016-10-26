@@ -27,12 +27,12 @@ public class MainActivity extends AppCompatActivity {
     private Spinner spinnerPosition;
     private Spinner spinnerMoveTo;
     private List<String> positions;
-    private List<Object> items;
+    private List items;
 
     private RecyclerView.Adapter createChipsAdapter() {
         List<ChipsEntity> items = new ChipsFactory().getChips(this);
-        this.items = new ArrayList<Object>(items);
-        return new ChipsAdapter(items);
+        this.items = items;
+        return new ChipsAdapter(items, onRemoveListener);
     }
 
     private OnRemoveListener onRemoveListener = new OnRemoveListener() {
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         adapter = new RecyclerViewAdapter(items, onRemoveListener);
-        this.items = new ArrayList<Object>(items);
+        this.items = items;
 
         return adapter;
 

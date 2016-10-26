@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/btnRevert"
-        android:padding="10dp"
+        android:padding="4dp"
         android:clipToPadding="false"
         />
 

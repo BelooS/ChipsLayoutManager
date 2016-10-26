@@ -22,14 +22,14 @@ public class ChipsFactory {
                 .name("Veronic Cloyd")
                 .build());
 
-        chipsList.add(ChipsEntity.newBuilder()
-                .drawableResId(R.drawable.girl2)
-                .name("Jayne")
-                .description("Everyone want to meet Jayne")
-                .build());
+//        chipsList.add(ChipsEntity.newBuilder()
+//                .drawableResId(R.drawable.girl2)
+//                .name("Jayne")
+//                .description("Everyone want to meet Jayne")
+//                .build());
 
         chipsList.add(ChipsEntity.newBuilder()
-                .drawableResId(R.drawable.girl1)
+                .drawableResId(R.drawable.girl3)
                 .name("Cat")
                 .build());
 
@@ -40,19 +40,30 @@ public class ChipsFactory {
 
         chipsList.add(ChipsEntity.newBuilder()
                 .drawableResId(R.drawable.girl1)
-                .name("Ann")
+                .name("Ann Ackerman")
                 .build());
 
-        chipsList.add(ChipsEntity.newBuilder()
-                .drawableResId(R.drawable.batman)
-                .name("Second Batman")
-                .description("Batman is our friend")
-                .build());
+//        chipsList.add(ChipsEntity.newBuilder()
+//                .drawableResId(R.drawable.batman)
+//                .name("Second Batman")
+//                .description("Batman is our friend")
+//                .build());
 
         chipsList.add(ChipsEntity.newBuilder()
                 .drawableResId(R.drawable.girl2)
                 .name("Claudette")
                 .build());
+
+        chipsList.add(ChipsEntity.newBuilder()
+                .drawableResId(R.drawable.karl)
+                .name("Karl")
+                .build());
+
+        chipsList.add(ChipsEntity.newBuilder()
+                .drawableResId(R.drawable.anonymous)
+                .name("Very Long Name Anonymous")
+                .build());
+
 
 
         return chipsList;

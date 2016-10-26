@@ -27,4 +27,5 @@ dependencies {
     compile "com.android.support:appcompat-v7:$supportVersion"
     compile project(':ChipsLayoutManager')
     compile "com.android.support:recyclerview-v7:$supportVersion"
+    compile 'com.github.bumptech.glide:glide:3.7.0'
 }
