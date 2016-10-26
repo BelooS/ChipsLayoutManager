@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private List items;
 
     private RecyclerView.Adapter createChipsAdapter() {
-        List<ChipsEntity> items = new ChipsFactory().getChips(this);
+        List<ChipsEntity> items = new ChipsFactory().getDoubleChips();
         this.items = items;
         return new ChipsAdapter(items, onRemoveListener);
     }

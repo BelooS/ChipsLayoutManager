@@ -3,13 +3,14 @@ package beloo.recyclerviewcustomadapter;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import beloo.recyclerviewcustomadapter.entity.ChipsEntity;
 
 public class ChipsFactory {
 
-    List<ChipsEntity> getChips(Context context) {
+    List<ChipsEntity> getChips() {
 
         List<ChipsEntity> chipsList = new ArrayList<>();
         chipsList.add(ChipsEntity.newBuilder()
@@ -68,5 +69,14 @@ public class ChipsFactory {
 
         return chipsList;
 
+    }
+
+    List<ChipsEntity> getDoubleChips() {
+        List<ChipsEntity> chipsEntities = getChips();
+
+        List<ChipsEntity> secondPortion = getChips();
+        Collections.reverse(secondPortion);
+        chipsEntities.addAll(secondPortion);
+        return chipsEntities;
     }
 }
