@@ -39,7 +39,7 @@ public class ChipsFactory {
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
-                .drawableResId(R.drawable.girl1)
+                .drawableResId(R.drawable.girl4)
                 .name("Ann Ackerman")
                 .build());
 
@@ -50,7 +50,7 @@ public class ChipsFactory {
 //                .build());
 
         chipsList.add(ChipsEntity.newBuilder()
-                .drawableResId(R.drawable.girl2)
+                .drawableResId(R.drawable.girl5)
                 .name("Claudette")
                 .build());
 
