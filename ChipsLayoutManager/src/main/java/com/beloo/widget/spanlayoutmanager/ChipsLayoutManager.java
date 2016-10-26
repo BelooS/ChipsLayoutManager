@@ -309,16 +309,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         fill(recycler, anchorView, anchorPos);
     }
 
-    /*place all added views to cache... */
+    /** place all added views to cache... */
     private void fillCache() {
         viewCache.clear();
         for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
             View view = getChildAt(i);
             int pos = getPosition(view);
             viewCache.put(pos, view);
-
-            // detach cached views from layout
-            detachView(view);
         }
     }
 
@@ -327,6 +324,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         Rect anchorRect = anchorView.getAnchorViewRect();
 
         fillCache();
+
+        //... and remove from layout
+        for (int i = 0; i < viewCache.size(); i++) {
+            detachView(viewCache.valueAt(i));
+        }
 
         //up layouter should be invoked earlier than down layouter, because views with lower positions positioned above anchorView
         ILayouter upLayouter = layouterFactory.getUpLayouter(anchorRect);
