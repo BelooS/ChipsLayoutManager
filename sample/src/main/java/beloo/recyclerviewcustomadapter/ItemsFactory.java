@@ -44,9 +44,6 @@ public class ItemsFactory {
         list.add("Item1.1");
         list.add("Item2.2");
         list.add("Item3.3");
-        list.add("4");
-        list.add("5");
-        list.add("Item5");
         return list;
     }
 

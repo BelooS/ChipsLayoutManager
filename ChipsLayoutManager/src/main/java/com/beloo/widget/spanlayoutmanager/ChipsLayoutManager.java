@@ -3,6 +3,8 @@ package com.beloo.widget.spanlayoutmanager;
 import android.content.Context;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Parcelable;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -81,9 +83,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         this.orientation = orientation;
 
         viewPositionsStorage = new ViewCacheFactory(this).createCacheStorage();
-
         setAutoMeasureEnabled(true);
-        setMeasurementCacheEnabled(true);
     }
 
     private AbstractLayouterFactory createLayouterFactory() {
@@ -218,6 +218,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+
+        if (state.isPreLayout()) {
+            Log.i("onLayoutChildren", "isPreLayout = true" );
+        }
+
         //We have nothing to show for an empty data set but clear any existing views
         if (getItemCount() == 0) {
             detachAndScrapAttachedViews(recycler);
@@ -245,13 +250,55 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             }
         } else {
             anchorView = getAnchorVisibleTopLeftView();
+            detachAndScrapAttachedViews(recycler);
+            fill(recycler, anchorView);
         }
+    }
+
+    @Override
+    public void onMeasure(RecyclerView.Recycler recycler, RecyclerView.State state, int widthSpec, int heightSpec) {
+        super.onMeasure(recycler, state, widthSpec, heightSpec);
+        View view = findViewByPosition(3);
+
+        requestSimpleAnimationsInNextLayout();
+        if (!isAutoMeasureEnabled()) {
+            setMeasuredDimension(getWidth(), 260);
+        }
+
+        int mode = View.MeasureSpec.getMode(heightSpec);
+        String modeStr;
+        switch (mode) {
+            case View.MeasureSpec.EXACTLY:
+                modeStr = "exactly";
+                break;
+            case View.MeasureSpec.AT_MOST:
+                modeStr = "atMost";
+                break;
+            case View.MeasureSpec.UNSPECIFIED:
+                modeStr = "unspecified";
+                break;
+            default:
+                throw new IllegalStateException();
+        }
+
+        Log.d("onMeasure", "height spec mode = " + modeStr);
+        Log.d("height", "height = " + getHeight());
+        Log.d("onMeasure", "View = " + view);
     }
 
     @Override
     public void onItemsRemoved(RecyclerView recyclerView, int positionStart, int itemCount) {
         super.onItemsRemoved(recyclerView, positionStart, itemCount);
         onLayoutUpdatedFromPosition(positionStart);
+        setAutoMeasureEnabled(false);
+
+//        new Handler(Looper.myLooper()).postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                setAutoMeasureEnabled(true);
+//                requestLayoutWithAnimations();
+//            }
+//        }, 400);
     }
 
     @Override
@@ -661,4 +708,5 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         scroller.setTargetPosition(position);
         startSmoothScroll(scroller);
     }
+
 }
