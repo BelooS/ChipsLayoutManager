@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
 //        items.add(positionMoveTo, item);
 //
 //        adapter.notifyItemMoved(position, positionMoveTo);
-        rvTest.scrollToPosition(126);
+        rvTest.smoothScrollToPosition(126);
     }
 
     public void onInsertClicked(View view) {

@@ -173,7 +173,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public void onRestoreInstanceState(Parcelable state) {
         container = (ParcelableContainer) state;
-        anchorView = container.getAnchorViewState();
+        anchorView = AnchorViewState.getNotFoundState();
+        anchorView.setPosition(container.getAnchorPosition());
+
         viewPositionsStorage.onRestoreInstanceState(container.getPositionsCache(orientation));
         cacheNormalizationPosition = 0;
 //        cacheNormalizationPosition = container.getNormalizationPosition(orientation);
@@ -182,9 +184,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public Parcelable onSaveInstanceState() {
-        AnchorViewState anchorViewState = getAnchorVisibleTopLeftView();
 
-        container.putAnchorViewState(anchorViewState);
+        int anchorPosition = anchorView.getPosition();
+        container.putAnchorPosition(anchorPosition);
+
         //todo not worked now. will be provided in next releases
 //        container.putPositionsCache(orientation, viewPositionsStorage.onSaveInstanceState());
 //
@@ -597,6 +600,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
-        throw new UnsupportedOperationException("unsupported in this version");
+        throw new UnsupportedOperationException("not supported in this version");
     }
 }
