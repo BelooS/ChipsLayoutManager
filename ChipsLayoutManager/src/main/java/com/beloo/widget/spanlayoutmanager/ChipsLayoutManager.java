@@ -41,19 +41,24 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
 
     private IViewCacheStorage viewPositionsStorage;
+
+    /** store detached views to probably reattach it if them still visible */
     private SparseArray<View> viewCache = new SparseArray<>();
 
-    private Integer anchorViewPosition = null;
-
+    /** storing state due orientation changes */
     private ParcelableContainer container = new ParcelableContainer();
 
     private IFillLogger logger = new EmptyLogger();
 
+    /** is layout in RTL mode. Variable needed to detect mode changes */
     private boolean isLayoutRTL = false;
 
+    /** highest view in layout. Have always actual value, because it set in {@link #onLayoutChildren}*/
     private View highestView;
+    /** lowest view in layout. Have always actual value, because it set in {@link #onLayoutChildren}*/
     private View lowestView;
 
+    /** current device orientation*/
     @DeviceOrientation
     private int orientation;
 
@@ -128,11 +133,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return this;
         }
 
+        /** strictly disable scrolling if needed */
         public Builder setScrollingEnabled(boolean isEnabled) {
             ChipsLayoutManager.this.setScrollingEnabledContract(isEnabled);
             return this;
         }
 
+        /** set maximum possible count of views in row */
         public Builder setMaxViewsInRow(@IntRange(from = 1) int maxViewsInRow) {
             if (maxViewsInRow < 1) throw new IllegalArgumentException("maxViewsInRow should be positive, but is = " + maxViewsInRow);
             ChipsLayoutManager.this.maxViewsInRow = maxViewsInRow;
@@ -185,6 +192,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public Parcelable onSaveInstanceState() {
 
+        //store only position on anchor. Rect of anchor will be invalidated
         int anchorPosition = anchorView.getPosition();
         container.putAnchorPosition(anchorPosition);
 
@@ -222,24 +230,17 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         calcRecyclerCacheSize(recycler);
 
         if (!state.isPreLayout()) {
-//            if (anchorView == null || anchorView.isNotFoundState()) {
-//                //try to found anchorView here
-//                anchorView = getAnchorVisibleTopLeftView();
-//            }
             detachAndScrapAttachedViews(recycler);
 
-            if (!anchorView.isNotFoundState() && anchorViewPosition != null && anchorViewPosition == 0) {
+            if (!anchorView.isNotFoundState() && anchorView.getPosition() == 0) {
                 //we can't add view in a hidden area if added view inserted on a zero position. so needed workaround here, we reset anchor position to 0
                 //for properly insertion only
-                fill(recycler, anchorView, anchorViewPosition);
-                anchorViewPosition = null;
+                fill(recycler, anchorView, anchorView.getPosition());
             } else {
                 fill(recycler, anchorView);
             }
         } else {
             anchorView = getAnchorVisibleTopLeftView();
-            if (!anchorView.isNotFoundState())
-                anchorViewPosition = anchorView.getPosition();
         }
     }
 
@@ -269,6 +270,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     @Override
+    public void onItemsUpdated(RecyclerView recyclerView, int positionStart, int itemCount, Object payload) {
+        onItemsUpdated(recyclerView, positionStart, itemCount);
+        onLayoutUpdatedFromPosition(positionStart);
+    }
+
+    @Override
     public void onItemsMoved(RecyclerView recyclerView, int from, int to, int itemCount) {
         super.onItemsMoved(recyclerView, from, to, itemCount);
         onLayoutUpdatedFromPosition(from);
@@ -281,11 +288,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 startRowPos : Math.min(cacheNormalizationPosition, startRowPos);
     }
 
-    @Override
-    public void onItemsUpdated(RecyclerView recyclerView, int positionStart, int itemCount, Object payload) {
-        onItemsUpdated(recyclerView, positionStart, itemCount);
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean canScrollVertically() {
         findHighestAndLowestViews();
@@ -317,6 +322,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return true;
     }
 
+    /** place all views on theirs right places according to current state */
     private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView) {
         int anchorPos = anchorView.getPosition();
 
@@ -325,7 +331,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     /** place all added views to cache... */
     private void fillCache() {
-        viewCache.clear();
         for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
             View view = getChildAt(i);
             int pos = getPosition(view);
@@ -355,6 +360,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
 
+    /** place all views on theirs right places according to current state */
     private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView, int startingPos) {
 
         Rect anchorRect = anchorView.getAnchorViewRect();
@@ -384,6 +390,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             logger.onRemovedAndRecycled(i);
         }
 
+        viewCache.clear();
+
         performNormalizationIfNeeded();
         logger.onAfterRemovingViews();
     }
@@ -400,13 +408,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     private void fillWithLayouter(RecyclerView.Recycler recycler, ILayouter layouter, int startingPos) {
         AbstractPositionIterator iterator = layouter.positionIterator();
+        //start from anchor position
         iterator.move(startingPos);
         logger.onStartLayouter();
 
         while (iterator.hasNext()) {
             int pos = iterator.next();
             View view = viewCache.get(pos);
-            if (view == null) {
+            if (view == null) { // we don't have view from previous layouter stage, request new one
                 view = recycler.getViewForPosition(pos);
                 logger.onItemRequested();
 
@@ -422,11 +431,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                     break;
                 }
 
-            } else {
+            } else { //we have detached views from previous layouter stage, attach it if needed
                 if (!layouter.onAttachView(view)) {
                     break;
                 }
 
+                //remove reattached view from cache
                 viewCache.remove(pos);
             }
 
@@ -459,6 +469,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return dy;
     }
 
+    /** perform changing layout with playing RecyclerView animations */
     private void requestLayoutWithAnimations() {
         postOnAnimation(new Runnable() {
             @Override
@@ -535,6 +546,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return delta;
     }
 
+    /** after several layout changes our item views probably haven't placed on right places,
+     * because we don't memorize whole positions of items.
+     * So them should be normalized to real positions when we can do it. */
     private void performNormalizationIfNeeded() {
         final View topView = getChildAt(0);
         if (topView == null) return;
@@ -584,6 +598,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return topLeft;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void scrollToPosition(int position) {
         if (position >= getItemCount() || position < 0) {
             Log.e("span layout manager", "Cannot scroll to " + position + ", item count " + getItemCount());
@@ -598,6 +615,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         requestLayout();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
         throw new UnsupportedOperationException("not supported in this version");

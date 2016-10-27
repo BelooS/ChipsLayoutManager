@@ -139,9 +139,6 @@ abstract class AbstractLayouter implements ILayouter {
      * This method have to be called on attaching view*/
     public boolean onAttachView(View view) {
         if (isFinishedLayouting()) return false;
-        if (layoutManager.getPosition(view) == 0) {
-            Log.d(this.getClass().getSimpleName(), "zero view attached");
-        }
 
         int leftBorderCurrentView = layoutManager.getDecoratedLeft(view);
 
@@ -182,6 +179,8 @@ abstract class AbstractLayouter implements ILayouter {
         rowViews.clear();
     }
 
+    /** by default items placed and attached to a top of the row.
+     * Modify theirs relative positions according to the selected child gravity */
     private void applyChildGravity(View view, Rect viewRect, int rowTop, int rowBottom) {
         @SpanLayoutChildGravity
         int viewGravity = childGravityResolver.getItemGravity(getLayoutManager().getPosition(view));
