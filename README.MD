@@ -1,4 +1,4 @@
-# ChipsLayoutManager <img src="https://www.cleveroad.com/public/comercial/label-android.svg" height="19">
+# ChipsLayoutManager [ ![Download](https://api.bintray.com/packages/beloo/widget/ChipsLayoutManager/images/download.svg) ](https://bintray.com/beloo/widget/ChipsLayoutManager/_latestVersion) <img src="https://www.cleveroad.com/public/comercial/label-android.svg" height="19">
 ![ChipsLayoutManager for RecyclerView. Custom layout manager for RecyclerView](/images/header.png)
 
 ## This is ChipsLayoutManager - custom Recycler View's LayoutManager which move item to the next line when no space left on the current 
