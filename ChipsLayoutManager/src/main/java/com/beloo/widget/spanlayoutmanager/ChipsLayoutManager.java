@@ -1,16 +1,19 @@
 package com.beloo.widget.spanlayoutmanager;
 
 import android.content.Context;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.os.Parcelable;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 
 import com.beloo.widget.spanlayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.spanlayoutmanager.cache.ViewCacheFactory;
@@ -619,7 +622,38 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      * {@inheritDoc}
      */
     @Override
-    public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
-        throw new UnsupportedOperationException("not supported in this version");
+    public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, final int position) {
+        if (position >= getItemCount() || position < 0) {
+            Log.e("span layout manager", "Cannot scroll to " + position + ", item count " + getItemCount());
+            return;
+        }
+
+        LinearSmoothScroller scroller = new LinearSmoothScroller(recyclerView.getContext()) {
+            /*
+             * LinearSmoothScroller, at a minimum, just need to know the vector
+             * (x/y distance) to travel in order to get from the current positioning
+             * to the target.
+             */
+            @Override
+            public PointF computeScrollVectorForPosition(int targetPosition) {
+                int visiblePosition = anchorView.getPosition();
+
+                return new PointF(0, position > visiblePosition ? 1000 : -1000);
+            }
+
+            @Override
+            protected void onTargetFound(View targetView, RecyclerView.State state, Action action) {
+                super.onTargetFound(targetView, state, action);
+                int desiredTop = getPaddingTop();
+                int currentTop = getDecoratedTop(targetView);
+
+                int dy = currentTop - desiredTop;
+
+                //perform fit animation to move target view at top of layout
+                action.update(0, dy, 50, new LinearInterpolator());
+            }
+        };
+        scroller.setTargetPosition(position);
+        startSmoothScroll(scroller);
     }
 }
