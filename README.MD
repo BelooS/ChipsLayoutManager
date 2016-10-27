@@ -100,5 +100,6 @@ I appreciate any help and contributors will be mentioned here.
 ### Known issues
 * Cache of view positions is cleared on orientation change. But it wouldn't be so critical, because views are going to be properly repositioned 
 when user will scroll to start again.
+* http://stackoverflow.com/q/40242011/3379437
 
 This issues are going to be fixed in next versions.
