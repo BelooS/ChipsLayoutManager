@@ -35,6 +35,10 @@ class AnchorViewState implements Parcelable {
         return position;
     }
 
+    public void setPosition(Integer position) {
+        this.position = position;
+    }
+
     public Rect getAnchorViewRect() {
         return anchorViewRect;
     }

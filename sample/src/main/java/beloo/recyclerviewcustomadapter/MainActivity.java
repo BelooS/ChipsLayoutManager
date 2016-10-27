@@ -49,8 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
         List<String> items;
         if (savedInstanceState == null) {
-            items = new ItemsFactory().getFewItems();
-//            items = new ItemsFactory().getALotOfItems();
+//            items = new ItemsFactory().getFewItems();
+            items = new ItemsFactory().getALotOfItems();
 //            items = new ItemsFactory().getItems();
         } else {
             items = savedInstanceState.getStringArrayList(EXTRA);
@@ -72,8 +72,8 @@ public class MainActivity extends AppCompatActivity {
         spinnerPosition = (Spinner) findViewById(R.id.spinnerPosition);
         spinnerMoveTo = (Spinner) findViewById(R.id.spinnerMoveTo);
 
-        adapter = createChipsAdapter();
-//        adapter = createItemsAdapter(savedInstanceState);
+//        adapter = createChipsAdapter();
+        adapter = createItemsAdapter(savedInstanceState);
 
         ChipsLayoutManager spanLayoutManager = ChipsLayoutManager.newBuilder(this)
                 //set vertical gravity for all items in a row. Default = Gravity.CENTER_VERTICAL
@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-//        outState.putStringArrayList(EXTRA, new ArrayList<>(items));
+        outState.putStringArrayList(EXTRA, new ArrayList<>(items));
     }
 
     private void updateSpinner() {
@@ -154,20 +154,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onMoveClicked(View view) {
-        int position = spinnerPosition.getSelectedItemPosition();
-        if (position == Spinner.INVALID_POSITION)
-            return;
-
-        int positionMoveTo = spinnerMoveTo.getSelectedItemPosition();
-        if (positionMoveTo == Spinner.INVALID_POSITION)
-            return;
-
-        if (position == positionMoveTo) return;
-
-        Object item = items.remove(position);
-        items.add(positionMoveTo, item);
-
-        adapter.notifyItemMoved(position, positionMoveTo);
+//        int position = spinnerPosition.getSelectedItemPosition();
+//        if (position == Spinner.INVALID_POSITION)
+//            return;
+//
+//        int positionMoveTo = spinnerMoveTo.getSelectedItemPosition();
+//        if (positionMoveTo == Spinner.INVALID_POSITION)
+//            return;
+//
+//        if (position == positionMoveTo) return;
+//
+//        Object item = items.remove(position);
+//        items.add(positionMoveTo, item);
+//
+//        adapter.notifyItemMoved(position, positionMoveTo);
+        rvTest.scrollToPosition(126);
     }
 
     public void onInsertClicked(View view) {

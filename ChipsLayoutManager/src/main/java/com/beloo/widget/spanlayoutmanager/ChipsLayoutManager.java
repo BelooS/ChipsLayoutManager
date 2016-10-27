@@ -65,7 +65,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /**
      * stored current anchor view due to scroll state changes
      */
-    private AnchorViewState anchorView;
+    private AnchorViewState anchorView = AnchorViewState.getNotFoundState();
 
     private ChipsLayoutManager(Context context) {
         @DeviceOrientation
@@ -184,13 +184,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public Parcelable onSaveInstanceState() {
         AnchorViewState anchorViewState = getAnchorVisibleTopLeftView();
 
-        //make anchor view show fully after rotation. Because concrete positions of other views will be changed anyway
-        Rect rect = anchorViewState.getAnchorViewRect();
-        if (rect.top < 0) {
-            rect.bottom += -rect.top;
-            rect.top = 0;
-        }
-
         container.putAnchorViewState(anchorViewState);
         //todo not worked now. will be provided in next releases
 //        container.putPositionsCache(orientation, viewPositionsStorage.onSaveInstanceState());
@@ -226,10 +219,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         calcRecyclerCacheSize(recycler);
 
         if (!state.isPreLayout()) {
-            if (anchorView == null || anchorView.isNotFoundState()) {
-                //try to found anchorView here
-                anchorView = getAnchorVisibleTopLeftView();
-            }
+//            if (anchorView == null || anchorView.isNotFoundState()) {
+//                //try to found anchorView here
+//                anchorView = getAnchorVisibleTopLeftView();
+//            }
             detachAndScrapAttachedViews(recycler);
 
             if (!anchorView.isNotFoundState() && anchorViewPosition != null && anchorViewPosition == 0) {
@@ -428,7 +421,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             } else {
                 if (!layouter.onAttachView(view)) {
-                    Log.d(TAG, "break attaching on position = " + pos);
                     break;
                 }
 
@@ -590,13 +582,21 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     public void scrollToPosition(int position) {
-        if (position >= getItemCount()) {
+        if (position >= getItemCount() || position < 0) {
             Log.e("span layout manager", "Cannot scroll to " + position + ", item count " + getItemCount());
             return;
         }
+
+        cacheNormalizationPosition = cacheNormalizationPosition != null ? cacheNormalizationPosition : viewPositionsStorage.getLastCachePosition();
+        anchorView = AnchorViewState.getNotFoundState();
+        anchorView.setPosition(position);
 
         //Trigger a new view layout
         requestLayout();
     }
 
+    @Override
+    public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
+        throw new UnsupportedOperationException("unsupported in this version");
+    }
 }

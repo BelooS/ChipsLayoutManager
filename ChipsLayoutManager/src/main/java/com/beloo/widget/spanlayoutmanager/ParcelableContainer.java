@@ -1,5 +1,6 @@
 package com.beloo.widget.spanlayoutmanager;
 
+import android.graphics.Rect;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntRange;
@@ -16,6 +17,14 @@ class ParcelableContainer implements Parcelable {
     ParcelableContainer() {}
 
     void putAnchorViewState(AnchorViewState anchorViewState) {
+
+        //make anchor view show fully after rotation. Because concrete positions of other views will be changed anyway
+        Rect rect = anchorViewState.getAnchorViewRect();
+        if (rect.top < 0) {
+            rect.bottom += -rect.top;
+            rect.top = 0;
+        }
+
         this.anchorViewState = anchorViewState;
     }
 
