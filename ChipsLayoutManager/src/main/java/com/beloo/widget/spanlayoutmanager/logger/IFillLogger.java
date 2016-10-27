@@ -1,5 +1,7 @@
 package com.beloo.widget.spanlayoutmanager.logger;
 
+import com.beloo.widget.spanlayoutmanager.AnchorViewState;
+
 public interface IFillLogger {
 
 
@@ -16,4 +18,6 @@ public interface IFillLogger {
     void onRemovedAndRecycled(int position);
 
     void onAfterRemovingViews();
+
+    void onBeforeLayouter(AnchorViewState state);
 }

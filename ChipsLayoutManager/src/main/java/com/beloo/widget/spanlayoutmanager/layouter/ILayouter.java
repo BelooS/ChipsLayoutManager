@@ -14,7 +14,20 @@ public interface ILayouter {
      * @return * @return true if view successfully attached, false if view can't be attached because out of space on screen */
     boolean onAttachView(View view);
 
+    /** @return size of current row*/
+    int getRowSize();
+
+    /** @return top of current row*/
+    int getRowTop();
+
+    /** @return bottom of current row */
+    int getRowBottom();
+
+    /** @return size of previous row*/
     int getPreviousRowSize();
+
+    /** @param layouterListener listener to layouter events*/
+    void setLayouterListener(ILayouterListener layouterListener);
 
     AbstractPositionIterator positionIterator();
 }

@@ -43,6 +43,9 @@ abstract class AbstractLayouter implements ILayouter {
     private IChildGravityResolver childGravityResolver;
     private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
 
+    @Nullable
+    private ILayouterListener layouterListener;
+
     AbstractLayouter(ChipsLayoutManager layoutManager, int topOffset, int bottomOffset, IViewCacheStorage cacheStorage, IChildGravityResolver childGravityResolver) {
         this.layoutManager = layoutManager;
         this.rowTop = topOffset;
@@ -73,6 +76,11 @@ abstract class AbstractLayouter implements ILayouter {
 
     final IViewCacheStorage getCacheStorage() {
         return cacheStorage;
+    }
+
+    @Override
+    public void setLayouterListener(ILayouterListener layouterListener) {
+        this.layouterListener = layouterListener;
     }
 
     @Override
@@ -171,6 +179,10 @@ abstract class AbstractLayouter implements ILayouter {
             layoutManager.layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
         }
 
+        if (layouterListener != null) {
+            layouterListener.onLayoutRow(this);
+        }
+
         onAfterLayout();
 
         previousRowSize = rowSize;
@@ -191,4 +203,20 @@ abstract class AbstractLayouter implements ILayouter {
     ChipsLayoutManager getLayoutManager() {
         return layoutManager;
     }
+
+    @Override
+    public int getRowSize() {
+        return rowSize;
+    }
+
+    @Override
+    public int getRowTop() {
+        return rowTop;
+    }
+
+    @Override
+    public int getRowBottom() {
+        return rowBottom;
+    }
+
 }

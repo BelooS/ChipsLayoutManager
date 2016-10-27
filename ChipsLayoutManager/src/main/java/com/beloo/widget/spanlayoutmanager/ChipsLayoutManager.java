@@ -23,6 +23,7 @@ import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
 import com.beloo.widget.spanlayoutmanager.layouter.AbstractLayouterFactory;
 import com.beloo.widget.spanlayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.spanlayoutmanager.layouter.ILayouter;
+import com.beloo.widget.spanlayoutmanager.layouter.ILayouterListener;
 import com.beloo.widget.spanlayoutmanager.layouter.LTRLayouterFactory;
 import com.beloo.widget.spanlayoutmanager.layouter.RTLLayouterFactory;
 import com.beloo.widget.spanlayoutmanager.logger.EmptyLogger;
@@ -31,6 +32,9 @@ import com.beloo.widget.spanlayoutmanager.logger.IFillLogger;
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
     private static final int INT_ROW_SIZE_APPROXIMATELY_FOR_CACHE = 10;
+    /**
+     * coefficient to support fast scrolling, caching views only for one row may not be enough
+     */
     private static final float FAST_SCROLLING_COEFFICIENT = 2;
 
     //---- contract parameters
@@ -38,10 +42,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private boolean isScrollingEnabledContract = true;
     private Integer maxViewsInRow = null;
     //--- end contract parameters
-
-    /**
-     * coefficient to support fast scrolling, caching views only for one row may not be enough
-     */
 
     private IViewCacheStorage viewPositionsStorage;
 
@@ -87,7 +87,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     private AbstractLayouterFactory createLayouterFactory() {
-        AbstractLayouterFactory layouterFactory = isLayoutRTL() ? new RTLLayouterFactory(this, viewPositionsStorage) : new LTRLayouterFactory(this, viewPositionsStorage);
+        AbstractLayouterFactory layouterFactory = isLayoutRTL() ?
+                new RTLLayouterFactory(this, viewPositionsStorage) : new LTRLayouterFactory(this, viewPositionsStorage);
         layouterFactory.setMaxViewsInRow(maxViewsInRow);
         return layouterFactory;
     }
@@ -325,13 +326,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return true;
     }
 
-    /** place all views on theirs right places according to current state */
-    private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView) {
-        int anchorPos = anchorView.getPosition();
-
-        fill(recycler, anchorView, anchorPos);
-    }
-
     /** place all added views to cache... */
     private void fillCache() {
         for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
@@ -362,6 +356,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
     }
 
+    /** place all views on theirs right places according to current state */
+    private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView) {
+        int anchorPos = anchorView.getPosition();
+
+        fill(recycler, anchorView, anchorPos);
+    }
 
     /** place all views on theirs right places according to current state */
     private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView, int startingPos) {
@@ -376,6 +376,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
 
         AbstractLayouterFactory layouterFactory = createLayouterFactory();
+
+        logger.onBeforeLayouter(anchorView);
 
         //up layouter should be invoked earlier than down layouter, because views with lower positions positioned above anchorView
         ILayouter upLayouter = layouterFactory.getUpLayouter(anchorRect);
@@ -560,6 +562,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         if (cacheNormalizationPosition != null && (topViewPosition < cacheNormalizationPosition ||
                 (cacheNormalizationPosition == 0 && cacheNormalizationPosition == topViewPosition))) {
             Log.d(TAG, "normalization, position = " + cacheNormalizationPosition + " top view position = " + topViewPosition);
+            Log.d(TAG, "top view top = " + getDecoratedTop(topView));
+            Log.d(TAG, "top view bottom = " + getDecoratedBottom(topView));
             viewPositionsStorage.purgeCacheFromPosition(cacheNormalizationPosition);
             //reset normalization position
             cacheNormalizationPosition = null;
@@ -574,6 +578,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         AnchorViewState topLeft = AnchorViewState.getNotFoundState();
 
         Rect mainRect = new Rect(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), getHeight() - getPaddingBottom());
+//        Rect mainRect = new Rect(0, 0, getWidth(), getHeight());
         int minTop = Integer.MAX_VALUE;
         for (int i = 0; i < childCount; i++) {
             View view = getChildAt(i);
@@ -637,8 +642,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             @Override
             public PointF computeScrollVectorForPosition(int targetPosition) {
                 int visiblePosition = anchorView.getPosition();
-
-                return new PointF(0, position > visiblePosition ? 1000 : -1000);
+                //determine scroll up or scroll down needed
+                return new PointF(0, position > visiblePosition ? 1 : -1);
             }
 
             @Override

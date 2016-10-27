@@ -15,7 +15,7 @@ but with support of CRUD animations i decided to make such stuff and share it.
 ### Installation
 
 ```GRADLE 
-compile 'com.beloo.widget:ChipsLayoutManager:0.0.1-beta'
+compile 'com.beloo.widget:ChipsLayoutManager:0.1.1'
 ```
 
 Assuming you have installed jCenter provider:
@@ -33,7 +33,7 @@ or just import `ChipsLayoutManager` module to your project.
 Layout manager represents chips or spanned or "bubble" structure of list items and is a good replace for typical implementations of such issue based on spans in `TextView` 
 or custom `FlowLayout`s.
 
-* supports `RecyclerView`'s features, such as default animations while CRUD items & custom `ItemAnimator`s, `ItemDecorator`s etc. `wrap_content` of height is supported
+* supports `RecyclerView`'s features, such as default animations while CRUD items & custom `ItemAnimator`s, `ItemDecorator`s, scrolling etc. `wrap_content` of height is supported
 * vertical scrolling is supported. Horizontal scrolling isn't supported. It is possible to disable vertical scrolling as well. Supported padding/margin, clipToPadding parameter of `RecyclerView`
 * supports different height and width of items
 * recycling items support (another advantage over `TextView` approach)

@@ -154,21 +154,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onMoveClicked(View view) {
-//        int position = spinnerPosition.getSelectedItemPosition();
-//        if (position == Spinner.INVALID_POSITION)
-//            return;
-//
-//        int positionMoveTo = spinnerMoveTo.getSelectedItemPosition();
-//        if (positionMoveTo == Spinner.INVALID_POSITION)
-//            return;
-//
-//        if (position == positionMoveTo) return;
-//
-//        Object item = items.remove(position);
-//        items.add(positionMoveTo, item);
-//
-//        adapter.notifyItemMoved(position, positionMoveTo);
-        rvTest.smoothScrollToPosition(126);
+        int position = spinnerPosition.getSelectedItemPosition();
+        if (position == Spinner.INVALID_POSITION)
+            return;
+
+        int positionMoveTo = spinnerMoveTo.getSelectedItemPosition();
+        if (positionMoveTo == Spinner.INVALID_POSITION)
+            return;
+
+        if (position == positionMoveTo) return;
+
+        Object item = items.remove(position);
+        items.add(positionMoveTo, item);
+
+        adapter.notifyItemMoved(position, positionMoveTo);
     }
 
     public void onInsertClicked(View view) {

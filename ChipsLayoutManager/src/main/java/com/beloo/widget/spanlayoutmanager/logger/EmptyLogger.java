@@ -1,5 +1,7 @@
 package com.beloo.widget.spanlayoutmanager.logger;
 
+import com.beloo.widget.spanlayoutmanager.AnchorViewState;
+
 public class EmptyLogger implements IFillLogger {
     @Override
     public void onStartLayouter() {
@@ -33,6 +35,11 @@ public class EmptyLogger implements IFillLogger {
 
     @Override
     public void onAfterRemovingViews() {
+
+    }
+
+    @Override
+    public void onBeforeLayouter(AnchorViewState state) {
 
     }
 }

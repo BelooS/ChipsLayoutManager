@@ -4,6 +4,8 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
+import com.beloo.widget.spanlayoutmanager.AnchorViewState;
+
 public class FillLogger implements IFillLogger {
     private SparseArray<View> viewCache;
     private int requestedItems;
@@ -53,5 +55,13 @@ public class FillLogger implements IFillLogger {
     @Override
     public void onAfterRemovingViews() {
         Log.d("fillWithLayouter", "recycled count = " + recycledSize);
+    }
+
+    @Override
+    public void onBeforeLayouter(AnchorViewState anchorView) {
+        if (anchorView.getAnchorViewRect() != null) {
+            Log.d("fill", "anchorPos " + anchorView.getPosition());
+            Log.d("fill", "anchorTop " + anchorView.getAnchorViewRect().top);
+        }
     }
 }

@@ -11,7 +11,7 @@ import android.support.v7.widget.RecyclerView;
  * @return View, which is highest visible left view
  */
 
-class AnchorViewState implements Parcelable {
+public class AnchorViewState implements Parcelable {
     private Integer position = 0;
     private Rect anchorViewRect;
 
