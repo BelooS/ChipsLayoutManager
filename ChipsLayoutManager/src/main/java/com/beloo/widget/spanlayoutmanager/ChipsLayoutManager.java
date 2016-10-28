@@ -3,6 +3,8 @@ package com.beloo.widget.spanlayoutmanager;
 import android.content.Context;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Parcelable;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -13,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
+import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 
 import com.beloo.widget.spanlayoutmanager.cache.IViewCacheStorage;
@@ -70,6 +73,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Nullable
     private Integer cacheNormalizationPosition = null;
 
+    /** height of RecyclerView before removing item */
+    private Integer beforeRemovingHeight = null;
+
+    /** height which we receive after {@link #onLayoutChildren} method finished.
+     * Contains correct height after auto-measuring */
+    private int autoMeasureHeight = 0;
+
     /**
      * stored current anchor view due to scroll state changes
      */
@@ -81,9 +91,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         this.orientation = orientation;
 
         viewPositionsStorage = new ViewCacheFactory(this).createCacheStorage();
-
         setAutoMeasureEnabled(true);
-        setMeasurementCacheEnabled(true);
     }
 
     private AbstractLayouterFactory createLayouterFactory() {
@@ -178,6 +186,18 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public void onAdapterChanged(RecyclerView.Adapter oldAdapter,
                                  RecyclerView.Adapter newAdapter) {
         //Completely scrap the existing layout
+        newAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeRemoved(int positionStart, int itemCount) {
+                // on api 16 this is invoked before onItemsRemoved
+                super.onItemRangeRemoved(positionStart, itemCount);
+                beforeRemovingHeight = autoMeasureHeight;
+                /** we detected removing event, so should process measuring manually
+                 * @see <a href="http://stackoverflow.com/questions/40242011/custom-recyclerviews-layoutmanager-automeasuring-after-animation-finished-on-i">Stack Overflow issue</a>
+                 */
+                setAutoMeasureEnabled(false);
+            }
+        });
         removeAllViews();
     }
 
@@ -218,6 +238,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+
+        if (state.isPreLayout()) {
+            Log.i("onLayoutChildren", "isPreLayout = true" );
+        }
+
         //We have nothing to show for an empty data set but clear any existing views
         if (getItemCount() == 0) {
             detachAndScrapAttachedViews(recycler);
@@ -246,12 +271,44 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         } else {
             anchorView = getAnchorVisibleTopLeftView();
         }
+
+        autoMeasureHeight = getHeight();
     }
 
     @Override
-    public void onItemsRemoved(RecyclerView recyclerView, int positionStart, int itemCount) {
+    public void onMeasure(RecyclerView.Recycler recycler, RecyclerView.State state, int widthSpec, int heightSpec) {
+        super.onMeasure(recycler, state, widthSpec, heightSpec);
+
+        if (!isAutoMeasureEnabled()) {
+            // we should perform measuring manually
+            // so request animations
+            requestSimpleAnimationsInNextLayout();
+            //keep height until remove animation will be completed
+            setMeasuredDimension(View.MeasureSpec.getSize(widthSpec), beforeRemovingHeight);
+        }
+    }
+
+    @Override
+    public void onItemsRemoved(final RecyclerView recyclerView, int positionStart, int itemCount) {
         super.onItemsRemoved(recyclerView, positionStart, itemCount);
         onLayoutUpdatedFromPosition(positionStart);
+
+        //subscribe to next animations tick
+        postOnAnimation(new Runnable() {
+            @Override
+            public void run() {
+                //listen removing animation
+                recyclerView.getItemAnimator().isRunning(new RecyclerView.ItemAnimator.ItemAnimatorFinishedListener() {
+                    @Override
+                    public void onAnimationsFinished() {
+                        //when removing animation finished return auto-measuring back
+                        setAutoMeasureEnabled(true);
+                        // and process onMeasure again
+                        requestLayout();
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -446,6 +503,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             }
 
         }
+
+        Log.i("fill", "height after layout = " + getHeight());
 
         logger.onFinishedLayouter();
 
@@ -661,4 +720,5 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         scroller.setTargetPosition(position);
         startSmoothScroll(scroller);
     }
+
 }
