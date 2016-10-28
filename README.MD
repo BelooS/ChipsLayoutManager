@@ -1,4 +1,4 @@
-# ChipsLayoutManager [![ChipsLayoutManager is an android library](https://www.cleveroad.com/public/comercial/label-android.svg)](#) [![minSdk for ChipsLayoutManager](https://img.shields.io/badge/minSdk-15-green.svg)](#)
+# ChipsLayoutManager [![ChipsLayoutManager is an android library](/images/for_android.svg)](#) [![minSdk for ChipsLayoutManager](https://img.shields.io/badge/minSdk-15-green.svg)](#)
 ![ChipsLayoutManager for RecyclerView. Custom layout manager for RecyclerView](/images/header.png)
 
 ## This is ChipsLayoutManager - custom Recycler View's LayoutManager which move item to the next line when no space left on the current 
