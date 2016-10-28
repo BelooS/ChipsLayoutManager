@@ -1,7 +1,7 @@
 # ChipsLayoutManager <img alt="ChipsLayoutManager is an android library" src="https://www.cleveroad.com/public/comercial/label-android.svg" height="19"> [![minSdk for ChipsLayoutManager](https://img.shields.io/badge/minSdk-15-green.svg)](#)
 ![ChipsLayoutManager for RecyclerView. Custom layout manager for RecyclerView](/images/header.png)
 
-## This is ChipsLayoutManager - custom Recycler View's LayoutManager which move item to the next line when no space left on the current 
+## This is ChipsLayoutManager - custom Recycler View's LayoutManager which moves item to the next line when no space left on the current 
 This layout manager could represent [Google Chips material design pattern](https://material.google.com/components/chips.html#)
 
 As an android developer i see that google isn't so polite to support all our wishes, and when i faced with such common task like create spannable list
@@ -100,7 +100,6 @@ I appreciate any help and contributors will be mentioned here.
 ### Known issues
 * Cache of view positions is cleared on orientation change. But it wouldn't be so critical, because views are going to be properly repositioned 
 when user will scroll to start again.
-* http://stackoverflow.com/q/40242011/3379437
 
 This issues are going to be fixed in next versions.
 
