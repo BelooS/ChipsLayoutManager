@@ -15,7 +15,7 @@ but with support of CRUD animations i decided to make such stuff and share it.
 ### Installation [ ![Download](https://api.bintray.com/packages/beloo/widget/ChipsLayoutManager/images/download.svg) ](https://bintray.com/beloo/widget/ChipsLayoutManager/_latestVersion)
 
 ```GRADLE 
-compile 'com.beloo.widget:ChipsLayoutManager:0.1.1'
+compile 'com.beloo.widget:ChipsLayoutManager:0.1.2'
 ```
 
 Assuming you have installed jCenter provider:
