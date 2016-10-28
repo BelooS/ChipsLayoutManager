@@ -73,6 +73,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Nullable
     private Integer cacheNormalizationPosition = null;
 
+    /** height of RecyclerView before removing item */
+    private Integer beforeRemovingHeight = null;
+
+    /** height which we receive after {@link #onLayoutChildren} method finished.
+     * Contains correct height after auto-measuring */
+    private int autoMeasureHeight = 0;
+
     /**
      * stored current anchor view due to scroll state changes
      */
@@ -179,6 +186,18 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public void onAdapterChanged(RecyclerView.Adapter oldAdapter,
                                  RecyclerView.Adapter newAdapter) {
         //Completely scrap the existing layout
+        newAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeRemoved(int positionStart, int itemCount) {
+                // on api 16 this is invoked before onItemsRemoved
+                super.onItemRangeRemoved(positionStart, itemCount);
+                beforeRemovingHeight = autoMeasureHeight;
+                /** we detected removing event, so should process measuring manually
+                 * @see <a href="http://stackoverflow.com/questions/40242011/custom-recyclerviews-layoutmanager-automeasuring-after-animation-finished-on-i">Stack Overflow issue</a>
+                 */
+                setAutoMeasureEnabled(false);
+            }
+        });
         removeAllViews();
     }
 
@@ -251,59 +270,45 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             }
         } else {
             anchorView = getAnchorVisibleTopLeftView();
-            detachAndScrapAttachedViews(recycler);
-            fill(recycler, anchorView);
         }
+
+        autoMeasureHeight = getHeight();
     }
 
     @Override
     public void onMeasure(RecyclerView.Recycler recycler, RecyclerView.State state, int widthSpec, int heightSpec) {
         super.onMeasure(recycler, state, widthSpec, heightSpec);
-        View view = findViewByPosition(3);
 
-        requestSimpleAnimationsInNextLayout();
         if (!isAutoMeasureEnabled()) {
-            setMeasuredDimension(getWidth(), 260);
+            // we should perform measuring manually
+            // so request animations
+            requestSimpleAnimationsInNextLayout();
+            //keep height until remove animation will be completed
+            setMeasuredDimension(View.MeasureSpec.getSize(widthSpec), beforeRemovingHeight);
         }
-
-        int mode = View.MeasureSpec.getMode(heightSpec);
-        String modeStr;
-        switch (mode) {
-            case View.MeasureSpec.EXACTLY:
-                modeStr = "exactly";
-                break;
-            case View.MeasureSpec.AT_MOST:
-                modeStr = "atMost";
-                break;
-            case View.MeasureSpec.UNSPECIFIED:
-                modeStr = "unspecified";
-                break;
-            default:
-                throw new IllegalStateException();
-        }
-
-        Log.d("onMeasure", "height spec mode = " + modeStr);
-        Log.d("height", "height = " + getHeight());
-        Log.d("onMeasure", "View = " + view);
     }
 
     @Override
     public void onItemsRemoved(final RecyclerView recyclerView, int positionStart, int itemCount) {
         super.onItemsRemoved(recyclerView, positionStart, itemCount);
         onLayoutUpdatedFromPosition(positionStart);
-        setAutoMeasureEnabled(false);
 
-        recyclerView.getItemAnimator().isRunning(new RecyclerView.ItemAnimator.ItemAnimatorFinishedListener() {
+        //subscribe to next animations tick
+        postOnAnimation(new Runnable() {
             @Override
-            public void onAnimationsFinished() {
-                Log.d(TAG, "on animation end");
-                setAutoMeasureEnabled(true);
-                requestSimpleAnimationsInNextLayout();
-                requestLayout();
-                recyclerView.setLayoutAnimationListener(null);
+            public void run() {
+                //listen removing animation
+                recyclerView.getItemAnimator().isRunning(new RecyclerView.ItemAnimator.ItemAnimatorFinishedListener() {
+                    @Override
+                    public void onAnimationsFinished() {
+                        //when removing animation finished return auto-measuring back
+                        setAutoMeasureEnabled(true);
+                        // and process onMeasure again
+                        requestLayout();
+                    }
+                });
             }
         });
-
     }
 
     @Override
@@ -498,6 +503,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             }
 
         }
+
+        Log.i("fill", "height after layout = " + getHeight());
 
         logger.onFinishedLayouter();
 
