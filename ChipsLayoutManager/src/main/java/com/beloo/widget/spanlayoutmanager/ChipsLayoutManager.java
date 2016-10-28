@@ -15,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
+import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 
 import com.beloo.widget.spanlayoutmanager.cache.IViewCacheStorage;
@@ -287,18 +288,22 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     @Override
-    public void onItemsRemoved(RecyclerView recyclerView, int positionStart, int itemCount) {
+    public void onItemsRemoved(final RecyclerView recyclerView, int positionStart, int itemCount) {
         super.onItemsRemoved(recyclerView, positionStart, itemCount);
         onLayoutUpdatedFromPosition(positionStart);
         setAutoMeasureEnabled(false);
 
-//        new Handler(Looper.myLooper()).postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                setAutoMeasureEnabled(true);
-//                requestLayoutWithAnimations();
-//            }
-//        }, 400);
+        recyclerView.getItemAnimator().isRunning(new RecyclerView.ItemAnimator.ItemAnimatorFinishedListener() {
+            @Override
+            public void onAnimationsFinished() {
+                Log.d(TAG, "on animation end");
+                setAutoMeasureEnabled(true);
+                requestSimpleAnimationsInNextLayout();
+                requestLayout();
+                recyclerView.setLayoutAnimationListener(null);
+            }
+        });
+
     }
 
     @Override
