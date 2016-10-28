@@ -1,4 +1,4 @@
-# ChipsLayoutManager <img src="https://www.cleveroad.com/public/comercial/label-android.svg" height="19">
+# ChipsLayoutManager <img src="https://www.cleveroad.com/public/comercial/label-android.svg" height="19"> [![minSdk for ChipsLayoutManager](https://img.shields.io/badge/minSdk-15-green.svg)](#)
 ![ChipsLayoutManager for RecyclerView. Custom layout manager for RecyclerView](/images/header.png)
 
 ## This is ChipsLayoutManager - custom Recycler View's LayoutManager which move item to the next line when no space left on the current 
@@ -104,7 +104,7 @@ when user will scroll to start again.
 
 This issues are going to be fixed in next versions.
 
-### License
+### License [![license for ChipsLayoutManager](https://img.shields.io/crates/l/rustc-serialize.svg)]()
 
     Copyright 2016 Beloy Oleg, Ukraine.
     
