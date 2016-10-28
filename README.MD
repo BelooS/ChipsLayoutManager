@@ -1,4 +1,4 @@
-# ChipsLayoutManager [![ChipsLayoutManager is an android library](/images/for_android.svg)](#) [![minSdk for ChipsLayoutManager](https://img.shields.io/badge/minSdk-15-green.svg)](#)
+# ChipsLayoutManager <img alt="ChipsLayoutManager is an android library" src="https://www.cleveroad.com/public/comercial/label-android.svg" height="19"> [![minSdk for ChipsLayoutManager](https://img.shields.io/badge/minSdk-15-green.svg)](#)
 ![ChipsLayoutManager for RecyclerView. Custom layout manager for RecyclerView](/images/header.png)
 
 ## This is ChipsLayoutManager - custom Recycler View's LayoutManager which move item to the next line when no space left on the current 
@@ -72,7 +72,7 @@ ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
 rv.setLayoutManager(chipsLayoutManager);
 ```
 
-**Device current direction** have chosen by default.
+**Device current direction** have been chosen by default.
 You can manipulate with layout direction (**LTR** or **RTL**)<br/>
 _On Api >= 17:_
 ```XML
