@@ -72,8 +72,8 @@ public class MainActivity extends AppCompatActivity {
         spinnerPosition = (Spinner) findViewById(R.id.spinnerPosition);
         spinnerMoveTo = (Spinner) findViewById(R.id.spinnerMoveTo);
 
-//        adapter = createChipsAdapter();
-        adapter = createItemsAdapter(savedInstanceState);
+        adapter = createChipsAdapter();
+//        adapter = createItemsAdapter(savedInstanceState);
 
         ChipsLayoutManager spanLayoutManager = ChipsLayoutManager.newBuilder(this)
                 //set vertical gravity for all items in a row. Default = Gravity.CENTER_VERTICAL

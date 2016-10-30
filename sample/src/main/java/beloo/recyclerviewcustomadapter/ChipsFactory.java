@@ -10,7 +10,7 @@ import beloo.recyclerviewcustomadapter.entity.ChipsEntity;
 
 public class ChipsFactory {
 
-    List<ChipsEntity> getChips() {
+    List<ChipsEntity> getFewChips() {
 
         List<ChipsEntity> chipsList = new ArrayList<>();
         chipsList.add(ChipsEntity.newBuilder()
@@ -71,10 +71,27 @@ public class ChipsFactory {
 
     }
 
-    List<ChipsEntity> getDoubleChips() {
-        List<ChipsEntity> chipsEntities = getChips();
+    List<ChipsEntity> getChips() {
+        List<ChipsEntity> chipsEntities = getFewChips();
 
-        List<ChipsEntity> secondPortion = getChips();
+        List<ChipsEntity> secondPortion = getFewChips();
+        Collections.reverse(secondPortion);
+        chipsEntities.addAll(secondPortion);
+        chipsEntities.addAll(getFewChips());
+        chipsEntities.addAll(getFewChips());
+
+        for (int i=0; i< chipsEntities.size(); i++) {
+            ChipsEntity chipsEntity = chipsEntities.get(i);
+            chipsEntity.setName(chipsEntity.getName() + " " + i);
+        }
+
+        return chipsEntities;
+    }
+
+    List<ChipsEntity> getDoubleChips() {
+        List<ChipsEntity> chipsEntities = getFewChips();
+
+        List<ChipsEntity> secondPortion = getFewChips();
         Collections.reverse(secondPortion);
         chipsEntities.addAll(secondPortion);
         return chipsEntities;
