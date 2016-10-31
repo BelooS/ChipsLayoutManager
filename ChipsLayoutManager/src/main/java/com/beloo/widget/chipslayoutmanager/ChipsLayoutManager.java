@@ -282,6 +282,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         if (state.isPreLayout()) {
             Log.i("onLayoutChildren", "isPreLayout = true");
+        } else {
+            Log.i("onLayoutChildren", "isPreLayout = false");
         }
 
         //We have nothing to show for an empty data set but clear any existing views
