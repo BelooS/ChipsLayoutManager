@@ -30,6 +30,9 @@ import com.beloo.widget.chipslayoutmanager.logger.IAdapterActionsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IFillLogger;
 import com.beloo.widget.chipslayoutmanager.logger.LoggerFactory;
 
+import java.util.HashSet;
+import java.util.List;
+
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
     private static final int INT_ROW_SIZE_APPROXIMATELY_FOR_CACHE = 10;
@@ -311,14 +314,38 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             } else {
                 fill(recycler, anchorView);
             }
+
+            layoutDisappearingViews(recycler);
+
         } else {
-            //todo fill removed cache
             fillRemovedCache();
             anchorView = getAnchorVisibleTopLeftView();
         }
 
         autoMeasureHeight = getHeight();
     }
+
+    private void layoutDisappearingViews(RecyclerView.Recycler recycler) {
+        final List<RecyclerView.ViewHolder> scrapList = recycler.getScrapList();
+        final HashSet<View> disappearingViews = new HashSet<>(scrapList.size());
+
+        for (RecyclerView.ViewHolder holder : scrapList) {
+            final View child = holder.itemView;
+            final RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) child.getLayoutParams();
+            if (!lp.isItemRemoved()) {
+                disappearingViews.add(child);
+            }
+        }
+
+        for (View view : disappearingViews) {
+            addDisappearingView(view);
+            int width = getDecoratedMeasuredWidth(view);
+
+            //todo try to find position in cache.
+            layoutDecorated(view, 0, getHeight() + 100, width, getHeight() + 100 + getDecoratedBottom(view));
+        }
+    }
+
 
     /** during pre-layout fill cache of views, which will be removed after pre-layout */
     private void fillRemovedCache() {
