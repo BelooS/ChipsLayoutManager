@@ -158,6 +158,9 @@ public class MainActivity extends AppCompatActivity {
 
         if (position == positionMoveTo) return;
 
+        Object item = items.remove(position);
+        items.add(positionMoveTo, item);
+
         adapter.notifyItemMoved(position, positionMoveTo);
     }
 
