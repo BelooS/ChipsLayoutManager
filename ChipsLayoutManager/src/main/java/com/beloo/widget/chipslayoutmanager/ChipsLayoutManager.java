@@ -25,8 +25,10 @@ import com.beloo.widget.chipslayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.chipslayoutmanager.layouter.ILayouter;
 import com.beloo.widget.chipslayoutmanager.layouter.LTRLayouterFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.RTLLayouterFactory;
-import com.beloo.widget.chipslayoutmanager.logger.EmptyLogger;
+import com.beloo.widget.chipslayoutmanager.logger.EmptyFillLogger;
+import com.beloo.widget.chipslayoutmanager.logger.IAdapterActionsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IFillLogger;
+import com.beloo.widget.chipslayoutmanager.logger.LoggerFactory;
 
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
@@ -60,7 +62,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     private ParcelableContainer container = new ParcelableContainer();
 
-    private IFillLogger logger = new EmptyLogger();
+    //---loggers below
+    private IFillLogger logger;
+    private IAdapterActionsLogger adapterActionsLogger;
+    //--- end loggers
+
 
     /**
      * is layout in RTL mode. Variable needed to detect mode changes
@@ -109,6 +115,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         @DeviceOrientation
         int orientation = context.getResources().getConfiguration().orientation;
         this.orientation = orientation;
+
+        LoggerFactory loggerFactory = new LoggerFactory();
+        logger = loggerFactory.getFillLogger();
+        adapterActionsLogger = loggerFactory.getAdapterActionsLogger();
 
         viewPositionsStorage = new ViewCacheFactory(this).createCacheStorage();
         setAutoMeasureEnabled(true);
@@ -334,6 +344,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public void onItemsRemoved(final RecyclerView recyclerView, int positionStart, int itemCount) {
+        adapterActionsLogger.onItemsRemoved(positionStart, itemCount);
         super.onItemsRemoved(recyclerView, positionStart, itemCount);
         onLayoutUpdatedFromPosition(positionStart);
 
@@ -351,12 +362,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public void onItemsAdded(RecyclerView recyclerView, int positionStart, int itemCount) {
+        adapterActionsLogger.onItemsAdded(positionStart, itemCount);
         super.onItemsAdded(recyclerView, positionStart, itemCount);
         onLayoutUpdatedFromPosition(positionStart);
     }
 
     @Override
     public void onItemsChanged(RecyclerView recyclerView) {
+        adapterActionsLogger.onItemsChanged();
         super.onItemsChanged(recyclerView);
         viewPositionsStorage.purge();
         onLayoutUpdatedFromPosition(0);
@@ -364,6 +377,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public void onItemsUpdated(RecyclerView recyclerView, int positionStart, int itemCount) {
+        adapterActionsLogger.onItemsUpdated(positionStart, itemCount);
         super.onItemsUpdated(recyclerView, positionStart, itemCount);
         onLayoutUpdatedFromPosition(positionStart);
     }
@@ -371,11 +385,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public void onItemsUpdated(RecyclerView recyclerView, int positionStart, int itemCount, Object payload) {
         onItemsUpdated(recyclerView, positionStart, itemCount);
-        onLayoutUpdatedFromPosition(positionStart);
     }
 
     @Override
     public void onItemsMoved(RecyclerView recyclerView, int from, int to, int itemCount) {
+        adapterActionsLogger.onItemsMoved(from, to, itemCount);
         super.onItemsMoved(recyclerView, from, to, itemCount);
         onLayoutUpdatedFromPosition(from);
     }

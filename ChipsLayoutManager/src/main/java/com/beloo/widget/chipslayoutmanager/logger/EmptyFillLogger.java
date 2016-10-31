@@ -2,7 +2,7 @@ package com.beloo.widget.chipslayoutmanager.logger;
 
 import com.beloo.widget.chipslayoutmanager.AnchorViewState;
 
-public class EmptyLogger implements IFillLogger {
+public class EmptyFillLogger implements IFillLogger {
     @Override
     public void onStartLayouter() {
 
