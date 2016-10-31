@@ -30,6 +30,10 @@ public class ChipsEntity implements Parcelable {
         return name;
     }
 
+    public void setName(@NonNull String name) {
+        this.name = name;
+    }
+
     private ChipsEntity(Builder builder) {
         drawableResId = builder.drawableResId;
         description = builder.description;

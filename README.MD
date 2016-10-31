@@ -8,7 +8,7 @@ As an android developer i see that google isn't so polite to support all our wis
 but with support of CRUD animations i decided to make such stuff and share it.
 
 <p align="center">
-    <img src="/images/demo.gif" alt="Span layout manager demo">
+    <img src="/images/demo.gif" alt="Chips layout manager gif with scrolling">
 </p>
 
 ## Setup and usage
