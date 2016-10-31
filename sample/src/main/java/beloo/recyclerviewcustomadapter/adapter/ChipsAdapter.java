@@ -74,8 +74,10 @@ public class ChipsAdapter extends  RecyclerView.Adapter<ChipsAdapter.ViewHolder>
                 tvDescription.setText(entity.getDescription());
             }
 
-            Glide.with(ivPhoto.getContext()).load(entity.getDrawableResId())
-                    .transform(new CircleTransform(ivPhoto.getContext())).into(ivPhoto);
+            if (entity.getDrawableResId() != null) {
+                Glide.with(ivPhoto.getContext()).load(entity.getDrawableResId())
+                        .transform(new CircleTransform(ivPhoto.getContext())).into(ivPhoto);
+            }
 
             tvName.setText(entity.getName());
 
