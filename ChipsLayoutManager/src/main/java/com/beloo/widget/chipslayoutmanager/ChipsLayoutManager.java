@@ -310,23 +310,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 fill(recycler, anchorView);
             }
         } else {
-            //todo fill removed cache
-            fillRemovedCache();
             anchorView = getAnchorVisibleTopLeftView();
         }
 
         autoMeasureHeight = getHeight();
-    }
-
-    /** during pre-layout fill cache of views, which will be removed after pre-layout */
-    private void fillRemovedCache() {
-        for (View view : childViews) {
-            RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) view.getLayoutParams();
-
-            if (lp.isItemRemoved()) {
-                removedViewCache.put(lp.getViewLayoutPosition(), view);
-            }
-        }
     }
 
     @Override

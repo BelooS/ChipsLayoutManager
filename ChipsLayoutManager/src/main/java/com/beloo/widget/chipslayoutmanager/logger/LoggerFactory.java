@@ -10,6 +10,6 @@ public class LoggerFactory {
 
     @NonNull
     public IAdapterActionsLogger getAdapterActionsLogger() {
-        return new AdapterActionsLogger();
+        return new EmptyAdapterActionsLogger();
     }
 }
