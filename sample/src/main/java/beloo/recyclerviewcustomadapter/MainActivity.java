@@ -16,10 +16,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import beloo.recyclerviewcustomadapter.adapter.ChipsAdapter;
-import beloo.recyclerviewcustomadapter.adapter.RecyclerViewAdapter;
-import beloo.recyclerviewcustomadapter.entity.ChipsEntity;
-
 public class MainActivity extends AppCompatActivity {
     private static final String EXTRA = "data";
     private RecyclerView rvTest;
@@ -29,11 +25,8 @@ public class MainActivity extends AppCompatActivity {
     private List<String> positions;
     private List items;
 
-    private RecyclerView.Adapter createChipsAdapter() {
-        List<ChipsEntity> items = new ChipsFactory().getChips();
-        this.items = items;
-        return new ChipsAdapter(items, onRemoveListener);
-    }
+    /** replace here different data sets */
+    private IItemsFactory itemsFactory = new ChipsFactory();
 
     private OnRemoveListener onRemoveListener = new OnRemoveListener() {
         @Override
@@ -45,18 +38,19 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private RecyclerView.Adapter createItemsAdapter(Bundle savedInstanceState) {
+    @SuppressWarnings("unchecked")
+    private RecyclerView.Adapter createAdapter(Bundle savedInstanceState) {
 
         List<String> items;
         if (savedInstanceState == null) {
-//            items = new ItemsFactory().getFewItems();
-            items = new ItemsFactory().getALotOfItems();
-//            items = new ItemsFactory().getItems();
+//            items = itemsFactory.getFewItems();
+//            items = itemsFactory.getALotOfItems();/
+            items = itemsFactory.getItems();
         } else {
             items = savedInstanceState.getStringArrayList(EXTRA);
         }
 
-        adapter = new RecyclerViewAdapter(items, onRemoveListener);
+        adapter = itemsFactory.createAdapter(items, onRemoveListener);
         this.items = items;
 
         return adapter;
@@ -72,8 +66,7 @@ public class MainActivity extends AppCompatActivity {
         spinnerPosition = (Spinner) findViewById(R.id.spinnerPosition);
         spinnerMoveTo = (Spinner) findViewById(R.id.spinnerMoveTo);
 
-        adapter = createChipsAdapter();
-//        adapter = createItemsAdapter(savedInstanceState);
+        adapter = createAdapter(savedInstanceState);
 
         ChipsLayoutManager spanLayoutManager = ChipsLayoutManager.newBuilder(this)
                 //set vertical gravity for all items in a row. Default = Gravity.CENTER_VERTICAL
@@ -109,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(EXTRA, new ArrayList<>(items));
@@ -164,9 +158,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (position == positionMoveTo) return;
 
-        Object item = items.remove(position);
-        items.add(positionMoveTo, item);
-
         adapter.notifyItemMoved(position, positionMoveTo);
     }
 
@@ -174,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
         int position = spinnerPosition.getSelectedItemPosition();
         if (position == Spinner.INVALID_POSITION)
             position = 0;
-        items.add(position, "inserted item." + position);
+        items.add(position, itemsFactory.createOneItemForPosition(position));
         Log.i("activity", "insert at " + position);
         adapter.notifyItemInserted(position);
         updateSpinner();

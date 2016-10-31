@@ -1,10 +1,14 @@
 package beloo.recyclerviewcustomadapter;
 
+import android.support.v7.widget.RecyclerView;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-public class ItemsFactory {
+import beloo.recyclerviewcustomadapter.adapter.RecyclerViewAdapter;
+
+public class ItemsFactory implements IItemsFactory<String> {
     public List<String> getItems() {
         List<String> list = new LinkedList<>();
         list.add("Item0.0");
@@ -36,6 +40,11 @@ public class ItemsFactory {
         list.add("Item26");
         list.add("Item27");
         return list;
+    }
+
+    @Override
+    public List<String> getDoubleItems() {
+        throw new UnsupportedOperationException("not implemented");
     }
 
     public List<String> getFewItems() {
@@ -85,5 +94,15 @@ public class ItemsFactory {
 
         }
         return list;
+    }
+
+    @Override
+    public String createOneItemForPosition(int position) {
+        return "inserted item." + position;
+    }
+
+    @Override
+    public RecyclerView.Adapter<? extends RecyclerView.ViewHolder> createAdapter(List<String> items, OnRemoveListener onRemoveListener) {
+        return new RecyclerViewAdapter(items, onRemoveListener);
     }
 }

@@ -564,8 +564,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         }
 
-        Log.i("fill", "height after layout = " + getHeight());
-
         logger.onFinishedLayouter();
 
         //layout last row

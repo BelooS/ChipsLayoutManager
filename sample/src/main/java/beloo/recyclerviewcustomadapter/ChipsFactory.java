@@ -1,17 +1,19 @@
 package beloo.recyclerviewcustomadapter;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import beloo.recyclerviewcustomadapter.adapter.ChipsAdapter;
 import beloo.recyclerviewcustomadapter.entity.ChipsEntity;
 
-public class ChipsFactory {
+public class ChipsFactory implements IItemsFactory<ChipsEntity> {
 
-    List<ChipsEntity> getFewChips() {
-
+    @Override
+    public List<ChipsEntity> getFewItems() {
         List<ChipsEntity> chipsList = new ArrayList<>();
         chipsList.add(ChipsEntity.newBuilder()
                 .drawableResId(R.drawable.batman)
@@ -65,20 +67,18 @@ public class ChipsFactory {
                 .name("Very Long Name Anonymous")
                 .build());
 
-
-
         return chipsList;
-
     }
 
-    List<ChipsEntity> getChips() {
-        List<ChipsEntity> chipsEntities = getFewChips();
+    @Override
+    public List<ChipsEntity> getItems() {
+        List<ChipsEntity> chipsEntities = getFewItems();
 
-        List<ChipsEntity> secondPortion = getFewChips();
+        List<ChipsEntity> secondPortion = getFewItems();
         Collections.reverse(secondPortion);
         chipsEntities.addAll(secondPortion);
-        chipsEntities.addAll(getFewChips());
-        chipsEntities.addAll(getFewChips());
+        chipsEntities.addAll(getFewItems());
+        chipsEntities.addAll(getFewItems());
 
         for (int i=0; i< chipsEntities.size(); i++) {
             ChipsEntity chipsEntity = chipsEntities.get(i);
@@ -88,12 +88,35 @@ public class ChipsFactory {
         return chipsEntities;
     }
 
-    List<ChipsEntity> getDoubleChips() {
-        List<ChipsEntity> chipsEntities = getFewChips();
+    @Override
+    public List<ChipsEntity> getDoubleItems() {
+        List<ChipsEntity> chipsEntities = getFewItems();
 
-        List<ChipsEntity> secondPortion = getFewChips();
+        List<ChipsEntity> secondPortion = getFewItems();
         Collections.reverse(secondPortion);
         chipsEntities.addAll(secondPortion);
         return chipsEntities;
+    }
+
+    @Override
+    public List<ChipsEntity> getALotOfItems() {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    @Override
+    public List<ChipsEntity> getALotOfRandomItems() {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    @Override
+    public ChipsEntity createOneItemForPosition(int position) {
+        return ChipsEntity.newBuilder()
+                .name("Newbie " + position)
+                .build();
+    }
+
+    @Override
+    public RecyclerView.Adapter<? extends RecyclerView.ViewHolder> createAdapter(List<ChipsEntity> chipsEntities, OnRemoveListener onRemoveListener) {
+        return new ChipsAdapter(chipsEntities, onRemoveListener);
     }
 }
