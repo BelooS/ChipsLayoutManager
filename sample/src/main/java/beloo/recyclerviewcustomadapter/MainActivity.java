@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putStringArrayList(EXTRA, new ArrayList<>(items));
+        outState.putParcelableArrayList(EXTRA, new ArrayList<>(items));
     }
 
     private void updateSpinner() {

@@ -1,10 +1,12 @@
 package beloo.recyclerviewcustomadapter.entity;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public class ChipsEntity {
+public class ChipsEntity implements Parcelable {
     @DrawableRes
     private int drawableResId;
 
@@ -72,4 +74,35 @@ public class ChipsEntity {
             return new ChipsEntity(this);
         }
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.drawableResId);
+        dest.writeString(this.description);
+        dest.writeString(this.name);
+    }
+
+    protected ChipsEntity(Parcel in) {
+        this.drawableResId = in.readInt();
+        this.description = in.readString();
+        this.name = in.readString();
+    }
+
+    public static final Parcelable.Creator<ChipsEntity> CREATOR = new Parcelable.Creator<ChipsEntity>() {
+        @Override
+        public ChipsEntity createFromParcel(Parcel source) {
+            return new ChipsEntity(source);
+        }
+
+        @Override
+        public ChipsEntity[] newArray(int size) {
+            return new ChipsEntity[size];
+        }
+    };
 }
