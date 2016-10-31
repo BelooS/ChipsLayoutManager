@@ -3,8 +3,6 @@ package com.beloo.widget.spanlayoutmanager;
 import android.content.Context;
 import android.graphics.PointF;
 import android.graphics.Rect;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.Parcelable;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -15,7 +13,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
-import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 
 import com.beloo.widget.spanlayoutmanager.cache.IViewCacheStorage;
@@ -26,7 +23,6 @@ import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
 import com.beloo.widget.spanlayoutmanager.layouter.AbstractLayouterFactory;
 import com.beloo.widget.spanlayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.spanlayoutmanager.layouter.ILayouter;
-import com.beloo.widget.spanlayoutmanager.layouter.ILayouterListener;
 import com.beloo.widget.spanlayoutmanager.layouter.LTRLayouterFactory;
 import com.beloo.widget.spanlayoutmanager.layouter.RTLLayouterFactory;
 import com.beloo.widget.spanlayoutmanager.logger.EmptyLogger;
@@ -48,36 +44,54 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     private IViewCacheStorage viewPositionsStorage;
 
-    /** store detached views to probably reattach it if them still visible */
+    /**
+     * store detached views to probably reattach it if them still visible
+     */
     private SparseArray<View> viewCache = new SparseArray<>();
 
-    /** storing state due orientation changes */
+    /**
+     * storing state due orientation changes
+     */
     private ParcelableContainer container = new ParcelableContainer();
 
     private IFillLogger logger = new EmptyLogger();
 
-    /** is layout in RTL mode. Variable needed to detect mode changes */
+    /**
+     * is layout in RTL mode. Variable needed to detect mode changes
+     */
     private boolean isLayoutRTL = false;
 
-    /** highest view in layout. Have always actual value, because it set in {@link #onLayoutChildren}*/
+    /**
+     * highest view in layout. Have always actual value, because it set in {@link #onLayoutChildren}
+     */
     private View highestView;
-    /** lowest view in layout. Have always actual value, because it set in {@link #onLayoutChildren}*/
+    /**
+     * lowest view in layout. Have always actual value, because it set in {@link #onLayoutChildren}
+     */
     private View lowestView;
 
-    /** current device orientation*/
+    /**
+     * current device orientation
+     */
     @DeviceOrientation
     private int orientation;
 
-    /** when scrolling reached this position {@link ChipsLayoutManager} is able to restore items layout according to cached items with positions above.
-     * That layout would exactly correspond to current item view situation */
+    /**
+     * when scrolling reached this position {@link ChipsLayoutManager} is able to restore items layout according to cached items with positions above.
+     * That layout would exactly correspond to current item view situation
+     */
     @Nullable
     private Integer cacheNormalizationPosition = null;
 
-    /** height of RecyclerView before removing item */
+    /**
+     * height of RecyclerView before removing item
+     */
     private Integer beforeRemovingHeight = null;
 
-    /** height which we receive after {@link #onLayoutChildren} method finished.
-     * Contains correct height after auto-measuring */
+    /**
+     * height which we receive after {@link #onLayoutChildren} method finished.
+     * Contains correct height after auto-measuring
+     */
     private int autoMeasureHeight = 0;
 
     /**
@@ -113,9 +127,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         isScrollingEnabledContract = isEnabled;
     }
 
-    /** change max count of row views in runtime*/
+    /**
+     * change max count of row views in runtime
+     */
     public void setMaxViewsInRow(@IntRange(from = 1) Integer maxViewsInRow) {
-        if (maxViewsInRow < 1) throw new IllegalArgumentException("maxViewsInRow should be positive, but is = " + maxViewsInRow);
+        if (maxViewsInRow < 1)
+            throw new IllegalArgumentException("maxViewsInRow should be positive, but is = " + maxViewsInRow);
         this.maxViewsInRow = maxViewsInRow;
         cacheNormalizationPosition = 0;
         viewPositionsStorage.purge();
@@ -127,7 +144,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         @SpanLayoutChildGravity
         private Integer gravity;
 
-        private Builder(){}
+        private Builder() {
+        }
 
         /**
          * set vertical gravity in a row for all children. Default = CENTER_VERTICAL
@@ -145,15 +163,20 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return this;
         }
 
-        /** strictly disable scrolling if needed */
+        /**
+         * strictly disable scrolling if needed
+         */
         public Builder setScrollingEnabled(boolean isEnabled) {
             ChipsLayoutManager.this.setScrollingEnabledContract(isEnabled);
             return this;
         }
 
-        /** set maximum possible count of views in row */
+        /**
+         * set maximum possible count of views in row
+         */
         public Builder setMaxViewsInRow(@IntRange(from = 1) int maxViewsInRow) {
-            if (maxViewsInRow < 1) throw new IllegalArgumentException("maxViewsInRow should be positive, but is = " + maxViewsInRow);
+            if (maxViewsInRow < 1)
+                throw new IllegalArgumentException("maxViewsInRow should be positive, but is = " + maxViewsInRow);
             ChipsLayoutManager.this.maxViewsInRow = maxViewsInRow;
             return this;
         }
@@ -240,7 +263,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
 
         if (state.isPreLayout()) {
-            Log.i("onLayoutChildren", "isPreLayout = true" );
+            Log.i("onLayoutChildren", "isPreLayout = true");
         }
 
         //We have nothing to show for an empty data set but clear any existing views
@@ -294,20 +317,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         onLayoutUpdatedFromPosition(positionStart);
 
         //subscribe to next animations tick
-        postOnAnimation(new Runnable() {
-            @Override
-            public void run() {
-                //listen removing animation
-                recyclerView.getItemAnimator().isRunning(new RecyclerView.ItemAnimator.ItemAnimatorFinishedListener() {
-                    @Override
-                    public void onAnimationsFinished() {
-                        //when removing animation finished return auto-measuring back
-                        setAutoMeasureEnabled(true);
-                        // and process onMeasure again
-                        requestLayout();
-                    }
-                });
-            }
+        postOnAnimation(() -> {
+            //listen removing animation
+            recyclerView.getItemAnimator().isRunning(() -> {
+                //when removing animation finished return auto-measuring back
+                setAutoMeasureEnabled(true);
+                // and process onMeasure again
+                requestLayout();
+            });
         });
     }
 
@@ -345,7 +362,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private void onLayoutUpdatedFromPosition(int position) {
         viewPositionsStorage.purgeCacheFromPosition(position);
         int startRowPos = viewPositionsStorage.getStartOfRow(position);
-        cacheNormalizationPosition = cacheNormalizationPosition == null?
+        cacheNormalizationPosition = cacheNormalizationPosition == null ?
                 startRowPos : Math.min(cacheNormalizationPosition, startRowPos);
     }
 
@@ -383,7 +400,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return true;
     }
 
-    /** place all added views to cache... */
+    /**
+     * place all added views to cache...
+     */
     private void fillCache() {
         for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
             View view = getChildAt(i);
@@ -392,7 +411,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
     }
 
-    /** find highest & lowest views */
+    /**
+     * find highest & lowest views
+     */
     private void findHighestAndLowestViews() {
         highestView = null;
         lowestView = null;
@@ -413,14 +434,18 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
     }
 
-    /** place all views on theirs right places according to current state */
+    /**
+     * place all views on theirs right places according to current state
+     */
     private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView) {
         int anchorPos = anchorView.getPosition();
 
         fill(recycler, anchorView, anchorPos);
     }
 
-    /** place all views on theirs right places according to current state */
+    /**
+     * place all views on theirs right places according to current state
+     */
     private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView, int startingPos) {
 
         Rect anchorRect = anchorView.getAnchorViewRect();
@@ -516,7 +541,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      * recycler should contain all recycled views from a longest row, not just 2 holders by default
      */
     private void calcRecyclerCacheSize(RecyclerView.Recycler recycler) {
-        int viewsInRow = maxViewsInRow == null? INT_ROW_SIZE_APPROXIMATELY_FOR_CACHE : maxViewsInRow;
+        int viewsInRow = maxViewsInRow == null ? INT_ROW_SIZE_APPROXIMATELY_FOR_CACHE : maxViewsInRow;
         recycler.setViewCacheSize((int) (viewsInRow * FAST_SCROLLING_COEFFICIENT));
     }
 
@@ -533,14 +558,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return dy;
     }
 
-    /** perform changing layout with playing RecyclerView animations */
+    /**
+     * perform changing layout with playing RecyclerView animations
+     */
     private void requestLayoutWithAnimations() {
-        postOnAnimation(new Runnable() {
-            @Override
-            public void run() {
-                requestLayout();
-                requestSimpleAnimationsInNextLayout();
-            }
+        postOnAnimation(() -> {
+            requestLayout();
+            requestSimpleAnimationsInNextLayout();
         });
     }
 
@@ -552,16 +576,19 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         int delta = 0;
         if (dy < 0) {   //if content scrolled down
-           delta = onContentScrolledDown(dy);
+            delta = onContentScrolledDown(dy);
         } else if (dy > 0) { //if content scrolled up
-           delta = onContentScrolledUp(dy);
+            delta = onContentScrolledUp(dy);
         }
         return delta;
     }
 
-    /** invoked when content scrolled down (return to older items)
+    /**
+     * invoked when content scrolled down (return to older items)
+     *
      * @param dy not processed changing of y axis
-     * @return delta. Calculated changing of y axis */
+     * @return delta. Calculated changing of y axis
+     */
     private int onContentScrolledDown(int dy) {
         int delta;
 
@@ -589,9 +616,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return delta;
     }
 
-    /** invoked when content scrolled up (to newer items)
+    /**
+     * invoked when content scrolled up (to newer items)
+     *
      * @param dy not processed changing of y axis
-     * @return delta. Calculated changing of y axis*/
+     * @return delta. Calculated changing of y axis
+     */
     private int onContentScrolledUp(int dy) {
         int childCount = getChildCount();
         int itemCount = getItemCount();
@@ -610,9 +640,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return delta;
     }
 
-    /** after several layout changes our item views probably haven't placed on right places,
+    /**
+     * after several layout changes our item views probably haven't placed on right places,
      * because we don't memorize whole positions of items.
-     * So them should be normalized to real positions when we can do it. */
+     * So them should be normalized to real positions when we can do it.
+     */
     private void performNormalizationIfNeeded() {
         final View topView = getChildAt(0);
         if (topView == null) return;
@@ -658,7 +690,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
 
         if (!topLeft.isNotFoundState()) {
-            assert topLeft.getAnchorViewRect()!= null;
+            assert topLeft.getAnchorViewRect() != null;
             topLeft.getAnchorViewRect().top = minTop;
         }
 

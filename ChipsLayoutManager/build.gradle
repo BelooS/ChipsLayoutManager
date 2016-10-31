@@ -1,3 +1,7 @@
+plugins {
+    id "me.tatarka.retrolambda" version "3.3.1"
+}
+
 apply plugin: 'com.android.library'
 
 //upload settings to bintray
@@ -42,6 +46,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
