@@ -9,8 +9,8 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.beloo.widget.spanlayoutmanager.ChipsLayoutManager;
-import com.beloo.widget.spanlayoutmanager.gravity.IChildGravityResolver;
+import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
