@@ -109,6 +109,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return childGravityResolver;
     }
 
+    /** use it to strcitly disable scrolling.
+     * If scrolling enabled it would be disabled in case all items fit on the screen */
     public void setScrollingEnabledContract(boolean isEnabled) {
         isScrollingEnabledContract = isEnabled;
     }
