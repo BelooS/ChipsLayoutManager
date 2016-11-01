@@ -44,8 +44,7 @@ abstract class AbstractLayouter implements ILayouter {
     private IChildGravityResolver childGravityResolver;
     private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
 
-    @Nullable
-    private ILayouterListener layouterListener;
+    private List<ILayouterListener> layouterListeners = new LinkedList<>();
 
     @NonNull
     private IFinishingCriteria finishingCriteria;
@@ -87,8 +86,20 @@ abstract class AbstractLayouter implements ILayouter {
         return cacheStorage;
     }
 
-    public void setLayouterListener(@Nullable ILayouterListener layouterListener) {
-        this.layouterListener = layouterListener;
+    public void addLayouterListener(ILayouterListener layouterListener) {
+        if (layouterListener != null)
+            layouterListeners.add(layouterListener);
+    }
+
+    @Override
+    public void removeLayouterListener(ILayouterListener layouterListener) {
+        layouterListeners.remove(layouterListener);
+    }
+
+    private void notifyLayouterListeners() {
+        for (ILayouterListener layouterListener : layouterListeners) {
+            layouterListener.onLayoutRow(this);
+        }
     }
 
     @Override
@@ -189,9 +200,7 @@ abstract class AbstractLayouter implements ILayouter {
             layoutManager.layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
         }
 
-        if (layouterListener != null) {
-            layouterListener.onLayoutRow(this);
-        }
+        notifyLayouterListeners();
 
         onAfterLayout();
 

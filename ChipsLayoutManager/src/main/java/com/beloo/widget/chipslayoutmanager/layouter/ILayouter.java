@@ -1,5 +1,6 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
+import android.support.annotation.Nullable;
 import android.view.View;
 
 public interface ILayouter {
@@ -25,6 +26,10 @@ public interface ILayouter {
 
     /** @return size of previous row*/
     int getPreviousRowSize();
+
+    void addLayouterListener(ILayouterListener layouterListener);
+
+    void removeLayouterListener(ILayouterListener layouterListener);
 
     AbstractPositionIterator positionIterator();
 }
