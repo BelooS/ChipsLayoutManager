@@ -308,14 +308,22 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         if (!state.isPreLayout()) {
             Log.i("onLayoutChildren", "isPreLayout = false");
             layoutDisappearingViews(recycler);
+            detachAndScrapAttachedViews(recycler);
+            fill(recycler, anchorView);
         } else {
             Log.i("onLayoutChildren", "isPreLayout = true");
             fillRemovedCache();
             anchorView = getAnchorVisibleTopLeftView();
+            detachAndScrapAttachedViews(recycler);
+
+            //in case removing draw additional rows to show predictive animations
+            AbstractLayouterFactory layouterFactory = createLayouterFactory();
+            layouterFactory.setAdditionalRowsCount(2);
+
+            fill(recycler, layouterFactory, anchorView);
         }
 
-        detachAndScrapAttachedViews(recycler);
-        fill(recycler, anchorView);
+
 
         autoMeasureHeight = getHeight();
     }
@@ -387,11 +395,17 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
     }
 
+    /**
+     * place all views on theirs right places according to current state
+     */
+    private void fill (RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView) {
+        fill(recycler, createLayouterFactory(), anchorView);
+    }
 
     /**
      * place all views on theirs right places according to current state
      */
-    private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView) {
+    private void fill(RecyclerView.Recycler recycler, AbstractLayouterFactory layouterFactory, @NonNull AnchorViewState anchorView) {
         int startingPos = anchorView.getPosition();
         Rect anchorRect = anchorView.getAnchorViewRect();
 
@@ -401,8 +415,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         for (int i = 0; i < viewCache.size(); i++) {
             detachView(viewCache.valueAt(i));
         }
-
-        AbstractLayouterFactory layouterFactory = createLayouterFactory();
 
         logger.onBeforeLayouter(anchorView);
 

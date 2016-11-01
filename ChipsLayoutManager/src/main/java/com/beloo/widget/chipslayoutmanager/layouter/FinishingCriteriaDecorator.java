@@ -1,10 +1,10 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
-public abstract class FinishingCriteriaDecorator implements IFinishingCriteria {
+abstract class FinishingCriteriaDecorator implements IFinishingCriteria {
 
     private IFinishingCriteria finishingCriteria;
 
-    public FinishingCriteriaDecorator(IFinishingCriteria finishingCriteria) {
+    FinishingCriteriaDecorator(IFinishingCriteria finishingCriteria) {
         this.finishingCriteria = finishingCriteria;
     }
 
