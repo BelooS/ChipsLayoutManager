@@ -289,12 +289,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
 
-        if (state.isPreLayout()) {
-            Log.i("onLayoutChildren", "isPreLayout = true");
-        } else {
-            Log.i("onLayoutChildren", "isPreLayout = false");
-        }
-
         //We have nothing to show for an empty data set but clear any existing views
         if (getItemCount() == 0) {
             detachAndScrapAttachedViews(recycler);
@@ -305,28 +299,23 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             //if layout direction changed programmatically we should clear anchors
             isLayoutRTL = isLayoutRTL();
             viewPositionsStorage.purge();
+            //so detach all views before we start searching for anchor view
             detachAndScrapAttachedViews(recycler);
         }
 
         calcRecyclerCacheSize(recycler);
 
         if (!state.isPreLayout()) {
-            detachAndScrapAttachedViews(recycler);
-
-            if (!anchorView.isNotFoundState() && anchorView.getPosition() == 0) {
-                //we can't add view in a hidden area if added view inserted on a zero position. so needed workaround here, we reset anchor position to 0
-                //for properly insertion only
-                fill(recycler, anchorView, anchorView.getPosition());
-            } else {
-                fill(recycler, anchorView);
-            }
-
+            Log.i("onLayoutChildren", "isPreLayout = false");
             layoutDisappearingViews(recycler);
-
         } else {
+            Log.i("onLayoutChildren", "isPreLayout = true");
             fillRemovedCache();
             anchorView = getAnchorVisibleTopLeftView();
         }
+
+        detachAndScrapAttachedViews(recycler);
+        fill(recycler, anchorView);
 
         autoMeasureHeight = getHeight();
     }
@@ -398,20 +387,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
     }
 
+
     /**
      * place all views on theirs right places according to current state
      */
     private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView) {
-        int anchorPos = anchorView.getPosition();
-
-        fill(recycler, anchorView, anchorPos);
-    }
-
-    /**
-     * place all views on theirs right places according to current state
-     */
-    private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView, int startingPos) {
-
+        int startingPos = anchorView.getPosition();
         Rect anchorRect = anchorView.getAnchorViewRect();
 
         fillCache();
