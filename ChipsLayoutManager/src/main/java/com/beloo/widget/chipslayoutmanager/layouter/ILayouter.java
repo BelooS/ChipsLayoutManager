@@ -26,8 +26,5 @@ public interface ILayouter {
     /** @return size of previous row*/
     int getPreviousRowSize();
 
-    /** @param layouterListener listener to layouter events*/
-    void setLayouterListener(ILayouterListener layouterListener);
-
     AbstractPositionIterator positionIterator();
 }

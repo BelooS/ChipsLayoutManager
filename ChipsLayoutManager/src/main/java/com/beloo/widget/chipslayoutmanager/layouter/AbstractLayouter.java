@@ -77,8 +77,7 @@ abstract class AbstractLayouter implements ILayouter {
         return cacheStorage;
     }
 
-    @Override
-    public void setLayouterListener(ILayouterListener layouterListener) {
+    public void setLayouterListener(@Nullable ILayouterListener layouterListener) {
         this.layouterListener = layouterListener;
     }
 
