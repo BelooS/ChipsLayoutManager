@@ -12,14 +12,18 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
         super(cacheStorage, layoutManager);
     }
 
-    public ILayouter getUpLayouter(@Nullable Rect anchorRect) {
-        Rect offsetRect = new Rect(
+
+    private Rect createOffsetRectForUpLayouter(Rect anchorRect) {
+        return new Rect(
                 //we shouldn't include anchor view here, so anchorLeft is a rightOffset
                 anchorRect == null ? layoutManager.getPaddingLeft() : anchorRect.right,
                 anchorRect == null ? layoutManager.getPaddingTop() : anchorRect.top,
                 0,
-                anchorRect == null ? layoutManager.getPaddingBottom() : anchorRect.bottom
-        );
+                anchorRect == null ? layoutManager.getPaddingBottom() : anchorRect.bottom);
+    }
+
+    public ILayouter getUpLayouter(@Nullable Rect anchorRect) {
+        Rect offsetRect = createOffsetRectForUpLayouter(anchorRect);
 
         AbstractLayouter layouter = new RTLUpLayouter(layoutManager,
                 layoutManager.getChildGravityResolver(),
@@ -31,13 +35,16 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
         return layouter;
     }
 
-    public ILayouter getDownLayouter(@Nullable Rect anchorRect) {
-        Rect offsetRect = new Rect(
+    private Rect createOffsetRectForDownLayouter(Rect anchorRect) {
+        return new Rect(
                 0,
                 anchorRect == null ? layoutManager.getPaddingTop() : anchorRect.top,
                 anchorRect == null ? layoutManager.getPaddingRight() : anchorRect.right,
-                anchorRect == null ? layoutManager.getPaddingBottom() : anchorRect.bottom
-        );
+                anchorRect == null ? layoutManager.getPaddingBottom() : anchorRect.bottom);
+    }
+
+    public ILayouter getDownLayouter(@Nullable Rect anchorRect) {
+        Rect offsetRect = createOffsetRectForDownLayouter(anchorRect);
 
         AbstractLayouter layouter = new RTLDownLayouter(layoutManager,
                 layoutManager.getChildGravityResolver(),
