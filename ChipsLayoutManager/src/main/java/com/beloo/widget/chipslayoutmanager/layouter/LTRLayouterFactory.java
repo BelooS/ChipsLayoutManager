@@ -1,6 +1,7 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
+import android.support.annotation.IntRange;
 import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
@@ -28,7 +29,7 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
                 offsetRect,
-                new CriteriaUpLayouterFinished());
+                new CriteriaAdditionalRow(new CriteriaUpLayouterFinished(), getAdditionalRowsCount()));
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
         return layouter;
@@ -51,7 +52,7 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
                 offsetRect,
-                new CriteriaDownLayouterFinished());
+                new CriteriaAdditionalRow(new CriteriaDownLayouterFinished(), getAdditionalRowsCount()));
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
         return layouter;

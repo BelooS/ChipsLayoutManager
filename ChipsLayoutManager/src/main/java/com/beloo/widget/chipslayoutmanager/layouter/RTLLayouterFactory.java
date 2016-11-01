@@ -29,7 +29,7 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
                 offsetRect,
-                new CriteriaUpLayouterFinished());
+                new CriteriaAdditionalRow(new CriteriaUpLayouterFinished(), getAdditionalRowsCount()));
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
         return layouter;
@@ -50,7 +50,7 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
                 offsetRect,
-                new CriteriaDownLayouterFinished());
+                new CriteriaAdditionalRow(new CriteriaDownLayouterFinished(), getAdditionalRowsCount()));
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
         return layouter;

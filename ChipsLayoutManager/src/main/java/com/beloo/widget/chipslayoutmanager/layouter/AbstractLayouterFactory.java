@@ -1,6 +1,7 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
+import android.support.annotation.IntRange;
 import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
@@ -12,6 +13,9 @@ public abstract class AbstractLayouterFactory {
     @Nullable
     private Integer maxViewsInRow = null;
 
+    @IntRange(from = 0)
+    private int additionalRowsCount;
+
     AbstractLayouterFactory(IViewCacheStorage cacheStorage, ChipsLayoutManager layoutManager) {
         this.cacheStorage = cacheStorage;
         this.layoutManager = layoutManager;
@@ -21,8 +25,16 @@ public abstract class AbstractLayouterFactory {
         this.maxViewsInRow = maxViewsInRow;
     }
 
+    public void setAdditionalRowsCount(int additionalRowsCount) {
+        this.additionalRowsCount = additionalRowsCount;
+    }
+
+    int getAdditionalRowsCount() {
+        return additionalRowsCount;
+    }
+
     @Nullable
-    public Integer getMaxViewsInRow() {
+    Integer getMaxViewsInRow() {
         return maxViewsInRow;
     }
 
