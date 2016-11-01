@@ -70,6 +70,14 @@ abstract class AbstractLayouter implements ILayouter {
         return layoutManager.getHeight();
     }
 
+    public List<Item> getCurrentRowItems() {
+        List<Item> items = new LinkedList<>();
+        for (Pair<Rect, View> rowView : rowViews) {
+            items.add(new Item(rowView.first, layoutManager.getPosition(rowView.second)));
+        }
+        return items;
+    }
+
     final int getCanvasLeftBorder() {
         return layoutManager.getPaddingLeft();
     }
@@ -97,8 +105,10 @@ abstract class AbstractLayouter implements ILayouter {
     }
 
     private void notifyLayouterListeners() {
-        for (ILayouterListener layouterListener : layouterListeners) {
-            layouterListener.onLayoutRow(this);
+        if (rowSize > 0) {
+            for (ILayouterListener layouterListener : layouterListeners) {
+                layouterListener.onLayoutRow(this);
+            }
         }
     }
 
@@ -231,6 +241,11 @@ abstract class AbstractLayouter implements ILayouter {
     @Override
     public int getRowTop() {
         return rowTop;
+    }
+
+    @Override
+    public Rect getRowRect() {
+        return new Rect(getCanvasLeftBorder(), rowTop, getCanvasRightBorder(), getRowBottom());
     }
 
     @Override

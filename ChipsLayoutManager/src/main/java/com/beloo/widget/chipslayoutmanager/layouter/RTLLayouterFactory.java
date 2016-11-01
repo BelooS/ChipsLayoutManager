@@ -32,6 +32,7 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
                 new CriteriaAdditionalRow(new CriteriaUpLayouterFinished(), getAdditionalRowsCount()));
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
+        layouter.addLayouterListener(getLayouterListener());
         return layouter;
     }
 
@@ -53,6 +54,7 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
                 new CriteriaAdditionalRow(new CriteriaDownLayouterFinished(), getAdditionalRowsCount()));
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
+        layouter.addLayouterListener(getLayouterListener());
         return layouter;
     }
 

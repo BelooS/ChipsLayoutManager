@@ -32,6 +32,7 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
                 new CriteriaAdditionalRow(new CriteriaUpLayouterFinished(), getAdditionalRowsCount()));
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
+        layouter.addLayouterListener(getLayouterListener());
         return layouter;
     }
 
@@ -52,9 +53,14 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
                 offsetRect,
-                new CriteriaAdditionalRow(new CriteriaDownLayouterFinished(), getAdditionalRowsCount()));
+                new CriteriaAdditionalHeight(
+                        new CriteriaAdditionalRow(
+                                new CriteriaDownLayouterFinished(),
+                                getAdditionalRowsCount()),
+                        getAdditionalHeight()));
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
+        layouter.addLayouterListener(getLayouterListener());
         return layouter;
     }
 

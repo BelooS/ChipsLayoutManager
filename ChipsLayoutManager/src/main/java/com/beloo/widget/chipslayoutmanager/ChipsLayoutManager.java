@@ -23,13 +23,14 @@ import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouterFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.chipslayoutmanager.layouter.ILayouter;
+import com.beloo.widget.chipslayoutmanager.layouter.Item;
 import com.beloo.widget.chipslayoutmanager.layouter.LTRLayouterFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.RTLLayouterFactory;
-import com.beloo.widget.chipslayoutmanager.logger.EmptyFillLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IAdapterActionsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IFillLogger;
 import com.beloo.widget.chipslayoutmanager.logger.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -59,6 +60,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     /** map of views, which will be deleted after pre-layout */
     private SparseArray<View> removedViewCache = new SparseArray<>();
+
+    HashMap<Rect, List<Item>> visibleRowsMap = new HashMap<>();
 
     /**
      * storing state due orientation changes
@@ -114,6 +117,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     private AnchorViewState anchorView = AnchorViewState.getNotFoundState();
 
+    private int bufItemCount;
+
     private ChipsLayoutManager(Context context) {
         @DeviceOrientation
         int orientation = context.getResources().getConfiguration().orientation;
@@ -131,6 +136,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         AbstractLayouterFactory layouterFactory = isLayoutRTL() ?
                 new RTLLayouterFactory(this, viewPositionsStorage) : new LTRLayouterFactory(this, viewPositionsStorage);
         layouterFactory.setMaxViewsInRow(maxViewsInRow);
+        layouterFactory.setLayouterListener(layouter -> visibleRowsMap.put(layouter.getRowRect(), layouter.getCurrentRowItems()));
         return layouterFactory;
     }
 
@@ -287,6 +293,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
 
     @Override
+    public int getItemCount() {
+        return super.getItemCount();
+    }
+
+    @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
 
         //We have nothing to show for an empty data set but clear any existing views
@@ -294,6 +305,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             detachAndScrapAttachedViews(recycler);
             return;
         }
+
+        Log.w("onLayoutChildren","item count = " + getItemCount());
 
         if (isLayoutRTL() != isLayoutRTL) {
             //if layout direction changed programmatically we should clear anchors
@@ -312,13 +325,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             fill(recycler, anchorView);
         } else {
             Log.i("onLayoutChildren", "isPreLayout = true");
-            fillRemovedCache();
+            int additionalHeight = calcRemovedHeight();
             anchorView = getAnchorVisibleTopLeftView();
             detachAndScrapAttachedViews(recycler);
 
             //in case removing draw additional rows to show predictive animations
             AbstractLayouterFactory layouterFactory = createLayouterFactory();
-            layouterFactory.setAdditionalRowsCount(2);
+            Log.d(TAG, "additional height  = " + additionalHeight);
+            layouterFactory.setAdditionalHeight(additionalHeight);
 
             fill(recycler, layouterFactory, anchorView);
         }
@@ -349,16 +363,40 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
     }
 
+    private Rect containsInVisibleRow(View view) {
+        int left = getDecoratedLeft(view) + 1;
+        int top = getDecoratedTop(view) + 1;
+        for (Rect rect : visibleRowsMap.keySet()) {
+            if (rect.contains(left, top)) {
+                return rect;
+            }
+        }
+        throw new IllegalStateException("can't find view in visible rows");
+    }
 
-    /** during pre-layout fill cache of views, which will be removed after pre-layout */
-    private void fillRemovedCache() {
+    /** during pre-layout calculate approximate height which will be free after removing */
+    int calcRemovedHeight() {
+        int removedHeight = 0;
+
+        HashMap<Rect, Integer> highestDeletedViewInRowMap = new HashMap<>();
+
         for (View view : childViews) {
             RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) view.getLayoutParams();
 
             if (lp.isItemRemoved()) {
-                removedViewCache.put(lp.getViewLayoutPosition(), view);
+                Rect rowRect = containsInVisibleRow(view);
+                Integer maxHeight = highestDeletedViewInRowMap.get(rowRect);
+                maxHeight = maxHeight == null ? 0 : maxHeight;
+                int viewHeight = getDecoratedMeasuredHeight(view);
+                highestDeletedViewInRowMap.put(rowRect, Math.max(maxHeight, viewHeight));
             }
         }
+
+        for (Integer integer : highestDeletedViewInRowMap.values()) {
+            removedHeight += integer;
+        }
+
+        return removedHeight;
     }
 
     /**
