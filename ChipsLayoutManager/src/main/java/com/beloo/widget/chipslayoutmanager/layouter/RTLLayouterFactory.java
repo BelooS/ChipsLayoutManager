@@ -13,20 +13,36 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
     }
 
     public ILayouter getUpLayouter(@Nullable Rect anchorRect) {
-        AbstractLayouter layouter = new RTLUpLayouter(layoutManager, layoutManager.getChildGravityResolver(), cacheStorage,
-                anchorRect == null ? layoutManager.getPaddingTop() : anchorRect.top,
+        Rect offsetRect = new Rect(
                 //we shouldn't include anchor view here, so anchorLeft is a rightOffset
                 anchorRect == null ? layoutManager.getPaddingLeft() : anchorRect.right,
-                anchorRect == null ? layoutManager.getPaddingBottom() : anchorRect.bottom);
+                anchorRect == null ? layoutManager.getPaddingTop() : anchorRect.top,
+                0,
+                anchorRect == null ? layoutManager.getPaddingBottom() : anchorRect.bottom
+        );
+
+        AbstractLayouter layouter = new RTLUpLayouter(layoutManager,
+                layoutManager.getChildGravityResolver(),
+                cacheStorage,
+                offsetRect);
+
         layouter.setMaxViewsInRow(getMaxViewsInRow());
         return layouter;
     }
 
     public ILayouter getDownLayouter(@Nullable Rect anchorRect) {
-        AbstractLayouter layouter = new RTLDownLayouter(layoutManager, layoutManager.getChildGravityResolver(), cacheStorage,
+        Rect offsetRect = new Rect(
+                0,
                 anchorRect == null ? layoutManager.getPaddingTop() : anchorRect.top,
                 anchorRect == null ? layoutManager.getPaddingRight() : anchorRect.right,
-                anchorRect == null ? layoutManager.getPaddingBottom() : anchorRect.bottom);
+                anchorRect == null ? layoutManager.getPaddingBottom() : anchorRect.bottom
+        );
+
+        AbstractLayouter layouter = new RTLDownLayouter(layoutManager,
+                layoutManager.getChildGravityResolver(),
+                cacheStorage,
+                offsetRect);
+
         layouter.setMaxViewsInRow(getMaxViewsInRow());
         return layouter;
     }
