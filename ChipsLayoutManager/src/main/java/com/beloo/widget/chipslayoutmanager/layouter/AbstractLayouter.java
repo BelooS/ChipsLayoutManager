@@ -45,10 +45,10 @@ abstract class AbstractLayouter implements ILayouter {
     @Nullable
     private ILayouterListener layouterListener;
 
-    AbstractLayouter(ChipsLayoutManager layoutManager, int topOffset, int bottomOffset, IViewCacheStorage cacheStorage, IChildGravityResolver childGravityResolver) {
+    AbstractLayouter(ChipsLayoutManager layoutManager, Rect offsetRect, IViewCacheStorage cacheStorage, IChildGravityResolver childGravityResolver) {
         this.layoutManager = layoutManager;
-        this.rowTop = topOffset;
-        this.rowBottom = bottomOffset;
+        this.rowTop = offsetRect.top;
+        this.rowBottom = offsetRect.bottom;
         this.cacheStorage = cacheStorage;
         this.childGravityResolver = childGravityResolver;
     }

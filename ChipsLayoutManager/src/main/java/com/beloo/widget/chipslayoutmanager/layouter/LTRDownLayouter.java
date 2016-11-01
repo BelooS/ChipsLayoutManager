@@ -14,9 +14,9 @@ class LTRDownLayouter extends AbstractLayouter {
     LTRDownLayouter(ChipsLayoutManager layoutManager,
                     IChildGravityResolver childGravityResolver,
                     IViewCacheStorage cacheStorage,
-                    int topOffset, int leftOffset, int bottomOffset) {
-        super(layoutManager, topOffset, bottomOffset, cacheStorage, childGravityResolver);
-        viewLeft = leftOffset;
+                    Rect offsetRect) {
+        super(layoutManager, offsetRect, cacheStorage, childGravityResolver);
+        viewLeft = offsetRect.left;
     }
 
     @Override

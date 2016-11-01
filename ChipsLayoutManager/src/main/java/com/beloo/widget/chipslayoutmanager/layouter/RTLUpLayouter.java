@@ -17,10 +17,9 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     RTLUpLayouter(ChipsLayoutManager spanLayoutManager,
                   IChildGravityResolver childGravityResolver,
                   IViewCacheStorage cacheStorage,
-                  int topOffset, int leftOffset, int bottomOffset) {
-        super(spanLayoutManager, topOffset, bottomOffset, cacheStorage, childGravityResolver);
-        Log.d(TAG, "start bottom offset = " + bottomOffset);
-        this.viewLeft = leftOffset;
+                  Rect offsetRect) {
+        super(spanLayoutManager, offsetRect, cacheStorage, childGravityResolver);
+        this.viewLeft = offsetRect.left;
     }
 
     @Override

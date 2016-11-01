@@ -13,9 +13,9 @@ class RTLDownLayouter extends AbstractLayouter {
 
     RTLDownLayouter(ChipsLayoutManager layoutManager, IChildGravityResolver childGravityResolver,
                     IViewCacheStorage cacheStorage,
-                    int topOffset, int rightOffset, int bottomOffset) {
-        super(layoutManager, topOffset, bottomOffset, cacheStorage, childGravityResolver);
-        viewRight = rightOffset;
+                    Rect offsetRect) {
+        super(layoutManager, offsetRect, cacheStorage, childGravityResolver);
+        viewRight = offsetRect.right;
     }
 
     @Override
