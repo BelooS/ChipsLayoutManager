@@ -24,7 +24,8 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
         AbstractLayouter layouter = new RTLUpLayouter(layoutManager,
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
-                offsetRect);
+                offsetRect,
+                new CriteriaUpLayouterFinished());
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
         return layouter;
@@ -41,7 +42,8 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
         AbstractLayouter layouter = new RTLDownLayouter(layoutManager,
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
-                offsetRect);
+                offsetRect,
+                new CriteriaDownLayouterFinished());
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
         return layouter;

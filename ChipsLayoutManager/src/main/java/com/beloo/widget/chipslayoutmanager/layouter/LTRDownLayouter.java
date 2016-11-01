@@ -14,8 +14,9 @@ class LTRDownLayouter extends AbstractLayouter {
     LTRDownLayouter(ChipsLayoutManager layoutManager,
                     IChildGravityResolver childGravityResolver,
                     IViewCacheStorage cacheStorage,
-                    Rect offsetRect) {
-        super(layoutManager, offsetRect, cacheStorage, childGravityResolver);
+                    Rect offsetRect,
+                    IFinishingCriteria finishingCriteria) {
+        super(layoutManager, offsetRect, cacheStorage, childGravityResolver, finishingCriteria);
         viewLeft = offsetRect.left;
     }
 
@@ -64,10 +65,4 @@ class LTRDownLayouter extends AbstractLayouter {
 
         return super.onAttachView(view);
     }
-
-    @Override
-    public boolean isFinishedLayouting() {
-        return rowTop > getCanvasBottomBorder();
-    }
-
 }

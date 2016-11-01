@@ -23,7 +23,8 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
         AbstractLayouter layouter = new LTRUpLayouter(layoutManager,
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
-                offsetRect);
+                offsetRect,
+                new CriteriaUpLayouterFinished());
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
         return layouter;
@@ -42,7 +43,8 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
         AbstractLayouter layouter = new LTRDownLayouter(layoutManager,
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
-                offsetRect);
+                offsetRect,
+                new CriteriaDownLayouterFinished());
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
         return layouter;

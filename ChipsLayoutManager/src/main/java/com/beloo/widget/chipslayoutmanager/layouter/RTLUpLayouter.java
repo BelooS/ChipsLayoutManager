@@ -17,8 +17,9 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     RTLUpLayouter(ChipsLayoutManager spanLayoutManager,
                   IChildGravityResolver childGravityResolver,
                   IViewCacheStorage cacheStorage,
-                  Rect offsetRect) {
-        super(spanLayoutManager, offsetRect, cacheStorage, childGravityResolver);
+                  Rect offsetRect,
+                  IFinishingCriteria finishingCriteria) {
+        super(spanLayoutManager, offsetRect, cacheStorage, childGravityResolver, finishingCriteria);
         this.viewLeft = offsetRect.left;
     }
 
@@ -71,11 +72,6 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
         rowTop = Math.min(rowTop, getLayoutManager().getDecoratedTop(view));
 
         return super.onAttachView(view);
-    }
-
-    @Override
-    public boolean isFinishedLayouting() {
-        return rowBottom < getCanvasTopBorder();
     }
 
     @Override

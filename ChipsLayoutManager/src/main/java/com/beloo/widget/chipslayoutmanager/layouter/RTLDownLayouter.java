@@ -11,10 +11,12 @@ class RTLDownLayouter extends AbstractLayouter {
 
     private int viewRight;
 
-    RTLDownLayouter(ChipsLayoutManager layoutManager, IChildGravityResolver childGravityResolver,
+    RTLDownLayouter(ChipsLayoutManager layoutManager,
+                    IChildGravityResolver childGravityResolver,
                     IViewCacheStorage cacheStorage,
-                    Rect offsetRect) {
-        super(layoutManager, offsetRect, cacheStorage, childGravityResolver);
+                    Rect offsetRect,
+                    IFinishingCriteria finishingCriteria) {
+        super(layoutManager, offsetRect, cacheStorage, childGravityResolver, finishingCriteria);
         viewRight = offsetRect.right;
     }
 
@@ -62,11 +64,6 @@ class RTLDownLayouter extends AbstractLayouter {
         rowBottom = Math.max(rowBottom, getLayoutManager().getDecoratedBottom(view));
 
         return super.onAttachView(view);
-    }
-
-    @Override
-    public boolean isFinishedLayouting() {
-        return rowTop > getCanvasBottomBorder();
     }
 
 }

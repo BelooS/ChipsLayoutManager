@@ -15,8 +15,9 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     LTRUpLayouter(ChipsLayoutManager layoutManager,
                   IChildGravityResolver childGravityResolver,
                   IViewCacheStorage cacheStorage,
-                  Rect offsetRect) {
-        super(layoutManager, offsetRect, cacheStorage, childGravityResolver);
+                  Rect offsetRect,
+                  IFinishingCriteria finishingCriteria) {
+        super(layoutManager, offsetRect, cacheStorage, childGravityResolver, finishingCriteria);
         this.viewRight = offsetRect.right;
     }
 
@@ -70,11 +71,6 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
         rowTop = Math.min(rowTop, getLayoutManager().getDecoratedTop(view));
 
         return super.onAttachView(view);
-    }
-
-    @Override
-    public boolean isFinishedLayouting() {
-        return rowBottom < getCanvasTopBorder();
     }
 
     @Override

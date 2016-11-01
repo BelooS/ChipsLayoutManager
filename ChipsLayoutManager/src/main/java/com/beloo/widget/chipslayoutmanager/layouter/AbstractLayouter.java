@@ -2,6 +2,7 @@ package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
 import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Pair;
 import android.view.View;
@@ -39,18 +40,27 @@ abstract class AbstractLayouter implements ILayouter {
     private ChipsLayoutManager layoutManager;
     private IViewCacheStorage cacheStorage;
 
+    @NonNull
     private IChildGravityResolver childGravityResolver;
     private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
 
     @Nullable
     private ILayouterListener layouterListener;
 
-    AbstractLayouter(ChipsLayoutManager layoutManager, Rect offsetRect, IViewCacheStorage cacheStorage, IChildGravityResolver childGravityResolver) {
+    @NonNull
+    private IFinishingCriteria finishingCriteria;
+
+    AbstractLayouter(@NonNull ChipsLayoutManager layoutManager,
+                     @NonNull Rect offsetRect,
+                     IViewCacheStorage cacheStorage,
+                     @NonNull IChildGravityResolver childGravityResolver,
+                     @NonNull IFinishingCriteria finishingCriteria) {
         this.layoutManager = layoutManager;
         this.rowTop = offsetRect.top;
         this.rowBottom = offsetRect.bottom;
         this.cacheStorage = cacheStorage;
         this.childGravityResolver = childGravityResolver;
+        this.finishingCriteria = finishingCriteria;
     }
 
     final int getCanvasRightBorder() {
@@ -118,7 +128,9 @@ abstract class AbstractLayouter implements ILayouter {
     }
 
     /** if all necessary view have placed*/
-    abstract boolean isFinishedLayouting();
+    final boolean isFinishedLayouting() {
+        return finishingCriteria.isFinishedLayouting(this);
+    }
 
     /** check if we can not add current view to row*/
     @CallSuper
