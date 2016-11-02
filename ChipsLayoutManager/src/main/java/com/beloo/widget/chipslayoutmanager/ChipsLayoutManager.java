@@ -324,11 +324,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         calcRecyclerCacheSize(recycler);
 
         if (!state.isPreLayout()) {
-//            layoutDisappearingViews(recycler);
             detachAndScrapAttachedViews(recycler);
             fill(recycler, anchorView);
+            layoutDisappearingViews(recycler);
         } else {
-            int additionalHeight = calcRemovedHeight();
+            int additionalHeight = calcDisappearingViewsHeight(recycler);
             predictiveAnimationsLogger.heightOfCanvas(this);
             predictiveAnimationsLogger.onSummarizedDeletingItemsHeightCalculated(additionalHeight);
             anchorView = getAnchorVisibleTopLeftView();
@@ -348,6 +348,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     private void layoutDisappearingViews(RecyclerView.Recycler recycler) {
         final List<RecyclerView.ViewHolder> scrapList = recycler.getScrapList();
+        //views which moved from screen, but not deleted
         final HashSet<View> disappearingViews = new HashSet<>(scrapList.size());
 
         for (RecyclerView.ViewHolder holder : scrapList) {
@@ -378,8 +379,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         throw new IllegalStateException("can't find view in visible rows");
     }
 
-    /** during pre-layout calculate approximate height which will be free after removing */
-    int calcRemovedHeight() {
+    /** during pre-layout calculate approximate height which will be free after moving items offscreen (removed or moved) */
+    int calcDisappearingViewsHeight(RecyclerView.Recycler recycler) {
         int removedHeight = 0;
 
         HashMap<Rect, Integer> highestDeletedViewInRowMap = new HashMap<>();
@@ -387,7 +388,19 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         for (View view : childViews) {
             RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) view.getLayoutParams();
 
-            if (lp.isItemRemoved()) {
+            boolean probablyMovedFromScreen = false;
+
+            if (!lp.isItemRemoved()) {
+                //view won't be removed, but maybe it moved offscreen
+                int pos = lp.getViewLayoutPosition();
+                int lowestPosition = highestView == null? Integer.MIN_VALUE : getPosition(highestView);
+                int highestPosition = lowestView == null? Integer.MAX_VALUE : getPosition(lowestView);
+
+                pos = recycler.convertPreLayoutPositionToPostLayout(pos);
+                probablyMovedFromScreen = pos < lowestPosition || pos > highestPosition;
+            }
+
+            if (lp.isItemRemoved() || probablyMovedFromScreen) {
                 deletingItemsOnScreenCount++;
                 Rect rowRect = containsInVisibleRow(view);
                 Integer maxHeight = highestDeletedViewInRowMap.get(rowRect);
