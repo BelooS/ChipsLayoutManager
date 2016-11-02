@@ -346,7 +346,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         autoMeasureHeight = getHeight();
     }
 
-    private void layoutDisappearingViews(RecyclerView.Recycler recycler) {
+    private HashSet<View> layoutDisappearingViews(RecyclerView.Recycler recycler) {
         final List<RecyclerView.ViewHolder> scrapList = recycler.getScrapList();
         //views which moved from screen, but not deleted
         final HashSet<View> disappearingViews = new HashSet<>(scrapList.size());
@@ -359,14 +359,16 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             }
         }
 
-        for (View view : disappearingViews) {
-            addDisappearingView(view);
-            int width = getDecoratedMeasuredWidth(view);
-            int height = getDecoratedMeasuredHeight(view);
+//        for (View view : disappearingViews) {
+//            addDisappearingView(view);
+//            int width = getDecoratedMeasuredWidth(view);
+//            int height = getDecoratedMeasuredHeight(view);
+//
+//            //todo try to find position in cache.
+//            layoutDecorated(view, 0, getHeight() + 100, width, getHeight() + 100 + height);
+//        }
 
-            //todo try to find position in cache.
-            layoutDecorated(view, 0, getHeight() + 100, width, getHeight() + 100 + height);
-        }
+        return disappearingViews;
     }
 
     private Rect containsInVisibleRow(View view) {
