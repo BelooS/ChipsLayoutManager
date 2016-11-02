@@ -31,8 +31,8 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
                 offsetRect,
-                new CriteriaAdditionalRow(new CriteriaUpLayouterFinished(), getAdditionalRowsCount()),
-                new RealTopPlacer(layoutManager));
+                getUpFinishingCriteria(),
+                getTopPlacer());
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
         layouter.addLayouterListener(getLayouterListener());
@@ -56,12 +56,8 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
                 offsetRect,
-                new CriteriaAdditionalHeight(
-                        new CriteriaAdditionalRow(
-                                new CriteriaDownLayouterFinished(),
-                                getAdditionalRowsCount()),
-                        getAdditionalHeight()),
-                new RealBottomPlacer(layoutManager));
+                getDownFinishingCriteria(),
+                getBottomPlacer());
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
         layouter.addLayouterListener(getLayouterListener());
