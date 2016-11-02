@@ -28,6 +28,7 @@ import com.beloo.widget.chipslayoutmanager.layouter.LTRLayouterFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.RTLLayouterFactory;
 import com.beloo.widget.chipslayoutmanager.logger.IAdapterActionsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IFillLogger;
+import com.beloo.widget.chipslayoutmanager.logger.IPredictiveAnimationsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.LoggerFactory;
 
 import java.util.HashMap;
@@ -71,6 +72,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     //---loggers below
     private IFillLogger logger;
     private IAdapterActionsLogger adapterActionsLogger;
+    private IPredictiveAnimationsLogger predictiveAnimationsLogger;
     //--- end loggers
 
 
@@ -127,6 +129,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         LoggerFactory loggerFactory = new LoggerFactory();
         logger = loggerFactory.getFillLogger();
         adapterActionsLogger = loggerFactory.getAdapterActionsLogger();
+        predictiveAnimationsLogger = loggerFactory.getPredictiveAnimationsLogger();
 
         viewPositionsStorage = new ViewCacheFactory(this).createCacheStorage();
         setAutoMeasureEnabled(true);
@@ -308,7 +311,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return;
         }
 
-        Log.w("onLayoutChildren","item count = " + getItemCount());
+        predictiveAnimationsLogger.logState(state);
 
         if (isLayoutRTL() != isLayoutRTL) {
             //if layout direction changed programmatically we should clear anchors
@@ -321,20 +324,18 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         calcRecyclerCacheSize(recycler);
 
         if (!state.isPreLayout()) {
-            Log.i("onLayoutChildren", "isPreLayout = false");
 //            layoutDisappearingViews(recycler);
             detachAndScrapAttachedViews(recycler);
             fill(recycler, anchorView);
         } else {
-            Log.i("onLayoutChildren", "isPreLayout = true");
             int additionalHeight = calcRemovedHeight();
+            predictiveAnimationsLogger.heightOfCanvas(this);
+            predictiveAnimationsLogger.onSummarizedDeletingItemsHeightCalculated(additionalHeight);
             anchorView = getAnchorVisibleTopLeftView();
             detachAndScrapAttachedViews(recycler);
 
             //in case removing draw additional rows to show predictive animations
             AbstractLayouterFactory layouterFactory = createLayouterFactory();
-            Log.d(TAG, "height =" + getHeight());
-            Log.d(TAG, "additional height  = " + additionalHeight);
             layouterFactory.setAdditionalHeight(additionalHeight);
 
             fill(recycler, layouterFactory, anchorView);

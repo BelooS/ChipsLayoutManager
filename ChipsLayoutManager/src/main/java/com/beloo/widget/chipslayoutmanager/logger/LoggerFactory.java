@@ -12,4 +12,9 @@ public class LoggerFactory {
     public IAdapterActionsLogger getAdapterActionsLogger() {
         return new EmptyAdapterActionsLogger();
     }
+
+    @NonNull
+    public IPredictiveAnimationsLogger getPredictiveAnimationsLogger() {
+        return new PredictiveAnimationsLogger();
+    }
 }
