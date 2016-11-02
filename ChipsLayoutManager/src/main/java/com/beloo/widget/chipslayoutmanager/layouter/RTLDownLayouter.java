@@ -6,6 +6,7 @@ import android.view.View;
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 
 class RTLDownLayouter extends AbstractLayouter {
 
@@ -15,8 +16,9 @@ class RTLDownLayouter extends AbstractLayouter {
                     IChildGravityResolver childGravityResolver,
                     IViewCacheStorage cacheStorage,
                     Rect offsetRect,
-                    IFinishingCriteria finishingCriteria) {
-        super(layoutManager, offsetRect, cacheStorage, childGravityResolver, finishingCriteria);
+                    IFinishingCriteria finishingCriteria,
+                    IPlacer placer) {
+        super(layoutManager, offsetRect, cacheStorage, childGravityResolver, finishingCriteria, placer);
         viewRight = offsetRect.right;
     }
 
@@ -30,12 +32,6 @@ class RTLDownLayouter extends AbstractLayouter {
         //go to next row, increase top coordinate, reset left
         viewRight = getCanvasRightBorder();
         rowTop = rowBottom;
-    }
-
-
-    @Override
-    void addView(View view) {
-        getLayoutManager().addView(view);
     }
 
     @Override

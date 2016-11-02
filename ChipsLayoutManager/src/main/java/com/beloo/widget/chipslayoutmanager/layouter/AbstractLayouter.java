@@ -16,6 +16,7 @@ import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.GravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifier;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 
 abstract class AbstractLayouter implements ILayouter {
     int currentViewWidth;
@@ -49,17 +50,22 @@ abstract class AbstractLayouter implements ILayouter {
     @NonNull
     private IFinishingCriteria finishingCriteria;
 
+    @NonNull
+    private IPlacer placer;
+
     AbstractLayouter(@NonNull ChipsLayoutManager layoutManager,
                      @NonNull Rect offsetRect,
                      IViewCacheStorage cacheStorage,
                      @NonNull IChildGravityResolver childGravityResolver,
-                     @NonNull IFinishingCriteria finishingCriteria) {
+                     @NonNull IFinishingCriteria finishingCriteria,
+                     @NonNull IPlacer placer) {
         this.layoutManager = layoutManager;
         this.rowTop = offsetRect.top;
         this.rowBottom = offsetRect.bottom;
         this.cacheStorage = cacheStorage;
         this.childGravityResolver = childGravityResolver;
         this.finishingCriteria = finishingCriteria;
+        this.placer = placer;
     }
 
     final int getCanvasRightBorder() {
@@ -149,7 +155,7 @@ abstract class AbstractLayouter implements ILayouter {
     }
 
     /** if all necessary view have placed*/
-    final boolean isFinishedLayouting() {
+    boolean isFinishedLayouting() {
         return finishingCriteria.isFinishedLayouting(this);
     }
 
@@ -163,7 +169,9 @@ abstract class AbstractLayouter implements ILayouter {
     abstract Rect createViewRect(View view);
 
     /** add view to layout manager */
-    abstract void addView(View view);
+    void addView(View view) {
+        placer.addView(view);
+    }
 
     /** called when layouter ready to add row to canvas. Children could perform normalization actions on created row*/
     abstract void onPreLayout();

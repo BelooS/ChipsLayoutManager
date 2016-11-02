@@ -8,6 +8,7 @@ import android.view.View;
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 
 class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     private static final String TAG = RTLUpLayouter.class.getSimpleName();
@@ -18,14 +19,10 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
                   IChildGravityResolver childGravityResolver,
                   IViewCacheStorage cacheStorage,
                   Rect offsetRect,
-                  IFinishingCriteria finishingCriteria) {
-        super(spanLayoutManager, offsetRect, cacheStorage, childGravityResolver, finishingCriteria);
+                  IFinishingCriteria finishingCriteria,
+                  IPlacer placer) {
+        super(spanLayoutManager, offsetRect, cacheStorage, childGravityResolver, finishingCriteria, placer);
         this.viewLeft = offsetRect.left;
-    }
-
-    @Override
-    void addView(View view) {
-        getLayoutManager().addView(view, 0);
     }
 
     @Override

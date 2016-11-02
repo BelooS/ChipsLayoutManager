@@ -6,6 +6,8 @@ import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.RealBottomPlacer;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.RealTopPlacer;
 
 public class LTRLayouterFactory extends AbstractLayouterFactory {
 
@@ -29,7 +31,8 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
                 offsetRect,
-                new CriteriaAdditionalRow(new CriteriaUpLayouterFinished(), getAdditionalRowsCount()));
+                new CriteriaAdditionalRow(new CriteriaUpLayouterFinished(), getAdditionalRowsCount()),
+                new RealTopPlacer(layoutManager));
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
         layouter.addLayouterListener(getLayouterListener());
@@ -57,7 +60,8 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
                         new CriteriaAdditionalRow(
                                 new CriteriaDownLayouterFinished(),
                                 getAdditionalRowsCount()),
-                        getAdditionalHeight()));
+                        getAdditionalHeight()),
+                new RealBottomPlacer(layoutManager));
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
         layouter.addLayouterListener(getLayouterListener());
