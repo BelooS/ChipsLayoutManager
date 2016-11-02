@@ -18,7 +18,7 @@ import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifier;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 
-abstract class AbstractLayouter implements ILayouter {
+public abstract class AbstractLayouter implements ILayouter {
     int currentViewWidth;
     int currentViewHeight;
     private int currentViewPosition;
@@ -237,7 +237,7 @@ abstract class AbstractLayouter implements ILayouter {
         gravityModifier.modifyChildRect(rowTop, rowBottom, viewRect);
     }
 
-    ChipsLayoutManager getLayoutManager() {
+    public ChipsLayoutManager getLayoutManager() {
         return layoutManager;
     }
 
