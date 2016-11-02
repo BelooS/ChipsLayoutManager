@@ -23,12 +23,16 @@ import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouterFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.chipslayoutmanager.layouter.ILayouter;
+import com.beloo.widget.chipslayoutmanager.layouter.Item;
 import com.beloo.widget.chipslayoutmanager.layouter.LTRLayouterFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.RTLLayouterFactory;
-import com.beloo.widget.chipslayoutmanager.logger.EmptyFillLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IAdapterActionsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IFillLogger;
 import com.beloo.widget.chipslayoutmanager.logger.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
@@ -56,6 +60,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     /** map of views, which will be deleted after pre-layout */
     private SparseArray<View> removedViewCache = new SparseArray<>();
+
+    HashMap<Rect, List<Item>> visibleRowsMap = new HashMap<>();
 
     /**
      * storing state due orientation changes
@@ -111,6 +117,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     private AnchorViewState anchorView = AnchorViewState.getNotFoundState();
 
+    private int deletingItemsCount;
+
     private ChipsLayoutManager(Context context) {
         @DeviceOrientation
         int orientation = context.getResources().getConfiguration().orientation;
@@ -128,6 +136,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         AbstractLayouterFactory layouterFactory = isLayoutRTL() ?
                 new RTLLayouterFactory(this, viewPositionsStorage) : new LTRLayouterFactory(this, viewPositionsStorage);
         layouterFactory.setMaxViewsInRow(maxViewsInRow);
+        layouterFactory.setLayouterListener(layouter -> visibleRowsMap.put(layouter.getRowRect(), layouter.getCurrentRowItems()));
         return layouterFactory;
     }
 
@@ -239,6 +248,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 setAutoMeasureEnabled(false);
             }
         });
+
         removeAllViews();
     }
 
@@ -272,17 +282,25 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 //        }
 //        Log.d(TAG, "STORE. orientation = " + orientation + " normalizationPos = " + storedNormalizationPosition);
 //
-//        container.putNormalizationPosition(orientation, storedNormalizationPosition);
+//        container.putNormalizationPosition(orientation, storedNormalizatdionPosition);
 
         return container;
     }
 
     @Override
-    public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+    public boolean supportsPredictiveItemAnimations() {
+        return true;
+    }
 
-        if (state.isPreLayout()) {
-            Log.i("onLayoutChildren", "isPreLayout = true");
-        }
+
+    @Override
+    public int getItemCount() {
+        //in pre-layouter drawing we need item count with items will be actually deleted to pre-draw appearing items properly
+        return super.getItemCount() + deletingItemsCount;
+    }
+
+    @Override
+    public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
 
         //We have nothing to show for an empty data set but clear any existing views
         if (getItemCount() == 0) {
@@ -290,136 +308,99 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return;
         }
 
+        Log.w("onLayoutChildren","item count = " + getItemCount());
+
         if (isLayoutRTL() != isLayoutRTL) {
             //if layout direction changed programmatically we should clear anchors
             isLayoutRTL = isLayoutRTL();
             viewPositionsStorage.purge();
+            //so detach all views before we start searching for anchor view
             detachAndScrapAttachedViews(recycler);
         }
 
         calcRecyclerCacheSize(recycler);
 
         if (!state.isPreLayout()) {
+            Log.i("onLayoutChildren", "isPreLayout = false");
+            layoutDisappearingViews(recycler);
+            detachAndScrapAttachedViews(recycler);
+            fill(recycler, anchorView);
+        } else {
+            Log.i("onLayoutChildren", "isPreLayout = true");
+            int additionalHeight = calcRemovedHeight();
+            anchorView = getAnchorVisibleTopLeftView();
             detachAndScrapAttachedViews(recycler);
 
-            if (!anchorView.isNotFoundState() && anchorView.getPosition() == 0) {
-                //we can't add view in a hidden area if added view inserted on a zero position. so needed workaround here, we reset anchor position to 0
-                //for properly insertion only
-                fill(recycler, anchorView, anchorView.getPosition());
-            } else {
-                fill(recycler, anchorView);
-            }
-        } else {
-            anchorView = getAnchorVisibleTopLeftView();
+            //in case removing draw additional rows to show predictive animations
+            AbstractLayouterFactory layouterFactory = createLayouterFactory();
+            Log.d(TAG, "height =" + getHeight());
+            Log.d(TAG, "additional height  = " + additionalHeight);
+            layouterFactory.setAdditionalHeight(additionalHeight);
+
+            fill(recycler, layouterFactory, anchorView);
         }
+
+        deletingItemsCount = 0;
 
         autoMeasureHeight = getHeight();
     }
 
-    @Override
-    public void onMeasure(RecyclerView.Recycler recycler, RecyclerView.State state, int widthSpec, int heightSpec) {
-        super.onMeasure(recycler, state, widthSpec, heightSpec);
+    private void layoutDisappearingViews(RecyclerView.Recycler recycler) {
+        final List<RecyclerView.ViewHolder> scrapList = recycler.getScrapList();
+        final HashSet<View> disappearingViews = new HashSet<>(scrapList.size());
 
-        if (!isAutoMeasureEnabled()) {
-            // we should perform measuring manually
-            // so request animations
-            requestSimpleAnimationsInNextLayout();
-            //keep height until remove animation will be completed
-            setMeasuredDimension(View.MeasureSpec.getSize(widthSpec), beforeRemovingHeight);
-        }
-    }
-
-    @Override
-    public void onItemsRemoved(final RecyclerView recyclerView, int positionStart, int itemCount) {
-        adapterActionsLogger.onItemsRemoved(positionStart, itemCount);
-        super.onItemsRemoved(recyclerView, positionStart, itemCount);
-        onLayoutUpdatedFromPosition(positionStart);
-
-        //subscribe to next animations tick
-        postOnAnimation(() -> {
-            //listen removing animation
-            recyclerView.getItemAnimator().isRunning(() -> {
-                //when removing animation finished return auto-measuring back
-                setAutoMeasureEnabled(true);
-                // and process onMeasure again
-                requestLayout();
-            });
-        });
-    }
-
-    @Override
-    public void onItemsAdded(RecyclerView recyclerView, int positionStart, int itemCount) {
-        adapterActionsLogger.onItemsAdded(positionStart, itemCount);
-        super.onItemsAdded(recyclerView, positionStart, itemCount);
-        onLayoutUpdatedFromPosition(positionStart);
-    }
-
-    @Override
-    public void onItemsChanged(RecyclerView recyclerView) {
-        adapterActionsLogger.onItemsChanged();
-        super.onItemsChanged(recyclerView);
-        viewPositionsStorage.purge();
-        onLayoutUpdatedFromPosition(0);
-    }
-
-    @Override
-    public void onItemsUpdated(RecyclerView recyclerView, int positionStart, int itemCount) {
-        adapterActionsLogger.onItemsUpdated(positionStart, itemCount);
-        super.onItemsUpdated(recyclerView, positionStart, itemCount);
-        onLayoutUpdatedFromPosition(positionStart);
-    }
-
-    @Override
-    public void onItemsUpdated(RecyclerView recyclerView, int positionStart, int itemCount, Object payload) {
-        onItemsUpdated(recyclerView, positionStart, itemCount);
-    }
-
-    @Override
-    public void onItemsMoved(RecyclerView recyclerView, int from, int to, int itemCount) {
-        adapterActionsLogger.onItemsMoved(from, to, itemCount);
-        super.onItemsMoved(recyclerView, from, to, itemCount);
-        onLayoutUpdatedFromPosition(from);
-    }
-
-    private void onLayoutUpdatedFromPosition(int position) {
-        viewPositionsStorage.purgeCacheFromPosition(position);
-        int startRowPos = viewPositionsStorage.getStartOfRow(position);
-        cacheNormalizationPosition = cacheNormalizationPosition == null ?
-                startRowPos : Math.min(cacheNormalizationPosition, startRowPos);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean canScrollVertically() {
-        findHighestAndLowestViews();
-        if (getChildCount() > 0) {
-            View view = getChildAt(0);
-            View lastChild = getChildAt(getChildCount() - 1);
-
-            int firstViewPosition = getPosition(view);
-            int lastViewPosition = getPosition(lastChild);
-
-            int top = getDecoratedTop(highestView);
-            int bottom = getDecoratedBottom(lowestView);
-
-            if (firstViewPosition == 0
-                    && lastViewPosition == getItemCount() - 1
-                    && top >= getPaddingTop()
-                    && bottom <= getHeight() - getPaddingBottom()) {
-                return false;
+        for (RecyclerView.ViewHolder holder : scrapList) {
+            final View child = holder.itemView;
+            final RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) child.getLayoutParams();
+            if (!lp.isItemRemoved()) {
+                disappearingViews.add(child);
             }
-        } else {
-            return false;
         }
 
-        return isScrollingEnabledContract;
+        for (View view : disappearingViews) {
+            addDisappearingView(view);
+            int width = getDecoratedMeasuredWidth(view);
+
+            //todo try to find position in cache.
+            layoutDecorated(view, 0, getHeight() + 100, width, getHeight() + 100 + getDecoratedBottom(view));
+        }
     }
 
-    @Override
-    public boolean supportsPredictiveItemAnimations() {
-        return true;
+    private Rect containsInVisibleRow(View view) {
+        int left = getDecoratedLeft(view) + 1;
+        int top = getDecoratedTop(view) + 1;
+        for (Rect rect : visibleRowsMap.keySet()) {
+            if (rect.contains(left, top)) {
+                return rect;
+            }
+        }
+        throw new IllegalStateException("can't find view in visible rows");
+    }
+
+    /** during pre-layout calculate approximate height which will be free after removing */
+    int calcRemovedHeight() {
+        int removedHeight = 0;
+
+        HashMap<Rect, Integer> highestDeletedViewInRowMap = new HashMap<>();
+
+        for (View view : childViews) {
+            RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) view.getLayoutParams();
+
+            if (lp.isItemRemoved()) {
+                deletingItemsCount++;
+                Rect rowRect = containsInVisibleRow(view);
+                Integer maxHeight = highestDeletedViewInRowMap.get(rowRect);
+                maxHeight = maxHeight == null ? 0 : maxHeight;
+                int viewHeight = getDecoratedMeasuredHeight(view);
+                highestDeletedViewInRowMap.put(rowRect, Math.max(maxHeight, viewHeight));
+            }
+        }
+
+        for (Integer integer : highestDeletedViewInRowMap.values()) {
+            removedHeight += integer;
+        }
+
+        return removedHeight;
     }
 
     /**
@@ -459,17 +440,15 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /**
      * place all views on theirs right places according to current state
      */
-    private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView) {
-        int anchorPos = anchorView.getPosition();
-
-        fill(recycler, anchorView, anchorPos);
+    private void fill (RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView) {
+        fill(recycler, createLayouterFactory(), anchorView);
     }
 
     /**
      * place all views on theirs right places according to current state
      */
-    private void fill(RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView, int startingPos) {
-
+    private void fill(RecyclerView.Recycler recycler, AbstractLayouterFactory layouterFactory, @NonNull AnchorViewState anchorView) {
+        int startingPos = anchorView.getPosition();
         Rect anchorRect = anchorView.getAnchorViewRect();
 
         fillCache();
@@ -478,8 +457,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         for (int i = 0; i < viewCache.size(); i++) {
             detachView(viewCache.valueAt(i));
         }
-
-        AbstractLayouterFactory layouterFactory = createLayouterFactory();
 
         logger.onBeforeLayouter(anchorView);
 
@@ -564,6 +541,36 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         int viewsInRow = maxViewsInRow == null ? INT_ROW_SIZE_APPROXIMATELY_FOR_CACHE : maxViewsInRow;
         recycler.setViewCacheSize((int) (viewsInRow * FAST_SCROLLING_COEFFICIENT));
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean canScrollVertically() {
+        findHighestAndLowestViews();
+        if (getChildCount() > 0) {
+            View view = getChildAt(0);
+            View lastChild = getChildAt(getChildCount() - 1);
+
+            int firstViewPosition = getPosition(view);
+            int lastViewPosition = getPosition(lastChild);
+
+            int top = getDecoratedTop(highestView);
+            int bottom = getDecoratedBottom(lowestView);
+
+            if (firstViewPosition == 0
+                    && lastViewPosition == getItemCount() - 1
+                    && top >= getPaddingTop()
+                    && bottom <= getHeight() - getPaddingBottom()) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+        return isScrollingEnabledContract;
+    }
+
 
     /**
      * calculate offset of views while scrolling, layout items on new places
@@ -771,6 +778,78 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         };
         scroller.setTargetPosition(position);
         startSmoothScroll(scroller);
+    }
+
+    @Override
+    public void onMeasure(RecyclerView.Recycler recycler, RecyclerView.State state, int widthSpec, int heightSpec) {
+        super.onMeasure(recycler, state, widthSpec, heightSpec);
+
+        if (!isAutoMeasureEnabled()) {
+            // we should perform measuring manually
+            // so request animations
+            requestSimpleAnimationsInNextLayout();
+            //keep height until remove animation will be completed
+            setMeasuredDimension(View.MeasureSpec.getSize(widthSpec), beforeRemovingHeight);
+        }
+    }
+
+    @Override
+    public void onItemsRemoved(final RecyclerView recyclerView, int positionStart, int itemCount) {
+        adapterActionsLogger.onItemsRemoved(positionStart, itemCount);
+        super.onItemsRemoved(recyclerView, positionStart, itemCount);
+        onLayoutUpdatedFromPosition(positionStart);
+
+        //subscribe to next animations tick
+        postOnAnimation(() -> {
+            //listen removing animation
+            recyclerView.getItemAnimator().isRunning(() -> {
+                //when removing animation finished return auto-measuring back
+                setAutoMeasureEnabled(true);
+                // and process onMeasure again
+                requestLayout();
+            });
+        });
+    }
+
+    @Override
+    public void onItemsAdded(RecyclerView recyclerView, int positionStart, int itemCount) {
+        adapterActionsLogger.onItemsAdded(positionStart, itemCount);
+        super.onItemsAdded(recyclerView, positionStart, itemCount);
+        onLayoutUpdatedFromPosition(positionStart);
+    }
+
+    @Override
+    public void onItemsChanged(RecyclerView recyclerView) {
+        adapterActionsLogger.onItemsChanged();
+        super.onItemsChanged(recyclerView);
+        viewPositionsStorage.purge();
+        onLayoutUpdatedFromPosition(0);
+    }
+
+    @Override
+    public void onItemsUpdated(RecyclerView recyclerView, int positionStart, int itemCount) {
+        adapterActionsLogger.onItemsUpdated(positionStart, itemCount);
+        super.onItemsUpdated(recyclerView, positionStart, itemCount);
+        onLayoutUpdatedFromPosition(positionStart);
+    }
+
+    @Override
+    public void onItemsUpdated(RecyclerView recyclerView, int positionStart, int itemCount, Object payload) {
+        onItemsUpdated(recyclerView, positionStart, itemCount);
+    }
+
+    @Override
+    public void onItemsMoved(RecyclerView recyclerView, int from, int to, int itemCount) {
+        adapterActionsLogger.onItemsMoved(from, to, itemCount);
+        super.onItemsMoved(recyclerView, from, to, itemCount);
+        onLayoutUpdatedFromPosition(from);
+    }
+
+    private void onLayoutUpdatedFromPosition(int position) {
+        viewPositionsStorage.purgeCacheFromPosition(position);
+        int startRowPos = viewPositionsStorage.getStartOfRow(position);
+        cacheNormalizationPosition = cacheNormalizationPosition == null ?
+                startRowPos : Math.min(cacheNormalizationPosition, startRowPos);
     }
 
 }

@@ -2,6 +2,7 @@ package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
 import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Pair;
 import android.view.View;
@@ -39,18 +40,26 @@ abstract class AbstractLayouter implements ILayouter {
     private ChipsLayoutManager layoutManager;
     private IViewCacheStorage cacheStorage;
 
+    @NonNull
     private IChildGravityResolver childGravityResolver;
     private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
 
-    @Nullable
-    private ILayouterListener layouterListener;
+    private List<ILayouterListener> layouterListeners = new LinkedList<>();
 
-    AbstractLayouter(ChipsLayoutManager layoutManager, Rect offsetRect, IViewCacheStorage cacheStorage, IChildGravityResolver childGravityResolver) {
+    @NonNull
+    private IFinishingCriteria finishingCriteria;
+
+    AbstractLayouter(@NonNull ChipsLayoutManager layoutManager,
+                     @NonNull Rect offsetRect,
+                     IViewCacheStorage cacheStorage,
+                     @NonNull IChildGravityResolver childGravityResolver,
+                     @NonNull IFinishingCriteria finishingCriteria) {
         this.layoutManager = layoutManager;
         this.rowTop = offsetRect.top;
         this.rowBottom = offsetRect.bottom;
         this.cacheStorage = cacheStorage;
         this.childGravityResolver = childGravityResolver;
+        this.finishingCriteria = finishingCriteria;
     }
 
     final int getCanvasRightBorder() {
@@ -59,6 +68,14 @@ abstract class AbstractLayouter implements ILayouter {
 
     final int getCanvasBottomBorder() {
         return layoutManager.getHeight();
+    }
+
+    public List<Item> getCurrentRowItems() {
+        List<Item> items = new LinkedList<>();
+        for (Pair<Rect, View> rowView : rowViews) {
+            items.add(new Item(rowView.first, layoutManager.getPosition(rowView.second)));
+        }
+        return items;
     }
 
     final int getCanvasLeftBorder() {
@@ -77,9 +94,22 @@ abstract class AbstractLayouter implements ILayouter {
         return cacheStorage;
     }
 
+    public void addLayouterListener(ILayouterListener layouterListener) {
+        if (layouterListener != null)
+            layouterListeners.add(layouterListener);
+    }
+
     @Override
-    public void setLayouterListener(ILayouterListener layouterListener) {
-        this.layouterListener = layouterListener;
+    public void removeLayouterListener(ILayouterListener layouterListener) {
+        layouterListeners.remove(layouterListener);
+    }
+
+    private void notifyLayouterListeners() {
+        if (rowSize > 0) {
+            for (ILayouterListener layouterListener : layouterListeners) {
+                layouterListener.onLayoutRow(this);
+            }
+        }
     }
 
     @Override
@@ -119,7 +149,9 @@ abstract class AbstractLayouter implements ILayouter {
     }
 
     /** if all necessary view have placed*/
-    abstract boolean isFinishedLayouting();
+    final boolean isFinishedLayouting() {
+        return finishingCriteria.isFinishedLayouting(this);
+    }
 
     /** check if we can not add current view to row*/
     @CallSuper
@@ -178,9 +210,7 @@ abstract class AbstractLayouter implements ILayouter {
             layoutManager.layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
         }
 
-        if (layouterListener != null) {
-            layouterListener.onLayoutRow(this);
-        }
+        notifyLayouterListeners();
 
         onAfterLayout();
 
@@ -211,6 +241,11 @@ abstract class AbstractLayouter implements ILayouter {
     @Override
     public int getRowTop() {
         return rowTop;
+    }
+
+    @Override
+    public Rect getRowRect() {
+        return new Rect(getCanvasLeftBorder(), rowTop, getCanvasRightBorder(), getRowBottom());
     }
 
     @Override

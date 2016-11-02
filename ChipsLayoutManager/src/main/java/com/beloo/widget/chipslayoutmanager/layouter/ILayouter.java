@@ -1,6 +1,11 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
+import android.graphics.Rect;
+import android.support.annotation.Nullable;
+import android.util.Pair;
 import android.view.View;
+
+import java.util.List;
 
 public interface ILayouter {
     /** add views from current row to layout*/
@@ -26,8 +31,13 @@ public interface ILayouter {
     /** @return size of previous row*/
     int getPreviousRowSize();
 
-    /** @param layouterListener listener to layouter events*/
-    void setLayouterListener(ILayouterListener layouterListener);
+    List<Item> getCurrentRowItems();
+
+    Rect getRowRect();
+
+    void addLayouterListener(ILayouterListener layouterListener);
+
+    void removeLayouterListener(ILayouterListener layouterListener);
 
     AbstractPositionIterator positionIterator();
 }
