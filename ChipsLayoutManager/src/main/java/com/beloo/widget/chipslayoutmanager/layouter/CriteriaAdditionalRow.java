@@ -19,7 +19,7 @@ public class CriteriaAdditionalRow extends FinishingCriteriaDecorator implements
             abstractLayouter.addLayouterListener(this);
         }
 
-        return super.isFinishedLayouting(abstractLayouter) && requiredRowsCount == additionalRowsCount;
+        return super.isFinishedLayouting(abstractLayouter) && additionalRowsCount >= requiredRowsCount;
     }
 
     @Override

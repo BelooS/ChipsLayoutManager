@@ -117,7 +117,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     private AnchorViewState anchorView = AnchorViewState.getNotFoundState();
 
-    private int bufItemCount;
+    private int deletingItemsCount;
 
     private ChipsLayoutManager(Context context) {
         @DeviceOrientation
@@ -248,6 +248,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 setAutoMeasureEnabled(false);
             }
         });
+
         removeAllViews();
     }
 
@@ -281,7 +282,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 //        }
 //        Log.d(TAG, "STORE. orientation = " + orientation + " normalizationPos = " + storedNormalizationPosition);
 //
-//        container.putNormalizationPosition(orientation, storedNormalizationPosition);
+//        container.putNormalizationPosition(orientation, storedNormalizatdionPosition);
 
         return container;
     }
@@ -294,7 +295,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public int getItemCount() {
-        return super.getItemCount();
+        //in pre-layouter drawing we need item count with items will be actually deleted to pre-draw appearing items properly
+        return super.getItemCount() + deletingItemsCount;
     }
 
     @Override
@@ -331,13 +333,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             //in case removing draw additional rows to show predictive animations
             AbstractLayouterFactory layouterFactory = createLayouterFactory();
+            Log.d(TAG, "height =" + getHeight());
             Log.d(TAG, "additional height  = " + additionalHeight);
             layouterFactory.setAdditionalHeight(additionalHeight);
 
             fill(recycler, layouterFactory, anchorView);
         }
 
-
+        deletingItemsCount = 0;
 
         autoMeasureHeight = getHeight();
     }
@@ -384,6 +387,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) view.getLayoutParams();
 
             if (lp.isItemRemoved()) {
+                deletingItemsCount++;
                 Rect rowRect = containsInVisibleRow(view);
                 Integer maxHeight = highestDeletedViewInRowMap.get(rowRect);
                 maxHeight = maxHeight == null ? 0 : maxHeight;
