@@ -362,9 +362,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         for (View view : disappearingViews) {
             addDisappearingView(view);
             int width = getDecoratedMeasuredWidth(view);
+            int height = getDecoratedMeasuredHeight(view);
 
             //todo try to find position in cache.
-            layoutDecorated(view, 0, getHeight() + 100, width, getHeight() + 100 + getDecoratedBottom(view));
+            layoutDecorated(view, 0, getHeight() + 100, width, getHeight() + 100 + height);
         }
     }
 
