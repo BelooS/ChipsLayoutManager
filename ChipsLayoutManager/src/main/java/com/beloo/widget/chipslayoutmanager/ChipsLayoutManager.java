@@ -117,7 +117,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     private AnchorViewState anchorView = AnchorViewState.getNotFoundState();
 
-    private int deletingItemsCount;
+    private int deletingItemsOnScreenCount;
 
     private ChipsLayoutManager(Context context) {
         @DeviceOrientation
@@ -296,7 +296,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public int getItemCount() {
         //in pre-layouter drawing we need item count with items will be actually deleted to pre-draw appearing items properly
-        return super.getItemCount() + deletingItemsCount;
+        return super.getItemCount() + deletingItemsOnScreenCount;
     }
 
     @Override
@@ -322,7 +322,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         if (!state.isPreLayout()) {
             Log.i("onLayoutChildren", "isPreLayout = false");
-            layoutDisappearingViews(recycler);
+//            layoutDisappearingViews(recycler);
             detachAndScrapAttachedViews(recycler);
             fill(recycler, anchorView);
         } else {
@@ -340,7 +340,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             fill(recycler, layouterFactory, anchorView);
         }
 
-        deletingItemsCount = 0;
+        deletingItemsOnScreenCount = 0;
 
         autoMeasureHeight = getHeight();
     }
@@ -387,7 +387,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) view.getLayoutParams();
 
             if (lp.isItemRemoved()) {
-                deletingItemsCount++;
+                deletingItemsOnScreenCount++;
                 Rect rowRect = containsInVisibleRow(view);
                 Integer maxHeight = highestDeletedViewInRowMap.get(rowRect);
                 maxHeight = maxHeight == null ? 0 : maxHeight;

@@ -31,11 +31,6 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
                 offsetRect,
                 new CriteriaAdditionalRow(new CriteriaUpLayouterFinished(), getAdditionalRowsCount()));
 
-        AbstractLayouter layouter = new LTRUpLayouter(layoutManager,
-                layoutManager.getChildGravityResolver(),
-                cacheStorage,
-                offsetRect);
-
         layouter.setMaxViewsInRow(getMaxViewsInRow());
         layouter.addLayouterListener(getLayouterListener());
         return layouter;
