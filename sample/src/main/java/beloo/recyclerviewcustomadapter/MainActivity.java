@@ -141,13 +141,9 @@ public class MainActivity extends AppCompatActivity {
         int position = spinnerPosition.getSelectedItemPosition();
         if (position == Spinner.INVALID_POSITION)
             return;
-
-        for (int i=0; i<5; i++) {
-            items.remove(8);
-        }
-
+        items.remove(position);
         Log.i("activity", "delete at " + position);
-        adapter.notifyItemRangeRemoved(8, 5);
+        adapter.notifyItemRemoved(position);
         updateSpinner();
     }
 
