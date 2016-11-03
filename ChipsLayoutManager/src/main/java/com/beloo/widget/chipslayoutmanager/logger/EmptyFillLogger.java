@@ -1,6 +1,6 @@
 package com.beloo.widget.chipslayoutmanager.logger;
 
-import com.beloo.widget.chipslayoutmanager.AnchorViewState;
+import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 
 public class EmptyFillLogger implements IFillLogger {
     @Override

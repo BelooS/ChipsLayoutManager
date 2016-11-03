@@ -15,6 +15,9 @@ import android.util.SparseArray;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 
+import com.beloo.widget.chipslayoutmanager.anchor.AnchorFactory;
+import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
+import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.cache.ViewCacheFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.CenterChildGravity;
@@ -114,10 +117,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     private int autoMeasureHeight = 0;
 
+    private IAnchorFactory anchorFactory = new AnchorFactory(this);
+
     /**
      * stored current anchor view due to scroll state changes
      */
-    private AnchorViewState anchorView = AnchorViewState.getNotFoundState();
+    private AnchorViewState anchorView = anchorFactory.createNotFound();
 
     private int deletingItemsOnScreenCount;
 
@@ -258,7 +263,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public void onRestoreInstanceState(Parcelable state) {
         container = (ParcelableContainer) state;
-        anchorView = AnchorViewState.getNotFoundState();
+        anchorView = anchorFactory.createNotFound();
         anchorView.setPosition(container.getAnchorPosition());
 
         viewPositionsStorage.onRestoreInstanceState(container.getPositionsCache(orientation));
@@ -331,7 +336,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             int additionalHeight = calcDisappearingViewsHeight(recycler);
             predictiveAnimationsLogger.heightOfCanvas(this);
             predictiveAnimationsLogger.onSummarizedDeletingItemsHeightCalculated(additionalHeight);
-            anchorView = getAnchorVisibleTopLeftView();
+            anchorView = anchorFactory.getTopLeftAnchor();
             detachAndScrapAttachedViews(recycler);
 
             //in case removing draw additional rows to show predictive animations
@@ -596,7 +601,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
         dy = scrollVerticallyInternal(dy);
         offsetChildrenVertical(-dy);
-        anchorView = getAnchorVisibleTopLeftView();
+        anchorView = anchorFactory.getTopLeftAnchor();
 
         fill(recycler, anchorView);
         return dy;
@@ -638,7 +643,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         performNormalizationIfNeeded();
 
-        AnchorViewState state = getAnchorVisibleTopLeftView();
+        AnchorViewState state = anchorFactory.getTopLeftAnchor();
 
         if (state.getPosition() != 0) { //in case 0 position haven't added in layout yet
             delta = dy;
@@ -706,41 +711,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
     }
 
-    @NonNull
-    /** find the view in a higher row which is closest to the left border*/
-    private AnchorViewState getAnchorVisibleTopLeftView() {
-        int childCount = getChildCount();
-        AnchorViewState topLeft = AnchorViewState.getNotFoundState();
-
-        Rect mainRect = new Rect(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), getHeight() - getPaddingBottom());
-//        Rect mainRect = new Rect(0, 0, getWidth(), getHeight());
-        int minTop = Integer.MAX_VALUE;
-        for (int i = 0; i < childCount; i++) {
-            View view = getChildAt(i);
-            int top = getDecoratedTop(view);
-            int bottom = getDecoratedBottom(view);
-            int left = getDecoratedLeft(view);
-            int right = getDecoratedRight(view);
-            Rect viewRect = new Rect(left, top, right, bottom);
-            boolean intersect = viewRect.intersect(mainRect);
-            if (intersect) {
-                if (getPosition(view) != -1) {
-                    if (topLeft.isNotFoundState()) {
-                        topLeft = new AnchorViewState(getPosition(view), new Rect(left, top, right, bottom));
-                    }
-                    minTop = Math.min(minTop, top);
-                }
-            }
-        }
-
-        if (!topLeft.isNotFoundState()) {
-            assert topLeft.getAnchorViewRect() != null;
-            topLeft.getAnchorViewRect().top = minTop;
-        }
-
-        return topLeft;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -751,7 +721,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
 
         cacheNormalizationPosition = cacheNormalizationPosition != null ? cacheNormalizationPosition : viewPositionsStorage.getLastCachePosition();
-        anchorView = AnchorViewState.getNotFoundState();
+        anchorView = anchorFactory.getTopLeftAnchor();
         anchorView.setPosition(position);
 
         //Trigger a new view layout

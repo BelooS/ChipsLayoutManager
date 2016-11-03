@@ -1,4 +1,4 @@
-package com.beloo.widget.chipslayoutmanager;
+package com.beloo.widget.chipslayoutmanager.anchor;
 
 import android.graphics.Rect;
 import android.os.Parcel;
@@ -39,6 +39,10 @@ public class AnchorViewState implements Parcelable {
 
     public Rect getAnchorViewRect() {
         return anchorViewRect;
+    }
+
+    public boolean isRemoving() {
+        return getPosition() == -1;
     }
 
     //parcelable logic below

@@ -4,7 +4,7 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
-import com.beloo.widget.chipslayoutmanager.AnchorViewState;
+import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 
 public class FillLogger implements IFillLogger {
     private SparseArray<View> viewCache;
