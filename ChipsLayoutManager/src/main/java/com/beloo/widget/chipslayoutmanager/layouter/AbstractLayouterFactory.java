@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
-import com.beloo.widget.chipslayoutmanager.layouter.placer.DisappearingViewBottomPlacer;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.RealBottomPlacer;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.RealTopPlacer;
@@ -59,12 +58,12 @@ public abstract class AbstractLayouterFactory {
     //todo move to criteria factory
     @NonNull
     IFinishingCriteria getUpFinishingCriteria() {
-        return new CriteriaAdditionalHeight(new CriteriaUpLayouterFinished(), getAdditionalHeight());
+        return new CriteriaUpLayouterFinished();
     }
 
     @NonNull
     IFinishingCriteria getDownFinishingCriteria() {
-        return new CriteriaAdditionalHeight(new CriteriaDownLayouterFinished(), getAdditionalHeight());
+        return new CriteriaDownAdditionalHeight(new CriteriaDownLayouterFinished(), getAdditionalHeight());
     }
 
     @NonNull
