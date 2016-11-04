@@ -335,27 +335,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             AbstractLayouterFactory layouterFactory = createLayouterFactory();
             fill(recycler, layouterFactory, anchorView);
 
-            SparseArray<View> disappearingViews = getDisappearingViews(recycler);
-            Log.d(TAG, "disappearing views count = " + disappearingViews.size());
-
-            if (disappearingViews.size() > 0) {
-                Log.d(TAG, "fill disappering views");
-                layouterFactory.setAdditionalRowsCount(5);
-                AnchorViewState anchorViewState = anchorFactory.createAnchorState(lowestView);
-                ILayouter layouter = layouterFactory.getDisappearingDownLayouter(anchorViewState.getAnchorViewRect());
-                fillWithLayouter(recycler, layouter, anchorViewState.getPosition());
-
-                disappearingViews = getDisappearingViews(recycler);
-                Log.d(TAG, "AFTER disappearing views count = " + disappearingViews.size());
-
-                layouter = layouterFactory.createInfiniteLayouter(layouter);
-
-                for (int i = 0; i< disappearingViews.size(); i++) {
-                    int key = disappearingViews.keyAt(i);
-                    layouter.placeView(disappearingViews.get(key));
-                }
-                layouter.layoutRow();
-            }
+            layoutDisappearingViews(recycler, layouterFactory);
 
             performNormalizationIfNeeded();
         } else {
@@ -375,6 +355,42 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         deletingItemsOnScreenCount = 0;
 
         autoMeasureHeight = getHeight();
+    }
+
+    /** layout disappearing view to support predictive animations */
+    private void layoutDisappearingViews(RecyclerView.Recycler recycler, AbstractLayouterFactory layouterFactory) {
+        SparseArray<View> disappearingViews = getDisappearingViews(recycler);
+        Log.d(TAG, "disappearing views count = " + disappearingViews.size());
+
+        if (disappearingViews.size() > 0) {
+            /** we have some moving views
+             * we should place it as disappearing to support predictive animations
+             * we can't place all possible moves on theirs real place, because concrete layout position of particular view depends on placing of previous views
+             * and there could be moving from 0 position to 10k. But it is preferably to place nearest moved view to real positions to make moving more natural
+             * like moving from 0 position to 15 for example, where user could scroll fast and check
+             */
+
+            Log.d(TAG, "fill disappearing views");
+            //so we fill additional rows to cover nearest moves
+            layouterFactory.setAdditionalRowsCount(5);
+            AnchorViewState anchorViewState = anchorFactory.createAnchorState(lowestView);
+            ILayouter layouter = layouterFactory.getDisappearingDownLayouter(anchorViewState.getAnchorViewRect());
+            fillWithLayouter(recycler, layouter, anchorViewState.getPosition());
+
+            disappearingViews = getDisappearingViews(recycler);
+            Log.d(TAG, "AFTER disappearing views count = " + disappearingViews.size());
+
+
+            layouter = layouterFactory.createInfiniteLayouter(layouter);
+
+            //we should layout disappearing views left somewhere, just continue layout them in current layouter
+            for (int i = 0; i< disappearingViews.size(); i++) {
+                int key = disappearingViews.keyAt(i);
+                layouter.placeView(disappearingViews.get(key));
+            }
+            //layout last row
+            layouter.layoutRow();
+        }
     }
 
     public SparseArray<View> getDisappearingViews(RecyclerView.Recycler recycler) {
@@ -549,6 +565,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 try {
                     view = recycler.getViewForPosition(pos);
                 } catch (IndexOutOfBoundsException e) {
+                    /** WTF sometimes on prediction animation playing in case very fast sequential changes in adapter
+                     * {@link #getItemCount} could return value bigger than real count of items
+                     * & {@link RecyclerView.Recycler#getViewForPosition(int)} throws exception in this case!
+                     * to handle it, just leave the loop*/
                     break;
                 }
                 logger.onItemRequested();
