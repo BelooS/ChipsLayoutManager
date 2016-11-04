@@ -342,7 +342,19 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 Log.d(TAG, "fill disappering views");
                 layouterFactory.setAdditionalRowsCount(5);
                 AnchorViewState anchorViewState = anchorFactory.createAnchorState(lowestView);
-                fillWithLayouter(recycler, layouterFactory.getDisappearingDownLayouter(anchorViewState.getAnchorViewRect()), anchorViewState.getPosition());
+                ILayouter layouter = layouterFactory.getDisappearingDownLayouter(anchorViewState.getAnchorViewRect());
+                fillWithLayouter(recycler, layouter, anchorViewState.getPosition());
+
+                disappearingViews = getDisappearingViews(recycler);
+                Log.d(TAG, "AFTER disappearing views count = " + disappearingViews.size());
+
+                layouter = layouterFactory.createInfiniteLayouter(layouter);
+
+                for (int i = 0; i< disappearingViews.size(); i++) {
+                    int key = disappearingViews.keyAt(i);
+                    layouter.placeView(disappearingViews.get(key));
+                }
+                layouter.layoutRow();
             }
 
             performNormalizationIfNeeded();

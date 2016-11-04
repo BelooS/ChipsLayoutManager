@@ -97,6 +97,10 @@ public abstract class AbstractLayouterFactory {
 
     public abstract ILayouter getUpLayouter(@Nullable Rect anchorRect);
     public abstract ILayouter getDownLayouter(@Nullable Rect anchorRect);
-
     public abstract ILayouter getDisappearingDownLayouter(@Nullable Rect anchorRect);
+
+    public ILayouter createInfiniteLayouter(ILayouter layouter) {
+        ((AbstractLayouter)layouter).setFinishingCriteria(new InfiniteCriteria());
+        return layouter;
+    }
 }

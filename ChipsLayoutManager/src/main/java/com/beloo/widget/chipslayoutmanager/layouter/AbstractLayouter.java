@@ -68,6 +68,10 @@ public abstract class AbstractLayouter implements ILayouter {
         this.placer = placer;
     }
 
+    public void setFinishingCriteria(@NonNull IFinishingCriteria finishingCriteria) {
+        this.finishingCriteria = finishingCriteria;
+    }
+
     final int getCanvasRightBorder() {
         return layoutManager.getWidth() - layoutManager.getPaddingRight();
     }
