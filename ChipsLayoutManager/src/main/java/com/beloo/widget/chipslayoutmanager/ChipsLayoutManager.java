@@ -58,7 +58,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private IViewCacheStorage viewPositionsStorage;
 
     /**
-     * store detached views to probably reattach it if them still visible
+     * store detached views to probably reattach it if them still visible.
+     * Used while scrolling
      */
     private SparseArray<View> viewCache = new SparseArray<>();
 
@@ -330,8 +331,21 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         if (!state.isPreLayout()) {
             detachAndScrapAttachedViews(recycler);
-            fill(recycler, anchorView);
-            layoutDisappearingViews(recycler);
+
+            AbstractLayouterFactory layouterFactory = createLayouterFactory();
+            fill(recycler, layouterFactory, anchorView);
+
+            SparseArray<View> disappearingViews = getDisappearingViews(recycler);
+            Log.d(TAG, "disappearing views count = " + disappearingViews.size());
+
+            if (disappearingViews.size() > 0) {
+                Log.d(TAG, "fill disappering views");
+                layouterFactory.setAdditionalRowsCount(5);
+                AnchorViewState anchorViewState = anchorFactory.createAnchorState(lowestView);
+                fillWithLayouter(recycler, layouterFactory.getDisappearingDownLayouter(anchorViewState.getAnchorViewRect()), anchorViewState.getPosition());
+            }
+
+            performNormalizationIfNeeded();
         } else {
             int additionalHeight = calcDisappearingViewsHeight(recycler);
             predictiveAnimationsLogger.heightOfCanvas(this);
@@ -341,7 +355,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             //in case removing draw additional rows to show predictive animations
             AbstractLayouterFactory layouterFactory = createLayouterFactory();
-            layouterFactory.setAdditionalHeight(additionalHeight);
+            layouterFactory.setAdditionalHeight(additionalHeight*2);
 
             fill(recycler, layouterFactory, anchorView);
         }
@@ -351,27 +365,18 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         autoMeasureHeight = getHeight();
     }
 
-    private HashSet<View> layoutDisappearingViews(RecyclerView.Recycler recycler) {
+    public SparseArray<View> getDisappearingViews(RecyclerView.Recycler recycler) {
         final List<RecyclerView.ViewHolder> scrapList = recycler.getScrapList();
         //views which moved from screen, but not deleted
-        final HashSet<View> disappearingViews = new HashSet<>(scrapList.size());
+        final SparseArray<View> disappearingViews = new SparseArray<>(scrapList.size());
 
         for (RecyclerView.ViewHolder holder : scrapList) {
             final View child = holder.itemView;
             final RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) child.getLayoutParams();
             if (!lp.isItemRemoved()) {
-                disappearingViews.add(child);
+                disappearingViews.put(getPosition(child), child);
             }
         }
-
-//        for (View view : disappearingViews) {
-//            addDisappearingView(view);
-//            int width = getDecoratedMeasuredWidth(view);
-//            int height = getDecoratedMeasuredHeight(view);
-//
-//            //todo try to find position in cache.
-//            layoutDecorated(view, 0, getHeight() + 100, width, getHeight() + 100 + height);
-//        }
 
         return disappearingViews;
     }
@@ -426,7 +431,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     /**
-     * place all added views to cache...
+     * place all added views to cache (in case scrolling)...
      */
     private void fillCache() {
         for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
@@ -499,10 +504,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
 
         viewCache.clear();
-
-        performNormalizationIfNeeded();
         logger.onAfterRemovingViews();
     }
+
+//    RecyclerView.Recycler recycler;
+//
+//    public void removeAndRecycleView(View view) {
+//        removeAndRecycleView(view, recycler);
+//    }
 
     /**
      * @return true if RTL mode enabled in RecyclerView
@@ -552,7 +561,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         logger.onFinishedLayouter();
 
-        //layout last row
+        //layout last row, in case iterator fully processed
         layouter.layoutRow();
     }
 

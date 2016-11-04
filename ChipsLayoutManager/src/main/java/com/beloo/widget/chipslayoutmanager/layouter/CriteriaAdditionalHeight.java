@@ -16,4 +16,5 @@ public class CriteriaAdditionalHeight extends FinishingCriteriaDecorator {
                 //if additional height filled
                 abstractLayouter.getRowTop() > bottomBorder + additionalHeight;
     }
+
 }

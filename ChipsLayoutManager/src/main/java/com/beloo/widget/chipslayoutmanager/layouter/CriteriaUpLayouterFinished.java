@@ -6,4 +6,9 @@ public class CriteriaUpLayouterFinished implements IFinishingCriteria {
     public boolean isFinishedLayouting(AbstractLayouter abstractLayouter) {
         return abstractLayouter.getRowBottom() < abstractLayouter.getCanvasTopBorder();
     }
+
+    @Override
+    public boolean isFinishedLayouting() {
+        throw new UnsupportedOperationException("not supported");
+    }
 }

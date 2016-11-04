@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.DisappearingViewBottomPlacer;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.RealBottomPlacer;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.RealTopPlacer;
 
@@ -58,6 +59,23 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
                 offsetRect,
                 getDownFinishingCriteria(),
                 getBottomPlacer());
+
+        layouter.setMaxViewsInRow(getMaxViewsInRow());
+        layouter.addLayouterListener(getLayouterListener());
+        return layouter;
+    }
+
+    @Override
+    public ILayouter getDisappearingDownLayouter(@Nullable Rect anchorRect) {
+        Rect offsetRect = createOffsetRectForDownLayouter(anchorRect);
+
+        //down layouting should start from right point of anchor view to right point of container
+        AbstractLayouter layouter = new LTRDownLayouter(layoutManager,
+                layoutManager.getChildGravityResolver(),
+                cacheStorage,
+                offsetRect,
+                new CriteriaAdditionalRow(new EmtpyCriteria(), getAdditionalRowsCount()),
+                new DisappearingViewBottomPlacer(layoutManager));
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
         layouter.addLayouterListener(getLayouterListener());

@@ -67,6 +67,7 @@ public class ChipsAdapter extends  RecyclerView.Adapter<ChipsAdapter.ViewHolder>
         }
 
         void bindItem(ChipsEntity entity) {
+            itemView.setTag(entity.getName());
             if (TextUtils.isEmpty(entity.getDescription())) {
                 tvDescription.setVisibility(View.GONE);
             } else {

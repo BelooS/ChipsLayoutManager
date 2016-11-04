@@ -168,11 +168,6 @@ public abstract class AbstractLayouter implements ILayouter {
     /** factory method for Rect, where view will be placed. Creation based on inner layouter parameters */
     abstract Rect createViewRect(View view);
 
-    /** add view to layout manager */
-    void addView(View view) {
-        placer.addView(view);
-    }
-
     /** called when layouter ready to add row to canvas. Children could perform normalization actions on created row*/
     abstract void onPreLayout();
 
@@ -213,7 +208,7 @@ public abstract class AbstractLayouter implements ILayouter {
 
             applyChildGravity(view, viewRect, rowTop, rowBottom);
             //add view to layout
-            addView(view);
+            placer.addView(view);
             //layout whole views in a row
             layoutManager.layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
         }

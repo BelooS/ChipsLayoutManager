@@ -1,30 +1,22 @@
 package com.beloo.widget.chipslayoutmanager.layouter.placer;
 
-import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
-
-import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouter;
-import com.beloo.widget.chipslayoutmanager.layouter.IFinishingCriteria;
+import android.widget.TextView;
+import com.beloo.widget.chipslayoutmanager.R;
 
 public class DisappearingViewBottomPlacer extends AbstractPlacer {
 
-    @NonNull
-    private IFinishingCriteria behaviourCriteria;
-    @NonNull
-    private AbstractLayouter abstractLayouter;
-
-    public DisappearingViewBottomPlacer(@NonNull AbstractLayouter abstractLayouter, @NonNull IFinishingCriteria behaviourCriteria) {
-        super(abstractLayouter.getLayoutManager());
-        this.behaviourCriteria = behaviourCriteria;
-        this.abstractLayouter = abstractLayouter;
+    public DisappearingViewBottomPlacer(RecyclerView.LayoutManager layoutManager) {
+        super(layoutManager);
     }
 
     @Override
     public void addView(View view) {
-        if (!behaviourCriteria.isFinishedLayouting(abstractLayouter)) {
-            getLayoutManager().addView(view);
-        } else {
-            getLayoutManager().addDisappearingView(view);
-        }
+        getLayoutManager().addDisappearingView(view);
+
+        Log.i(this.getClass().getSimpleName(), "added disappearing view, position = " + getLayoutManager().getPosition(view));
+        Log.d(this.getClass().getSimpleName(), "name = " + ((TextView)view.findViewById(R.id.tvName)).getText().toString());
     }
 }
