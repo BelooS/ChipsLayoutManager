@@ -543,9 +543,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         while (iterator.hasNext()) {
             int pos = iterator.next();
+            Log.w(TAG, "pos = " + pos);
             View view = viewCache.get(pos);
             if (view == null) { // we don't have view from previous layouter stage, request new one
-                view = recycler.getViewForPosition(pos);
+                try {
+                    view = recycler.getViewForPosition(pos);
+                } catch (IndexOutOfBoundsException e) {
+                    break;
+                }
                 logger.onItemRequested();
 
                 measureChildWithMargins(view, 0, 0);
@@ -850,7 +855,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public void onItemsMoved(RecyclerView recyclerView, int from, int to, int itemCount) {
         adapterActionsLogger.onItemsMoved(from, to, itemCount);
         super.onItemsMoved(recyclerView, from, to, itemCount);
-        onLayoutUpdatedFromPosition(from);
+        onLayoutUpdatedFromPosition(Math.min(from, to));
     }
 
     private void onLayoutUpdatedFromPosition(int position) {
