@@ -32,10 +32,6 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     @Nullable
     private Integer leftBorderOfPreviouslyAttachedView = null;
 
-    /** Max items in row restriction. Layout of row should be stopped when this count of views reached*/
-    @Nullable
-    private Integer maxViewsInRow = null;
-
     private int rowSize = 0;
     private int previousRowSize;
 
@@ -49,28 +45,27 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     private IFinishingCriteria finishingCriteria;
     @NonNull
     private IPlacer placer;
+
+    /** Max items in row restriction. Layout of row should be stopped when this count of views reached*/
+    @Nullable
+    private Integer maxViewsInRow = null;
     //--- end input dependencies
 
     private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
 
     private List<ILayouterListener> layouterListeners = new LinkedList<>();
 
-
-    AbstractLayouter(@NonNull ChipsLayoutManager layoutManager,
-                     @NonNull ICanvas canvas,
-                     @NonNull Rect offsetRect,
-                     IViewCacheStorage cacheStorage,
-                     @NonNull IChildGravityResolver childGravityResolver,
-                     @NonNull IFinishingCriteria finishingCriteria,
-                     @NonNull IPlacer placer) {
-        this.layoutManager = layoutManager;
-        this.canvas = canvas;
-        this.rowTop = offsetRect.top;
-        this.rowBottom = offsetRect.bottom;
-        this.cacheStorage = cacheStorage;
-        this.childGravityResolver = childGravityResolver;
-        this.finishingCriteria = finishingCriteria;
-        this.placer = placer;
+    AbstractLayouter(Builder builder) {
+        layoutManager = builder.layoutManager;
+        cacheStorage = builder.cacheStorage;
+        canvas = builder.canvas;
+        childGravityResolver = builder.childGravityResolver;
+        setFinishingCriteria(builder.finishingCriteria);
+        placer = builder.placer;
+        this.rowTop = builder.offsetRect.top;
+        this.rowBottom = builder.offsetRect.bottom;
+        this.maxViewsInRow = builder.maxCountInRow;
+        this.layouterListeners = builder.layouterListeners;
     }
 
     public void setFinishingCriteria(@NonNull IFinishingCriteria finishingCriteria) {
@@ -265,4 +260,75 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         return rowBottom;
     }
 
+    public abstract static class Builder {
+        private ChipsLayoutManager layoutManager;
+        private IViewCacheStorage cacheStorage;
+        private ICanvas canvas;
+        private IChildGravityResolver childGravityResolver;
+        private IFinishingCriteria finishingCriteria;
+        private IPlacer placer;
+        private Rect offsetRect;
+        private Integer maxCountInRow;
+        private List<ILayouterListener> layouterListeners = new LinkedList<>();
+
+        Builder() {}
+
+        @NonNull
+        public Builder offsetRect(@NonNull Rect offsetRect) {
+            this.offsetRect = offsetRect;
+            return this;
+        }
+
+        @NonNull
+        public final Builder layoutManager(@NonNull ChipsLayoutManager layoutManager) {
+            this.layoutManager = layoutManager;
+            return this;
+        }
+
+        Builder maxCountInRow(Integer maxCountInRow) {
+            this.maxCountInRow = maxCountInRow;
+            return this;
+        }
+
+        @NonNull
+        final Builder cacheStorage(@NonNull IViewCacheStorage cacheStorage) {
+            this.cacheStorage = cacheStorage;
+            return this;
+        }
+
+        @NonNull
+        final Builder canvas(@NonNull ICanvas canvas) {
+            this.canvas = canvas;
+            return this;
+        }
+
+        @NonNull
+        final Builder childGravityResolver(@NonNull IChildGravityResolver childGravityResolver) {
+            this.childGravityResolver = childGravityResolver;
+            return this;
+        }
+
+        @NonNull
+        final Builder finishingCriteria(@NonNull IFinishingCriteria finishingCriteria) {
+            this.finishingCriteria = finishingCriteria;
+            return this;
+        }
+
+        @NonNull
+        public final Builder placer(@NonNull IPlacer placer) {
+            this.placer = placer;
+            return this;
+        }
+
+        @NonNull
+        final Builder addLayouterListener(@Nullable ILayouterListener layouterListener) {
+            if (layouterListener != null) {
+                layouterListeners.add(layouterListener);
+            }
+            return this;
+        }
+
+        @NonNull
+        public abstract AbstractLayouter build();
+    }
 }

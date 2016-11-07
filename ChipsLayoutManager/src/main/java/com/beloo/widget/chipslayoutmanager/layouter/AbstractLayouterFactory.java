@@ -7,11 +7,14 @@ import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.CriteriaAdditionalRow;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.CriteriaDownAdditionalHeight;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.CriteriaDownLayouterFinished;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.CriteriaUpLayouterFinished;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.EmtpyCriteria;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.InfiniteCriteria;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.DisappearingViewBottomPlacer;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.RealBottomPlacer;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.RealTopPlacer;
@@ -30,17 +33,9 @@ public abstract class AbstractLayouterFactory {
 
     private int additionalHeight;
 
-    @NonNull
-    private IPlacer bottomPlacer;
-    @NonNull
-    private IPlacer topPlacer;
-
-
     AbstractLayouterFactory(IViewCacheStorage cacheStorage, ChipsLayoutManager layoutManager) {
         this.cacheStorage = cacheStorage;
         this.layoutManager = layoutManager;
-        bottomPlacer = new RealBottomPlacer(layoutManager);
-        topPlacer = new RealTopPlacer(layoutManager);
     }
 
     public void setLayouterListener(@Nullable ILayouterListener layouterListener) {
@@ -71,16 +66,6 @@ public abstract class AbstractLayouterFactory {
         return new CriteriaDownAdditionalHeight(new CriteriaDownLayouterFinished(), getAdditionalHeight());
     }
 
-    @NonNull
-    IPlacer getBottomPlacer() {
-        return bottomPlacer;
-    }
-
-    @NonNull
-    IPlacer getTopPlacer() {
-        return topPlacer;
-    }
-
     int getAdditionalRowsCount() {
         return additionalRowsCount;
     }
@@ -95,13 +80,42 @@ public abstract class AbstractLayouterFactory {
         return layouterListener;
     }
 
-    public int getAdditionalHeight() {
+    int getAdditionalHeight() {
         return additionalHeight;
     }
 
-    public abstract ILayouter getUpLayouter(@Nullable Rect anchorRect);
-    public abstract ILayouter getDownLayouter(@Nullable Rect anchorRect);
-    public abstract ILayouter getDisappearingDownLayouter(@Nullable Rect anchorRect);
+    abstract AbstractLayouter.Builder createUpBuilder(Rect anchorRect);
+    abstract AbstractLayouter.Builder createDownBuilder(Rect anchorRect);
+
+    private AbstractLayouter.Builder fillBasicBuilder(AbstractLayouter.Builder builder) {
+        return builder.layoutManager(layoutManager)
+                .canvas(new Square(layoutManager))
+                .childGravityResolver(layoutManager.getChildGravityResolver())
+                .cacheStorage(cacheStorage)
+                .maxCountInRow(getMaxViewsInRow())
+                .addLayouterListener(getLayouterListener());
+    }
+
+    public final ILayouter getUpLayouter(@Nullable Rect anchorRect) {
+        return fillBasicBuilder(createUpBuilder(anchorRect))
+                .finishingCriteria(getUpFinishingCriteria())
+                .placer(new RealTopPlacer(layoutManager))
+                .build();
+    }
+
+    public final ILayouter getDownLayouter(@Nullable Rect anchorRect) {
+        return fillBasicBuilder(createDownBuilder(anchorRect))
+                .finishingCriteria(getDownFinishingCriteria())
+                .placer(new RealBottomPlacer(layoutManager))
+                .build();
+    }
+
+    public final ILayouter getDisappearingDownLayouter(@Nullable Rect anchorRect) {
+        return fillBasicBuilder(createDownBuilder(anchorRect))
+                .finishingCriteria(new CriteriaAdditionalRow(new EmtpyCriteria(), getAdditionalRowsCount()))
+                .placer(new DisappearingViewBottomPlacer(layoutManager))
+                .build();
+    }
 
     public ILayouter createInfiniteLayouter(ILayouter layouter) {
         ((AbstractLayouter)layouter).setFinishingCriteria(new InfiniteCriteria());

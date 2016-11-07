@@ -1,6 +1,7 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.view.View;
 
@@ -13,17 +14,15 @@ import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     private static final String TAG = RTLUpLayouter.class.getSimpleName();
 
-    protected int viewLeft;
+    private int viewLeft;
 
-    RTLUpLayouter(ChipsLayoutManager spanLayoutManager,
-                  ICanvas canvas,
-                  IChildGravityResolver childGravityResolver,
-                  IViewCacheStorage cacheStorage,
-                  Rect offsetRect,
-                  IFinishingCriteria finishingCriteria,
-                  IPlacer placer) {
-        super(spanLayoutManager, canvas, offsetRect, cacheStorage, childGravityResolver, finishingCriteria, placer);
-        this.viewLeft = offsetRect.left;
+    private RTLUpLayouter(Builder builder) {
+        super(builder);
+        viewLeft = builder.viewLeft;
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
     }
 
     @Override
@@ -87,4 +86,23 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
         return new DecrementalPositionIterator();
     }
 
+
+    public static final class Builder extends AbstractLayouter.Builder {
+        private int viewLeft;
+
+        private Builder() {
+        }
+
+        @NonNull
+        @Override
+        public AbstractLayouter.Builder offsetRect(@NonNull Rect offsetRect) {
+            this.viewLeft = offsetRect.left;
+            return super.offsetRect(offsetRect);
+        }
+
+        @NonNull
+        public RTLUpLayouter build() {
+            return new RTLUpLayouter(this);
+        }
+    }
 }

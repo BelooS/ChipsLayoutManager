@@ -29,29 +29,19 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
                 anchorRect == null ? layoutManager.getPaddingBottom() : anchorRect.bottom);
     }
 
-    private ICriteriaFactory createDefaultCriteriaFactory() {
-        return new DefaultCriteriaFactory(getAdditionalHeight());
-    }
-
-    public ILayouter getUpLayouter(@Nullable Rect anchorRect) {
-        Rect offsetRect = createOffsetRectForUpLayouter(anchorRect);
-
-        ICriteriaFactory criteriaFactory = createDefaultCriteriaFactory();
-
-        AbstractLayouter layouter = new RTLUpLayouter(layoutManager,
-                new Square(layoutManager),
-                layoutManager.getChildGravityResolver(),
-                cacheStorage,
-                offsetRect,
-                criteriaFactory.getUpFinishingCriteria(),
-                getTopPlacer());
-
-        layouter.setMaxViewsInRow(getMaxViewsInRow());
-        layouter.addLayouterListener(getLayouterListener());
-        return layouter;
+    @Override
+    AbstractLayouter.Builder createUpBuilder(Rect anchorRect) {
+        return RTLUpLayouter.newBuilder()
+                .offsetRect(createOffsetRectForUpLayouter(anchorRect));
     }
 
     //---- down layouter below
+
+    @Override
+    AbstractLayouter.Builder createDownBuilder(Rect anchorRect) {
+        return RTLDownLayouter.newBuilder()
+                .offsetRect(createOffsetRectForDownLayouter(anchorRect));
+    }
 
     private Rect createOffsetRectForDownLayouter(Rect anchorRect) {
         return new Rect(
@@ -60,42 +50,4 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
                 anchorRect == null ? layoutManager.getPaddingRight() : anchorRect.right,
                 anchorRect == null ? layoutManager.getPaddingBottom() : anchorRect.bottom);
     }
-
-    public ILayouter getDownLayouter(@Nullable Rect anchorRect) {
-        Rect offsetRect = createOffsetRectForDownLayouter(anchorRect);
-
-        ICriteriaFactory criteriaFactory = createDefaultCriteriaFactory();
-
-        AbstractLayouter layouter = new RTLDownLayouter(layoutManager,
-                new Square(layoutManager),
-                layoutManager.getChildGravityResolver(),
-                cacheStorage,
-                offsetRect,
-                criteriaFactory.getDownFinishingCriteria(),
-                getBottomPlacer());
-
-        layouter.setMaxViewsInRow(getMaxViewsInRow());
-        layouter.addLayouterListener(getLayouterListener());
-        return layouter;
-    }
-
-    @Override
-    public ILayouter getDisappearingDownLayouter(@Nullable Rect anchorRect) {
-        Rect offsetRect = createOffsetRectForDownLayouter(anchorRect);
-
-        ICriteriaFactory criteriaFactory = new DisappearingCriteriaFactory(getAdditionalRowsCount());
-
-        AbstractLayouter layouter = new RTLDownLayouter(layoutManager,
-                new Square(layoutManager),
-                layoutManager.getChildGravityResolver(),
-                cacheStorage,
-                offsetRect,
-                criteriaFactory.getDownFinishingCriteria(),
-                new DisappearingViewBottomPlacer(layoutManager));
-
-        layouter.setMaxViewsInRow(getMaxViewsInRow());
-        layouter.addLayouterListener(getLayouterListener());
-        return layouter;
-    }
-
 }

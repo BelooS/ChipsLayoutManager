@@ -374,6 +374,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             //so we fill additional rows to cover nearest moves
             layouterFactory.setAdditionalRowsCount(5);
             AnchorViewState anchorViewState = anchorFactory.createAnchorState(lowestView);
+
             ILayouter layouter = layouterFactory.getDisappearingDownLayouter(anchorViewState.getAnchorViewRect());
             fillWithLayouter(recycler, layouter, anchorViewState.getPosition());
 

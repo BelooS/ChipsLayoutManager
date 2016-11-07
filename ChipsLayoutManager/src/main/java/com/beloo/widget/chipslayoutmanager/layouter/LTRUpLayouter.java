@@ -1,6 +1,7 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.view.View;
 
@@ -14,15 +15,13 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
     private int viewRight;
 
-    LTRUpLayouter(ChipsLayoutManager layoutManager,
-                  ICanvas canvas,
-                  IChildGravityResolver childGravityResolver,
-                  IViewCacheStorage cacheStorage,
-                  Rect offsetRect,
-                  IFinishingCriteria finishingCriteria,
-                  IPlacer placer) {
-        super(layoutManager, canvas, offsetRect, cacheStorage, childGravityResolver, finishingCriteria, placer);
-        this.viewRight = offsetRect.right;
+    private LTRUpLayouter(Builder builder) {
+        super(builder);
+        viewRight = builder.viewRight;
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
     }
 
     @Override
@@ -87,4 +86,23 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
         return new DecrementalPositionIterator();
     }
 
+
+    public static final class Builder extends AbstractLayouter.Builder {
+        private int viewRight;
+
+        private Builder() {
+        }
+
+        @NonNull
+        @Override
+        public AbstractLayouter.Builder offsetRect(@NonNull Rect offsetRect) {
+            viewRight = offsetRect.right;
+            return super.offsetRect(offsetRect);
+        }
+
+        @NonNull
+        public LTRUpLayouter build() {
+            return new LTRUpLayouter(this);
+        }
+    }
 }

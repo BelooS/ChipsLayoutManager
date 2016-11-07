@@ -1,6 +1,7 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
@@ -13,15 +14,13 @@ class RTLDownLayouter extends AbstractLayouter {
 
     private int viewRight;
 
-    RTLDownLayouter(ChipsLayoutManager layoutManager,
-                    ICanvas canvas,
-                    IChildGravityResolver childGravityResolver,
-                    IViewCacheStorage cacheStorage,
-                    Rect offsetRect,
-                    IFinishingCriteria finishingCriteria,
-                    IPlacer placer) {
-        super(layoutManager, canvas, offsetRect, cacheStorage, childGravityResolver, finishingCriteria, placer);
-        viewRight = offsetRect.right;
+    private RTLDownLayouter(Builder builder) {
+        super(builder);
+        viewRight = builder.viewRight;
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
     }
 
     @Override
@@ -64,4 +63,23 @@ class RTLDownLayouter extends AbstractLayouter {
         return super.onAttachView(view);
     }
 
+
+    public static final class Builder extends AbstractLayouter.Builder {
+        private int viewRight;
+
+        private Builder() {
+        }
+
+        @NonNull
+        @Override
+        public AbstractLayouter.Builder offsetRect(@NonNull Rect offsetRect) {
+            viewRight = offsetRect.right;
+            return super.offsetRect(offsetRect);
+        }
+
+        @NonNull
+        public RTLDownLayouter build() {
+            return new RTLDownLayouter(this);
+        }
+    }
 }

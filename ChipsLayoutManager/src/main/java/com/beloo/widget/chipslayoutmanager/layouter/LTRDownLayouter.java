@@ -1,6 +1,7 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
@@ -13,15 +14,13 @@ class LTRDownLayouter extends AbstractLayouter {
 
     private int viewLeft;
 
-    LTRDownLayouter(ChipsLayoutManager layoutManager,
-                    ICanvas canvas,
-                    IChildGravityResolver childGravityResolver,
-                    IViewCacheStorage cacheStorage,
-                    Rect offsetRect,
-                    IFinishingCriteria finishingCriteria,
-                    IPlacer placer) {
-        super(layoutManager, canvas, offsetRect, cacheStorage, childGravityResolver, finishingCriteria, placer);
-        viewLeft = offsetRect.left;
+    private LTRDownLayouter(Builder builder) {
+        super(builder);
+        viewLeft = builder.viewLeft;
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
     }
 
     @Override
@@ -63,5 +62,24 @@ class LTRDownLayouter extends AbstractLayouter {
         rowBottom = Math.max(rowBottom, getLayoutManager().getDecoratedBottom(view));
 
         return super.onAttachView(view);
+    }
+
+    public static final class Builder extends AbstractLayouter.Builder {
+        private int viewLeft;
+
+        private Builder() {
+        }
+
+        @NonNull
+        @Override
+        public AbstractLayouter.Builder offsetRect(@NonNull Rect offsetRect) {
+            this.viewLeft = offsetRect.left;
+            return super.offsetRect(offsetRect);
+        }
+
+        @NonNull
+        public LTRDownLayouter build() {
+            return new LTRDownLayouter(this);
+        }
     }
 }

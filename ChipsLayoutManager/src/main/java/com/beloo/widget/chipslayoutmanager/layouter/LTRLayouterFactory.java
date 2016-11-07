@@ -24,22 +24,6 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
                 anchorRect == null? layoutManager.getPaddingBottom() : anchorRect.bottom);
     }
 
-    public ILayouter getUpLayouter(@Nullable Rect anchorRect) {
-        Rect offsetRect = createOffsetRectForUpLayouter(anchorRect);
-
-        AbstractLayouter layouter = new LTRUpLayouter(layoutManager,
-                new Square(layoutManager),
-                layoutManager.getChildGravityResolver(),
-                cacheStorage,
-                offsetRect,
-                getUpFinishingCriteria(),
-                getTopPlacer());
-
-        layouter.setMaxViewsInRow(getMaxViewsInRow());
-        layouter.addLayouterListener(getLayouterListener());
-        return layouter;
-    }
-
     private Rect createOffsetRectForDownLayouter(Rect anchorRect) {
         return new Rect(
                 //we should include anchor view here, so anchorLeft is a leftOffset
@@ -49,39 +33,15 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
                 anchorRect == null? layoutManager.getPaddingBottom() : anchorRect.bottom);
     }
 
-    public ILayouter getDownLayouter(@Nullable Rect anchorRect) {
-        Rect offsetRect = createOffsetRectForDownLayouter(anchorRect);
-
-        //down layouting should start from right point of anchor view to right point of container
-        AbstractLayouter layouter = new LTRDownLayouter(layoutManager,
-                new Square(layoutManager),
-                layoutManager.getChildGravityResolver(),
-                cacheStorage,
-                offsetRect,
-                getDownFinishingCriteria(),
-                getBottomPlacer());
-
-        layouter.setMaxViewsInRow(getMaxViewsInRow());
-        layouter.addLayouterListener(getLayouterListener());
-        return layouter;
+    @Override
+    AbstractLayouter.Builder createUpBuilder(Rect anchorRect) {
+        return LTRUpLayouter.newBuilder()
+                .offsetRect(createOffsetRectForUpLayouter(anchorRect));
     }
 
     @Override
-    public ILayouter getDisappearingDownLayouter(@Nullable Rect anchorRect) {
-        Rect offsetRect = createOffsetRectForDownLayouter(anchorRect);
-
-        //down layouting should start from right point of anchor view to right point of container
-        AbstractLayouter layouter = new LTRDownLayouter(layoutManager,
-                new Square(layoutManager),
-                layoutManager.getChildGravityResolver(),
-                cacheStorage,
-                offsetRect,
-                new CriteriaAdditionalRow(new EmtpyCriteria(), getAdditionalRowsCount()),
-                new DisappearingViewBottomPlacer(layoutManager));
-
-        layouter.setMaxViewsInRow(getMaxViewsInRow());
-        layouter.addLayouterListener(getLayouterListener());
-        return layouter;
+    AbstractLayouter.Builder createDownBuilder(Rect anchorRect) {
+        return LTRDownLayouter.newBuilder()
+                .offsetRect(createOffsetRectForDownLayouter(anchorRect));
     }
-
 }
