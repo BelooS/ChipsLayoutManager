@@ -35,6 +35,7 @@ import com.beloo.widget.chipslayoutmanager.logger.IPredictiveAnimationsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -363,6 +364,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         Log.d(TAG, "disappearing views count = " + disappearingViews.size());
 
         if (disappearingViews.size() > 0) {
+            for (View view : disappearingViews.whole()) {
+                Log.w(TAG, "disappearing view pos = " + getPosition(view));
+            }
             /** we have some moving views
              * we should place it as disappearing to support predictive animations
              * we can't place all possible moves on theirs real place, because concrete layout position of particular view depends on placing of previous views
@@ -373,17 +377,21 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             Log.d(TAG, "fill disappearing views");
             //so we fill additional rows to cover nearest moves
             layouterFactory.setAdditionalRowsCount(5);
-            AnchorViewState anchorViewState = anchorFactory.createAnchorState(highestView);
+            AnchorViewState highestViewState = anchorFactory.createAnchorState(highestView);
+            AnchorViewState lowestViewState = anchorFactory.createAnchorState(lowestView);
 
-            ILayouter upLayouter = layouterFactory.getDisappearingUpLayouter(anchorViewState.getAnchorViewRect());
-            fillWithLayouter(recycler, upLayouter, anchorViewState.getPosition() - 1);
+            ILayouter upLayouter = layouterFactory.getDisappearingUpLayouter(highestViewState.getAnchorViewRect());
+            //todo layouting could reset view in scrap here, which we need actually place for predictive animations
+            fillWithLayouter(recycler, upLayouter, highestViewState.getPosition() - 1);
 
-            anchorViewState = anchorFactory.createAnchorState(lowestView);
-            ILayouter downLayouter = layouterFactory.getDisappearingDownLayouter(anchorViewState.getAnchorViewRect());
-            fillWithLayouter(recycler, downLayouter, anchorViewState.getPosition());
+            ILayouter downLayouter = layouterFactory.getDisappearingDownLayouter(lowestViewState.getAnchorViewRect());
+            fillWithLayouter(recycler, downLayouter, lowestViewState.getPosition());
 
             disappearingViews = getDisappearingViews(recycler);
             Log.d(TAG, "AFTER disappearing views count = " + disappearingViews.size());
+            for (View view : disappearingViews.whole()) {
+                Log.w(TAG, "disappearing view pos = " + getPosition(view));
+            }
 
             downLayouter = layouterFactory.createInfiniteLayouter(downLayouter);
 
@@ -411,6 +419,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         int size() {
             return upViews.size() + downViews.size();
         }
+
+        List<View> whole() {
+            LinkedList<View> wholeList = new LinkedList<>();
+            wholeList.addAll(upViews);
+            wholeList.addAll(downViews);
+            return wholeList;
+        }
+
     }
 
     public DisappearingViewsContainer getDisappearingViews(RecyclerView.Recycler recycler) {

@@ -1,6 +1,7 @@
 package com.beloo.widget.chipslayoutmanager.layouter.placer;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 
 public class RealTopPlacer extends AbstractPlacer implements IPlacer {

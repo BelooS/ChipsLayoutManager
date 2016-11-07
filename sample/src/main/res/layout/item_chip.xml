@@ -41,12 +41,25 @@
             android:layout_centerVertical="true"
             />
 
+        <TextView
+            android:id="@+id/tvPosition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/tvName"
+            android:layout_toEndOf="@id/tvName"
+            android:layout_centerVertical="true"
+            tools:text="100"
+            android:layout_marginLeft="2dp"
+            android:layout_marginStart="2dp"
+            android:textColor="@android:color/holo_red_dark"
+            />
+
         <ImageButton
             android:id="@+id/ibClose"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/tvName"
-            android:layout_toEndOf="@+id/tvName"
+            android:layout_toRightOf="@+id/tvPosition"
+            android:layout_toEndOf="@+id/tvPosition"
             android:layout_marginRight="4dp"
             android:layout_marginEnd="4dp"
             android:layout_marginLeft="4dp"

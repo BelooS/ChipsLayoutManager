@@ -162,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
         items.add(positionMoveTo, item);
 
         adapter.notifyItemMoved(position, positionMoveTo);
+        adapter.notifyItemRangeChanged(position, positionMoveTo);
     }
 
     public void onInsertClicked(View view) {

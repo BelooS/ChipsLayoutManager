@@ -1,10 +1,5 @@
 package beloo.recyclerviewcustomadapter.adapter;
 
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -23,16 +18,21 @@ import beloo.recyclerviewcustomadapter.R;
 import beloo.recyclerviewcustomadapter.entity.ChipsEntity;
 import beloo.recyclerviewcustomadapter.util.CircleTransform;
 
-import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
-
 public class ChipsAdapter extends  RecyclerView.Adapter<ChipsAdapter.ViewHolder> {
 
     private List<ChipsEntity> chipsEntities;
     private OnRemoveListener onRemoveListener;
+    private boolean isShowingPosition;
 
     public ChipsAdapter(List<ChipsEntity> chipsEntities, OnRemoveListener onRemoveListener) {
         this.chipsEntities = chipsEntities;
         this.onRemoveListener = onRemoveListener;
+    }
+
+    public ChipsAdapter(List<ChipsEntity> chipsEntities, OnRemoveListener onRemoveListener, boolean isShowingPosition) {
+        this.chipsEntities = chipsEntities;
+        this.onRemoveListener = onRemoveListener;
+        this.isShowingPosition = isShowingPosition;
     }
 
     @Override
@@ -57,6 +57,7 @@ public class ChipsAdapter extends  RecyclerView.Adapter<ChipsAdapter.ViewHolder>
         private ImageView ivPhoto;
         private TextView tvName;
         private ImageButton ibClose;
+        private TextView tvPosition;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -64,6 +65,7 @@ public class ChipsAdapter extends  RecyclerView.Adapter<ChipsAdapter.ViewHolder>
             ivPhoto = (ImageView) itemView.findViewById(R.id.ivPhoto);
             tvName = (TextView) itemView.findViewById(R.id.tvName);
             ibClose = (ImageButton) itemView.findViewById(R.id.ibClose);
+            tvPosition = (TextView) itemView.findViewById(R.id.tvPosition);
         }
 
         void bindItem(ChipsEntity entity) {
@@ -81,6 +83,10 @@ public class ChipsAdapter extends  RecyclerView.Adapter<ChipsAdapter.ViewHolder>
             }
 
             tvName.setText(entity.getName());
+
+            if (isShowingPosition) {
+                tvPosition.setText(String.valueOf(getAdapterPosition()));
+            }
 
             ibClose.setOnClickListener(new View.OnClickListener() {
                 @Override
