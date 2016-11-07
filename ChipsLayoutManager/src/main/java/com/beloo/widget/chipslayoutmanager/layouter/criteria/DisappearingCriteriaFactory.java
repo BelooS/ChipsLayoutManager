@@ -13,7 +13,7 @@ public class DisappearingCriteriaFactory implements ICriteriaFactory {
     @NonNull
     @Override
     public IFinishingCriteria getUpFinishingCriteria() {
-        throw new UnsupportedOperationException("not implemented");
+        return new CriteriaAdditionalRow(new EmtpyCriteria(), additionalRowsCount);
     }
 
     @NonNull

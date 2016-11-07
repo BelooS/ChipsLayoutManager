@@ -18,13 +18,14 @@ import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.InfiniteCriteria;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.DisappearingViewBottomPlacer;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.DisappearingViewTopPlacer;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.RealBottomPlacer;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.RealTopPlacer;
 
 public abstract class AbstractLayouterFactory {
     ChipsLayoutManager layoutManager;
-    IViewCacheStorage cacheStorage;
+    private IViewCacheStorage cacheStorage;
     @Nullable
     private Integer maxViewsInRow = null;
 
@@ -58,21 +59,21 @@ public abstract class AbstractLayouterFactory {
         this.additionalRowsCount = additionalRowsCount;
     }
 
-    int getAdditionalRowsCount() {
+    private int getAdditionalRowsCount() {
         return additionalRowsCount;
     }
 
     @Nullable
-    Integer getMaxViewsInRow() {
+    private Integer getMaxViewsInRow() {
         return maxViewsInRow;
     }
 
     @Nullable
-    ILayouterListener getLayouterListener() {
+    private ILayouterListener getLayouterListener() {
         return layouterListener;
     }
 
-    int getAdditionalHeight() {
+    private int getAdditionalHeight() {
         return additionalHeight;
     }
 
@@ -118,6 +119,17 @@ public abstract class AbstractLayouterFactory {
                 .placer(new DisappearingViewBottomPlacer(layoutManager))
                 .build();
     }
+
+    @NonNull
+    public final ILayouter getDisappearingUpLayouter(@Nullable Rect anchorRect) {
+        ICriteriaFactory criteriaFactory = new DisappearingCriteriaFactory(getAdditionalRowsCount());
+
+        return fillBasicBuilder(createDownBuilder(anchorRect))
+                .finishingCriteria(criteriaFactory.getUpFinishingCriteria())
+                .placer(new DisappearingViewTopPlacer(layoutManager))
+                .build();
+    }
+
 
     @NonNull
     public ILayouter createInfiniteLayouter(ILayouter layouter) {

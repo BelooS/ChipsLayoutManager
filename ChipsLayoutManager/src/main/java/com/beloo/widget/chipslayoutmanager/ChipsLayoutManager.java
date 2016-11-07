@@ -347,7 +347,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             //in case removing draw additional rows to show predictive animations
             AbstractLayouterFactory layouterFactory = createLayouterFactory();
-            layouterFactory.setAdditionalHeight(additionalHeight*2);
+            layouterFactory.setAdditionalHeight(additionalHeight);
 
             fill(recycler, layouterFactory, anchorView);
         }
@@ -375,6 +375,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             layouterFactory.setAdditionalRowsCount(5);
             AnchorViewState anchorViewState = anchorFactory.createAnchorState(lowestView);
 
+            ILayouter upLayouter = layouterFactory.getDisappearingUpLayouter(anchorViewState.getAnchorViewRect());
+            fillWithLayouter(recycler, upLayouter, anchorViewState.getPosition() - 1);
             ILayouter layouter = layouterFactory.getDisappearingDownLayouter(anchorViewState.getAnchorViewRect());
             fillWithLayouter(recycler, layouter, anchorViewState.getPosition());
 
