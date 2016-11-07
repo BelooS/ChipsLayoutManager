@@ -6,7 +6,10 @@ import android.support.annotation.Nullable;
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.CriteriaAdditionalRow;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.DefaultCriteriaFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.DisappearingCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.EmtpyCriteria;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.DisappearingViewBottomPlacer;
 
 public class RTLLayouterFactory extends AbstractLayouterFactory {
@@ -26,15 +29,21 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
                 anchorRect == null ? layoutManager.getPaddingBottom() : anchorRect.bottom);
     }
 
+    private ICriteriaFactory createDefaultCriteriaFactory() {
+        return new DefaultCriteriaFactory(getAdditionalHeight());
+    }
+
     public ILayouter getUpLayouter(@Nullable Rect anchorRect) {
         Rect offsetRect = createOffsetRectForUpLayouter(anchorRect);
+
+        ICriteriaFactory criteriaFactory = createDefaultCriteriaFactory();
 
         AbstractLayouter layouter = new RTLUpLayouter(layoutManager,
                 new Square(layoutManager),
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
                 offsetRect,
-                getUpFinishingCriteria(),
+                criteriaFactory.getUpFinishingCriteria(),
                 getTopPlacer());
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
@@ -55,12 +64,14 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
     public ILayouter getDownLayouter(@Nullable Rect anchorRect) {
         Rect offsetRect = createOffsetRectForDownLayouter(anchorRect);
 
+        ICriteriaFactory criteriaFactory = createDefaultCriteriaFactory();
+
         AbstractLayouter layouter = new RTLDownLayouter(layoutManager,
                 new Square(layoutManager),
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
                 offsetRect,
-                getDownFinishingCriteria(),
+                criteriaFactory.getDownFinishingCriteria(),
                 getBottomPlacer());
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
@@ -72,12 +83,14 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
     public ILayouter getDisappearingDownLayouter(@Nullable Rect anchorRect) {
         Rect offsetRect = createOffsetRectForDownLayouter(anchorRect);
 
+        ICriteriaFactory criteriaFactory = new DisappearingCriteriaFactory(getAdditionalRowsCount());
+
         AbstractLayouter layouter = new RTLDownLayouter(layoutManager,
                 new Square(layoutManager),
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
                 offsetRect,
-                new CriteriaAdditionalRow(new EmtpyCriteria(), getAdditionalRowsCount()),
+                criteriaFactory.getDownFinishingCriteria(),
                 new DisappearingViewBottomPlacer(layoutManager));
 
         layouter.setMaxViewsInRow(getMaxViewsInRow());
