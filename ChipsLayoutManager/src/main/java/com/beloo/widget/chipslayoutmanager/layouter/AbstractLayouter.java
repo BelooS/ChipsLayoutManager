@@ -4,6 +4,7 @@ import android.graphics.Rect;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
@@ -143,6 +144,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     /** calculate view positions, view won't be actually added to layout when calling this method
      * @return true if view successfully placed, false if view can't be placed because out of space on screen and have to be recycled */
     public final boolean placeView(View view) {
+        layoutManager.measureChildWithMargins(view, 0, 0);
         calculateView(view);
 
         if (canNotBePlacedInCurrentRow()) {
@@ -213,6 +215,11 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
             applyChildGravity(view, viewRect, rowTop, rowBottom);
             //add view to layout
             placer.addView(view);
+
+            if (getCurrentViewPosition() == 0) {
+                Log.d("abstract layouter", "zero view rect = " + viewRect);
+            }
+
             //layout whole views in a row
             layoutManager.layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
         }

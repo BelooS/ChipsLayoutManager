@@ -11,6 +11,14 @@ public class Item {
         this.viewPosition = viewPosition;
     }
 
+    public Rect getViewRect() {
+        return viewRect;
+    }
+
+    public int getViewPosition() {
+        return viewPosition;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

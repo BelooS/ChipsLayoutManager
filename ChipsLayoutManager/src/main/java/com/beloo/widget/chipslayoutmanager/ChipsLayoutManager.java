@@ -26,6 +26,7 @@ import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouterFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.chipslayoutmanager.layouter.ILayouter;
+import com.beloo.widget.chipslayoutmanager.layouter.ILayouterListener;
 import com.beloo.widget.chipslayoutmanager.layouter.Item;
 import com.beloo.widget.chipslayoutmanager.layouter.LTRLayouterFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.RTLLayouterFactory;
@@ -326,6 +327,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             viewPositionsStorage.purge();
             //so detach all views before we start searching for anchor view
             detachAndScrapAttachedViews(recycler);
+
         }
 
         calcRecyclerCacheSize(recycler);
@@ -337,8 +339,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             fill(recycler, layouterFactory, anchorView);
 
             layoutDisappearingViews(recycler, layouterFactory);
-
-            performNormalizationIfNeeded();
         } else {
             int additionalHeight = calcDisappearingViewsHeight(recycler);
             predictiveAnimationsLogger.heightOfCanvas(this);
@@ -346,11 +346,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             anchorView = anchorFactory.getTopLeftAnchor();
             detachAndScrapAttachedViews(recycler);
 
-            //in case removing draw additional rows to show predictive animations
+            //in case removing draw additional rows to show predictive animations for appearing views
             AbstractLayouterFactory layouterFactory = createLayouterFactory();
-            layouterFactory.setAdditionalHeight(additionalHeight * 2);
+            layouterFactory.setAdditionalHeight(additionalHeight);
+            layouterFactory.setAdditionalRowsCount(5);
 
             fill(recycler, layouterFactory, anchorView);
+
+            layoutDisappearingViews(recycler, layouterFactory);
         }
 
         deletingItemsOnScreenCount = 0;
@@ -364,9 +367,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         Log.d(TAG, "disappearing views count = " + disappearingViews.size());
 
         if (disappearingViews.size() > 0) {
-            for (View view : disappearingViews.whole()) {
-                Log.w(TAG, "disappearing view pos = " + getPosition(view));
-            }
             /** we have some moving views
              * we should place it as disappearing to support predictive animations
              * we can't place all possible moves on theirs real place, because concrete layout position of particular view depends on placing of previous views
@@ -380,6 +380,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             AnchorViewState highestViewState = anchorFactory.createAnchorState(highestView);
             AnchorViewState lowestViewState = anchorFactory.createAnchorState(lowestView);
 
+            layouterFactory.setLayouterListener(layouter -> {
+                for (Item item : layouter.getCurrentRowItems()) {
+                    disappearingViews.remove(item.getViewPosition());
+                }
+            });
+
             ILayouter upLayouter = layouterFactory.getDisappearingUpLayouter(highestViewState.getAnchorViewRect());
             //todo layouting could reset view in scrap here, which we need actually place for predictive animations
             fillWithLayouter(recycler, upLayouter, highestViewState.getPosition() - 1);
@@ -387,17 +393,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             ILayouter downLayouter = layouterFactory.getDisappearingDownLayouter(lowestViewState.getAnchorViewRect());
             fillWithLayouter(recycler, downLayouter, lowestViewState.getPosition());
 
-            disappearingViews = getDisappearingViews(recycler);
             Log.d(TAG, "AFTER disappearing views count = " + disappearingViews.size());
-            for (View view : disappearingViews.whole()) {
-                Log.w(TAG, "disappearing view pos = " + getPosition(view));
-            }
 
             downLayouter = layouterFactory.createInfiniteLayouter(downLayouter);
 
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
             for (int i = 0; i< disappearingViews.downViews.size(); i++) {
-                downLayouter.placeView(disappearingViews.downViews.get(i));
+                int position = disappearingViews.downViews.keyAt(i);
+                downLayouter.placeView(recycler.getViewForPosition(position));
             }
             //layout last row
             downLayouter.layoutRow();
@@ -405,27 +408,28 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             upLayouter = layouterFactory.createInfiniteLayouter(upLayouter);
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
             for (int i = 0; i< disappearingViews.upViews.size(); i++) {
-                upLayouter.placeView(disappearingViews.upViews.get(i));
+                int position = disappearingViews.upViews.keyAt(i);
+                upLayouter.placeView(recycler.getViewForPosition(position));
             }
+
             //layout last row
             upLayouter.layoutRow();
         }
     }
 
     private class DisappearingViewsContainer {
-        private List<View> upViews = new LinkedList<>();
-        private List<View> downViews = new LinkedList<>();
+        private SparseArray<View> upViews = new SparseArray<>();
+        private SparseArray<View> downViews = new SparseArray<>();
 
         int size() {
             return upViews.size() + downViews.size();
         }
 
-        List<View> whole() {
-            LinkedList<View> wholeList = new LinkedList<>();
-            wholeList.addAll(upViews);
-            wholeList.addAll(downViews);
-            return wholeList;
+        void remove(int position) {
+            upViews.remove(position);
+            downViews.remove(position);
         }
+
 
     }
 
@@ -442,9 +446,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             final RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) child.getLayoutParams();
             if (!lp.isItemRemoved()) {
                 if (lp.getViewAdapterPosition() < highestViewPosition) {
-                    container.upViews.add(child);
+                    container.upViews.put(lp.getViewAdapterPosition(), child);
                 } else if (lp.getViewAdapterPosition() > lowestViewPosition) {
-                    container.downViews.add(child);
+                    container.downViews.put(lp.getViewAdapterPosition(), child);
                 }
             }
         }
@@ -614,8 +618,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                     break;
                 }
                 logger.onItemRequested();
-
-                measureChildWithMargins(view, 0, 0);
 
                 if (!layouter.placeView(view)) {
                      /* reached end of visible bounds, exit.
