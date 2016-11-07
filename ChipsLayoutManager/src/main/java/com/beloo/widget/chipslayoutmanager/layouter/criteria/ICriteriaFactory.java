@@ -8,5 +8,4 @@ public interface ICriteriaFactory {
 
     @NonNull
     IFinishingCriteria getDownFinishingCriteria();
-
 }
