@@ -35,7 +35,7 @@ import com.beloo.widget.chipslayoutmanager.logger.IPredictiveAnimationsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
@@ -347,7 +347,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             //in case removing draw additional rows to show predictive animations
             AbstractLayouterFactory layouterFactory = createLayouterFactory();
-            layouterFactory.setAdditionalHeight(additionalHeight);
+            layouterFactory.setAdditionalHeight(additionalHeight * 2);
 
             fill(recycler, layouterFactory, anchorView);
         }
@@ -359,7 +359,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     /** layout disappearing view to support predictive animations */
     private void layoutDisappearingViews(RecyclerView.Recycler recycler, AbstractLayouterFactory layouterFactory) {
-        SparseArray<View> disappearingViews = getDisappearingViews(recycler);
+        DisappearingViewsContainer disappearingViews = getDisappearingViews(recycler);
         Log.d(TAG, "disappearing views count = " + disappearingViews.size());
 
         if (disappearingViews.size() > 0) {
@@ -373,43 +373,67 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             Log.d(TAG, "fill disappearing views");
             //so we fill additional rows to cover nearest moves
             layouterFactory.setAdditionalRowsCount(5);
-            AnchorViewState anchorViewState = anchorFactory.createAnchorState(lowestView);
+            AnchorViewState anchorViewState = anchorFactory.createAnchorState(highestView);
 
             ILayouter upLayouter = layouterFactory.getDisappearingUpLayouter(anchorViewState.getAnchorViewRect());
             fillWithLayouter(recycler, upLayouter, anchorViewState.getPosition() - 1);
-            ILayouter layouter = layouterFactory.getDisappearingDownLayouter(anchorViewState.getAnchorViewRect());
-            fillWithLayouter(recycler, layouter, anchorViewState.getPosition());
+
+            anchorViewState = anchorFactory.createAnchorState(lowestView);
+            ILayouter downLayouter = layouterFactory.getDisappearingDownLayouter(anchorViewState.getAnchorViewRect());
+            fillWithLayouter(recycler, downLayouter, anchorViewState.getPosition());
 
             disappearingViews = getDisappearingViews(recycler);
             Log.d(TAG, "AFTER disappearing views count = " + disappearingViews.size());
 
-
-            layouter = layouterFactory.createInfiniteLayouter(layouter);
+            downLayouter = layouterFactory.createInfiniteLayouter(downLayouter);
 
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
-            for (int i = 0; i< disappearingViews.size(); i++) {
-                int key = disappearingViews.keyAt(i);
-                layouter.placeView(disappearingViews.get(key));
+            for (int i = 0; i< disappearingViews.downViews.size(); i++) {
+                downLayouter.placeView(disappearingViews.downViews.get(i));
             }
             //layout last row
-            layouter.layoutRow();
+            downLayouter.layoutRow();
+
+            upLayouter = layouterFactory.createInfiniteLayouter(upLayouter);
+            //we should layout disappearing views left somewhere, just continue layout them in current layouter
+            for (int i = 0; i< disappearingViews.upViews.size(); i++) {
+                upLayouter.placeView(disappearingViews.upViews.get(i));
+            }
+            //layout last row
+            upLayouter.layoutRow();
         }
     }
 
-    public SparseArray<View> getDisappearingViews(RecyclerView.Recycler recycler) {
+    private class DisappearingViewsContainer {
+        private List<View> upViews = new LinkedList<>();
+        private List<View> downViews = new LinkedList<>();
+
+        int size() {
+            return upViews.size() + downViews.size();
+        }
+    }
+
+    public DisappearingViewsContainer getDisappearingViews(RecyclerView.Recycler recycler) {
         final List<RecyclerView.ViewHolder> scrapList = recycler.getScrapList();
         //views which moved from screen, but not deleted
-        final SparseArray<View> disappearingViews = new SparseArray<>(scrapList.size());
+        DisappearingViewsContainer container = new DisappearingViewsContainer();
+
+        int highestViewPosition = getPosition(highestView);
+        int lowestViewPosition = getPosition(lowestView);
 
         for (RecyclerView.ViewHolder holder : scrapList) {
             final View child = holder.itemView;
             final RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) child.getLayoutParams();
             if (!lp.isItemRemoved()) {
-                disappearingViews.put(getPosition(child), child);
+                if (lp.getViewAdapterPosition() < highestViewPosition) {
+                    container.upViews.add(child);
+                } else if (lp.getViewAdapterPosition() > lowestViewPosition) {
+                    container.downViews.add(child);
+                }
             }
         }
 
-        return disappearingViews;
+        return container;
     }
 
     private Rect containsInVisibleRow(View view) {
@@ -558,11 +582,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         AbstractPositionIterator iterator = layouter.positionIterator();
         //start from anchor position
         iterator.move(startingPos);
-        logger.onStartLayouter();
+        logger.onStartLayouter(startingPos);
 
         while (iterator.hasNext()) {
             int pos = iterator.next();
-            Log.w(TAG, "pos = " + pos);
             View view = viewCache.get(pos);
             if (view == null) { // we don't have view from previous layouter stage, request new one
                 try {

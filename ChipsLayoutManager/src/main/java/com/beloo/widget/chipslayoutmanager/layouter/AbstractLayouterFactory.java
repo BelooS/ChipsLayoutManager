@@ -124,7 +124,7 @@ public abstract class AbstractLayouterFactory {
     public final ILayouter getDisappearingUpLayouter(@Nullable Rect anchorRect) {
         ICriteriaFactory criteriaFactory = new DisappearingCriteriaFactory(getAdditionalRowsCount());
 
-        return fillBasicBuilder(createDownBuilder(anchorRect))
+        return fillBasicBuilder(createUpBuilder(anchorRect))
                 .finishingCriteria(criteriaFactory.getUpFinishingCriteria())
                 .placer(new DisappearingViewTopPlacer(layoutManager))
                 .build();

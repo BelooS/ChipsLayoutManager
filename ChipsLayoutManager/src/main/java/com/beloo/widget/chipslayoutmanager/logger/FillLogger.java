@@ -18,11 +18,12 @@ public class FillLogger implements IFillLogger {
     }
 
     @Override
-    public void onStartLayouter() {
+    public void onStartLayouter(int startPosition) {
         requestedItems = 0;
         recycledItems = 0;
         startCacheSize = viewCache.size();
 
+        Log.d("fillWithLayouter", "start position = " + startPosition);
         Log.d("fillWithLayouter", "cached items = " + startCacheSize);
     }
 

@@ -4,8 +4,7 @@ import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 
 public interface IFillLogger {
 
-
-    void onStartLayouter();
+    void onStartLayouter(int startPosition);
 
     void onItemRequested();
 

@@ -1,11 +1,13 @@
 package com.beloo.widget.chipslayoutmanager.logger;
 
+import android.util.Log;
+
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 
-public class EmptyFillLogger implements IFillLogger {
+public class StartPositionLogger implements IFillLogger {
     @Override
-    public void onStartLayouter(int position) {
-
+    public void onStartLayouter(int startPosition) {
+        Log.d("fillWithLayouter", "start position = " + startPosition);
     }
 
     @Override
