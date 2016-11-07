@@ -1,4 +1,6 @@
-package com.beloo.widget.chipslayoutmanager.layouter;
+package com.beloo.widget.chipslayoutmanager.layouter.criteria;
+
+import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouter;
 
 public class CriteriaUpLayouterFinished implements IFinishingCriteria {
 

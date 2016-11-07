@@ -1,13 +1,13 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
-import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 
 class RTLUpLayouter extends AbstractLayouter implements ILayouter {
@@ -16,12 +16,13 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     protected int viewLeft;
 
     RTLUpLayouter(ChipsLayoutManager spanLayoutManager,
+                  ICanvas canvas,
                   IChildGravityResolver childGravityResolver,
                   IViewCacheStorage cacheStorage,
                   Rect offsetRect,
                   IFinishingCriteria finishingCriteria,
                   IPlacer placer) {
-        super(spanLayoutManager, offsetRect, cacheStorage, childGravityResolver, finishingCriteria, placer);
+        super(spanLayoutManager, canvas, offsetRect, cacheStorage, childGravityResolver, finishingCriteria, placer);
         this.viewLeft = offsetRect.left;
     }
 

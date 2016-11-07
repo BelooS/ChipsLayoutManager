@@ -16,9 +16,10 @@ import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.GravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifier;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 
-public abstract class AbstractLayouter implements ILayouter {
+public abstract class AbstractLayouter implements ILayouter, ICanvas {
     int currentViewWidth;
     int currentViewHeight;
     private int currentViewPosition;
@@ -38,28 +39,32 @@ public abstract class AbstractLayouter implements ILayouter {
     private int rowSize = 0;
     private int previousRowSize;
 
+    //--- input dependencies
     private ChipsLayoutManager layoutManager;
     private IViewCacheStorage cacheStorage;
-
+    private ICanvas canvas;
     @NonNull
     private IChildGravityResolver childGravityResolver;
+    @NonNull
+    private IFinishingCriteria finishingCriteria;
+    @NonNull
+    private IPlacer placer;
+    //--- end input dependencies
+
     private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
 
     private List<ILayouterListener> layouterListeners = new LinkedList<>();
 
-    @NonNull
-    private IFinishingCriteria finishingCriteria;
-
-    @NonNull
-    private IPlacer placer;
 
     AbstractLayouter(@NonNull ChipsLayoutManager layoutManager,
+                     @NonNull ICanvas canvas,
                      @NonNull Rect offsetRect,
                      IViewCacheStorage cacheStorage,
                      @NonNull IChildGravityResolver childGravityResolver,
                      @NonNull IFinishingCriteria finishingCriteria,
                      @NonNull IPlacer placer) {
         this.layoutManager = layoutManager;
+        this.canvas = canvas;
         this.rowTop = offsetRect.top;
         this.rowBottom = offsetRect.bottom;
         this.cacheStorage = cacheStorage;
@@ -72,12 +77,20 @@ public abstract class AbstractLayouter implements ILayouter {
         this.finishingCriteria = finishingCriteria;
     }
 
-    final int getCanvasRightBorder() {
-        return layoutManager.getWidth() - layoutManager.getPaddingRight();
+    public final int getCanvasRightBorder() {
+        return canvas.getCanvasRightBorder();
     }
 
-    final int getCanvasBottomBorder() {
-        return layoutManager.getHeight();
+    public final int getCanvasBottomBorder() {
+        return canvas.getCanvasBottomBorder();
+    }
+
+    public final int getCanvasLeftBorder() {
+        return canvas.getCanvasLeftBorder();
+    }
+
+    public final int getCanvasTopBorder() {
+        return canvas.getCanvasTopBorder();
     }
 
     public List<Item> getCurrentRowItems() {
@@ -86,14 +99,6 @@ public abstract class AbstractLayouter implements ILayouter {
             items.add(new Item(rowView.first, layoutManager.getPosition(rowView.second)));
         }
         return items;
-    }
-
-    final int getCanvasLeftBorder() {
-        return layoutManager.getPaddingLeft();
-    }
-
-    final int getCanvasTopBorder() {
-        return 0;
     }
 
     final int getCurrentViewPosition() {

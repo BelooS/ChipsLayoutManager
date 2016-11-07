@@ -5,6 +5,8 @@ import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.CriteriaAdditionalRow;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.EmtpyCriteria;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.DisappearingViewBottomPlacer;
 
 public class RTLLayouterFactory extends AbstractLayouterFactory {
@@ -28,6 +30,7 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
         Rect offsetRect = createOffsetRectForUpLayouter(anchorRect);
 
         AbstractLayouter layouter = new RTLUpLayouter(layoutManager,
+                new Square(layoutManager),
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
                 offsetRect,
@@ -53,6 +56,7 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
         Rect offsetRect = createOffsetRectForDownLayouter(anchorRect);
 
         AbstractLayouter layouter = new RTLDownLayouter(layoutManager,
+                new Square(layoutManager),
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
                 offsetRect,
@@ -69,6 +73,7 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
         Rect offsetRect = createOffsetRectForDownLayouter(anchorRect);
 
         AbstractLayouter layouter = new RTLDownLayouter(layoutManager,
+                new Square(layoutManager),
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
                 offsetRect,

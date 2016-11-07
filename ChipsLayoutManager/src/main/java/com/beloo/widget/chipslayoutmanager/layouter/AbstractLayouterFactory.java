@@ -7,6 +7,11 @@ import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.CriteriaDownAdditionalHeight;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.CriteriaDownLayouterFinished;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.CriteriaUpLayouterFinished;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.InfiniteCriteria;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.RealBottomPlacer;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.RealTopPlacer;

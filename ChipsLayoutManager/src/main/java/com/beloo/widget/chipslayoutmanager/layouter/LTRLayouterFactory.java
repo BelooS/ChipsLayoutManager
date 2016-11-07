@@ -1,14 +1,13 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
-import android.support.annotation.IntRange;
 import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.CriteriaAdditionalRow;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.EmtpyCriteria;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.DisappearingViewBottomPlacer;
-import com.beloo.widget.chipslayoutmanager.layouter.placer.RealBottomPlacer;
-import com.beloo.widget.chipslayoutmanager.layouter.placer.RealTopPlacer;
 
 public class LTRLayouterFactory extends AbstractLayouterFactory {
 
@@ -29,6 +28,7 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
         Rect offsetRect = createOffsetRectForUpLayouter(anchorRect);
 
         AbstractLayouter layouter = new LTRUpLayouter(layoutManager,
+                new Square(layoutManager),
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
                 offsetRect,
@@ -54,6 +54,7 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
 
         //down layouting should start from right point of anchor view to right point of container
         AbstractLayouter layouter = new LTRDownLayouter(layoutManager,
+                new Square(layoutManager),
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
                 offsetRect,
@@ -71,6 +72,7 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
 
         //down layouting should start from right point of anchor view to right point of container
         AbstractLayouter layouter = new LTRDownLayouter(layoutManager,
+                new Square(layoutManager),
                 layoutManager.getChildGravityResolver(),
                 cacheStorage,
                 offsetRect,

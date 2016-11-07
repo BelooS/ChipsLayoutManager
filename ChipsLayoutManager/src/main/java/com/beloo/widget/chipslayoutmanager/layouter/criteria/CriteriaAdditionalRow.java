@@ -1,4 +1,8 @@
-package com.beloo.widget.chipslayoutmanager.layouter;
+package com.beloo.widget.chipslayoutmanager.layouter.criteria;
+
+import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouter;
+import com.beloo.widget.chipslayoutmanager.layouter.ILayouter;
+import com.beloo.widget.chipslayoutmanager.layouter.ILayouterListener;
 
 public class CriteriaAdditionalRow extends FinishingCriteriaDecorator implements IFinishingCriteria, ILayouterListener {
 

@@ -1,10 +1,12 @@
-package com.beloo.widget.chipslayoutmanager.layouter;
+package com.beloo.widget.chipslayoutmanager.layouter.criteria;
+
+import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouter;
 
 public class CriteriaDownAdditionalHeight extends FinishingCriteriaDecorator {
 
     private int additionalHeight;
 
-    CriteriaDownAdditionalHeight(IFinishingCriteria finishingCriteria, int additionalHeight) {
+    public CriteriaDownAdditionalHeight(IFinishingCriteria finishingCriteria, int additionalHeight) {
         super(finishingCriteria);
         this.additionalHeight = additionalHeight;
     }
