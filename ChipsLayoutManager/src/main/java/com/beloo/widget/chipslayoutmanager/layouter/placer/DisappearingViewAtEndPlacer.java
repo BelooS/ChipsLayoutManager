@@ -17,5 +17,8 @@ class DisappearingViewAtEndPlacer extends AbstractPlacer {
     @Override
     public void addView(View view) {
         getLayoutManager().addDisappearingView(view);
+
+        Timber.i("added disappearing view, position = " + getLayoutManager().getPosition(view));
+//        Timber.d("name = " + ((TextView)view.findViewById(R.id.tvName)).getText().toString());
     }
 }
