@@ -40,7 +40,6 @@ or custom `FlowLayout`s.
 * items gravity inside row support. For all items or only for required ones
 * LTR and RTL support
 * activity orientation change support
-* predictive animations supported (animate view movement outside of visible bounds)
 
 <p align="center">
     <img src="/images/animations.gif" alt="ChipsLayoutManager. Default RecyclerView animations support">
