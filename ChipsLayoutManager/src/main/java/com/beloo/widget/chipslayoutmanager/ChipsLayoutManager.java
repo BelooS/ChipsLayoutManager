@@ -39,6 +39,7 @@ import java.util.List;
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
     private static final int INT_ROW_SIZE_APPROXIMATELY_FOR_CACHE = 10;
+    private static final int APPROXIMATE_ADDITIONAL_ROWS_COUNT = 5;
     /**
      * coefficient to support fast scrolling, caching views only for one row may not be enough
      */
@@ -335,10 +336,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
              * like moving from 0 position to 15 for example, where user could scroll fast and check
              */
             //so we fill additional rows to cover nearest moves
-            layouterFactory.setAdditionalRowsCount(5);
+            layouterFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
             fill(recycler, layouterFactory, anchorView, true);
 
-//            layoutDisappearingViews(recycler, layouterFactory);
+            performNormalizationIfNeeded();
         } else {
             int additionalHeight = calcDisappearingViewsHeight(recycler);
             predictiveAnimationsLogger.heightOfCanvas(this);
@@ -349,7 +350,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             //in case removing draw additional rows to show predictive animations for appearing views
             AbstractLayouterFactory layouterFactory = createLayouterFactory();
             layouterFactory.setAdditionalHeight(additionalHeight);
-            layouterFactory.setAdditionalRowsCount(5);
+            layouterFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
 
             fill(recycler, layouterFactory, anchorView, false);
         }

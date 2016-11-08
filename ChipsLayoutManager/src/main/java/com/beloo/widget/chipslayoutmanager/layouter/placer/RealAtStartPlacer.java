@@ -14,6 +14,6 @@ class RealAtStartPlacer extends AbstractPlacer implements IPlacer {
         //mark that we add view at beginning of children
         getLayoutManager().addView(view, 0);
 
-        Log.d("RealTopPlacer", "add view " +getLayoutManager().getPosition(view) + " at top");
+        Log.i("RealTopPlacer", "add view " +getLayoutManager().getPosition(view) + " at top");
     }
 }

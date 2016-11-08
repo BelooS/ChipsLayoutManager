@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 public class LoggerFactory {
     @NonNull
     public IFillLogger getFillLogger() {
-        return new StartPositionLogger();
+        return new EmptyFillLogger();
     }
 
     @NonNull
