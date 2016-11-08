@@ -328,6 +328,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             detachAndScrapAttachedViews(recycler);
 
             AbstractLayouterFactory layouterFactory = createLayouterFactory();
+            /** In case some moving views
+             * we should place it at layout to support predictive animations
+             * we can't place all possible moves on theirs real place, because concrete layout position of particular view depends on placing of previous views
+             * and there could be moving from 0 position to 10k. But it is preferably to place nearest moved view to real positions to make moving more natural
+             * like moving from 0 position to 15 for example, where user could scroll fast and check
+             */
+            //so we fill additional rows to cover nearest moves
+            layouterFactory.setAdditionalRowsCount(5);
             fill(recycler, layouterFactory, anchorView, true);
 
 //            layoutDisappearingViews(recycler, layouterFactory);
@@ -358,33 +366,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         Log.d(TAG, "disappearing views count = " + disappearingViews.size());
 
         if (disappearingViews.size() > 0) {
-            /** we have some moving views
-             * we should place it at layout to support predictive animations
-             * we can't place all possible moves on theirs real place, because concrete layout position of particular view depends on placing of previous views
-             * and there could be moving from 0 position to 10k. But it is preferably to place nearest moved view to real positions to make moving more natural
-             * like moving from 0 position to 15 for example, where user could scroll fast and check
-             */
-
             Log.d(TAG, "fill disappearing views");
-            //so we fill additional rows to cover nearest moves
-            layouterFactory.setAdditionalRowsCount(5);
-
-            Log.d(TAG, "lowest view position =" + getPosition(lowestView));
-
-            layouterFactory.addLayouterListener(layouter -> {
-                for (Item item : layouter.getCurrentRowItems()) {
-                    disappearingViews.remove(item.getViewPosition());
-                }
-            });
-
-            upLayouter = layouterFactory.buildUpLayouter(upLayouter);
-            downLayouter = layouterFactory.buildDownLayouter(downLayouter);
-
-            fillWithLayouter(recycler, upLayouter);
-            fillWithLayouter(recycler, downLayouter);
-
-            Log.d(TAG, "AFTER disappearing views count = " + disappearingViews.size());
-
             downLayouter = layouterFactory.buildInfiniteLayouter(layouterFactory.getDisappearingDownLayouter(downLayouter));
 
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
