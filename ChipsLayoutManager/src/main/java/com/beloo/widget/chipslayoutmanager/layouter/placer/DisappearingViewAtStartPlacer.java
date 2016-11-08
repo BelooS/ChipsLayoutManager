@@ -19,7 +19,7 @@ class DisappearingViewAtStartPlacer extends AbstractPlacer {
     public void addView(View view) {
         getLayoutManager().addDisappearingView(view, 0);
 
-        Timber.i("added disappearing view, position = " + getLayoutManager().getPosition(view));
-        Timber.d("name = " + ((TextView)view.findViewById(R.id.tvName)).getText().toString());
+//        Timber.i("added disappearing view, position = " + getLayoutManager().getPosition(view));
+//        Timber.d("name = " + ((TextView)view.findViewById(R.id.tvName)).getText().toString());
     }
 }
