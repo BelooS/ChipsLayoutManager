@@ -7,9 +7,9 @@ import android.widget.TextView;
 
 import com.beloo.widget.chipslayoutmanager.R;
 
-public class DisappearingViewAtStartPlacer extends AbstractPlacer {
+class DisappearingViewAtStartPlacer extends AbstractPlacer {
 
-    public DisappearingViewAtStartPlacer(RecyclerView.LayoutManager layoutManager) {
+    DisappearingViewAtStartPlacer(RecyclerView.LayoutManager layoutManager) {
         super(layoutManager);
     }
 
