@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
             items.remove(position);
             Log.i("activity", "delete at " + position);
             adapter.notifyItemRemoved(position);
-            updateSpinner();
+            updateSpinners();
         }
     };
 
@@ -108,18 +108,23 @@ public class MainActivity extends AppCompatActivity {
         outState.putParcelableArrayList(EXTRA, new ArrayList<>(items));
     }
 
-    private void updateSpinner() {
+    private void updateSpinners() {
         positions = new LinkedList<>();
         for (int i = 0; i< items.size(); i++) {
             positions.add(String.valueOf(i));
         }
 
-        int selectedPosition = spinnerPosition.getSelectedItemPosition();
+        int selectedPosition = Math.min(spinnerPosition.getSelectedItemPosition(), positions.size() - 1);
+        int selectedMoveToPosition = Math.min(spinnerMoveTo.getSelectedItemPosition(), positions.size() -1);
 
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, positions);
         spinnerPosition.setAdapter(spinnerAdapter);
         selectedPosition = Math.min(spinnerAdapter.getCount() -1 , selectedPosition);
         spinnerPosition.setSelection(selectedPosition);
+
+        ArrayAdapter<String> spinnerAdapterMoveTo = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, positions);
+        spinnerMoveTo.setAdapter(spinnerAdapterMoveTo);
+        spinnerMoveTo.setSelection(selectedMoveToPosition);
     }
 
     public void onRevertClicked(View view) {
@@ -144,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         items.remove(position);
         Log.i("activity", "delete at " + position);
         adapter.notifyItemRemoved(position);
-        updateSpinner();
+        updateSpinners();
     }
 
     public void onMoveClicked(View view) {
@@ -162,7 +167,6 @@ public class MainActivity extends AppCompatActivity {
         items.add(positionMoveTo, item);
 
         adapter.notifyItemMoved(position, positionMoveTo);
-//        adapter.notifyItemRangeChanged(position, positionMoveTo);
     }
 
     public void onInsertClicked(View view) {
@@ -172,6 +176,6 @@ public class MainActivity extends AppCompatActivity {
         items.add(position, itemsFactory.createOneItemForPosition(position));
         Log.i("activity", "insert at " + position);
         adapter.notifyItemInserted(position);
-        updateSpinner();
+        updateSpinners();
     }
 }
