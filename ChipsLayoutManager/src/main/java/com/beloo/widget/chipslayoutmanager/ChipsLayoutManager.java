@@ -36,6 +36,8 @@ import com.beloo.widget.chipslayoutmanager.logger.LoggerFactory;
 
 import java.util.List;
 
+import timber.log.Timber;
+
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
     private static final int INT_ROW_SIZE_APPROXIMATELY_FOR_CACHE = 10;
@@ -125,6 +127,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private int deletingItemsOnScreenCount;
 
     private ChipsLayoutManager(Context context) {
+        //Timber
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
+
         @DeviceOrientation
         int orientation = context.getResources().getConfiguration().orientation;
         this.orientation = orientation;
@@ -266,7 +273,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         viewPositionsStorage.onRestoreInstanceState(container.getPositionsCache(orientation));
         cacheNormalizationPosition = 0;
 //        cacheNormalizationPosition = container.getNormalizationPosition(orientation);
-        Log.d(TAG, "RESTORE. orientation = " + orientation + " normalizationPos = " + cacheNormalizationPosition);
+        Timber.d("RESTORE. orientation = " + orientation + " normalizationPos = " + cacheNormalizationPosition);
     }
 
     @Override
@@ -285,7 +292,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 //        } else {
 //            storedNormalizationPosition = cacheNormalizationPosition;
 //        }
-//        Log.d(TAG, "STORE. orientation = " + orientation + " normalizationPos = " + storedNormalizationPosition);
+//        Timber.d(TAG, "STORE. orientation = " + orientation + " normalizationPos = " + storedNormalizationPosition);
 //
 //        container.putNormalizationPosition(orientation, storedNormalizatdionPosition);
 
@@ -364,10 +371,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private void layoutDisappearingViews(RecyclerView.Recycler recycler, AbstractLayouterFactory layouterFactory,
                                          ILayouter upLayouter, ILayouter downLayouter) {
         DisappearingViewsContainer disappearingViews = getDisappearingViews(recycler);
-        Log.d(TAG, "disappearing views count = " + disappearingViews.size());
+        Timber.d("disappearing views count = " + disappearingViews.size());
 
         if (disappearingViews.size() > 0) {
-            Log.d(TAG, "fill disappearing views");
+            Timber.d("fill disappearing views");
             downLayouter = layouterFactory.buildInfiniteLayouter(layouterFactory.getDisappearingDownLayouter(downLayouter));
 
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
@@ -763,9 +770,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         //perform normalization when we have reached previous position then normalization position
         if (cacheNormalizationPosition != null && (topViewPosition < cacheNormalizationPosition ||
                 (cacheNormalizationPosition == 0 && cacheNormalizationPosition == topViewPosition))) {
-            Log.d(TAG, "normalization, position = " + cacheNormalizationPosition + " top view position = " + topViewPosition);
-            Log.d(TAG, "top view top = " + getDecoratedTop(topView));
-            Log.d(TAG, "top view bottom = " + getDecoratedBottom(topView));
+            Timber.d("normalization, position = " + cacheNormalizationPosition + " top view position = " + topViewPosition);
             viewPositionsStorage.purgeCacheFromPosition(cacheNormalizationPosition);
             //reset normalization position
             cacheNormalizationPosition = null;
@@ -778,7 +783,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     public void scrollToPosition(int position) {
         if (position >= getItemCount() || position < 0) {
-            Log.e("span layout manager", "Cannot scroll to " + position + ", item count " + getItemCount());
+            Timber.e("span layout manager", "Cannot scroll to " + position + ", item count " + getItemCount());
             return;
         }
 
@@ -796,7 +801,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, final int position) {
         if (position >= getItemCount() || position < 0) {
-            Log.e("span layout manager", "Cannot scroll to " + position + ", item count " + getItemCount());
+            Timber.e("span layout manager", "Cannot scroll to " + position + ", item count " + getItemCount());
             return;
         }
 

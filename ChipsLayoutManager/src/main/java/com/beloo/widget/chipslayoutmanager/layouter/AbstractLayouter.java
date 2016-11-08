@@ -20,6 +20,8 @@ import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifier;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 
+import timber.log.Timber;
+
 public abstract class AbstractLayouter implements ILayouter, ICanvas {
     int currentViewWidth;
     int currentViewHeight;
@@ -241,7 +243,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
             placer.addView(view);
 
             if (getCurrentViewPosition() == 0) {
-                Log.d("abstract layouter", "zero view rect = " + viewRect);
+                Timber.d("abstract layouter", "zero view rect = " + viewRect);
             }
 
             //layout whole views in a row

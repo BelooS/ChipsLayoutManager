@@ -40,7 +40,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 break;
         }
         viewHolderCount++;
-//        Log.w(TAG, "created holders = " + viewHolderCount);
+//        Timber.w(TAG, "created holders = " + viewHolderCount);
         return new ViewHolder(itemView);
     }
 

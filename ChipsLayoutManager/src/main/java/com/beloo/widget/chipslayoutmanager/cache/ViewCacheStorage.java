@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
+import timber.log.Timber;
+
 class ViewCacheStorage implements IViewCacheStorage {
     private static final String TAG = ViewCacheStorage.class.getSimpleName();
     private static final int SIZE_MAX_CACHE = 1000;
@@ -59,7 +61,7 @@ class ViewCacheStorage implements IViewCacheStorage {
     @Override
     public void setCachingEnabled(boolean isEnabled) {
         if (isCachingEnabled == isEnabled) return;
-        Log.i(TAG, isEnabled ? "caching enabled" : "caching disabled");
+        Timber.i(isEnabled ? "caching enabled" : "caching disabled");
         isCachingEnabled = isEnabled;
     }
 
@@ -104,7 +106,7 @@ class ViewCacheStorage implements IViewCacheStorage {
 
     @Override
     public void purgeCacheToPosition(int position) {
-        Log.d(TAG, "cache purged to position " + position);
+        Timber.d("cache purged to position " + position);
         Iterator<Integer> removeIterator = startsRow.headSet(position).iterator();
         while (removeIterator.hasNext()) {
             removeIterator.next();
@@ -132,7 +134,7 @@ class ViewCacheStorage implements IViewCacheStorage {
 
     @Override
     public void purgeCacheFromPosition(int position) {
-        Log.d(TAG, "cache purged from position " + position);
+        Timber.d("cache purged from position " + position);
 
         Iterator<Integer> removeIterator = startsRow.tailSet(position, true).iterator();
         while (removeIterator.hasNext()) {
