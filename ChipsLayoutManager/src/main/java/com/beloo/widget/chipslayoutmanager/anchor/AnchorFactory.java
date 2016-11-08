@@ -40,6 +40,10 @@ public class AnchorFactory implements IAnchorFactory {
         if (!topLeft.isNotFoundState()) {
             assert topLeft.getAnchorViewRect() != null;
             topLeft.getAnchorViewRect().top = minTop;
+            /* we don't need bottom coordinate for layouter
+            also this helps to normalize row properly when anchor deleted and was the biggest view in a row
+            */
+            topLeft.getAnchorViewRect().bottom = 0;
         }
 
         return topLeft;
