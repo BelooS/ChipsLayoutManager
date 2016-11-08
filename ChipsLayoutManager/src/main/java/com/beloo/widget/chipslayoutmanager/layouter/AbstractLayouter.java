@@ -274,6 +274,10 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         return rowBottom;
     }
 
+    Rect getOffsetRect() {
+        return new Rect(viewLeft, rowTop, viewRight, rowBottom);
+    }
+
     int getLeftOffset() {
         return viewRight;
     }

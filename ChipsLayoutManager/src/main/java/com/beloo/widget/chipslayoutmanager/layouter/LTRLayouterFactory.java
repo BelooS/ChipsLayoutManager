@@ -15,33 +15,33 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
         super(cacheStorage, layoutManager);
     }
 
-    private Rect createOffsetRectForUpLayouter(Rect anchorRect) {
+    @Override
+    Rect createOffsetRectForUpLayouter(Rect anchorRect) {
         return new Rect(
                 0,
-                anchorRect == null? layoutManager.getPaddingTop() : anchorRect.top,
+                anchorRect == null ? layoutManager.getPaddingTop() : anchorRect.top,
                 //we shouldn't include anchor view here, so anchorLeft is a rightOffset
                 anchorRect == null ? layoutManager.getPaddingRight() : anchorRect.left,
-                anchorRect == null? layoutManager.getPaddingBottom() : anchorRect.bottom);
+                anchorRect == null ? layoutManager.getPaddingBottom() : anchorRect.bottom);
     }
 
-    private Rect createOffsetRectForDownLayouter(Rect anchorRect) {
+    @Override
+    Rect createOffsetRectForDownLayouter(Rect anchorRect) {
         return new Rect(
                 //we should include anchor view here, so anchorLeft is a leftOffset
                 anchorRect == null ? layoutManager.getPaddingLeft() : anchorRect.left,
-                anchorRect == null? layoutManager.getPaddingTop() : anchorRect.top,
+                anchorRect == null ? layoutManager.getPaddingTop() : anchorRect.top,
                 0,
-                anchorRect == null? layoutManager.getPaddingBottom() : anchorRect.bottom);
+                anchorRect == null ? layoutManager.getPaddingBottom() : anchorRect.bottom);
     }
 
     @Override
-    AbstractLayouter.Builder createUpBuilder(Rect anchorRect) {
-        return LTRUpLayouter.newBuilder()
-                .offsetRect(createOffsetRectForUpLayouter(anchorRect));
+    AbstractLayouter.Builder createUpBuilder() {
+        return LTRUpLayouter.newBuilder();
     }
 
     @Override
-    AbstractLayouter.Builder createDownBuilder(Rect anchorRect) {
-        return LTRDownLayouter.newBuilder()
-                .offsetRect(createOffsetRectForDownLayouter(anchorRect));
+    AbstractLayouter.Builder createDownBuilder() {
+        return LTRDownLayouter.newBuilder();
     }
 }

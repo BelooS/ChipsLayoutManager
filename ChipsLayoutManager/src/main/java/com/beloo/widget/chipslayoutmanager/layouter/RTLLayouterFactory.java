@@ -19,8 +19,8 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
     }
 
     //---- up layouter below
-
-    private Rect createOffsetRectForUpLayouter(Rect anchorRect) {
+    @Override
+    Rect createOffsetRectForUpLayouter(Rect anchorRect) {
         return new Rect(
                 //we shouldn't include anchor view here, so anchorLeft is a rightOffset
                 anchorRect == null ? layoutManager.getPaddingLeft() : anchorRect.right,
@@ -30,20 +30,19 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
     }
 
     @Override
-    AbstractLayouter.Builder createUpBuilder(Rect anchorRect) {
-        return RTLUpLayouter.newBuilder()
-                .offsetRect(createOffsetRectForUpLayouter(anchorRect));
+    AbstractLayouter.Builder createUpBuilder() {
+        return RTLUpLayouter.newBuilder();
     }
 
     //---- down layouter below
 
     @Override
-    AbstractLayouter.Builder createDownBuilder(Rect anchorRect) {
-        return RTLDownLayouter.newBuilder()
-                .offsetRect(createOffsetRectForDownLayouter(anchorRect));
+    AbstractLayouter.Builder createDownBuilder() {
+        return RTLDownLayouter.newBuilder();
     }
 
-    private Rect createOffsetRectForDownLayouter(Rect anchorRect) {
+    @Override
+    Rect createOffsetRectForDownLayouter(Rect anchorRect) {
         return new Rect(
                 0,
                 anchorRect == null ? layoutManager.getPaddingTop() : anchorRect.top,
