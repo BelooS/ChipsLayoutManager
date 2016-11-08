@@ -562,7 +562,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         logger.onAfterRemovingViews();
 
         if (isLayoutDisappearing) {
-//            layoutDisappearingViews(recycler, layouterFactory, upLayouter, downLayouter);
+            layoutDisappearingViews(recycler, layouterFactory, upLayouter, downLayouter);
         }
     }
 

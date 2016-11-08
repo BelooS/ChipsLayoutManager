@@ -38,7 +38,7 @@ class RTLDownLayouter extends AbstractLayouter {
     }
 
     @Override
-    public AbstractPositionIterator positionIterator() {
+    AbstractPositionIterator createPositionIterator() {
         return new IncrementalPositionIterator(getLayoutManager().getItemCount());
     }
 

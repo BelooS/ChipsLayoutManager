@@ -79,10 +79,9 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
-    public AbstractPositionIterator positionIterator() {
+    AbstractPositionIterator createPositionIterator() {
         return new DecrementalPositionIterator();
     }
-
 
     public static final class Builder extends AbstractLayouter.Builder {
         private Builder() {

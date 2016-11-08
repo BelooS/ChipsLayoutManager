@@ -142,7 +142,7 @@ public abstract class AbstractLayouterFactory {
         return fillBasicBuilder(createDownBuilder())
                 .offsetRect(((AbstractLayouter)layouter).getOffsetRect())
                 .finishingCriteria(criteriaFactory.getDownFinishingCriteria())
-                .placer(new DisappearingViewBottomPlacer(layoutManager))
+                .placer(new RealBottomPlacer(layoutManager))
                 .build();
     }
 

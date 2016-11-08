@@ -57,11 +57,14 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     private Integer maxViewsInRow = null;
     //--- end input dependencies
 
+    private AbstractPositionIterator positionIterator;
+
     private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
 
     private List<ILayouterListener> layouterListeners = new LinkedList<>();
 
     AbstractLayouter(Builder builder) {
+        //--- read builder
         layoutManager = builder.layoutManager;
         cacheStorage = builder.cacheStorage;
         canvas = builder.canvas;
@@ -74,10 +77,18 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         this.viewLeft = builder.offsetRect.left;
         this.maxViewsInRow = builder.maxCountInRow;
         this.layouterListeners = builder.layouterListeners;
+        //--- end read builder
+
+        positionIterator = createPositionIterator();
     }
 
     public void setFinishingCriteria(@NonNull IFinishingCriteria finishingCriteria) {
         this.finishingCriteria = finishingCriteria;
+    }
+
+    @Override
+    public AbstractPositionIterator positionIterator() {
+        return positionIterator;
     }
 
     public final int getCanvasRightBorder() {
@@ -186,6 +197,8 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
 
     /** called after row have been layouted. Children should prepare new row here. */
     abstract void onAfterLayout();
+
+    abstract AbstractPositionIterator createPositionIterator();
 
     @CallSuper
     @Override
