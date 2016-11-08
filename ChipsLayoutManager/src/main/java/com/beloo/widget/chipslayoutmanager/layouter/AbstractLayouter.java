@@ -30,6 +30,11 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     /** top of current row*/
     int rowTop;
 
+    /** right offset */
+    int viewRight;
+    /** left offset*/
+    int viewLeft;
+
     @Nullable
     private Integer leftBorderOfPreviouslyAttachedView = null;
 
@@ -65,6 +70,8 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         placer = builder.placer;
         this.rowTop = builder.offsetRect.top;
         this.rowBottom = builder.offsetRect.bottom;
+        this.viewRight = builder.offsetRect.right;
+        this.viewLeft = builder.offsetRect.left;
         this.maxViewsInRow = builder.maxCountInRow;
         this.layouterListeners = builder.layouterListeners;
     }
@@ -265,6 +272,14 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     @Override
     public int getRowBottom() {
         return rowBottom;
+    }
+
+    int getLeftOffset() {
+        return viewRight;
+    }
+
+    int getRightOffset() {
+        return viewLeft;
     }
 
     public abstract static class Builder {

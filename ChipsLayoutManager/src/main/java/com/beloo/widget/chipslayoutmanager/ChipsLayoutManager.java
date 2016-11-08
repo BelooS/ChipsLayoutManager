@@ -338,7 +338,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             AbstractLayouterFactory layouterFactory = createLayouterFactory();
             fill(recycler, layouterFactory, anchorView);
 
-            layoutDisappearingViews(recycler, layouterFactory);
+//            layoutDisappearingViews(recycler, layouterFactory);
         } else {
             int additionalHeight = calcDisappearingViewsHeight(recycler);
             predictiveAnimationsLogger.heightOfCanvas(this);
@@ -352,8 +352,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             layouterFactory.setAdditionalRowsCount(5);
 
             fill(recycler, layouterFactory, anchorView);
-
-            layoutDisappearingViews(recycler, layouterFactory);
         }
 
         deletingItemsOnScreenCount = 0;
@@ -379,6 +377,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             layouterFactory.setAdditionalRowsCount(5);
             AnchorViewState highestViewState = anchorFactory.createAnchorState(highestView);
             AnchorViewState lowestViewState = anchorFactory.createAnchorState(lowestView);
+
+            Log.d(TAG, "lowest view position =" + getPosition(lowestView));
 
             layouterFactory.setLayouterListener(layouter -> {
                 for (Item item : layouter.getCurrentRowItems()) {

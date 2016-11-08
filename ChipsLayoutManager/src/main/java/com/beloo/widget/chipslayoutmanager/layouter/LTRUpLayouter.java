@@ -13,11 +13,8 @@ import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 
 class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
-    private int viewRight;
-
     private LTRUpLayouter(Builder builder) {
         super(builder);
-        viewRight = builder.viewRight;
     }
 
     public static Builder newBuilder() {
@@ -88,16 +85,7 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
 
     public static final class Builder extends AbstractLayouter.Builder {
-        private int viewRight;
-
         private Builder() {
-        }
-
-        @NonNull
-        @Override
-        public AbstractLayouter.Builder offsetRect(@NonNull Rect offsetRect) {
-            viewRight = offsetRect.right;
-            return super.offsetRect(offsetRect);
         }
 
         @NonNull

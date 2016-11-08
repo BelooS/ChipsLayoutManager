@@ -12,11 +12,8 @@ import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 
 class LTRDownLayouter extends AbstractLayouter {
 
-    private int viewLeft;
-
     private LTRDownLayouter(Builder builder) {
         super(builder);
-        viewLeft = builder.viewLeft;
     }
 
     public static Builder newBuilder() {
@@ -65,16 +62,7 @@ class LTRDownLayouter extends AbstractLayouter {
     }
 
     public static final class Builder extends AbstractLayouter.Builder {
-        private int viewLeft;
-
         private Builder() {
-        }
-
-        @NonNull
-        @Override
-        public AbstractLayouter.Builder offsetRect(@NonNull Rect offsetRect) {
-            this.viewLeft = offsetRect.left;
-            return super.offsetRect(offsetRect);
         }
 
         @NonNull
