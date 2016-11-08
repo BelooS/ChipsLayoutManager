@@ -99,10 +99,8 @@ All pull requests are welcome. I've tried to make code clean & readable, so the 
 I appreciate any help and contributors will be mentioned here. 
 
 ### Known issues
-* Cache of view positions is cleared on orientation change. But it wouldn't be so critical, because views are going to be properly repositioned 
-when user will scroll to start again.
-
-This issues are going to be fixed in next versions.
+I create issues in tracking board of known problems.
+These issues are going to be fixed in next versions.
 
 ### License [![license for ChipsLayoutManager](https://img.shields.io/crates/l/rustc-serialize.svg)](#)
 
