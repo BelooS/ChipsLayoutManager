@@ -44,7 +44,7 @@ or custom `FlowLayout`s.
 * predictive animations supported (animate view movement outside of visible bounds)
 
 <p align="center">
-    <img src="/images/insert_delete_animations.gif" alt="ChipsLayoutManager. Default RecyclerView animations support"> <img src="/images/insert_delete_animations.gif" alt="ChipsLayoutManager. Default RecyclerView animations support">
+    <img src="/images/insert_delete_animations.gif" alt="ChipsLayoutManager. Default RecyclerView animations support">       <img src="/images/move_animations.gif" alt="ChipsLayoutManager. Movement animations support">
 </p>
 
 ###Layout Directions
