@@ -101,18 +101,6 @@ public abstract class AbstractLayouterFactory {
         IPlacerFactory placerFactory = new RealPlacerFactory(layoutManager);
 
         return fillBasicBuilder(createDownBuilder())
-                .offsetRect(createOffsetRectForUpLayouter(anchorRect))
-                .finishingCriteria(criteriaFactory.getDownFinishingCriteria())
-                .placer(placerFactory.getAtEndPlacer())
-                .build();
-    }
-
-    @NonNull
-    public final ILayouter getDisappearingDownLayouter(@Nullable Rect anchorRect) {
-        ICriteriaFactory criteriaFactory = new DisappearingCriteriaFactory(getAdditionalRowsCount());
-        IPlacerFactory placerFactory = new DisappearingPlacerFactory(layoutManager);
-
-        return fillBasicBuilder(createDownBuilder())
                 .offsetRect(createOffsetRectForDownLayouter(anchorRect))
                 .finishingCriteria(criteriaFactory.getDownFinishingCriteria())
                 .placer(placerFactory.getAtEndPlacer())
@@ -120,15 +108,27 @@ public abstract class AbstractLayouterFactory {
     }
 
     @NonNull
-    public final ILayouter getDisappearingUpLayouter(@Nullable Rect anchorRect) {
-        ICriteriaFactory criteriaFactory = new DisappearingCriteriaFactory(getAdditionalRowsCount());
-        IPlacerFactory placerFactory = new DisappearingPlacerFactory(layoutManager);
+    public final ILayouter buildUpLayouter(@NonNull ILayouter layouter) {
+        ICriteriaFactory criteriaFactory = new DefaultCriteriaFactory(getAdditionalHeight());
+        IPlacerFactory placerFactory = new RealPlacerFactory(layoutManager);
 
-        return fillBasicBuilder(createUpBuilder())
-                .offsetRect(createOffsetRectForUpLayouter(anchorRect))
-                .finishingCriteria(criteriaFactory.getUpFinishingCriteria())
-                .placer(placerFactory.getAtEndPlacer())
-                .build();
+        AbstractLayouter abstractLayouter = (AbstractLayouter) layouter;
+        abstractLayouter.setFinishingCriteria(criteriaFactory.getUpFinishingCriteria());
+        abstractLayouter.setPlacer(placerFactory.getAtEndPlacer());
+
+        return abstractLayouter;
+    }
+
+    @NonNull
+    public final ILayouter buildDownLayouter(@NonNull ILayouter layouter) {
+        ICriteriaFactory criteriaFactory = new DefaultCriteriaFactory(getAdditionalHeight());
+        IPlacerFactory placerFactory = new RealPlacerFactory(layoutManager);
+
+        AbstractLayouter abstractLayouter = (AbstractLayouter) layouter;
+        abstractLayouter.setFinishingCriteria(criteriaFactory.getDownFinishingCriteria());
+        abstractLayouter.setPlacer(placerFactory.getAtEndPlacer());
+
+        return abstractLayouter;
     }
 
     @NonNull

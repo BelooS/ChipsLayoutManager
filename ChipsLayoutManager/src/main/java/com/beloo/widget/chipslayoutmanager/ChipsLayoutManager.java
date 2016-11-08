@@ -377,6 +377,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 }
             });
 
+            upLayouter = layouterFactory.buildUpLayouter(upLayouter);
+            downLayouter = layouterFactory.buildDownLayouter(downLayouter);
+
             fillWithLayouter(recycler, upLayouter);
             fillWithLayouter(recycler, downLayouter);
 
