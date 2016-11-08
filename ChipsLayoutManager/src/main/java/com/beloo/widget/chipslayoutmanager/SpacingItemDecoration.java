@@ -1,4 +1,4 @@
-package beloo.recyclerviewcustomadapter;
+package com.beloo.widget.chipslayoutmanager;
 
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
