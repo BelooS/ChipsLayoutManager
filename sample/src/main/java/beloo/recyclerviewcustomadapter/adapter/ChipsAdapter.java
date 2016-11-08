@@ -22,7 +22,7 @@ public class ChipsAdapter extends  RecyclerView.Adapter<ChipsAdapter.ViewHolder>
 
     private List<ChipsEntity> chipsEntities;
     private OnRemoveListener onRemoveListener;
-    private boolean isShowingPosition = false;
+    private boolean isShowingPosition;
 
     public ChipsAdapter(List<ChipsEntity> chipsEntities, OnRemoveListener onRemoveListener) {
         this.chipsEntities = chipsEntities;
