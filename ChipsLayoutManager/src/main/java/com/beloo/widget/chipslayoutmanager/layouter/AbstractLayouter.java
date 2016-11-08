@@ -57,7 +57,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     private Integer maxViewsInRow = null;
     //--- end input dependencies
 
-    private AbstractPositionIterator positionIterator;
+    private AbstractPositionIterator positionIterator = createPositionIterator();
 
     private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
 
@@ -78,11 +78,9 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         this.maxViewsInRow = builder.maxCountInRow;
         this.layouterListeners = builder.layouterListeners;
         //--- end read builder
-
-        positionIterator = createPositionIterator();
     }
 
-    public void setFinishingCriteria(@NonNull IFinishingCriteria finishingCriteria) {
+    void setFinishingCriteria(@NonNull IFinishingCriteria finishingCriteria) {
         this.finishingCriteria = finishingCriteria;
     }
 
@@ -199,6 +197,10 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     abstract void onAfterLayout();
 
     abstract AbstractPositionIterator createPositionIterator();
+
+    void setPlacer(@NonNull IPlacer placer) {
+        this.placer = placer;
+    }
 
     @CallSuper
     @Override

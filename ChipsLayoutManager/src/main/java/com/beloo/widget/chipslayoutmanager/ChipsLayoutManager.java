@@ -34,7 +34,6 @@ import com.beloo.widget.chipslayoutmanager.logger.IFillLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IPredictiveAnimationsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
@@ -354,13 +353,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     /** layout disappearing view to support predictive animations */
     private void layoutDisappearingViews(RecyclerView.Recycler recycler, AbstractLayouterFactory layouterFactory,
-                                         ILayouter upInput, ILayouter downInput) {
+                                         ILayouter upLayouter, ILayouter downLayouter) {
         DisappearingViewsContainer disappearingViews = getDisappearingViews(recycler);
         Log.d(TAG, "disappearing views count = " + disappearingViews.size());
 
         if (disappearingViews.size() > 0) {
             /** we have some moving views
-             * we should place it as disappearing to support predictive animations
+             * we should place it at layout to support predictive animations
              * we can't place all possible moves on theirs real place, because concrete layout position of particular view depends on placing of previous views
              * and there could be moving from 0 position to 10k. But it is preferably to place nearest moved view to real positions to make moving more natural
              * like moving from 0 position to 15 for example, where user could scroll fast and check
@@ -369,8 +368,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             Log.d(TAG, "fill disappearing views");
             //so we fill additional rows to cover nearest moves
             layouterFactory.setAdditionalRowsCount(5);
-            AnchorViewState highestViewState = anchorFactory.createAnchorState(highestView);
-            AnchorViewState lowestViewState = anchorFactory.createAnchorState(lowestView);
 
             Log.d(TAG, "lowest view position =" + getPosition(lowestView));
 
@@ -380,15 +377,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 }
             });
 
-            ILayouter upLayouter = layouterFactory.getDisappearingUpLayouter(upInput);
-            fillWithLayouter(recycler, upLayouter, highestViewState.getPosition() - 1);
-
-            ILayouter downLayouter = layouterFactory.getDisappearingDownLayouter(downInput);
-            fillWithLayouter(recycler, downLayouter, lowestViewState.getPosition() + 2);
+            fillWithLayouter(recycler, upLayouter);
+            fillWithLayouter(recycler, downLayouter);
 
             Log.d(TAG, "AFTER disappearing views count = " + disappearingViews.size());
 
-            downLayouter = layouterFactory.createInfiniteLayouter(downLayouter);
+            downLayouter = layouterFactory.buildInfiniteLayouter(layouterFactory.getDisappearingDownLayouter(downLayouter));
 
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
             for (int i = 0; i< disappearingViews.downViews.size(); i++) {
@@ -398,7 +392,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             //layout last row
             downLayouter.layoutRow();
 
-            upLayouter = layouterFactory.createInfiniteLayouter(upLayouter);
+            upLayouter = layouterFactory.buildInfiniteLayouter(layouterFactory.getDisappearingUpLayouter(upLayouter));
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
             for (int i = 0; i< disappearingViews.upViews.size(); i++) {
                 int position = disappearingViews.upViews.keyAt(i);
@@ -544,9 +538,21 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         //up layouter should be invoked earlier than down layouter, because views with lower positions positioned above anchorView
         ILayouter upLayouter = layouterFactory.getUpLayouter(anchorRect);
-        fillWithLayouter(recycler, upLayouter, startingPos - 1);
+
+        AbstractPositionIterator iterator = upLayouter.positionIterator();
+        //start from anchor position
+        iterator.move(startingPos - 1);
+        logger.onStartLayouter(startingPos - 1);
+
+        fillWithLayouter(recycler, upLayouter);
         ILayouter downLayouter = layouterFactory.getDownLayouter(anchorRect);
-        fillWithLayouter(recycler, downLayouter, startingPos);
+
+        iterator = downLayouter.positionIterator();
+        //start from anchor position
+        iterator.move(startingPos);
+        logger.onStartLayouter(startingPos);
+
+        fillWithLayouter(recycler, downLayouter);
 
         findHighestAndLowestViews();
 
@@ -582,12 +588,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /**
      * place views in layout started from chosen position with chosen layouter
      */
-    private void fillWithLayouter(RecyclerView.Recycler recycler, ILayouter layouter, int startingPos) {
+    private void fillWithLayouter(RecyclerView.Recycler recycler, ILayouter layouter) {
         AbstractPositionIterator iterator = layouter.positionIterator();
-        //start from anchor position
-        iterator.move(startingPos);
-        logger.onStartLayouter(startingPos);
-
         while (iterator.hasNext()) {
             int pos = iterator.next();
             View view = viewCache.get(pos);

@@ -7,21 +7,14 @@ import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.CriteriaAdditionalRow;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.CriteriaDownAdditionalHeight;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.CriteriaDownLayouterFinished;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.CriteriaUpLayouterFinished;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.DefaultCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.DisappearingCriteriaFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.EmtpyCriteria;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.InfiniteCriteria;
-import com.beloo.widget.chipslayoutmanager.layouter.placer.DisappearingViewBottomPlacer;
-import com.beloo.widget.chipslayoutmanager.layouter.placer.DisappearingViewTopPlacer;
-import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
-import com.beloo.widget.chipslayoutmanager.layouter.placer.RealBottomPlacer;
-import com.beloo.widget.chipslayoutmanager.layouter.placer.RealTopPlacer;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.DisappearingViewAtEndPlacer;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.DisappearingViewAtStartPlacer;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.RealAtEndPlacer;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.RealAtStartPlacer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,7 +91,7 @@ public abstract class AbstractLayouterFactory {
         return fillBasicBuilder(createUpBuilder())
                 .offsetRect(createOffsetRectForUpLayouter(anchorRect))
                 .finishingCriteria(criteriaFactory.getUpFinishingCriteria())
-                .placer(new RealTopPlacer(layoutManager))
+                .placer(new RealAtStartPlacer(layoutManager))
                 .build();
     }
 
@@ -109,7 +102,7 @@ public abstract class AbstractLayouterFactory {
         return fillBasicBuilder(createDownBuilder())
                 .offsetRect(createOffsetRectForUpLayouter(anchorRect))
                 .finishingCriteria(criteriaFactory.getDownFinishingCriteria())
-                .placer(new RealBottomPlacer(layoutManager))
+                .placer(new RealAtEndPlacer(layoutManager))
                 .build();
     }
 
@@ -120,7 +113,7 @@ public abstract class AbstractLayouterFactory {
         return fillBasicBuilder(createDownBuilder())
                 .offsetRect(createOffsetRectForDownLayouter(anchorRect))
                 .finishingCriteria(criteriaFactory.getDownFinishingCriteria())
-                .placer(new DisappearingViewBottomPlacer(layoutManager))
+                .placer(new DisappearingViewAtEndPlacer(layoutManager))
                 .build();
     }
 
@@ -131,7 +124,7 @@ public abstract class AbstractLayouterFactory {
         return fillBasicBuilder(createUpBuilder())
                 .offsetRect(createOffsetRectForUpLayouter(anchorRect))
                 .finishingCriteria(criteriaFactory.getUpFinishingCriteria())
-                .placer(new DisappearingViewTopPlacer(layoutManager))
+                .placer(new DisappearingViewAtStartPlacer(layoutManager))
                 .build();
     }
 
@@ -139,27 +132,33 @@ public abstract class AbstractLayouterFactory {
     public final ILayouter getDisappearingDownLayouter(@NonNull ILayouter layouter) {
         ICriteriaFactory criteriaFactory = new DisappearingCriteriaFactory(getAdditionalRowsCount());
 
-        return fillBasicBuilder(createDownBuilder())
-                .offsetRect(((AbstractLayouter)layouter).getOffsetRect())
-                .finishingCriteria(criteriaFactory.getDownFinishingCriteria())
-                .placer(new RealBottomPlacer(layoutManager))
-                .build();
+        AbstractLayouter abstractLayouter = (AbstractLayouter) layouter;
+        abstractLayouter.setFinishingCriteria(criteriaFactory.getDownFinishingCriteria());
+        abstractLayouter.setPlacer(new DisappearingViewAtEndPlacer(layoutManager));
+
+//        return fillBasicBuilder(createDownBuilder())
+//                .offsetRect(((AbstractLayouter)layouter).getOffsetRect())
+//                .finishingCriteria(criteriaFactory.getDownFinishingCriteria())
+//                .placer(new DisappearingViewBottomPlacer(layoutManager))
+//                .build();
+
+        return abstractLayouter;
     }
 
     @NonNull
     public final ILayouter getDisappearingUpLayouter(@NonNull ILayouter layouter) {
         ICriteriaFactory criteriaFactory = new DisappearingCriteriaFactory(getAdditionalRowsCount());
 
-        return fillBasicBuilder(createUpBuilder())
-                .offsetRect(((AbstractLayouter)layouter).getOffsetRect())
-                .finishingCriteria(criteriaFactory.getUpFinishingCriteria())
-                .placer(new DisappearingViewTopPlacer(layoutManager))
-                .build();
+        AbstractLayouter abstractLayouter = (AbstractLayouter) layouter;
+        abstractLayouter.setFinishingCriteria(criteriaFactory.getUpFinishingCriteria());
+        abstractLayouter.setPlacer(new DisappearingViewAtStartPlacer(layoutManager));
+
+        return abstractLayouter;
     }
 
 
     @NonNull
-    public ILayouter createInfiniteLayouter(ILayouter layouter) {
+    public ILayouter buildInfiniteLayouter(ILayouter layouter) {
         ((AbstractLayouter)layouter).setFinishingCriteria(new InfiniteCriteria());
         return layouter;
     }

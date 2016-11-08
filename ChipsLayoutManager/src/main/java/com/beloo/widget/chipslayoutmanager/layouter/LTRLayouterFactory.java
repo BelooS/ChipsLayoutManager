@@ -1,13 +1,9 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
-import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.CriteriaAdditionalRow;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.EmtpyCriteria;
-import com.beloo.widget.chipslayoutmanager.layouter.placer.DisappearingViewBottomPlacer;
 
 public class LTRLayouterFactory extends AbstractLayouterFactory {
 
