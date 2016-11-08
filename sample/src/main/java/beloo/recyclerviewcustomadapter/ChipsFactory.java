@@ -112,6 +112,7 @@ public class ChipsFactory implements IItemsFactory<ChipsEntity> {
     public ChipsEntity createOneItemForPosition(int position) {
         return ChipsEntity.newBuilder()
                 .name("Newbie " + position)
+                .drawableResId(R.drawable.china_girl)
                 .build();
     }
 
