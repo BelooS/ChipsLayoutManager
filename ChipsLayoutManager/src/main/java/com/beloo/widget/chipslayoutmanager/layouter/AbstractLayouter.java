@@ -355,6 +355,12 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         }
 
         @NonNull
+        final Builder addLayouterListeners(@NonNull List<ILayouterListener> layouterListeners) {
+            this.layouterListeners.addAll(layouterListeners);
+            return this;
+        }
+
+        @NonNull
         public abstract AbstractLayouter build();
     }
 }

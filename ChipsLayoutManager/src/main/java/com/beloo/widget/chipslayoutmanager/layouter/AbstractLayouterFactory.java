@@ -23,6 +23,9 @@ import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.RealBottomPlacer;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.RealTopPlacer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class AbstractLayouterFactory {
     ChipsLayoutManager layoutManager;
     private IViewCacheStorage cacheStorage;
@@ -32,8 +35,7 @@ public abstract class AbstractLayouterFactory {
     @IntRange(from = 0)
     private int additionalRowsCount;
 
-    @Nullable
-    private ILayouterListener layouterListener;
+    private List<ILayouterListener> layouterListeners = new ArrayList<>();
 
     private int additionalHeight;
 
@@ -42,8 +44,10 @@ public abstract class AbstractLayouterFactory {
         this.layoutManager = layoutManager;
     }
 
-    public void setLayouterListener(@Nullable ILayouterListener layouterListener) {
-        this.layouterListener = layouterListener;
+    public void addLayouterListener(@Nullable ILayouterListener layouterListener) {
+        if (layouterListener != null) {
+            layouterListeners.add(layouterListener);
+        }
     }
 
     public void setMaxViewsInRow(@Nullable Integer maxViewsInRow) {
@@ -68,11 +72,6 @@ public abstract class AbstractLayouterFactory {
         return maxViewsInRow;
     }
 
-    @Nullable
-    private ILayouterListener getLayouterListener() {
-        return layouterListener;
-    }
-
     private int getAdditionalHeight() {
         return additionalHeight;
     }
@@ -89,7 +88,7 @@ public abstract class AbstractLayouterFactory {
                 .childGravityResolver(layoutManager.getChildGravityResolver())
                 .cacheStorage(cacheStorage)
                 .maxCountInRow(getMaxViewsInRow())
-                .addLayouterListener(getLayouterListener());
+                .addLayouterListeners(layouterListeners);
     }
 
     @NonNull
