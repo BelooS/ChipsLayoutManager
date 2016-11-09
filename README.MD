@@ -1,4 +1,4 @@
-# ChipsLayoutManager <img alt="ChipsLayoutManager is an android library" src="https://www.cleveroad.com/public/comercial/label-android.svg" height="19"> [![minSdk for ChipsLayoutManager](https://img.shields.io/badge/minSdk-15-green.svg)](#)
+# ChipsLayoutManager <img alt="ChipsLayoutManager is an android library" src="https://www.cleveroad.com/public/comercial/label-android.svg" height="19"> [![minSdk for ChipsLayoutManager](https://img.shields.io/badge/minSdk-15-green.svg)](#) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-ChipsLayoutManager-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/4568#)
 ![ChipsLayoutManager for RecyclerView. Custom layout manager for RecyclerView](/images/header.png)
 
 ## This is ChipsLayoutManager - custom Recycler View's LayoutManager which moves item to the next line when no space left on the current 
@@ -14,6 +14,7 @@ but with support of CRUD animations i decided to make such stuff and share it.
 ## Setup and usage
 ### Installation [ ![Download](https://api.bintray.com/packages/beloo/widget/ChipsLayoutManager/images/download.svg) ](https://bintray.com/beloo/widget/ChipsLayoutManager/_latestVersion)
 
+with gradle
 ```GRADLE 
 compile 'com.beloo.widget:ChipsLayoutManager:0.1.2'
 ```
@@ -40,16 +41,20 @@ or custom `FlowLayout`s.
 * items gravity inside row support. For all items or only for required ones
 * LTR and RTL support
 * activity orientation change support
+* predictive animations supported (animate view movement outside of visible bounds)
 
-<p align="center">
-    <img src="/images/animations.gif" alt="ChipsLayoutManager. Default RecyclerView animations support">
-</p>
+| Insert/delete | Move |
+|---|---|
+|![Insert/delete animations with ChipsLayoutManager](/images/insert_delete_animations.gif) |![Move animations with ChipsLayoutManager](/images/move_animations.gif)|
 
 ###Layout Directions
+<center>
 
 | Left to Right  | Right to Left  |
 |---|---|
 |![Left to Right implementation of ChipsLayoutManager](/images/ltr.png) |![Right to Left implementation of ChipsLayoutManager](/images/rtl.png)|
+
+</center>
 
 ### Usage
 
@@ -89,6 +94,10 @@ ViewCompat.setLayoutDirection(recyclerView, ViewCompat.LAYOUT_DIRECTION_RTL);
 
 For example look at sample application.
 <br />
+### Bonus
+You may need an `RecyclerView.ItemDecoration` to work with `ChipsLayoutManager` for fast setup as showed in sample. <br/>
+It contained in same package and named `SpacingItemDecoration`.
+
 ## Support
 BETA is going.
 I respond to your founded issues. Just create a ticket if you found something goes wrong.

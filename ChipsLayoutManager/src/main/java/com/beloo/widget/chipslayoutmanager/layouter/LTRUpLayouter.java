@@ -1,28 +1,24 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 
 class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
-    private int viewRight;
-
-    LTRUpLayouter(ChipsLayoutManager layoutManager,
-                  IChildGravityResolver childGravityResolver,
-                  IViewCacheStorage cacheStorage,
-                  int topOffset,int rightOffset, int bottomOffset) {
-        super(layoutManager, topOffset, bottomOffset, cacheStorage, childGravityResolver);
-        this.viewRight = rightOffset;
+    private LTRUpLayouter(Builder builder) {
+        super(builder);
     }
 
-    @Override
-    void addView(View view) {
-        getLayoutManager().addView(view, 0);
+    public static Builder newBuilder() {
+        return new Builder();
     }
 
     @Override
@@ -73,11 +69,6 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
-    public boolean isFinishedLayouting() {
-        return rowBottom < getCanvasTopBorder();
-    }
-
-    @Override
     public boolean canNotBePlacedInCurrentRow() {
         //when go up, check cache to layout according previous down algorithm
         boolean stopDueToCache = getCacheStorage().isPositionEndsRow(getCurrentViewPosition());
@@ -88,8 +79,18 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
-    public AbstractPositionIterator positionIterator() {
+    AbstractPositionIterator createPositionIterator() {
         return new DecrementalPositionIterator();
     }
 
+
+    public static final class Builder extends AbstractLayouter.Builder {
+        private Builder() {
+        }
+
+        @NonNull
+        public LTRUpLayouter build() {
+            return new LTRUpLayouter(this);
+        }
+    }
 }

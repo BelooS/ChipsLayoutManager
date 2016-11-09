@@ -2,7 +2,9 @@ package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
 import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
@@ -15,8 +17,12 @@ import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.GravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifier;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 
-abstract class AbstractLayouter implements ILayouter {
+import timber.log.Timber;
+
+public abstract class AbstractLayouter implements ILayouter, ICanvas {
     int currentViewWidth;
     int currentViewHeight;
     private int currentViewPosition;
@@ -26,47 +32,89 @@ abstract class AbstractLayouter implements ILayouter {
     /** top of current row*/
     int rowTop;
 
+    /** right offset */
+    int viewRight;
+    /** left offset*/
+    int viewLeft;
+
     @Nullable
     private Integer leftBorderOfPreviouslyAttachedView = null;
-
-    /** Max items in row restriction. Layout of row should be stopped when this count of views reached*/
-    @Nullable
-    private Integer maxViewsInRow = null;
 
     private int rowSize = 0;
     private int previousRowSize;
 
+    //--- input dependencies
     private ChipsLayoutManager layoutManager;
     private IViewCacheStorage cacheStorage;
-
+    private ICanvas canvas;
+    @NonNull
     private IChildGravityResolver childGravityResolver;
+    @NonNull
+    private IFinishingCriteria finishingCriteria;
+    @NonNull
+    private IPlacer placer;
+
+    /** Max items in row restriction. Layout of row should be stopped when this count of views reached*/
+    @Nullable
+    private Integer maxViewsInRow = null;
+    //--- end input dependencies
+
+    private AbstractPositionIterator positionIterator;
+
     private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
 
-    @Nullable
-    private ILayouterListener layouterListener;
+    private List<ILayouterListener> layouterListeners = new LinkedList<>();
 
-    AbstractLayouter(ChipsLayoutManager layoutManager, int topOffset, int bottomOffset, IViewCacheStorage cacheStorage, IChildGravityResolver childGravityResolver) {
-        this.layoutManager = layoutManager;
-        this.rowTop = topOffset;
-        this.rowBottom = bottomOffset;
-        this.cacheStorage = cacheStorage;
-        this.childGravityResolver = childGravityResolver;
+    AbstractLayouter(Builder builder) {
+        //--- read builder
+        layoutManager = builder.layoutManager;
+        cacheStorage = builder.cacheStorage;
+        canvas = builder.canvas;
+        childGravityResolver = builder.childGravityResolver;
+        setFinishingCriteria(builder.finishingCriteria);
+        placer = builder.placer;
+        this.rowTop = builder.offsetRect.top;
+        this.rowBottom = builder.offsetRect.bottom;
+        this.viewRight = builder.offsetRect.right;
+        this.viewLeft = builder.offsetRect.left;
+        this.maxViewsInRow = builder.maxCountInRow;
+        this.layouterListeners = builder.layouterListeners;
+        //--- end read builder
+
+        positionIterator = createPositionIterator();
     }
 
-    final int getCanvasRightBorder() {
-        return layoutManager.getWidth() - layoutManager.getPaddingRight();
+    void setFinishingCriteria(@NonNull IFinishingCriteria finishingCriteria) {
+        this.finishingCriteria = finishingCriteria;
     }
 
-    final int getCanvasBottomBorder() {
-        return layoutManager.getHeight();
+    @Override
+    public AbstractPositionIterator positionIterator() {
+        return positionIterator;
     }
 
-    final int getCanvasLeftBorder() {
-        return layoutManager.getPaddingLeft();
+    public final int getCanvasRightBorder() {
+        return canvas.getCanvasRightBorder();
     }
 
-    final int getCanvasTopBorder() {
-        return 0;
+    public final int getCanvasBottomBorder() {
+        return canvas.getCanvasBottomBorder();
+    }
+
+    public final int getCanvasLeftBorder() {
+        return canvas.getCanvasLeftBorder();
+    }
+
+    public final int getCanvasTopBorder() {
+        return canvas.getCanvasTopBorder();
+    }
+
+    public List<Item> getCurrentRowItems() {
+        List<Item> items = new LinkedList<>();
+        for (Pair<Rect, View> rowView : rowViews) {
+            items.add(new Item(rowView.first, layoutManager.getPosition(rowView.second)));
+        }
+        return items;
     }
 
     final int getCurrentViewPosition() {
@@ -77,9 +125,22 @@ abstract class AbstractLayouter implements ILayouter {
         return cacheStorage;
     }
 
+    public void addLayouterListener(ILayouterListener layouterListener) {
+        if (layouterListener != null)
+            layouterListeners.add(layouterListener);
+    }
+
     @Override
-    public void setLayouterListener(ILayouterListener layouterListener) {
-        this.layouterListener = layouterListener;
+    public void removeLayouterListener(ILayouterListener layouterListener) {
+        layouterListeners.remove(layouterListener);
+    }
+
+    private void notifyLayouterListeners() {
+        if (rowSize > 0) {
+            for (ILayouterListener layouterListener : layouterListeners) {
+                layouterListener.onLayoutRow(this);
+            }
+        }
     }
 
     @Override
@@ -103,6 +164,7 @@ abstract class AbstractLayouter implements ILayouter {
     /** calculate view positions, view won't be actually added to layout when calling this method
      * @return true if view successfully placed, false if view can't be placed because out of space on screen and have to be recycled */
     public final boolean placeView(View view) {
+        layoutManager.measureChildWithMargins(view, 0, 0);
         calculateView(view);
 
         if (canNotBePlacedInCurrentRow()) {
@@ -119,7 +181,9 @@ abstract class AbstractLayouter implements ILayouter {
     }
 
     /** if all necessary view have placed*/
-    abstract boolean isFinishedLayouting();
+    boolean isFinishedLayouting() {
+        return finishingCriteria.isFinishedLayouting(this);
+    }
 
     /** check if we can not add current view to row*/
     @CallSuper
@@ -130,14 +194,17 @@ abstract class AbstractLayouter implements ILayouter {
     /** factory method for Rect, where view will be placed. Creation based on inner layouter parameters */
     abstract Rect createViewRect(View view);
 
-    /** add view to layout manager */
-    abstract void addView(View view);
-
     /** called when layouter ready to add row to canvas. Children could perform normalization actions on created row*/
     abstract void onPreLayout();
 
     /** called after row have been layouted. Children should prepare new row here. */
     abstract void onAfterLayout();
+
+    abstract AbstractPositionIterator createPositionIterator();
+
+    void setPlacer(@NonNull IPlacer placer) {
+        this.placer = placer;
+    }
 
     @CallSuper
     @Override
@@ -173,14 +240,17 @@ abstract class AbstractLayouter implements ILayouter {
 
             applyChildGravity(view, viewRect, rowTop, rowBottom);
             //add view to layout
-            addView(view);
+            placer.addView(view);
+
+            if (getCurrentViewPosition() == 0) {
+                Timber.d("abstract layouter", "zero view rect = " + viewRect);
+            }
+
             //layout whole views in a row
             layoutManager.layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
         }
 
-        if (layouterListener != null) {
-            layouterListener.onLayoutRow(this);
-        }
+        notifyLayouterListeners();
 
         onAfterLayout();
 
@@ -199,7 +269,7 @@ abstract class AbstractLayouter implements ILayouter {
         gravityModifier.modifyChildRect(rowTop, rowBottom, viewRect);
     }
 
-    ChipsLayoutManager getLayoutManager() {
+    public ChipsLayoutManager getLayoutManager() {
         return layoutManager;
     }
 
@@ -214,8 +284,102 @@ abstract class AbstractLayouter implements ILayouter {
     }
 
     @Override
+    public Rect getRowRect() {
+        return new Rect(getCanvasLeftBorder(), rowTop, getCanvasRightBorder(), getRowBottom());
+    }
+
+    @Override
     public int getRowBottom() {
         return rowBottom;
     }
 
+    Rect getOffsetRect() {
+        return new Rect(viewLeft, rowTop, viewRight, rowBottom);
+    }
+
+    int getLeftOffset() {
+        return viewRight;
+    }
+
+    int getRightOffset() {
+        return viewLeft;
+    }
+
+    public abstract static class Builder {
+        private ChipsLayoutManager layoutManager;
+        private IViewCacheStorage cacheStorage;
+        private ICanvas canvas;
+        private IChildGravityResolver childGravityResolver;
+        private IFinishingCriteria finishingCriteria;
+        private IPlacer placer;
+        private Rect offsetRect;
+        private Integer maxCountInRow;
+        private List<ILayouterListener> layouterListeners = new LinkedList<>();
+
+        Builder() {}
+
+        @NonNull
+        public Builder offsetRect(@NonNull Rect offsetRect) {
+            this.offsetRect = offsetRect;
+            return this;
+        }
+
+        @NonNull
+        public final Builder layoutManager(@NonNull ChipsLayoutManager layoutManager) {
+            this.layoutManager = layoutManager;
+            return this;
+        }
+
+        Builder maxCountInRow(Integer maxCountInRow) {
+            this.maxCountInRow = maxCountInRow;
+            return this;
+        }
+
+        @NonNull
+        final Builder cacheStorage(@NonNull IViewCacheStorage cacheStorage) {
+            this.cacheStorage = cacheStorage;
+            return this;
+        }
+
+        @NonNull
+        final Builder canvas(@NonNull ICanvas canvas) {
+            this.canvas = canvas;
+            return this;
+        }
+
+        @NonNull
+        final Builder childGravityResolver(@NonNull IChildGravityResolver childGravityResolver) {
+            this.childGravityResolver = childGravityResolver;
+            return this;
+        }
+
+        @NonNull
+        final Builder finishingCriteria(@NonNull IFinishingCriteria finishingCriteria) {
+            this.finishingCriteria = finishingCriteria;
+            return this;
+        }
+
+        @NonNull
+        public final Builder placer(@NonNull IPlacer placer) {
+            this.placer = placer;
+            return this;
+        }
+
+        @NonNull
+        final Builder addLayouterListener(@Nullable ILayouterListener layouterListener) {
+            if (layouterListener != null) {
+                layouterListeners.add(layouterListener);
+            }
+            return this;
+        }
+
+        @NonNull
+        final Builder addLayouterListeners(@NonNull List<ILayouterListener> layouterListeners) {
+            this.layouterListeners.addAll(layouterListeners);
+            return this;
+        }
+
+        @NonNull
+        public abstract AbstractLayouter build();
+    }
 }

@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.3"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
 
     defaultConfig {
         applicationId "com.beloo.spanlayoutmanager.sample"
         minSdkVersion 15
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
     }
@@ -19,13 +19,13 @@ android {
     }
 }
 
-def supportVersion = "24+";
+def supportVersion = "25+";
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile "com.android.support:appcompat-v7:$supportVersion"
-    compile project(':ChipsLayoutManager')
+    compile project(path: ':ChipsLayoutManager', configuration: 'debug')
     compile "com.android.support:recyclerview-v7:$supportVersion"
     compile 'com.github.bumptech.glide:glide:3.7.0'
 }

@@ -1,21 +1,23 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 
 class RTLDownLayouter extends AbstractLayouter {
 
-    private int viewRight;
+    private RTLDownLayouter(Builder builder) {
+        super(builder);
+    }
 
-    RTLDownLayouter(ChipsLayoutManager layoutManager, IChildGravityResolver childGravityResolver,
-                    IViewCacheStorage cacheStorage,
-                    int topOffset, int rightOffset, int bottomOffset) {
-        super(layoutManager, topOffset, bottomOffset, cacheStorage, childGravityResolver);
-        viewRight = rightOffset;
+    public static Builder newBuilder() {
+        return new Builder();
     }
 
     @Override
@@ -30,19 +32,13 @@ class RTLDownLayouter extends AbstractLayouter {
         rowTop = rowBottom;
     }
 
-
-    @Override
-    void addView(View view) {
-        getLayoutManager().addView(view);
-    }
-
     @Override
     public boolean canNotBePlacedInCurrentRow() {
         return super.canNotBePlacedInCurrentRow() || (viewRight < getCanvasRightBorder() && viewRight - currentViewWidth < getCanvasLeftBorder());
     }
 
     @Override
-    public AbstractPositionIterator positionIterator() {
+    AbstractPositionIterator createPositionIterator() {
         return new IncrementalPositionIterator(getLayoutManager().getItemCount());
     }
 
@@ -64,9 +60,14 @@ class RTLDownLayouter extends AbstractLayouter {
         return super.onAttachView(view);
     }
 
-    @Override
-    public boolean isFinishedLayouting() {
-        return rowTop > getCanvasBottomBorder();
-    }
 
+    public static final class Builder extends AbstractLayouter.Builder {
+        private Builder() {
+        }
+
+        @NonNull
+        public RTLDownLayouter build() {
+            return new RTLDownLayouter(this);
+        }
+    }
 }

@@ -1,27 +1,23 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 
 class LTRDownLayouter extends AbstractLayouter {
 
-    private int viewLeft;
-
-    LTRDownLayouter(ChipsLayoutManager layoutManager,
-                    IChildGravityResolver childGravityResolver,
-                    IViewCacheStorage cacheStorage,
-                    int topOffset, int leftOffset, int bottomOffset) {
-        super(layoutManager, topOffset, bottomOffset, cacheStorage, childGravityResolver);
-        viewLeft = leftOffset;
+    private LTRDownLayouter(Builder builder) {
+        super(builder);
     }
 
-    @Override
-    void addView(View view) {
-        getLayoutManager().addView(view);
+    public static Builder newBuilder() {
+        return new Builder();
     }
 
     @Override
@@ -43,7 +39,7 @@ class LTRDownLayouter extends AbstractLayouter {
     }
 
     @Override
-    public AbstractPositionIterator positionIterator() {
+    AbstractPositionIterator createPositionIterator() {
         return new IncrementalPositionIterator(getLayoutManager().getItemCount());
     }
 
@@ -65,9 +61,13 @@ class LTRDownLayouter extends AbstractLayouter {
         return super.onAttachView(view);
     }
 
-    @Override
-    public boolean isFinishedLayouting() {
-        return rowTop > getCanvasBottomBorder();
-    }
+    public static final class Builder extends AbstractLayouter.Builder {
+        private Builder() {
+        }
 
+        @NonNull
+        public LTRDownLayouter build() {
+            return new LTRDownLayouter(this);
+        }
+    }
 }

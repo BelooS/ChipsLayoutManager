@@ -1,11 +1,10 @@
 package com.beloo.widget.chipslayoutmanager.logger;
 
-import com.beloo.widget.chipslayoutmanager.AnchorViewState;
+import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 
 public interface IFillLogger {
 
-
-    void onStartLayouter();
+    void onStartLayouter(int startPosition);
 
     void onItemRequested();
 

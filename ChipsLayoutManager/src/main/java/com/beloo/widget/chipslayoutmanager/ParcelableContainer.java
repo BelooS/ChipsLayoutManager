@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.SparseArray;
 
+import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
+
 class ParcelableContainer implements Parcelable {
 
     private AnchorViewState anchorViewState;
