@@ -155,7 +155,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     private AbstractLayouterFactory createLayouterFactory() {
         AbstractLayouterFactory layouterFactory = isLayoutRTL() ?
-                new RTLLayouterFactory(this, viewPositionsStorage) : new LTRLayouterFactory(this, viewPositionsStorage);
+                new RTLLayouterFactory(this, viewPositionsStorage, rowBreaker) : new LTRLayouterFactory(this, viewPositionsStorage, rowBreaker);
         layouterFactory.setMaxViewsInRow(maxViewsInRow);
         return layouterFactory;
     }

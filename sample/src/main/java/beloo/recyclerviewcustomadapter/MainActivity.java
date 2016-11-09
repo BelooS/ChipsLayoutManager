@@ -1,5 +1,6 @@
 package beloo.recyclerviewcustomadapter;
 
+import android.support.annotation.IntRange;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +12,7 @@ import android.widget.Spinner;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
+import com.beloo.widget.chipslayoutmanager.breaker.IRowBreaker;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 
 import java.util.ArrayList;
@@ -79,6 +81,12 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public int getItemGravity(int position) {
                         return Gravity.CENTER;
+                    }
+                })
+                .setRowBreaker(new IRowBreaker() {
+                    @Override
+                    public boolean isItemBreakRow(@IntRange(from = 0) int position) {
+                        return position == 6 || position == 11 || position == 2;
                     }
                 })
                 .build();

@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.chipslayoutmanager.breaker.IRowBreaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.DefaultCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.DisappearingCriteriaFactory;
@@ -21,6 +22,8 @@ import java.util.List;
 public abstract class AbstractLayouterFactory {
     ChipsLayoutManager layoutManager;
     private IViewCacheStorage cacheStorage;
+    @NonNull
+    private IRowBreaker breaker;
     @Nullable
     private Integer maxViewsInRow = null;
 
@@ -31,9 +34,10 @@ public abstract class AbstractLayouterFactory {
 
     private int additionalHeight;
 
-    AbstractLayouterFactory(IViewCacheStorage cacheStorage, ChipsLayoutManager layoutManager) {
+    AbstractLayouterFactory(ChipsLayoutManager layoutManager, IViewCacheStorage cacheStorage, @NonNull IRowBreaker breaker) {
         this.cacheStorage = cacheStorage;
         this.layoutManager = layoutManager;
+        this.breaker = breaker;
     }
 
     public void addLayouterListener(@Nullable ILayouterListener layouterListener) {
@@ -79,6 +83,7 @@ public abstract class AbstractLayouterFactory {
                 .canvas(new Square(layoutManager))
                 .childGravityResolver(layoutManager.getChildGravityResolver())
                 .cacheStorage(cacheStorage)
+                .breaker(breaker)
                 .maxCountInRow(getMaxViewsInRow())
                 .addLayouterListeners(layouterListeners);
     }

@@ -13,12 +13,14 @@ import java.util.List;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.SpanLayoutChildGravity;
+import com.beloo.widget.chipslayoutmanager.breaker.IRowBreaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.GravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifier;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
+import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 
 import timber.log.Timber;
 
@@ -53,7 +55,8 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     private IFinishingCriteria finishingCriteria;
     @NonNull
     private IPlacer placer;
-
+    @NonNull
+    private IRowBreaker breaker;
     /** Max items in row restriction. Layout of row should be stopped when this count of views reached*/
     @Nullable
     private Integer maxViewsInRow = null;
@@ -79,6 +82,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         this.viewLeft = builder.offsetRect.left;
         this.maxViewsInRow = builder.maxCountInRow;
         this.layouterListeners = builder.layouterListeners;
+        this.breaker = builder.breaker;
         //--- end read builder
 
         positionIterator = createPositionIterator();
@@ -86,6 +90,11 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
 
     void setFinishingCriteria(@NonNull IFinishingCriteria finishingCriteria) {
         this.finishingCriteria = finishingCriteria;
+    }
+
+    @NonNull
+    IRowBreaker getBreaker() {
+        return breaker;
     }
 
     @Override
@@ -177,6 +186,8 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         Rect rect = createViewRect(view);
         rowViews.add(new Pair<>(rect, view));
 
+
+
         return true;
     }
 
@@ -185,10 +196,10 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         return finishingCriteria.isFinishedLayouting(this);
     }
 
-    /** check if we can not add current view to row*/
-    @CallSuper
+    /** check if we can not add current view to row
+     * we determine it on the next layouter step, because we need next view size to determine whether it fits in row or not */
     boolean canNotBePlacedInCurrentRow() {
-        return maxViewsInRow!= null && rowSize >= maxViewsInRow;
+        return (maxViewsInRow!= null && rowSize >= maxViewsInRow);
     }
 
     /** factory method for Rect, where view will be placed. Creation based on inner layouter parameters */
@@ -312,6 +323,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         private IChildGravityResolver childGravityResolver;
         private IFinishingCriteria finishingCriteria;
         private IPlacer placer;
+        private IRowBreaker breaker;
         private Rect offsetRect;
         private Integer maxCountInRow;
         private List<ILayouterListener> layouterListeners = new LinkedList<>();
@@ -370,6 +382,13 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
             if (layouterListener != null) {
                 layouterListeners.add(layouterListener);
             }
+            return this;
+        }
+
+        @NonNull
+        final Builder breaker(@NonNull IRowBreaker breaker) {
+            AssertionUtils.assertNotNull(breaker, "breaker shouldn't be null");
+            this.breaker = breaker;
             return this;
         }
 
