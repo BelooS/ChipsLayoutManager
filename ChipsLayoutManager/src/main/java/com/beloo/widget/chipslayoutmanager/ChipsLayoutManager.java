@@ -18,6 +18,8 @@ import android.view.animation.LinearInterpolator;
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorFactory;
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
+import com.beloo.widget.chipslayoutmanager.breaker.EmptyRowBreaker;
+import com.beloo.widget.chipslayoutmanager.breaker.IRowBreaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.cache.ViewCacheFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.CenterChildGravity;
@@ -51,11 +53,16 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private ChildViewsIterable childViews = new ChildViewsIterable(this);
 
     //---- contract parameters
+    /** determine gravity of child inside row*/
     private IChildGravityResolver childGravityResolver;
     private boolean isScrollingEnabledContract = true;
+    /** strict restriction of max count of views in particular row */
     private Integer maxViewsInRow = null;
+    /** determines whether LM should break row from view position */
+    private IRowBreaker rowBreaker = new EmptyRowBreaker();
     //--- end contract parameters
 
+    /** store positions of placed view to know when LM should break row while moving back */
     private IViewCacheStorage viewPositionsStorage;
 
     /**
@@ -117,6 +124,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     private int autoMeasureHeight = 0;
 
+    /** factory which could retrieve anchorView on which layouting based*/
     private IAnchorFactory anchorFactory = new AnchorFactory(this);
 
     /**
@@ -124,6 +132,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     private AnchorViewState anchorView = anchorFactory.createNotFound();
 
+    /* in pre-layouter drawing we need item count with items will be actually deleted to pre-draw appearing items properly
+    * buf value*/
     private int deletingItemsOnScreenCount;
 
     private ChipsLayoutManager(Context context) {
@@ -565,12 +575,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
     }
 
-//    RecyclerView.Recycler recycler;
-//
-//    public void removeAndRecycleView(View view) {
-//        removeAndRecycleView(view, recycler);
-//    }
-
     /**
      * @return true if RTL mode enabled in RecyclerView
      */
@@ -834,6 +838,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         startSmoothScroll(scroller);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onMeasure(RecyclerView.Recycler recycler, RecyclerView.State state, int widthSpec, int heightSpec) {
         super.onMeasure(recycler, state, widthSpec, heightSpec);
@@ -847,6 +854,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onItemsRemoved(final RecyclerView recyclerView, int positionStart, int itemCount) {
         adapterActionsLogger.onItemsRemoved(positionStart, itemCount);
@@ -865,6 +875,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onItemsAdded(RecyclerView recyclerView, int positionStart, int itemCount) {
         adapterActionsLogger.onItemsAdded(positionStart, itemCount);
@@ -872,6 +885,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         onLayoutUpdatedFromPosition(positionStart);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onItemsChanged(RecyclerView recyclerView) {
         adapterActionsLogger.onItemsChanged();
@@ -880,6 +896,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         onLayoutUpdatedFromPosition(0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onItemsUpdated(RecyclerView recyclerView, int positionStart, int itemCount) {
         adapterActionsLogger.onItemsUpdated(positionStart, itemCount);
@@ -887,11 +906,17 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         onLayoutUpdatedFromPosition(positionStart);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onItemsUpdated(RecyclerView recyclerView, int positionStart, int itemCount, Object payload) {
         onItemsUpdated(recyclerView, positionStart, itemCount);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onItemsMoved(RecyclerView recyclerView, int from, int to, int itemCount) {
         adapterActionsLogger.onItemsMoved(from, to, itemCount);
