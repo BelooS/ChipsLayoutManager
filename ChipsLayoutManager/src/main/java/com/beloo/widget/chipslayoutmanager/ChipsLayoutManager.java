@@ -174,6 +174,24 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         isScrollingEnabledContract = isEnabled;
     }
 
+    /** @param breaker override to determine whether ChipsLayoutManager should breaks row due to position of view. */
+    public void setRowBreaker(@NonNull IRowBreaker breaker) {
+        AssertionUtils.assertNotNull(rowBreaker, "breaker couldn't be null");
+        this.rowBreaker = breaker;
+        requestLayoutWithAnimations();
+        onRuntimeLayoutChanges();
+    }
+
+    /**
+     * set gravity resolver in case you need special gravity for items. This method have priority over {@link Builder#setChildGravity(int)}
+     */
+    public void setGravityResolver(IChildGravityResolver gravityResolver) {
+        AssertionUtils.assertNotNull(gravityResolver, "gravity resolver couldn't be null");
+        this.childGravityResolver = gravityResolver;
+        requestLayoutWithAnimations();
+        onRuntimeLayoutChanges();
+    }
+
     /**
      * change max count of row views in runtime
      */
@@ -181,9 +199,23 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         if (maxViewsInRow < 1)
             throw new IllegalArgumentException("maxViewsInRow should be positive, but is = " + maxViewsInRow);
         this.maxViewsInRow = maxViewsInRow;
+        onRuntimeLayoutChanges();
+    }
+
+    void onRuntimeLayoutChanges() {
         cacheNormalizationPosition = 0;
         viewPositionsStorage.purge();
         requestLayoutWithAnimations();
+    }
+
+    /**
+     * perform changing layout with playing RecyclerView animations
+     */
+    public void requestLayoutWithAnimations() {
+        postOnAnimation(() -> {
+            requestLayout();
+            requestSimpleAnimationsInNextLayout();
+        });
     }
 
     public class Builder {
@@ -680,16 +712,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         factory.setAdditionalRowsCount(1);
         fill(recycler, factory, anchorView, false);
         return dy;
-    }
-
-    /**
-     * perform changing layout with playing RecyclerView animations
-     */
-    private void requestLayoutWithAnimations() {
-        postOnAnimation(() -> {
-            requestLayout();
-            requestSimpleAnimationsInNextLayout();
-        });
     }
 
     private int scrollVerticallyInternal(int dy) {
