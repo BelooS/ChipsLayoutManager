@@ -90,7 +90,11 @@ public abstract class AbstractLayouterFactory {
 
     @NonNull
     public final ILayouter getUpLayouter(@Nullable Rect anchorRect) {
-        ICriteriaFactory criteriaFactory = new DefaultCriteriaFactory(getAdditionalHeight());
+        ICriteriaFactory criteriaFactory = DefaultCriteriaFactory.newBuilder()
+                .additionalHeight(getAdditionalHeight())
+                .additionalRowCount(getAdditionalRowsCount())
+                .build();
+
         IPlacerFactory placerFactory = new RealPlacerFactory(layoutManager);
 
         return fillBasicBuilder(createUpBuilder())
@@ -102,7 +106,11 @@ public abstract class AbstractLayouterFactory {
 
     @NonNull
     public final ILayouter getDownLayouter(@Nullable Rect anchorRect) {
-        ICriteriaFactory criteriaFactory = new DefaultCriteriaFactory(getAdditionalHeight());
+        ICriteriaFactory criteriaFactory = DefaultCriteriaFactory.newBuilder()
+                .additionalHeight(getAdditionalHeight())
+                .additionalRowCount(getAdditionalRowsCount())
+                .build();
+
         IPlacerFactory placerFactory = new RealPlacerFactory(layoutManager);
 
         return fillBasicBuilder(createDownBuilder())
@@ -110,30 +118,6 @@ public abstract class AbstractLayouterFactory {
                 .finishingCriteria(criteriaFactory.getDownFinishingCriteria())
                 .placer(placerFactory.getAtEndPlacer())
                 .build();
-    }
-
-    @NonNull
-    public final ILayouter buildUpLayouter(@NonNull ILayouter layouter) {
-        ICriteriaFactory criteriaFactory = new DefaultCriteriaFactory(getAdditionalHeight());
-        IPlacerFactory placerFactory = new RealPlacerFactory(layoutManager);
-
-        AbstractLayouter abstractLayouter = (AbstractLayouter) layouter;
-        abstractLayouter.setFinishingCriteria(criteriaFactory.getUpFinishingCriteria());
-        abstractLayouter.setPlacer(placerFactory.getAtEndPlacer());
-
-        return abstractLayouter;
-    }
-
-    @NonNull
-    public final ILayouter buildDownLayouter(@NonNull ILayouter layouter) {
-        ICriteriaFactory criteriaFactory = new DefaultCriteriaFactory(getAdditionalHeight());
-        IPlacerFactory placerFactory = new RealPlacerFactory(layoutManager);
-
-        AbstractLayouter abstractLayouter = (AbstractLayouter) layouter;
-        abstractLayouter.setFinishingCriteria(criteriaFactory.getDownFinishingCriteria());
-        abstractLayouter.setPlacer(placerFactory.getAtEndPlacer());
-
-        return abstractLayouter;
     }
 
     @NonNull

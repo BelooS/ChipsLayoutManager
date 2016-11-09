@@ -5,20 +5,52 @@ import android.support.annotation.NonNull;
 public class DefaultCriteriaFactory implements ICriteriaFactory {
 
     private int additionalHeight;
+    private int additionalRowCount;
 
-    public DefaultCriteriaFactory(int additionalHeight) {
-        this.additionalHeight = additionalHeight;
+    private DefaultCriteriaFactory(Builder builder) {
+        additionalHeight = builder.additionalHeight;
+        additionalRowCount = builder.additionalRowCount;
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
     }
 
     @NonNull
     @Override
     public IFinishingCriteria getUpFinishingCriteria() {
-        return new CriteriaUpAdditionalHeight(new CriteriaUpLayouterFinished(), additionalHeight);
+        return new CriteriaAdditionalRow(new CriteriaUpAdditionalHeight(new CriteriaUpLayouterFinished(), additionalHeight), additionalRowCount);
     }
 
     @NonNull
     @Override
     public IFinishingCriteria getDownFinishingCriteria() {
-        return new CriteriaDownAdditionalHeight(new CriteriaDownLayouterFinished(), additionalHeight);
+        return new CriteriaAdditionalRow(new CriteriaDownAdditionalHeight(new CriteriaDownLayouterFinished(), additionalHeight), additionalRowCount);
+    }
+
+
+    public static final class Builder {
+        private int additionalHeight;
+        private int additionalRowCount;
+
+        private Builder() {
+        }
+
+        @NonNull
+        public Builder additionalHeight(int additionalHeight) {
+            this.additionalHeight = additionalHeight;
+            return this;
+        }
+
+        @NonNull
+        public Builder additionalRowCount(int additionalRowCount) {
+            this.additionalRowCount = additionalRowCount;
+            return this;
+        }
+
+        @NonNull
+        public DefaultCriteriaFactory build() {
+            return new DefaultCriteriaFactory(this);
+        }
     }
 }

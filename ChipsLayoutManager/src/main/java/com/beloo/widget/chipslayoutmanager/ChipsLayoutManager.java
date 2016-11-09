@@ -682,7 +682,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         offsetChildrenVertical(-dy);
         anchorView = anchorFactory.getTopLeftAnchor();
 
-        fill(recycler, anchorView);
+        AbstractLayouterFactory factory = createLayouterFactory();
+        //some bugs connected with displaying views from the last row, which not fully showed, so just add additional row to avoid a lot of it.
+        factory.setAdditionalRowsCount(1);
+        fill(recycler, factory, anchorView, false);
         return dy;
     }
 
