@@ -525,13 +525,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /**
      * place all views on theirs right places according to current state
      */
-    private void fill (RecyclerView.Recycler recycler, @NonNull AnchorViewState anchorView) {
-        fill(recycler, createLayouterFactory(), anchorView, false);
-    }
-
-    /**
-     * place all views on theirs right places according to current state
-     */
     private void fill(RecyclerView.Recycler recycler, AbstractLayouterFactory layouterFactory, @NonNull AnchorViewState anchorView, boolean isLayoutDisappearing) {
         int startingPos = anchorView.getPosition();
         Rect anchorRect = anchorView.getAnchorViewRect();
