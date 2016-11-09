@@ -35,6 +35,7 @@ import com.beloo.widget.chipslayoutmanager.logger.IAdapterActionsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IFillLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IPredictiveAnimationsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.LoggerFactory;
+import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 
 import java.util.List;
 
@@ -70,9 +71,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      * Used while scrolling
      */
     private SparseArray<View> viewCache = new SparseArray<>();
-
-    /** map of views, which will be deleted after pre-layout */
-    private SparseArray<View> removedViewCache = new SparseArray<>();
 
     /**
      * storing state due orientation changes
@@ -207,7 +205,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         /**
          * set gravity resolver in case you need special gravity for items. This method have priority over {@link #setChildGravity(int)}
          */
-        public Builder setGravityResolver(IChildGravityResolver gravityResolver) {
+        public Builder setGravityResolver(@NonNull IChildGravityResolver gravityResolver) {
+            AssertionUtils.assertNotNull(gravityResolver, "gravity resolver couldn't be null");
             childGravityResolver = gravityResolver;
             return this;
         }
@@ -227,6 +226,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             if (maxViewsInRow < 1)
                 throw new IllegalArgumentException("maxViewsInRow should be positive, but is = " + maxViewsInRow);
             ChipsLayoutManager.this.maxViewsInRow = maxViewsInRow;
+            return this;
+        }
+
+        /** @param breaker override to determine whether ChipsLayoutManager should breaks row due to position of view */
+        public Builder setRowBreaker(@NonNull IRowBreaker breaker) {
+            AssertionUtils.assertNotNull(breaker, "breaker couldn't be null");
+            ChipsLayoutManager.this.rowBreaker = breaker;
             return this;
         }
 
