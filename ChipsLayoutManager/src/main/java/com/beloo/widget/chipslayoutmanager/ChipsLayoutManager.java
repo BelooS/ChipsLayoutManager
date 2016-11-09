@@ -190,10 +190,17 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         requestLayoutWithAnimations();
     }
 
+    @Override
+    public void requestLayout() {
+        cacheNormalizationPosition = 0;
+        viewPositionsStorage.purge();
+        requestLayoutWithAnimations();
+    }
+
     /**
      * perform changing layout with playing RecyclerView animations
      */
-    public void requestLayoutWithAnimations() {
+    private void requestLayoutWithAnimations() {
         postOnAnimation(() -> {
             requestLayout();
             requestSimpleAnimationsInNextLayout();
@@ -479,7 +486,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             boolean probablyMovedFromScreen = false;
 
             if (!lp.isItemRemoved()) {
-                //view won't be removed, but maybe it moved offscreen
+                //view won't be removed, but maybe it is moved offscreen
                 int pos = lp.getViewLayoutPosition();
                 int lowestPosition = getPosition(highestView);
                 int highestPosition = getPosition(lowestView);
