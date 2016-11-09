@@ -229,7 +229,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return this;
         }
 
-        /** @param breaker override to determine whether ChipsLayoutManager should breaks row due to position of view */
+        /** @param breaker override to determine whether ChipsLayoutManager should breaks row due to position of view. */
         public Builder setRowBreaker(@NonNull IRowBreaker breaker) {
             AssertionUtils.assertNotNull(breaker, "breaker couldn't be null");
             ChipsLayoutManager.this.rowBreaker = breaker;

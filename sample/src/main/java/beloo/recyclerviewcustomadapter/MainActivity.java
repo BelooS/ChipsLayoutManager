@@ -83,12 +83,6 @@ public class MainActivity extends AppCompatActivity {
                         return Gravity.CENTER;
                     }
                 })
-                .setRowBreaker(new IRowBreaker() {
-                    @Override
-                    public boolean isItemBreakRow(@IntRange(from = 0) int position) {
-                        return position == 6 || position == 11 || position == 2;
-                    }
-                })
                 .build();
 
         rvTest.addItemDecoration(new SpacingItemDecoration(getResources().getDimensionPixelOffset(R.dimen.item_space),

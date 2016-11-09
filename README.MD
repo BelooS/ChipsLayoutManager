@@ -16,7 +16,7 @@ but with support of CRUD animations i decided to make such stuff and share it.
 
 with gradle
 ```GRADLE 
-compile 'com.beloo.widget:ChipsLayoutManager:0.2.0'
+compile 'com.beloo.widget:ChipsLayoutManager:0.2.1'
 ```
 
 Assuming you have installed jCenter provider:
@@ -42,6 +42,8 @@ or custom `FlowLayout`s.
 * LTR and RTL support
 * activity orientation change support
 * predictive animations supported (animate view movement outside of visible bounds)
+* setting max count of view in row
+* you are able to break row due to your conditions
 
 | Insert/delete | Move |
 |---|---|
@@ -71,6 +73,13 @@ ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
             @Override
             public int getItemGravity(int position) {
                 return Gravity.CENTER;
+            }
+        })
+        //you are able to break row due to your conditions. Row breaker should return true for that views
+        .setRowBreaker(new IRowBreaker() {
+            @Override
+            public boolean isItemBreakRow(@IntRange(from = 0) int position) {
+                return position == 6 || position == 11 || position == 2;
             }
         })
         .build();
