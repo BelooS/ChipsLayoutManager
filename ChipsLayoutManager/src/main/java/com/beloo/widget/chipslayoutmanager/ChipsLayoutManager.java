@@ -174,24 +174,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         isScrollingEnabledContract = isEnabled;
     }
 
-    /** @param breaker override to determine whether ChipsLayoutManager should breaks row due to position of view. */
-    public void setRowBreaker(@NonNull IRowBreaker breaker) {
-        AssertionUtils.assertNotNull(rowBreaker, "breaker couldn't be null");
-        this.rowBreaker = breaker;
-        requestLayoutWithAnimations();
-        onRuntimeLayoutChanges();
-    }
-
-    /**
-     * set gravity resolver in case you need special gravity for items. This method have priority over {@link Builder#setChildGravity(int)}
-     */
-    public void setGravityResolver(IChildGravityResolver gravityResolver) {
-        AssertionUtils.assertNotNull(gravityResolver, "gravity resolver couldn't be null");
-        this.childGravityResolver = gravityResolver;
-        requestLayoutWithAnimations();
-        onRuntimeLayoutChanges();
-    }
-
     /**
      * change max count of row views in runtime
      */
@@ -202,7 +184,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         onRuntimeLayoutChanges();
     }
 
-    void onRuntimeLayoutChanges() {
+    private void onRuntimeLayoutChanges() {
         cacheNormalizationPosition = 0;
         viewPositionsStorage.purge();
         requestLayoutWithAnimations();
