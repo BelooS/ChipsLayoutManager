@@ -75,7 +75,9 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
         if (stopDueToCache) return true;
 
         int bufRight = viewLeft + currentViewWidth;
-        return super.canNotBePlacedInCurrentRow() || (bufRight > getCanvasRightBorder() && viewLeft > getCanvasLeftBorder());
+        return super.canNotBePlacedInCurrentRow()
+                || (getBreaker().isItemBreakRow(getCurrentViewPosition()))
+                || (bufRight > getCanvasRightBorder() && viewLeft > getCanvasLeftBorder());
     }
 
     @Override

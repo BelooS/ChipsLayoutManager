@@ -34,7 +34,9 @@ class RTLDownLayouter extends AbstractLayouter {
 
     @Override
     public boolean canNotBePlacedInCurrentRow() {
-        return super.canNotBePlacedInCurrentRow() || (viewRight < getCanvasRightBorder() && viewRight - currentViewWidth < getCanvasLeftBorder());
+        return super.canNotBePlacedInCurrentRow()
+                || (getCurrentViewPosition() != 0 && getBreaker().isItemBreakRow(getCurrentViewPosition() - 1))
+                || (viewRight < getCanvasRightBorder() && viewRight - currentViewWidth < getCanvasLeftBorder());
     }
 
     @Override
