@@ -86,8 +86,8 @@ ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
 rv.setLayoutManager(chipsLayoutManager);
 ```
 
-Notice that if you changed gravity resolver or row breaker conditions in runtime - it won't affect already drew items, 
-you should call `requestLayout` on `ChipsLayoutManager`. 
+Notice that if you changed gravity resolver or row breaker conditions in runtime - it won't affect already drew items and cached item positions. 
+You have to call `notifyItemChanged` on `ChipsLayoutManager` otherwise layout won't be predictable. 
 
 **Device current direction** have been chosen by default.
 You can manipulate with layout direction (**LTR** or **RTL**)<br/>
