@@ -4,6 +4,8 @@ import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouter;
 import com.beloo.widget.chipslayoutmanager.layouter.ILayouter;
 import com.beloo.widget.chipslayoutmanager.layouter.ILayouterListener;
 
+import timber.log.Timber;
+
 public class CriteriaAdditionalRow extends FinishingCriteriaDecorator implements IFinishingCriteria, ILayouterListener {
 
     private int requiredRowsCount;
@@ -23,6 +25,9 @@ public class CriteriaAdditionalRow extends FinishingCriteriaDecorator implements
             abstractLayouter.addLayouterListener(this);
         }
 
+        if (super.isFinishedLayouting(abstractLayouter) && additionalRowsCount >= requiredRowsCount) {
+            Timber.d("finished additional row, child count = " + abstractLayouter.getLayoutManager().getChildCount());
+        }
         return super.isFinishedLayouting(abstractLayouter) && additionalRowsCount >= requiredRowsCount;
     }
 

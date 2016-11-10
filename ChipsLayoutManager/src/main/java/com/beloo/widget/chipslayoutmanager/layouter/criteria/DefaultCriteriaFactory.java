@@ -19,7 +19,7 @@ public class DefaultCriteriaFactory implements ICriteriaFactory {
     @NonNull
     @Override
     public IFinishingCriteria getUpFinishingCriteria() {
-        return new CriteriaAdditionalRow(new CriteriaUpAdditionalHeight(new CriteriaUpLayouterFinished(), additionalHeight), additionalRowCount);
+        return new CriteriaUpAdditionalHeight(new CriteriaUpLayouterFinished(), additionalHeight);
     }
 
     @NonNull

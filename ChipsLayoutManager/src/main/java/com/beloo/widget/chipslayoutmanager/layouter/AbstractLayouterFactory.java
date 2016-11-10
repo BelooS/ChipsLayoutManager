@@ -121,7 +121,7 @@ public abstract class AbstractLayouterFactory {
     }
 
     @NonNull
-    public final ILayouter getDisappearingDownLayouter(@NonNull ILayouter layouter) {
+    public final ILayouter buildDisappearingDownLayouter(@NonNull ILayouter layouter) {
         ICriteriaFactory criteriaFactory = new DisappearingCriteriaFactory(getAdditionalRowsCount());
         IPlacerFactory placerFactory = new DisappearingPlacerFactory(layoutManager);
 
@@ -133,7 +133,7 @@ public abstract class AbstractLayouterFactory {
     }
 
     @NonNull
-    public final ILayouter getDisappearingUpLayouter(@NonNull ILayouter layouter) {
+    public final ILayouter buildDisappearingUpLayouter(@NonNull ILayouter layouter) {
         ICriteriaFactory criteriaFactory = new DisappearingCriteriaFactory(getAdditionalRowsCount());
         IPlacerFactory placerFactory = new DisappearingPlacerFactory(layoutManager);
 

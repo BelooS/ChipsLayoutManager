@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -28,7 +27,6 @@ import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouterFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.chipslayoutmanager.layouter.ILayouter;
-import com.beloo.widget.chipslayoutmanager.layouter.Item;
 import com.beloo.widget.chipslayoutmanager.layouter.LTRLayouterFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.RTLLayouterFactory;
 import com.beloo.widget.chipslayoutmanager.logger.IAdapterActionsLogger;
@@ -382,8 +380,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             //so we fill additional rows to cover nearest moves
             layouterFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
             fill(recycler, layouterFactory, anchorView, true);
-
-            performNormalizationIfNeeded();
         } else {
             int additionalHeight = calcDisappearingViewsHeight(recycler);
             predictiveAnimationsLogger.heightOfCanvas(this);
@@ -412,7 +408,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         if (disappearingViews.size() > 0) {
             Timber.d("fill disappearing views");
-            downLayouter = layouterFactory.buildInfiniteLayouter(layouterFactory.getDisappearingDownLayouter(downLayouter));
+            downLayouter = layouterFactory.buildInfiniteLayouter(layouterFactory.buildDisappearingDownLayouter(downLayouter));
 
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
             for (int i = 0; i< disappearingViews.downViews.size(); i++) {
@@ -422,7 +418,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             //layout last row
             downLayouter.layoutRow();
 
-            upLayouter = layouterFactory.buildInfiniteLayouter(layouterFactory.getDisappearingUpLayouter(upLayouter));
+            upLayouter = layouterFactory.buildInfiniteLayouter(layouterFactory.buildDisappearingUpLayouter(upLayouter));
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
             for (int i = 0; i< disappearingViews.upViews.size(); i++) {
                 int position = disappearingViews.upViews.keyAt(i);
@@ -696,6 +692,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         offsetChildrenVertical(-dy);
         anchorView = anchorFactory.getTopLeftAnchor();
 
+        Timber.d("child count = " + getChildCount());
+
         AbstractLayouterFactory factory = createLayouterFactory();
         //some bugs connected with displaying views from the last row, which not fully showed, so just add additional row to avoid a lot of it.
         factory.setAdditionalRowsCount(1);
@@ -738,6 +736,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             int viewTop = state.getAnchorViewRect().top;
             int distance;
             distance = viewTop - topBorder;
+            Timber.d("scrollUp, distance = " + distance);
             if (viewTop - topBorder >= 0) {
                 // in case over scroll on top border
                 delta = distance;

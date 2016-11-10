@@ -145,10 +145,8 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     }
 
     private void notifyLayouterListeners() {
-        if (rowSize > 0) {
-            for (ILayouterListener layouterListener : layouterListeners) {
-                layouterListener.onLayoutRow(this);
-            }
+        for (ILayouterListener layouterListener : layouterListeners) {
+            layouterListener.onLayoutRow(this);
         }
     }
 
@@ -229,6 +227,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
 
         if (leftBorderOfPreviouslyAttachedView == null || leftBorderOfPreviouslyAttachedView>= leftBorderCurrentView) {
             //new row, reset row size
+            notifyLayouterListeners();
             rowSize = 0;
         }
 

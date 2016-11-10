@@ -25,6 +25,7 @@ public class CriteriaPolitePositionReached extends FinishingCriteriaDecorator im
     @Override
     public void onLayoutRow(ILayouter layouter) {
         if (isPositionReached) return;
+        if (layouter.getRowSize() == 0) return;
         for (Item item : layouter.getCurrentRowItems()) {
             if (item.getViewPosition() == reachedPosition) {
                 isPositionReached = true;

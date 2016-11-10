@@ -29,4 +29,8 @@ class ChildViewsIterable implements Iterable<View> {
             }
         };
     }
+
+    public int size() {
+        return layoutManager.getChildCount();
+    }
 }

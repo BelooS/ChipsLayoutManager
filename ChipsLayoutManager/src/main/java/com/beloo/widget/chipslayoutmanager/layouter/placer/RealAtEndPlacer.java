@@ -14,6 +14,6 @@ class RealAtEndPlacer extends AbstractPlacer implements IPlacer {
     public void addView(View view) {
         getLayoutManager().addView(view);
 
-        Timber.i("added view, position = " + getLayoutManager().getPosition(view));
+//        Timber.i("added view, position = " + getLayoutManager().getPosition(view));
     }
 }
