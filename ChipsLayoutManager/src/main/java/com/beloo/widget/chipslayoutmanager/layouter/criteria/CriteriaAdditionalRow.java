@@ -23,7 +23,7 @@ class CriteriaAdditionalRow extends FinishingCriteriaDecorator implements IFinis
 
     @Override
     public void onLayoutRow(ILayouter layouter) {
-        if (isFinishedLayouting((AbstractLayouter) layouter)) {
+        if (super.isFinishedLayouting((AbstractLayouter) layouter)) {
             additionalRowsCount++;
         }
     }
