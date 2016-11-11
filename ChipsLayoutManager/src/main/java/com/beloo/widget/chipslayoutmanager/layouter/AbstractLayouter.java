@@ -225,7 +225,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     public boolean onAttachView(View view) {
         int leftBorderCurrentView = layoutManager.getDecoratedLeft(view);
 
-        if (leftBorderOfPreviouslyAttachedView == null || leftBorderOfPreviouslyAttachedView>= leftBorderCurrentView) {
+        if (leftBorderOfPreviouslyAttachedView == null || leftBorderOfPreviouslyAttachedView >= leftBorderCurrentView) {
             //new row, reset row size
             notifyLayouterListeners();
             rowSize = 0;

@@ -193,7 +193,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public void requestLayout() {
-        cacheNormalizationPosition = 0;
+        cacheNormalizationPosition = null;
         viewPositionsStorage.purge();
         requestLayoutWithAnimations();
     }
@@ -203,7 +203,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     private void requestLayoutWithAnimations() {
         postOnAnimation(() -> {
-            requestLayout();
+            super.requestLayout();
             requestSimpleAnimationsInNextLayout();
         });
     }
@@ -309,8 +309,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         anchorView.setPosition(container.getAnchorPosition());
 
         viewPositionsStorage.onRestoreInstanceState(container.getPositionsCache(orientation));
-        cacheNormalizationPosition = 0;
-//        cacheNormalizationPosition = container.getNormalizationPosition(orientation);
+        cacheNormalizationPosition = container.getNormalizationPosition(orientation);
         Timber.d("RESTORE. orientation = " + orientation + " normalizationPos = " + cacheNormalizationPosition);
     }
 
@@ -321,18 +320,17 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         int anchorPosition = anchorView.getPosition();
         container.putAnchorPosition(anchorPosition);
 
-        //todo not worked now. will be provided in next releases
-//        container.putPositionsCache(orientation, viewPositionsStorage.onSaveInstanceState());
-//
-//        Integer storedNormalizationPosition;
-//        if (!viewPositionsStorage.isCacheEmpty()) {
-//            storedNormalizationPosition = cacheNormalizationPosition != null ? cacheNormalizationPosition : viewPositionsStorage.getLastCachePosition();
-//        } else {
-//            storedNormalizationPosition = cacheNormalizationPosition;
-//        }
-//        Timber.d(TAG, "STORE. orientation = " + orientation + " normalizationPos = " + storedNormalizationPosition);
-//
-//        container.putNormalizationPosition(orientation, storedNormalizatdionPosition);
+        container.putPositionsCache(orientation, viewPositionsStorage.onSaveInstanceState());
+
+        Integer storedNormalizationPosition;
+        if (!viewPositionsStorage.isCacheEmpty()) {
+            storedNormalizationPosition = cacheNormalizationPosition != null ? cacheNormalizationPosition : viewPositionsStorage.getLastCachePosition();
+        } else {
+            storedNormalizationPosition = cacheNormalizationPosition;
+        }
+        Timber.d(TAG, "STORE. orientation = " + orientation + " normalizationPos = " + storedNormalizationPosition);
+
+        container.putNormalizationPosition(orientation, storedNormalizationPosition);
 
         return container;
     }
@@ -407,9 +405,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private void layoutDisappearingViews(RecyclerView.Recycler recycler, AbstractLayouterFactory layouterFactory,
                                          ILayouter upLayouter, ILayouter downLayouter) {
         DisappearingViewsContainer disappearingViews = getDisappearingViews(recycler);
-        Timber.d("disappearing views count = " + disappearingViews.size());
 
         if (disappearingViews.size() > 0) {
+            Timber.d("disappearing views count = " + disappearingViews.size());
             Timber.d("fill disappearing views");
             downLayouter = layouterFactory.buildInfiniteLayouter(layouterFactory.buildDisappearingDownLayouter(downLayouter));
 
@@ -699,7 +697,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         AbstractLayouterFactory factory = createLayouterFactory();
         //some bugs connected with displaying views from the last row, which not fully showed, so just add additional row to avoid a lot of it.
-        factory.setAdditionalRowsCount(1);
+        factory.setAdditionalHeight(50);
         fill(recycler, factory, anchorView, false);
         return dy;
     }
@@ -792,7 +790,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         if (cacheNormalizationPosition != null && (topViewPosition < cacheNormalizationPosition ||
                 (cacheNormalizationPosition == 0 && cacheNormalizationPosition == topViewPosition))) {
             Timber.d("normalization, position = " + cacheNormalizationPosition + " top view position = " + topViewPosition);
-            viewPositionsStorage.purgeCacheFromPosition(cacheNormalizationPosition);
+            viewPositionsStorage.purgeCacheFromPosition(topViewPosition);
             //reset normalization position
             cacheNormalizationPosition = null;
             requestLayoutWithAnimations();
