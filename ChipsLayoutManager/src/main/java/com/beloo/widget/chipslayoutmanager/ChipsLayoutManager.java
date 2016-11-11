@@ -32,6 +32,7 @@ import com.beloo.widget.chipslayoutmanager.layouter.RTLLayouterFactory;
 import com.beloo.widget.chipslayoutmanager.logger.IAdapterActionsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IFillLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IPredictiveAnimationsLogger;
+import com.beloo.widget.chipslayoutmanager.logger.IScrollingLogger;
 import com.beloo.widget.chipslayoutmanager.logger.LoggerFactory;
 import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 
@@ -79,6 +80,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private IFillLogger logger;
     private IAdapterActionsLogger adapterActionsLogger;
     private IPredictiveAnimationsLogger predictiveAnimationsLogger;
+    private IScrollingLogger scrollingLogger;
     //--- end loggers
 
 
@@ -146,6 +148,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         logger = loggerFactory.getFillLogger();
         adapterActionsLogger = loggerFactory.getAdapterActionsLogger();
         predictiveAnimationsLogger = loggerFactory.getPredictiveAnimationsLogger();
+        scrollingLogger = loggerFactory.getScrollingLogger();
 
         viewPositionsStorage = new ViewCacheFactory(this).createCacheStorage();
         setAutoMeasureEnabled(true);
@@ -692,7 +695,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         offsetChildrenVertical(-dy);
         anchorView = anchorFactory.getTopLeftAnchor();
 
-        Timber.d("child count = " + getChildCount());
+        scrollingLogger.logChildCount(getChildCount());
 
         AbstractLayouterFactory factory = createLayouterFactory();
         //some bugs connected with displaying views from the last row, which not fully showed, so just add additional row to avoid a lot of it.
@@ -736,7 +739,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             int viewTop = state.getAnchorViewRect().top;
             int distance;
             distance = viewTop - topBorder;
-            Timber.d("scrollUp, distance = " + distance);
+
+            scrollingLogger.logUpScrollingNormalizationDistance(distance);
+
             if (viewTop - topBorder >= 0) {
                 // in case over scroll on top border
                 delta = distance;
