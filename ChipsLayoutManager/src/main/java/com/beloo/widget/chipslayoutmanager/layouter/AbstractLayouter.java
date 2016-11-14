@@ -25,8 +25,8 @@ import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 
 public abstract class AbstractLayouter implements ILayouter, ICanvas {
-    int currentViewWidth;
-    int currentViewHeight;
+    private int currentViewWidth;
+    private int currentViewHeight;
     private int currentViewPosition;
     List<Pair<Rect, View>> rowViews = new LinkedList<>();
     /** bottom of current row*/
@@ -38,9 +38,6 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     int viewRight;
     /** left offset*/
     int viewLeft;
-
-    @Nullable
-    private Integer leftBorderOfPreviouslyAttachedView = null;
 
     private int rowSize = 0;
     private int previousRowSize;
@@ -209,6 +206,8 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     /** called after row have been layouted. Children should prepare new row here. */
     abstract void onAfterLayout();
 
+    abstract boolean isAttachedViewFromNewRow(View view);
+
     abstract AbstractPositionIterator createPositionIterator();
 
     void setPlacer(@NonNull IPlacer placer) {
@@ -221,15 +220,14 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
      * Based on characteristics of last attached view, layouter algorithm will be able to continue placing from it.
      * This method have to be called on attaching view*/
     public boolean onAttachView(View view) {
-        int leftBorderCurrentView = layoutManager.getDecoratedLeft(view);
+        calculateView(view);
 
-        if (leftBorderOfPreviouslyAttachedView == null || leftBorderOfPreviouslyAttachedView >= leftBorderCurrentView) {
+        if (isAttachedViewFromNewRow(view)) {
             //new row, reset row size
+            Log.d("onAttachView", "on attached new row");
             notifyLayouterListeners();
             rowSize = 0;
         }
-
-        leftBorderOfPreviouslyAttachedView = leftBorderCurrentView;
 
         if (isFinishedLayouting()) return false;
 
@@ -309,6 +307,14 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
 
     int getRightOffset() {
         return viewLeft;
+    }
+
+    int getCurrentViewWidth() {
+        return currentViewWidth;
+    }
+
+    int getCurrentViewHeight() {
+        return currentViewHeight;
     }
 
     public abstract static class Builder {

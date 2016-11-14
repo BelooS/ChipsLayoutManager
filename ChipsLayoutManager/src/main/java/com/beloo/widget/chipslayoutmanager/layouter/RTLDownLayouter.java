@@ -4,12 +4,6 @@ import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.view.View;
 
-import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
-import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
-import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
-import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
-
 class RTLDownLayouter extends AbstractLayouter {
 
     private RTLDownLayouter(Builder builder) {
@@ -33,10 +27,20 @@ class RTLDownLayouter extends AbstractLayouter {
     }
 
     @Override
+    boolean isAttachedViewFromNewRow(View view) {
+
+        int topOfCurrentView = getLayoutManager().getDecoratedTop(view);
+        int rightOfCurrentVIew = getLayoutManager().getDecoratedRight(view);
+
+        return rowBottom <= topOfCurrentView
+                && rightOfCurrentVIew > viewRight;
+    }
+
+    @Override
     public boolean canNotBePlacedInCurrentRow() {
         return super.canNotBePlacedInCurrentRow()
                 || (getCurrentViewPosition() != 0 && getBreaker().isItemBreakRow(getCurrentViewPosition() - 1))
-                || (viewRight < getCanvasRightBorder() && viewRight - currentViewWidth < getCanvasLeftBorder());
+                || (viewRight < getCanvasRightBorder() && viewRight - getCurrentViewWidth() < getCanvasLeftBorder());
     }
 
     @Override
@@ -46,7 +50,7 @@ class RTLDownLayouter extends AbstractLayouter {
 
     @Override
     Rect createViewRect(View view) {
-        Rect viewRect = new Rect(viewRight - currentViewWidth, rowTop, viewRight, rowTop + currentViewHeight);
+        Rect viewRect = new Rect(viewRight - getCurrentViewWidth(), rowTop, viewRight, rowTop + getCurrentViewHeight());
         viewRight = viewRect.left;
         rowBottom = Math.max(rowBottom, viewRect.bottom);
         return viewRect;
@@ -54,12 +58,13 @@ class RTLDownLayouter extends AbstractLayouter {
 
     @Override
     public boolean onAttachView(View view) {
+        boolean isViewAttached = super.onAttachView(view);
         rowTop = getLayoutManager().getDecoratedTop(view);
         viewRight = getLayoutManager().getDecoratedLeft(view);
 
         rowBottom = Math.max(rowBottom, getLayoutManager().getDecoratedBottom(view));
 
-        return super.onAttachView(view);
+        return isViewAttached;
     }
 
 
