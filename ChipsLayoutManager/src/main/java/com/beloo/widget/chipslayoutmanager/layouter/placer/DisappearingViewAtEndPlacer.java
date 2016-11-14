@@ -6,8 +6,6 @@ import android.view.View;
 import android.widget.TextView;
 import com.beloo.widget.chipslayoutmanager.R;
 
-import timber.log.Log;
-
 class DisappearingViewAtEndPlacer extends AbstractPlacer {
 
     DisappearingViewAtEndPlacer(RecyclerView.LayoutManager layoutManager) {

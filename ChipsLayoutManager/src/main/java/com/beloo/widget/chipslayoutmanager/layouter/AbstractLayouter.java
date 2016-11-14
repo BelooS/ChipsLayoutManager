@@ -24,8 +24,6 @@ import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 
-import timber.log.Log;
-
 public abstract class AbstractLayouter implements ILayouter, ICanvas {
     int currentViewWidth;
     int currentViewHeight;

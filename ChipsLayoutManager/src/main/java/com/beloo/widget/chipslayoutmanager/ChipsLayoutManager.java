@@ -307,7 +307,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         viewPositionsStorage.onRestoreInstanceState(container.getPositionsCache(orientation));
         cacheNormalizationPosition = container.getNormalizationPosition(orientation);
-        Log.d("RESTORE" , "orientation = " + orientation + " normalizationPos = " + cacheNormalizationPosition);
+        Log.d("RESTORE", "orientation = " + orientation + " normalizationPos = " + cacheNormalizationPosition);
     }
 
     @Override
@@ -404,8 +404,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         DisappearingViewsContainer disappearingViews = getDisappearingViews(recycler);
 
         if (disappearingViews.size() > 0) {
-            Log.d("layoutDisappearingViews", "disappearing views count = " + disappearingViews.size());
-            Log.d("layoutDisappearingViews", "fill disappearing views");
+            Log.d("disappearing views", "count = " + disappearingViews.size());
+            Log.d("fill disappearing views", "");
             downLayouter = layouterFactory.buildInfiniteLayouter(layouterFactory.buildDisappearingDownLayouter(downLayouter));
 
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
@@ -786,7 +786,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         //perform normalization when we have reached previous position then normalization position
         if (cacheNormalizationPosition != null && (topViewPosition < cacheNormalizationPosition ||
                 (cacheNormalizationPosition == 0 && cacheNormalizationPosition == topViewPosition))) {
-            Log.d(TAG, "normalization, position = " + cacheNormalizationPosition + " top view position = " + topViewPosition);
+            Log.d("normalization", "position = " + cacheNormalizationPosition + " top view position = " + topViewPosition);
             viewPositionsStorage.purgeCacheFromPosition(topViewPosition);
             //reset normalization position
             cacheNormalizationPosition = null;
@@ -891,6 +891,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 });
             }
         });
+
     }
 
     /**
