@@ -199,7 +199,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         postOnAnimation(new Runnable() {
             @Override
             public void run() {
-                ChipsLayoutManager.this.requestLayout();
+                ChipsLayoutManager.super.requestLayout();
                 requestSimpleAnimationsInNextLayout();
             }
         });
@@ -307,7 +307,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         viewPositionsStorage.onRestoreInstanceState(container.getPositionsCache(orientation));
         cacheNormalizationPosition = container.getNormalizationPosition(orientation);
-        Log.d("RESTORE", "orientation = " + orientation + " normalizationPos = " + cacheNormalizationPosition);
+        Log.d(TAG, "RESTORE. orientation = " + orientation + " normalizationPos = " + cacheNormalizationPosition);
+        Log.d(TAG, "RESTORE. last cache position = " + viewPositionsStorage.getLastCachePosition());
     }
 
     @Override
@@ -316,15 +317,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         //store only position on anchor. Rect of anchor will be invalidated
         int anchorPosition = anchorView.getPosition();
         container.putAnchorPosition(anchorPosition);
-
         container.putPositionsCache(orientation, viewPositionsStorage.onSaveInstanceState());
+        Log.d(TAG, "STORE. last cache position =" + viewPositionsStorage.getLastCachePosition());
 
-        Integer storedNormalizationPosition;
-        if (!viewPositionsStorage.isCacheEmpty()) {
-            storedNormalizationPosition = cacheNormalizationPosition != null ? cacheNormalizationPosition : viewPositionsStorage.getLastCachePosition();
-        } else {
-            storedNormalizationPosition = cacheNormalizationPosition;
-        }
+        Integer storedNormalizationPosition = cacheNormalizationPosition != null ? cacheNormalizationPosition : viewPositionsStorage.getLastCachePosition();
+
         Log.d(TAG, "STORE. orientation = " + orientation + " normalizationPos = " + storedNormalizationPosition);
 
         container.putNormalizationPosition(orientation, storedNormalizationPosition);
@@ -357,7 +354,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         if (isLayoutRTL() != isLayoutRTL) {
             //if layout direction changed programmatically we should clear anchors
             isLayoutRTL = isLayoutRTL();
-            viewPositionsStorage.purge();
             //so detach all views before we start searching for anchor view
             detachAndScrapAttachedViews(recycler);
 

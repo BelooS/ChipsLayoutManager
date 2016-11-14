@@ -224,7 +224,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
 
         if (isAttachedViewFromNewRow(view)) {
             //new row, reset row size
-            Log.d("onAttachView", "on attached new row");
+//            Log.d("onAttachView", "on attached new row");
             notifyLayouterListeners();
             rowSize = 0;
         }

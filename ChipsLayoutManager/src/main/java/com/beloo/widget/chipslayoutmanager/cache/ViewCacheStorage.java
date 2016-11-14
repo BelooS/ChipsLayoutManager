@@ -119,8 +119,9 @@ class ViewCacheStorage implements IViewCacheStorage {
     }
 
     @Override
-    public int getLastCachePosition() {
-        if (endsRow.isEmpty()) throw new IllegalStateException("cache is empty");
+
+    public Integer getLastCachePosition() {
+        if (isCacheEmpty()) return null;
         return endsRow.last();
     }
 
