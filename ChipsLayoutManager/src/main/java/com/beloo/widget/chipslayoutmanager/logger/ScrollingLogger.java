@@ -1,6 +1,6 @@
 package com.beloo.widget.chipslayoutmanager.logger;
 
-import timber.log.Timber;
+import android.util.Log;
 
 public class ScrollingLogger implements IScrollingLogger {
     @Override
@@ -10,6 +10,6 @@ public class ScrollingLogger implements IScrollingLogger {
 
     @Override
     public void logUpScrollingNormalizationDistance(int distance) {
-        Timber.d("scrollUp, distance = " + distance);
+        Log.d("scrollUp", "distance = " + distance);
     }
 }

@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -37,8 +38,6 @@ import com.beloo.widget.chipslayoutmanager.logger.LoggerFactory;
 import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 
 import java.util.List;
-
-import timber.log.Timber;
 
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
@@ -135,11 +134,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private int deletingItemsOnScreenCount;
 
     private ChipsLayoutManager(Context context) {
-        //Timber
-        if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());
-        }
-
         @DeviceOrientation
         int orientation = context.getResources().getConfiguration().orientation;
         this.orientation = orientation;
@@ -202,9 +196,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      * perform changing layout with playing RecyclerView animations
      */
     private void requestLayoutWithAnimations() {
-        postOnAnimation(() -> {
-            super.requestLayout();
-            requestSimpleAnimationsInNextLayout();
+        postOnAnimation(new Runnable() {
+            @Override
+            public void run() {
+                ChipsLayoutManager.this.requestLayout();
+                requestSimpleAnimationsInNextLayout();
+            }
         });
     }
 
@@ -310,7 +307,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         viewPositionsStorage.onRestoreInstanceState(container.getPositionsCache(orientation));
         cacheNormalizationPosition = container.getNormalizationPosition(orientation);
-        Timber.d("RESTORE. orientation = " + orientation + " normalizationPos = " + cacheNormalizationPosition);
+        Log.d("RESTORE" , "orientation = " + orientation + " normalizationPos = " + cacheNormalizationPosition);
     }
 
     @Override
@@ -328,7 +325,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         } else {
             storedNormalizationPosition = cacheNormalizationPosition;
         }
-        Timber.d(TAG, "STORE. orientation = " + orientation + " normalizationPos = " + storedNormalizationPosition);
+        Log.d(TAG, "STORE. orientation = " + orientation + " normalizationPos = " + storedNormalizationPosition);
 
         container.putNormalizationPosition(orientation, storedNormalizationPosition);
 
@@ -407,8 +404,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         DisappearingViewsContainer disappearingViews = getDisappearingViews(recycler);
 
         if (disappearingViews.size() > 0) {
-            Timber.d("disappearing views count = " + disappearingViews.size());
-            Timber.d("fill disappearing views");
+            Log.d("layoutDisappearingViews", "disappearing views count = " + disappearingViews.size());
+            Log.d("layoutDisappearingViews", "fill disappearing views");
             downLayouter = layouterFactory.buildInfiniteLayouter(layouterFactory.buildDisappearingDownLayouter(downLayouter));
 
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
@@ -789,7 +786,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         //perform normalization when we have reached previous position then normalization position
         if (cacheNormalizationPosition != null && (topViewPosition < cacheNormalizationPosition ||
                 (cacheNormalizationPosition == 0 && cacheNormalizationPosition == topViewPosition))) {
-            Timber.d("normalization, position = " + cacheNormalizationPosition + " top view position = " + topViewPosition);
+            Log.d(TAG, "normalization, position = " + cacheNormalizationPosition + " top view position = " + topViewPosition);
             viewPositionsStorage.purgeCacheFromPosition(topViewPosition);
             //reset normalization position
             cacheNormalizationPosition = null;
@@ -802,7 +799,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     public void scrollToPosition(int position) {
         if (position >= getItemCount() || position < 0) {
-            Timber.e("span layout manager", "Cannot scroll to " + position + ", item count " + getItemCount());
+            Log.e("span layout manager", "Cannot scroll to " + position + ", item count " + getItemCount());
             return;
         }
 
@@ -820,7 +817,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, final int position) {
         if (position >= getItemCount() || position < 0) {
-            Timber.e("span layout manager", "Cannot scroll to " + position + ", item count " + getItemCount());
+            Log.e("span layout manager", "Cannot scroll to " + position + ", item count " + getItemCount());
             return;
         }
 
@@ -879,14 +876,20 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         onLayoutUpdatedFromPosition(positionStart);
 
         //subscribe to next animations tick
-        postOnAnimation(() -> {
+        postOnAnimation(new Runnable() {
             //listen removing animation
-            recyclerView.getItemAnimator().isRunning(() -> {
-                //when removing animation finished return auto-measuring back
-                setAutoMeasureEnabled(true);
-                // and process onMeasure again
-                requestLayout();
-            });
+            @Override
+            public void run() {
+                recyclerView.getItemAnimator().isRunning(new RecyclerView.ItemAnimator.ItemAnimatorFinishedListener() {
+                    @Override
+                    public void onAnimationsFinished() {
+                        //when removing animation finished return auto-measuring back
+                        setAutoMeasureEnabled(true);
+                        // and process onMeasure again
+                        requestLayout();
+                    }
+                });
+            }
         });
     }
 

@@ -3,7 +3,7 @@ package com.beloo.widget.chipslayoutmanager.layouter.placer;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import timber.log.Timber;
+import timber.log.Log;
 
 class RealAtEndPlacer extends AbstractPlacer implements IPlacer {
     public RealAtEndPlacer(RecyclerView.LayoutManager layoutManager) {
@@ -14,6 +14,6 @@ class RealAtEndPlacer extends AbstractPlacer implements IPlacer {
     public void addView(View view) {
         getLayoutManager().addView(view);
 
-//        Timber.i("added view, position = " + getLayoutManager().getPosition(view));
+//        Log.i("added view, position = " + getLayoutManager().getPosition(view));
     }
 }
