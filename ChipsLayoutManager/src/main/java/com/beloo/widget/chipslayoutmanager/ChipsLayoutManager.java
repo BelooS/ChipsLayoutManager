@@ -188,19 +188,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         requestLayoutWithAnimations();
     }
 
-    @Override
-    public void requestLayout() {
-        cacheNormalizationPosition = 0;
-        viewPositionsStorage.purge();
-        requestLayoutWithAnimations();
-    }
-
     /**
      * perform changing layout with playing RecyclerView animations
      */
     private void requestLayoutWithAnimations() {
         postOnAnimation(() -> {
-            requestLayout();
+            super.requestLayout();
             requestSimpleAnimationsInNextLayout();
         });
     }
@@ -808,7 +801,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         anchorView.setPosition(position);
 
         //Trigger a new view layout
-        requestLayout();
+        super.requestLayout();
     }
 
     /**
@@ -882,7 +875,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 //when removing animation finished return auto-measuring back
                 setAutoMeasureEnabled(true);
                 // and process onMeasure again
-                requestLayout();
+                super.requestLayout();
             });
         });
     }
