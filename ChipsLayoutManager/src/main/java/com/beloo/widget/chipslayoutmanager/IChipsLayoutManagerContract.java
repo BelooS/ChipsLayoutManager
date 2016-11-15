@@ -1,5 +1,5 @@
 package com.beloo.widget.chipslayoutmanager;
 
-public interface IChipsLayoutManagerContract {
+interface IChipsLayoutManagerContract {
     void setScrollingEnabledContract(boolean isEnabled);
 }
