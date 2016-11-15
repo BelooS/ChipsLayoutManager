@@ -6,8 +6,6 @@ import android.view.View;
 import android.widget.TextView;
 import com.beloo.widget.chipslayoutmanager.R;
 
-import timber.log.Timber;
-
 class DisappearingViewAtEndPlacer extends AbstractPlacer {
 
     DisappearingViewAtEndPlacer(RecyclerView.LayoutManager layoutManager) {
@@ -18,7 +16,7 @@ class DisappearingViewAtEndPlacer extends AbstractPlacer {
     public void addView(View view) {
         getLayoutManager().addDisappearingView(view);
 
-//        Timber.i("added disappearing view, position = " + getLayoutManager().getPosition(view));
-//        Timber.d("name = " + ((TextView)view.findViewById(R.id.tvName)).getText().toString());
+//        Log.i("added disappearing view, position = " + getLayoutManager().getPosition(view));
+//        Log.d("name = " + ((TextView)view.findViewById(R.id.tvName)).getText().toString());
     }
 }

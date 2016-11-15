@@ -5,12 +5,6 @@ import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.view.View;
 
-import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
-import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
-import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
-import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
-
 class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     private static final String TAG = RTLUpLayouter.class.getSimpleName();
 
@@ -45,18 +39,26 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
+    boolean isAttachedViewFromNewRow(View view) {
+        int bottomOfCurrentView = getLayoutManager().getDecoratedBottom(view);
+        int leftOfCurrentView = getLayoutManager().getDecoratedLeft(view);
+
+        return rowTop >= bottomOfCurrentView
+                && leftOfCurrentView < viewLeft;
+    }
+
+    @Override
     Rect createViewRect(View view) {
-        int right = viewLeft + currentViewWidth;
-        int viewTop = rowBottom - currentViewHeight;
+        int right = viewLeft + getCurrentViewWidth();
+        int viewTop = rowBottom - getCurrentViewHeight();
         Rect viewRect = new Rect(viewLeft, viewTop, right, rowBottom);
         viewLeft = viewRect.right;
         return viewRect;
     }
 
     @Override
-    public boolean onAttachView(View view) {
-
-        if (viewLeft != getCanvasLeftBorder() && viewLeft + getLayoutManager().getDecoratedMeasuredWidth(view) > getCanvasRightBorder()) {
+    public void onInterceptAttachView(View view) {
+        if (viewLeft != getCanvasLeftBorder() && viewLeft + getCurrentViewWidth() > getCanvasRightBorder()) {
             viewLeft = getCanvasLeftBorder();
             rowBottom = rowTop;
         } else {
@@ -64,8 +66,6 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
         }
 
         rowTop = Math.min(rowTop, getLayoutManager().getDecoratedTop(view));
-
-        return super.onAttachView(view);
     }
 
     @Override
@@ -74,7 +74,7 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
         boolean stopDueToCache = getCacheStorage().isPositionEndsRow(getCurrentViewPosition());
         if (stopDueToCache) return true;
 
-        int bufRight = viewLeft + currentViewWidth;
+        int bufRight = viewLeft + getCurrentViewWidth();
         return super.canNotBePlacedInCurrentRow()
                 || (getBreaker().isItemBreakRow(getCurrentViewPosition()))
                 || (bufRight > getCanvasRightBorder() && viewLeft > getCanvasLeftBorder());

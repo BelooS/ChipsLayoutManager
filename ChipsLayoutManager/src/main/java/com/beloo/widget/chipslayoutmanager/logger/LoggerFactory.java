@@ -17,4 +17,9 @@ public class LoggerFactory {
     public IPredictiveAnimationsLogger getPredictiveAnimationsLogger() {
         return new PredictiveAnimationsLogger();
     }
+
+    @NonNull
+    public IScrollingLogger getScrollingLogger() {
+        return new EmtpyScrollingLogger();
+    }
 }

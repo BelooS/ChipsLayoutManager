@@ -8,8 +8,10 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.SpanLayoutChildGravity;
@@ -22,11 +24,9 @@ import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 
-import timber.log.Timber;
-
 public abstract class AbstractLayouter implements ILayouter, ICanvas {
-    int currentViewWidth;
-    int currentViewHeight;
+    private int currentViewWidth;
+    private int currentViewHeight;
     private int currentViewPosition;
     List<Pair<Rect, View>> rowViews = new LinkedList<>();
     /** bottom of current row*/
@@ -38,9 +38,6 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     int viewRight;
     /** left offset*/
     int viewLeft;
-
-    @Nullable
-    private Integer leftBorderOfPreviouslyAttachedView = null;
 
     private int rowSize = 0;
     private int previousRowSize;
@@ -66,7 +63,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
 
     private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
 
-    private List<ILayouterListener> layouterListeners = new LinkedList<>();
+    private Set<ILayouterListener> layouterListeners = new HashSet<>();
 
     AbstractLayouter(Builder builder) {
         //--- read builder
@@ -184,8 +181,6 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         Rect rect = createViewRect(view);
         rowViews.add(new Pair<>(rect, view));
 
-
-
         return true;
     }
 
@@ -209,7 +204,11 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     /** called after row have been layouted. Children should prepare new row here. */
     abstract void onAfterLayout();
 
+    abstract boolean isAttachedViewFromNewRow(View view);
+
     abstract AbstractPositionIterator createPositionIterator();
+
+    abstract void onInterceptAttachView(View view);
 
     void setPlacer(@NonNull IPlacer placer) {
         this.placer = placer;
@@ -220,18 +219,19 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     /** Read layouter state from current attached view. We need only last of it, but we can't determine here which is last.
      * Based on characteristics of last attached view, layouter algorithm will be able to continue placing from it.
      * This method have to be called on attaching view*/
-    public boolean onAttachView(View view) {
-        if (isFinishedLayouting()) return false;
+    public final boolean onAttachView(View view) {
+        calculateView(view);
 
-        int leftBorderCurrentView = layoutManager.getDecoratedLeft(view);
-
-        if (leftBorderOfPreviouslyAttachedView == null || leftBorderOfPreviouslyAttachedView>= leftBorderCurrentView) {
+        if (isAttachedViewFromNewRow(view)) {
             //new row, reset row size
+//            Log.d("onAttachView", "on attached new row");
             notifyLayouterListeners();
             rowSize = 0;
         }
 
-        leftBorderOfPreviouslyAttachedView = leftBorderCurrentView;
+        onInterceptAttachView(view);
+
+        if (isFinishedLayouting()) return false;
 
         rowSize++;
         layoutManager.attachView(view);
@@ -251,10 +251,6 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
             applyChildGravity(view, viewRect, rowTop, rowBottom);
             //add view to layout
             placer.addView(view);
-
-            if (getCurrentViewPosition() == 0) {
-                Timber.d("abstract layouter", "zero view rect = " + viewRect);
-            }
 
             //layout whole views in a row
             layoutManager.layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
@@ -315,6 +311,14 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         return viewLeft;
     }
 
+    int getCurrentViewWidth() {
+        return currentViewWidth;
+    }
+
+    int getCurrentViewHeight() {
+        return currentViewHeight;
+    }
+
     public abstract static class Builder {
         private ChipsLayoutManager layoutManager;
         private IViewCacheStorage cacheStorage;
@@ -325,7 +329,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         private IRowBreaker breaker;
         private Rect offsetRect;
         private Integer maxCountInRow;
-        private List<ILayouterListener> layouterListeners = new LinkedList<>();
+        private HashSet<ILayouterListener> layouterListeners = new HashSet<>();
 
         Builder() {}
 

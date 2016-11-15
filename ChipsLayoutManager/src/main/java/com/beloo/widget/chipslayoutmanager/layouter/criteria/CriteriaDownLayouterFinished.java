@@ -8,7 +8,7 @@ public class CriteriaDownLayouterFinished implements IFinishingCriteria {
 
     @Override
     public boolean isFinishedLayouting(AbstractLayouter abstractLayouter) {
-        isFinished = isFinished || abstractLayouter.getRowTop() > abstractLayouter.getCanvasBottomBorder();
+        isFinished = isFinished || abstractLayouter.getRowTop() >= abstractLayouter.getCanvasBottomBorder();
         return isFinished;
     }
 

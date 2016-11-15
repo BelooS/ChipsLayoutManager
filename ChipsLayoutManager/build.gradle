@@ -1,7 +1,3 @@
-plugins {
-    id "me.tatarka.retrolambda" version "3.3.1"
-}
-
 apply plugin: 'com.android.library'
 
 //upload settings to bintray
@@ -49,11 +45,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
 }
 
 def supportVersion = "25+";
@@ -63,7 +54,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
     compile "com.android.support:appcompat-v7:$supportVersion"
-    compile 'com.jakewharton.timber:timber:4.3.1'
     compile "com.android.support:recyclerview-v7:$supportVersion"
 
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'

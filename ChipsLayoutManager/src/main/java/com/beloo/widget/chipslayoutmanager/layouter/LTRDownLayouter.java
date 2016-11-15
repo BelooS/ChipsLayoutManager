@@ -4,13 +4,9 @@ import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.view.View;
 
-import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
-import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
-import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
-import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
-
 class LTRDownLayouter extends AbstractLayouter {
+
+    private boolean isPurged;
 
     private LTRDownLayouter(Builder builder) {
         super(builder);
@@ -22,8 +18,16 @@ class LTRDownLayouter extends AbstractLayouter {
 
     @Override
     void onPreLayout() {
-        //cache only when go down
-        getCacheStorage().storeRow(rowViews);
+        if (!rowViews.isEmpty()) {
+            //todo this isn't great place for that. Should be refactored somehow
+            if (!isPurged) {
+                isPurged = true;
+                getCacheStorage().purgeCacheFromPosition(getLayoutManager().getPosition(rowViews.get(0).second));
+            }
+
+            //cache only when go down
+            getCacheStorage().storeRow(rowViews);
+        }
     }
 
     @Override
@@ -34,10 +38,21 @@ class LTRDownLayouter extends AbstractLayouter {
     }
 
     @Override
+    boolean isAttachedViewFromNewRow(View view) {
+
+        int topOfCurrentView = getLayoutManager().getDecoratedTop(view);
+        int leftOfCurrentView = getLayoutManager().getDecoratedLeft(view);
+
+        return rowBottom <= topOfCurrentView
+                && leftOfCurrentView < viewLeft;
+
+    }
+
+    @Override
     public boolean canNotBePlacedInCurrentRow() {
         return super.canNotBePlacedInCurrentRow()
                 || (getCurrentViewPosition() != 0 && getBreaker().isItemBreakRow(getCurrentViewPosition() - 1))
-                || (viewLeft > getCanvasLeftBorder() && viewLeft + currentViewWidth > getCanvasRightBorder());
+                || (viewLeft > getCanvasLeftBorder() && viewLeft + getCurrentViewWidth() > getCanvasRightBorder());
     }
 
     @Override
@@ -47,7 +62,7 @@ class LTRDownLayouter extends AbstractLayouter {
 
     @Override
     Rect createViewRect(View view) {
-        Rect viewRect = new Rect(viewLeft, rowTop, viewLeft + currentViewWidth, rowTop + currentViewHeight);
+        Rect viewRect = new Rect(viewLeft, rowTop, viewLeft + getCurrentViewWidth(), rowTop + getCurrentViewHeight());
 
         viewLeft = viewRect.right;
         rowBottom = Math.max(rowBottom, viewRect.bottom);
@@ -55,12 +70,10 @@ class LTRDownLayouter extends AbstractLayouter {
     }
 
     @Override
-    public boolean onAttachView(View view) {
+    public void onInterceptAttachView(View view) {
         rowTop = getLayoutManager().getDecoratedTop(view);
         viewLeft = getLayoutManager().getDecoratedRight(view);
         rowBottom = Math.max(rowBottom, getLayoutManager().getDecoratedBottom(view));
-
-        return super.onAttachView(view);
     }
 
     public static final class Builder extends AbstractLayouter.Builder {

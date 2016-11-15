@@ -4,12 +4,10 @@ import android.util.Log;
 
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 
-import timber.log.Timber;
-
 public class StartPositionLogger implements IFillLogger {
     @Override
     public void onStartLayouter(int startPosition) {
-        Timber.d("fillWithLayouter. " + "start position = " + startPosition);
+        Log.d("fillWithLayouter", "start position = " + startPosition);
     }
 
     @Override

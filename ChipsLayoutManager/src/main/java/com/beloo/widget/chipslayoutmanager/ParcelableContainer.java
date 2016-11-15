@@ -1,5 +1,6 @@
 package com.beloo.widget.chipslayoutmanager;
 
+import android.content.res.Configuration;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntRange;
@@ -16,7 +17,11 @@ class ParcelableContainer implements Parcelable {
     private SparseArray<Object> orientationCacheMap = new SparseArray<>();
     private SparseArray<Object> cacheNormalizationPositionMap = new SparseArray<>();
 
-    ParcelableContainer() {}
+    ParcelableContainer() {
+        //initial values. We should normalize cache when scrolled to zero in case first time of changing orientation state
+        cacheNormalizationPositionMap.put(Configuration.ORIENTATION_PORTRAIT, 0);
+        cacheNormalizationPositionMap.put(Configuration.ORIENTATION_LANDSCAPE, 0);
+    }
 
     void putAnchorViewState(AnchorViewState anchorViewState) {
         this.anchorViewState = anchorViewState;
@@ -62,14 +67,9 @@ class ParcelableContainer implements Parcelable {
     }
 
     @IntRange(from = 0)
-    @NonNull
+    @Nullable
     Integer getNormalizationPosition(@DeviceOrientation int orientation) {
-        Integer integer = (Integer) cacheNormalizationPositionMap.get(orientation);
-        //normalize by zero if no position stored
-        if (integer == null) {
-            integer = 0;
-        }
-        return integer;
+        return (Integer) cacheNormalizationPositionMap.get(orientation);
     }
 
     public static final Creator<ParcelableContainer> CREATOR = new Creator<ParcelableContainer>() {
