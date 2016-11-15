@@ -208,6 +208,8 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
 
     abstract AbstractPositionIterator createPositionIterator();
 
+    abstract void onInterceptAttachView(View view);
+
     void setPlacer(@NonNull IPlacer placer) {
         this.placer = placer;
     }
@@ -217,7 +219,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     /** Read layouter state from current attached view. We need only last of it, but we can't determine here which is last.
      * Based on characteristics of last attached view, layouter algorithm will be able to continue placing from it.
      * This method have to be called on attaching view*/
-    public boolean onAttachView(View view) {
+    public final boolean onAttachView(View view) {
         calculateView(view);
 
         if (isAttachedViewFromNewRow(view)) {
@@ -226,6 +228,8 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
             notifyLayouterListeners();
             rowSize = 0;
         }
+
+        onInterceptAttachView(view);
 
         if (isFinishedLayouting()) return false;
 

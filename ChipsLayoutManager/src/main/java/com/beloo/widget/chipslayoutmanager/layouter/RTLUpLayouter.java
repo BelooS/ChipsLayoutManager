@@ -57,9 +57,7 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
-    public boolean onAttachView(View view) {
-        boolean isViewAttached = super.onAttachView(view);
-
+    public void onInterceptAttachView(View view) {
         if (viewLeft != getCanvasLeftBorder() && viewLeft + getCurrentViewWidth() > getCanvasRightBorder()) {
             viewLeft = getCanvasLeftBorder();
             rowBottom = rowTop;
@@ -68,8 +66,6 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
         }
 
         rowTop = Math.min(rowTop, getLayoutManager().getDecoratedTop(view));
-
-        return isViewAttached;
     }
 
     @Override

@@ -62,13 +62,10 @@ class LTRDownLayouter extends AbstractLayouter {
     }
 
     @Override
-    public boolean onAttachView(View view) {
-        boolean isViewAttached = super.onAttachView(view);
+    public void onInterceptAttachView(View view) {
         rowTop = getLayoutManager().getDecoratedTop(view);
         viewLeft = getLayoutManager().getDecoratedRight(view);
         rowBottom = Math.max(rowBottom, getLayoutManager().getDecoratedBottom(view));
-
-        return isViewAttached;
     }
 
     public static final class Builder extends AbstractLayouter.Builder {

@@ -56,9 +56,7 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
-    public boolean onAttachView(View view) {
-        boolean isViewAttached = super.onAttachView(view);
-
+    public void onInterceptAttachView(View view) {
         if (viewRight != getCanvasRightBorder() && viewRight - getCurrentViewWidth() < getCanvasLeftBorder()) {
             //new row
             viewRight = getCanvasRightBorder();
@@ -68,8 +66,6 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
         }
 
         rowTop = Math.min(rowTop, getLayoutManager().getDecoratedTop(view));
-
-        return isViewAttached;
     }
 
     @Override

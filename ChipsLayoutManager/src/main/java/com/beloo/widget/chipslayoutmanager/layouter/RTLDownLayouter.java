@@ -57,14 +57,11 @@ class RTLDownLayouter extends AbstractLayouter {
     }
 
     @Override
-    public boolean onAttachView(View view) {
-        boolean isViewAttached = super.onAttachView(view);
+    public void onInterceptAttachView(View view) {
         rowTop = getLayoutManager().getDecoratedTop(view);
         viewRight = getLayoutManager().getDecoratedLeft(view);
 
         rowBottom = Math.max(rowBottom, getLayoutManager().getDecoratedBottom(view));
-
-        return isViewAttached;
     }
 
 
