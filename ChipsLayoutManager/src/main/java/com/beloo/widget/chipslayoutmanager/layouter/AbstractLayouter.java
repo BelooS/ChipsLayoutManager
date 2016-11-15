@@ -181,8 +181,6 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         Rect rect = createViewRect(view);
         rowViews.add(new Pair<>(rect, view));
 
-
-
         return true;
     }
 

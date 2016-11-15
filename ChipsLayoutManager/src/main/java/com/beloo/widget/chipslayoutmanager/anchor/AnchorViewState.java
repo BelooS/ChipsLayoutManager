@@ -25,7 +25,7 @@ public class AnchorViewState implements Parcelable {
         this.anchorViewRect = anchorViewRect;
     }
 
-    boolean isNotFoundState() {
+    public boolean isNotFoundState() {
         return anchorViewRect == null;
     }
 

@@ -16,8 +16,10 @@ class LTRDownLayouter extends AbstractLayouter {
 
     @Override
     void onPreLayout() {
-        //cache only when go down
-        getCacheStorage().storeRow(rowViews);
+        if (!rowViews.isEmpty()) {
+            //cache only when go down
+            getCacheStorage().storeRow(rowViews);
+        }
     }
 
     @Override

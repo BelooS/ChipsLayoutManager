@@ -104,6 +104,7 @@ class ViewCacheStorage implements IViewCacheStorage {
 
     @Override
     public void purgeCacheToPosition(int position) {
+        if (isCacheEmpty()) return;
         Log.d(TAG, "cache purged to position " + position);
         Iterator<Integer> removeIterator = startsRow.headSet(position).iterator();
         while (removeIterator.hasNext()) {
@@ -133,7 +134,7 @@ class ViewCacheStorage implements IViewCacheStorage {
 
     @Override
     public void purgeCacheFromPosition(int position) {
-        Log.d(TAG, "cache purged from position " + position);
+        if (isCacheEmpty()) return;
 
         Iterator<Integer> removeIterator = startsRow.tailSet(position, true).iterator();
         while (removeIterator.hasNext()) {

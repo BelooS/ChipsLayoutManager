@@ -61,7 +61,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private IRowBreaker rowBreaker = new EmptyRowBreaker();
     //--- end contract parameters
 
-    /** store positions of placed view to know when LM should break row while moving back */
+    /** store positions of placed view to know when LM should break row while moving back
+     * this cache mostly needed to place views when scrolling down to the same places, where they have been previously */
     private IViewCacheStorage viewPositionsStorage;
 
     /**
@@ -307,6 +308,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         viewPositionsStorage.onRestoreInstanceState(container.getPositionsCache(orientation));
         cacheNormalizationPosition = container.getNormalizationPosition(orientation);
+        viewPositionsStorage.purgeCacheFromPosition(cacheNormalizationPosition);
         Log.d(TAG, "RESTORE. orientation = " + orientation + " normalizationPos = " + cacheNormalizationPosition);
         Log.d(TAG, "RESTORE. last cache position = " + viewPositionsStorage.getLastCachePosition());
     }
@@ -364,6 +366,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         if (!state.isPreLayout()) {
             detachAndScrapAttachedViews(recycler);
 
+            //we perform layouting stage from scratch, so cache will be rebuilt soon, we could purge it and avoid unnecessary normalization
+            viewPositionsStorage.purgeCacheFromPosition(anchorView.getPosition());
+            if (cacheNormalizationPosition != null && anchorView.getPosition() <= cacheNormalizationPosition) {
+                cacheNormalizationPosition = null;
+            }
+
             AbstractLayouterFactory layouterFactory = createLayouterFactory();
             /** In case some moving views
              * we should place it at layout to support predictive animations
@@ -375,6 +383,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             layouterFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
             fill(recycler, layouterFactory, anchorView, true);
         } else {
+            //inside pre-layout stage. It is called when item animation reconstruction will be played
+            //it is NOT called on orientation changes
+
             int additionalHeight = calcDisappearingViewsHeight(recycler);
             predictiveAnimationsLogger.heightOfCanvas(this);
             predictiveAnimationsLogger.onSummarizedDeletingItemsHeightCalculated(additionalHeight);
@@ -597,6 +608,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     private void fillWithLayouter(RecyclerView.Recycler recycler, ILayouter layouter) {
         AbstractPositionIterator iterator = layouter.positionIterator();
+        boolean isCacheCleared = false;
         while (iterator.hasNext()) {
             int pos = iterator.next();
             View view = viewCache.get(pos);
@@ -610,6 +622,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                      * to handle it, just leave the loop*/
                     break;
                 }
+
                 logger.onItemRequested();
 
                 if (!layouter.placeView(view)) {
@@ -707,6 +720,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         } else if (dy > 0) { //if content scrolled up
             delta = onContentScrolledUp(dy);
         }
+
+        performNormalizationIfNeeded();
+
         return delta;
     }
 
@@ -718,8 +734,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     private int onContentScrolledDown(int dy) {
         int delta;
-
-        performNormalizationIfNeeded();
 
         AnchorViewState state = anchorFactory.getTopLeftAnchor();
 
@@ -783,6 +797,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         if (cacheNormalizationPosition != null && (topViewPosition < cacheNormalizationPosition ||
                 (cacheNormalizationPosition == 0 && cacheNormalizationPosition == topViewPosition))) {
             Log.d("normalization", "position = " + cacheNormalizationPosition + " top view position = " + topViewPosition);
+            Log.d(TAG, "cache purged from position " + topViewPosition);
             viewPositionsStorage.purgeCacheFromPosition(topViewPosition);
             //reset normalization position
             cacheNormalizationPosition = null;
@@ -940,6 +955,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     private void onLayoutUpdatedFromPosition(int position) {
+        Log.d(TAG, "cache purged from position " + position);
         viewPositionsStorage.purgeCacheFromPosition(position);
         int startRowPos = viewPositionsStorage.getStartOfRow(position);
         cacheNormalizationPosition = cacheNormalizationPosition == null ?
