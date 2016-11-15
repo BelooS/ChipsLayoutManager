@@ -6,6 +6,8 @@ import android.view.View;
 
 class RTLDownLayouter extends AbstractLayouter {
 
+    private boolean isPurged;
+
     private RTLDownLayouter(Builder builder) {
         super(builder);
     }
@@ -16,7 +18,15 @@ class RTLDownLayouter extends AbstractLayouter {
 
     @Override
     void onPreLayout() {
-        getCacheStorage().storeRow(rowViews);
+        if (!rowViews.isEmpty()) {
+            //todo this isn't great place for that. Should be refactored somehow
+            if (!isPurged) {
+                isPurged = true;
+                getCacheStorage().purgeCacheFromPosition(getLayoutManager().getPosition(rowViews.get(0).second));
+            }
+
+            getCacheStorage().storeRow(rowViews);
+        }
     }
 
     @Override

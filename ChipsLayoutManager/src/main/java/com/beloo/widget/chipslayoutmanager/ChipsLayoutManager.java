@@ -308,7 +308,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         viewPositionsStorage.onRestoreInstanceState(container.getPositionsCache(orientation));
         cacheNormalizationPosition = container.getNormalizationPosition(orientation);
-        viewPositionsStorage.purgeCacheFromPosition(cacheNormalizationPosition);
+
+        Log.d(TAG, "RESTORE. last cache position before cleanup = " + viewPositionsStorage.getLastCachePosition());
+        if (cacheNormalizationPosition != null) {
+            viewPositionsStorage.purgeCacheFromPosition(cacheNormalizationPosition);
+        }
+        viewPositionsStorage.purgeCacheFromPosition(container.getAnchorPosition());
+        Log.d(TAG, "RESTORE. anchor position =" + container.getAnchorPosition());
         Log.d(TAG, "RESTORE. orientation = " + orientation + " normalizationPos = " + cacheNormalizationPosition);
         Log.d(TAG, "RESTORE. last cache position = " + viewPositionsStorage.getLastCachePosition());
     }
@@ -608,7 +614,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     private void fillWithLayouter(RecyclerView.Recycler recycler, ILayouter layouter) {
         AbstractPositionIterator iterator = layouter.positionIterator();
-        boolean isCacheCleared = false;
         while (iterator.hasNext()) {
             int pos = iterator.next();
             View view = viewCache.get(pos);
@@ -790,18 +795,21 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      * So them should be normalized to real positions when we can do it.
      */
     private void performNormalizationIfNeeded() {
-        final View topView = getChildAt(0);
-        if (topView == null) return;
-        int topViewPosition = getPosition(topView);
-        //perform normalization when we have reached previous position then normalization position
-        if (cacheNormalizationPosition != null && (topViewPosition < cacheNormalizationPosition ||
-                (cacheNormalizationPosition == 0 && cacheNormalizationPosition == topViewPosition))) {
-            Log.d("normalization", "position = " + cacheNormalizationPosition + " top view position = " + topViewPosition);
-            Log.d(TAG, "cache purged from position " + topViewPosition);
-            viewPositionsStorage.purgeCacheFromPosition(topViewPosition);
-            //reset normalization position
-            cacheNormalizationPosition = null;
-            requestLayoutWithAnimations();
+        if (cacheNormalizationPosition != null) {
+            final View firstView = getChildAt(0);
+            if (firstView == null) return;
+            int firstViewPosition = getPosition(firstView);
+
+            if (firstViewPosition < cacheNormalizationPosition ||
+                    (cacheNormalizationPosition == 0 && cacheNormalizationPosition == firstViewPosition)) {
+                //perform normalization when we have reached previous position then normalization position
+                Log.d("normalization", "position = " + cacheNormalizationPosition + " top view position = " + firstViewPosition);
+                Log.d(TAG, "cache purged from position " + firstViewPosition);
+                viewPositionsStorage.purgeCacheFromPosition(firstViewPosition);
+                //reset normalization position
+                cacheNormalizationPosition = null;
+                requestLayoutWithAnimations();
+            }
         }
     }
 
