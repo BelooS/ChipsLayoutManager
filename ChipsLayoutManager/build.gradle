@@ -1,3 +1,8 @@
+plugins {
+    id "com.jfrog.bintray" version "1.7.3"
+    id "com.github.dcendents.android-maven" version "1.5"
+}
+
 apply plugin: 'com.android.library'
 
 //upload settings to bintray
@@ -8,7 +13,7 @@ ext {
     libraryName = 'ChipsLayoutManager'
     publishedGroupId = 'com.beloo.widget'
     artifact = 'ChipsLayoutManager'
-    libraryVersion = '0.2.2.2'
+    libraryVersion = '0.2.3'
 
     libraryDescription = 'Android. A custom layout manager for RecyclerView which mimicric TextView span behaviour, flow layouts behaviour with support of amazing recyclerView features'
 
@@ -25,7 +30,6 @@ ext {
 }
 
 android {
-    publishNonDefault true
     compileSdkVersion 25
     buildToolsVersion "25.0.0"
 
@@ -47,6 +51,28 @@ android {
     }
 }
 
+task androidJavadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+}
+
+task androidJavadocsJar(type: Jar) {
+    classifier = 'javadoc'
+    baseName = artifact
+    from androidJavadocs.destinationDir
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    baseName = artifact
+    from android.sourceSets.main.java.srcDirs
+}
+
+artifacts {
+    archives androidSourcesJar
+    archives androidJavadocsJar
+}
+
+
 def supportVersion = "25+";
 
 dependencies {
@@ -61,8 +87,6 @@ dependencies {
     androidTestCompile "com.android.support:support-annotations:$supportVersion"
     androidTestCompile 'pl.pragmatists:JUnitParams:1.0.5'
 }
-
-apply plugin: 'com.github.dcendents.android-maven'
 
 group = publishedGroupId // Maven Group ID for the artifact
 version = libraryVersion
@@ -107,38 +131,10 @@ install {
     }
 }
 
-apply plugin: 'com.jfrog.bintray'
-
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.getDestinationDir()
-}
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
-
-task findConventions << {
-    println project.getConvention()
-}
-
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
 bintray {
-//    user = System.getenv('bintray.user')
-//    key = System.getenv('bintray.apikey')
-
     user = properties.getProperty("bintray.user")
     key = properties.getProperty("bintray.apikey")
 
