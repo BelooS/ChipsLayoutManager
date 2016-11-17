@@ -14,9 +14,10 @@ import java.util.Set;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.SpanLayoutChildGravity;
+import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.ILayoutRowBreaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
-import com.beloo.widget.chipslayoutmanager.gravity.GravityModifiersFactory;
+import com.beloo.widget.chipslayoutmanager.gravity.RowGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifier;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
@@ -57,7 +58,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
 
     private AbstractPositionIterator positionIterator;
 
-    private GravityModifiersFactory gravityModifiersFactory = new GravityModifiersFactory();
+    private IGravityModifiersFactory IGravityModifiersFactory = new RowGravityModifiersFactory();
 
     private Set<ILayouterListener> layouterListeners = new HashSet<>();
 
@@ -257,7 +258,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     private void applyChildGravity(View view, Rect viewRect, int rowTop, int rowBottom) {
         @SpanLayoutChildGravity
         int viewGravity = childGravityResolver.getItemGravity(getLayoutManager().getPosition(view));
-        IGravityModifier gravityModifier = gravityModifiersFactory.getGravityModifier(viewGravity);
+        IGravityModifier gravityModifier = IGravityModifiersFactory.getGravityModifier(viewGravity);
         gravityModifier.modifyChildRect(rowTop, rowBottom, viewRect);
     }
 
