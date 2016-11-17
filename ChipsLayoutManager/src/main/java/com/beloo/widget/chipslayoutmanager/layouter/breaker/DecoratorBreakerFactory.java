@@ -28,7 +28,7 @@ public class DecoratorBreakerFactory implements IBreakerFactory {
     @Override
     public ILayoutRowBreaker createBackwardRowBreaker() {
         ILayoutRowBreaker breaker = breakerFactory.createBackwardRowBreaker();
-        breaker = new LeftRowBreakerContract(rowBreaker, new CacheRowBreaker(cacheStorage, breaker));
+        breaker = new BackwardBreakerContract(rowBreaker, new CacheRowBreaker(cacheStorage, breaker));
         if (maxViewsInRow != null) {
             breaker = new MaxViewsBreaker(maxViewsInRow, breaker);
         }
@@ -38,7 +38,7 @@ public class DecoratorBreakerFactory implements IBreakerFactory {
     @Override
     public ILayoutRowBreaker createForwardRowBreaker() {
         ILayoutRowBreaker breaker = breakerFactory.createForwardRowBreaker();
-        breaker = new RightRowBreakerContract(rowBreaker, breaker);
+        breaker = new ForwardBreakerContract(rowBreaker, breaker);
         if (maxViewsInRow != null) {
             breaker = new MaxViewsBreaker(maxViewsInRow, breaker);
         }

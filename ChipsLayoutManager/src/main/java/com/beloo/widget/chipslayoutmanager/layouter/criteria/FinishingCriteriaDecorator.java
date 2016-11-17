@@ -14,9 +14,4 @@ abstract class FinishingCriteriaDecorator implements IFinishingCriteria {
     public boolean isFinishedLayouting(AbstractLayouter abstractLayouter) {
         return finishingCriteria.isFinishedLayouting(abstractLayouter);
     }
-
-    @Override
-    public boolean isFinishedLayouting() {
-        throw new UnsupportedOperationException("not supported");
-    }
 }

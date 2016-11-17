@@ -2,12 +2,12 @@ package com.beloo.widget.chipslayoutmanager.layouter.criteria;
 
 import android.support.annotation.NonNull;
 
-public class DefaultCriteriaFactory implements ICriteriaFactory {
+public class VerticalDefaultCriteriaFactory implements ICriteriaFactory {
 
     private int additionalHeight;
     private int additionalRowCount;
 
-    private DefaultCriteriaFactory(Builder builder) {
+    private VerticalDefaultCriteriaFactory(Builder builder) {
         additionalHeight = builder.additionalHeight;
         additionalRowCount = builder.additionalRowCount;
     }
@@ -49,8 +49,8 @@ public class DefaultCriteriaFactory implements ICriteriaFactory {
         }
 
         @NonNull
-        public DefaultCriteriaFactory build() {
-            return new DefaultCriteriaFactory(this);
+        public VerticalDefaultCriteriaFactory build() {
+            return new VerticalDefaultCriteriaFactory(this);
         }
     }
 }

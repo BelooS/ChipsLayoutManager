@@ -15,7 +15,7 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
     }
 
     @Override
-    Rect createOffsetRectForUpLayouter(Rect anchorRect) {
+    Rect createOffsetRectForBackwardLayouter(Rect anchorRect) {
         return new Rect(
                 0,
                 anchorRect == null ? layoutManager.getPaddingTop() : anchorRect.top,
@@ -25,7 +25,7 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
     }
 
     @Override
-    Rect createOffsetRectForDownLayouter(Rect anchorRect) {
+    Rect createOffsetRectForForwardLayouter(Rect anchorRect) {
         return new Rect(
                 //we should include anchor view here, so anchorLeft is a leftOffset
                 anchorRect == null ? layoutManager.getPaddingLeft() : anchorRect.left,
@@ -35,12 +35,12 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
     }
 
     @Override
-    AbstractLayouter.Builder createUpBuilder() {
+    AbstractLayouter.Builder createBackwardBuilder() {
         return LTRUpLayouter.newBuilder();
     }
 
     @Override
-    AbstractLayouter.Builder createDownBuilder() {
+    AbstractLayouter.Builder createForwardBuilder() {
         return LTRDownLayouter.newBuilder();
     }
 }

@@ -9,7 +9,7 @@ import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.gravity.RowGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.DefaultCriteriaFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.VerticalDefaultCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.DisappearingCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.InfiniteCriteria;
@@ -62,10 +62,10 @@ public abstract class AbstractLayouterFactory {
         return additionalHeight;
     }
 
-    abstract AbstractLayouter.Builder createUpBuilder();
-    abstract AbstractLayouter.Builder createDownBuilder();
-    abstract Rect createOffsetRectForUpLayouter(Rect anchorRect);
-    abstract Rect createOffsetRectForDownLayouter(Rect anchorRect);
+    abstract AbstractLayouter.Builder createBackwardBuilder();
+    abstract AbstractLayouter.Builder createForwardBuilder();
+    abstract Rect createOffsetRectForBackwardLayouter(Rect anchorRect);
+    abstract Rect createOffsetRectForForwardLayouter(Rect anchorRect);
 
     @NonNull
     private AbstractLayouter.Builder fillBasicBuilder(AbstractLayouter.Builder builder) {
@@ -79,15 +79,15 @@ public abstract class AbstractLayouterFactory {
 
     @NonNull
     public final ILayouter getUpLayouter(@Nullable Rect anchorRect) {
-        ICriteriaFactory criteriaFactory = DefaultCriteriaFactory.newBuilder()
+        ICriteriaFactory criteriaFactory = VerticalDefaultCriteriaFactory.newBuilder()
                 .additionalHeight(getAdditionalHeight())
                 .additionalRowCount(getAdditionalRowsCount())
                 .build();
 
         IPlacerFactory placerFactory = new RealPlacerFactory(layoutManager);
 
-        return fillBasicBuilder(createUpBuilder())
-                .offsetRect(createOffsetRectForUpLayouter(anchorRect))
+        return fillBasicBuilder(createBackwardBuilder())
+                .offsetRect(createOffsetRectForBackwardLayouter(anchorRect))
                 .breaker(breakerFactory.createBackwardRowBreaker())
                 .finishingCriteria(criteriaFactory.getUpFinishingCriteria())
                 .placer(placerFactory.getAtStartPlacer())
@@ -96,15 +96,15 @@ public abstract class AbstractLayouterFactory {
 
     @NonNull
     public final ILayouter getDownLayouter(@Nullable Rect anchorRect) {
-        ICriteriaFactory criteriaFactory = DefaultCriteriaFactory.newBuilder()
+        ICriteriaFactory criteriaFactory = VerticalDefaultCriteriaFactory.newBuilder()
                 .additionalHeight(getAdditionalHeight())
                 .additionalRowCount(getAdditionalRowsCount())
                 .build();
 
         IPlacerFactory placerFactory = new RealPlacerFactory(layoutManager);
 
-        return fillBasicBuilder(createDownBuilder())
-                .offsetRect(createOffsetRectForDownLayouter(anchorRect))
+        return fillBasicBuilder(createForwardBuilder())
+                .offsetRect(createOffsetRectForForwardLayouter(anchorRect))
                 .breaker(breakerFactory.createForwardRowBreaker())
                 .finishingCriteria(criteriaFactory.getDownFinishingCriteria())
                 .placer(placerFactory.getAtEndPlacer())

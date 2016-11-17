@@ -2,11 +2,11 @@ package com.beloo.widget.chipslayoutmanager.layouter.breaker;
 
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouter;
 
-class LeftRowBreakerContract extends RowBreakerDecorator{
+class BackwardBreakerContract extends RowBreakerDecorator{
 
     private IRowBreaker breaker;
 
-    LeftRowBreakerContract(IRowBreaker breaker, ILayoutRowBreaker decorate) {
+    BackwardBreakerContract(IRowBreaker breaker, ILayoutRowBreaker decorate) {
         super(decorate);
         this.breaker = breaker;
     }

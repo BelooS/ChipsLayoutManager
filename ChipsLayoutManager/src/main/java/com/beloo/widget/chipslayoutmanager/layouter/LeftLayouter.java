@@ -11,6 +11,10 @@ class LeftLayouter extends AbstractLayouter {
         super(builder);
     }
 
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
     @Override
     Rect createViewRect(View view) {
 

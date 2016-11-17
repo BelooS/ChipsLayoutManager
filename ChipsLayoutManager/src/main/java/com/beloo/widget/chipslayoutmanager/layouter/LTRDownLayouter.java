@@ -12,6 +12,10 @@ class LTRDownLayouter extends AbstractLayouter {
         super(builder);
     }
 
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
     @Override
     Rect createViewRect(View view) {
         Rect viewRect = new Rect(viewLeft, viewTop, viewLeft + getCurrentViewWidth(), viewTop + getCurrentViewHeight());

@@ -8,8 +8,4 @@ public class EmtpyCriteria implements IFinishingCriteria {
         return true;
     }
 
-    @Override
-    public boolean isFinishedLayouting() {
-        return true;
-    }
 }
