@@ -23,10 +23,10 @@ public interface ILayouter {
     int getRowSize();
 
     /** @return top of current row*/
-    int getRowTop();
+    int getViewTop();
 
     /** @return bottom of current row */
-    int getRowBottom();
+    int getViewBottom();
 
     /** @return size of previous row*/
     int getPreviousRowSize();

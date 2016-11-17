@@ -15,7 +15,6 @@ import java.util.Set;
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.SpanLayoutChildGravity;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.ILayoutRowBreaker;
-import com.beloo.widget.chipslayoutmanager.layouter.breaker.IRowBreaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.GravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
@@ -30,9 +29,9 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     private int currentViewPosition;
     List<Pair<Rect, View>> rowViews = new LinkedList<>();
     /** bottom of current row*/
-    int rowBottom;
+    int viewBottom;
     /** top of current row*/
-    int rowTop;
+    int viewTop;
 
     /** right offset */
     int viewRight;
@@ -70,8 +69,8 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         childGravityResolver = builder.childGravityResolver;
         this.finishingCriteria = builder.finishingCriteria;
         placer = builder.placer;
-        this.rowTop = builder.offsetRect.top;
-        this.rowBottom = builder.offsetRect.bottom;
+        this.viewTop = builder.offsetRect.top;
+        this.viewBottom = builder.offsetRect.bottom;
         this.viewRight = builder.offsetRect.right;
         this.viewLeft = builder.offsetRect.left;
         this.layouterListeners = builder.layouterListeners;
@@ -235,7 +234,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
             Rect viewRect = rowViewRectPair.first;
             View view = rowViewRectPair.second;
 
-            applyChildGravity(view, viewRect, rowTop, rowBottom);
+            applyChildGravity(view, viewRect, viewTop, viewBottom);
             //add view to layout
             placer.addView(view);
 
@@ -271,23 +270,21 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         return rowSize;
     }
 
-    @Override
-    public int getRowTop() {
-        return rowTop;
+    public int getViewTop() {
+        return viewTop;
     }
 
     @Override
     public Rect getRowRect() {
-        return new Rect(getCanvasLeftBorder(), rowTop, getCanvasRightBorder(), getRowBottom());
+        return new Rect(getCanvasLeftBorder(), viewTop, getCanvasRightBorder(), getViewBottom());
     }
 
-    @Override
-    public int getRowBottom() {
-        return rowBottom;
+    public int getViewBottom() {
+        return viewBottom;
     }
 
     final Rect getOffsetRect() {
-        return new Rect(viewLeft, rowTop, viewRight, rowBottom);
+        return new Rect(viewLeft, viewTop, viewRight, viewBottom);
     }
 
     public final int getViewLeft() {

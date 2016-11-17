@@ -34,7 +34,7 @@ class LTRDownLayouter extends AbstractLayouter {
     void onAfterLayout() {
         //go to next row, increase top coordinate, reset left
         viewLeft = getCanvasLeftBorder();
-        rowTop = rowBottom;
+        viewTop = viewBottom;
     }
 
     @Override
@@ -43,7 +43,7 @@ class LTRDownLayouter extends AbstractLayouter {
         int topOfCurrentView = getLayoutManager().getDecoratedTop(view);
         int leftOfCurrentView = getLayoutManager().getDecoratedLeft(view);
 
-        return rowBottom <= topOfCurrentView
+        return viewBottom <= topOfCurrentView
                 && leftOfCurrentView < viewLeft;
 
     }
@@ -55,18 +55,18 @@ class LTRDownLayouter extends AbstractLayouter {
 
     @Override
     Rect createViewRect(View view) {
-        Rect viewRect = new Rect(viewLeft, rowTop, viewLeft + getCurrentViewWidth(), rowTop + getCurrentViewHeight());
+        Rect viewRect = new Rect(viewLeft, viewTop, viewLeft + getCurrentViewWidth(), viewTop + getCurrentViewHeight());
 
         viewLeft = viewRect.right;
-        rowBottom = Math.max(rowBottom, viewRect.bottom);
+        viewBottom = Math.max(viewBottom, viewRect.bottom);
         return viewRect;
     }
 
     @Override
     public void onInterceptAttachView(View view) {
-        rowTop = getLayoutManager().getDecoratedTop(view);
+        viewTop = getLayoutManager().getDecoratedTop(view);
         viewLeft = getLayoutManager().getDecoratedRight(view);
-        rowBottom = Math.max(rowBottom, getLayoutManager().getDecoratedBottom(view));
+        viewBottom = Math.max(viewBottom, getLayoutManager().getDecoratedBottom(view));
     }
 
     public static final class Builder extends AbstractLayouter.Builder {

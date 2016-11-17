@@ -26,8 +26,8 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
             viewRect.left = viewRect.left - leftOffsetOfRow;
             viewRect.right = viewRect.right - leftOffsetOfRow;
 
-            rowTop = Math.min(rowTop, viewRect.top);
-            rowBottom = Math.max(rowBottom, viewRect.bottom);
+            viewTop = Math.min(viewTop, viewRect.top);
+            viewBottom = Math.max(viewBottom, viewRect.bottom);
         }
     }
 
@@ -35,7 +35,7 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     void onAfterLayout() {
         //go to next row, increase top coordinate, reset left
         viewLeft = getCanvasLeftBorder();
-        rowBottom = rowTop;
+        viewBottom = viewTop;
     }
 
     @Override
@@ -43,15 +43,15 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
         int bottomOfCurrentView = getLayoutManager().getDecoratedBottom(view);
         int leftOfCurrentView = getLayoutManager().getDecoratedLeft(view);
 
-        return rowTop >= bottomOfCurrentView
+        return viewTop >= bottomOfCurrentView
                 && leftOfCurrentView < viewLeft;
     }
 
     @Override
     Rect createViewRect(View view) {
         int right = viewLeft + getCurrentViewWidth();
-        int viewTop = rowBottom - getCurrentViewHeight();
-        Rect viewRect = new Rect(viewLeft, viewTop, right, rowBottom);
+        int viewTop = viewBottom - getCurrentViewHeight();
+        Rect viewRect = new Rect(viewLeft, viewTop, right, viewBottom);
         viewLeft = viewRect.right;
         return viewRect;
     }
@@ -60,12 +60,12 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     public void onInterceptAttachView(View view) {
         if (viewLeft != getCanvasLeftBorder() && viewLeft + getCurrentViewWidth() > getCanvasRightBorder()) {
             viewLeft = getCanvasLeftBorder();
-            rowBottom = rowTop;
+            viewBottom = viewTop;
         } else {
             viewLeft = getLayoutManager().getDecoratedRight(view);
         }
 
-        rowTop = Math.min(rowTop, getLayoutManager().getDecoratedTop(view));
+        viewTop = Math.min(viewTop, getLayoutManager().getDecoratedTop(view));
     }
 
     @Override

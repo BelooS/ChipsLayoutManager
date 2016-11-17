@@ -16,7 +16,7 @@ public class CriteriaDownAdditionalHeight extends FinishingCriteriaDecorator {
         int bottomBorder = abstractLayouter.getCanvasBottomBorder();
         return super.isFinishedLayouting(abstractLayouter) &&
                 //if additional height filled
-                abstractLayouter.getRowTop() > bottomBorder + additionalHeight;
+                abstractLayouter.getViewTop() > bottomBorder + additionalHeight;
     }
 
 }

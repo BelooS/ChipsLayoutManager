@@ -5,8 +5,6 @@ import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.view.View;
 
-import java.util.Collections;
-
 class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
     private LTRUpLayouter(Builder builder) {
@@ -26,8 +24,8 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
             viewRect.left = viewRect.left - leftOffsetOfRow;
             viewRect.right = viewRect.right - leftOffsetOfRow;
 
-            rowTop = Math.min(rowTop, viewRect.top);
-            rowBottom = Math.max(rowBottom, viewRect.bottom);
+            viewTop = Math.min(viewTop, viewRect.top);
+            viewBottom = Math.max(viewBottom, viewRect.bottom);
         }
     }
 
@@ -35,7 +33,7 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     void onAfterLayout() {
         //go to next row, increase top coordinate, reset left
         viewRight = getCanvasRightBorder();
-        rowBottom = rowTop;
+        viewBottom = viewTop;
     }
 
     @Override
@@ -43,16 +41,16 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
         int bottomOfCurrentView = getLayoutManager().getDecoratedBottom(view);
         int rightOfCurrentView = getLayoutManager().getDecoratedRight(view);
 
-        return rowTop >= bottomOfCurrentView
+        return viewTop >= bottomOfCurrentView
                 && rightOfCurrentView > viewRight;
     }
 
     @Override
     Rect createViewRect(View view) {
         int left = viewRight - getCurrentViewWidth();
-        int viewTop = rowBottom - getCurrentViewHeight();
+        int viewTop = viewBottom - getCurrentViewHeight();
 
-        Rect viewRect = new Rect(left, viewTop, viewRight, rowBottom);
+        Rect viewRect = new Rect(left, viewTop, viewRight, viewBottom);
         viewRight = viewRect.left;
         return viewRect;
     }
@@ -62,12 +60,12 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
         if (viewRight != getCanvasRightBorder() && viewRight - getCurrentViewWidth() < getCanvasLeftBorder()) {
             //new row
             viewRight = getCanvasRightBorder();
-            rowBottom = rowTop;
+            viewBottom = viewTop;
         } else {
             viewRight = getLayoutManager().getDecoratedLeft(view);
         }
 
-        rowTop = Math.min(rowTop, getLayoutManager().getDecoratedTop(view));
+        viewTop = Math.min(viewTop, getLayoutManager().getDecoratedTop(view));
     }
 
     @Override
