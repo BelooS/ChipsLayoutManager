@@ -3,11 +3,11 @@ package com.beloo.widget.chipslayoutmanager.layouter.breaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouter;
 
-public class CacheRowBreaker extends RowBreakerDecorator {
+class CacheRowBreaker extends RowBreakerDecorator {
 
     private IViewCacheStorage cacheStorage;
 
-    CacheRowBreaker(ILayoutRowBreaker decorate, IViewCacheStorage cacheStorage) {
+    CacheRowBreaker(IViewCacheStorage cacheStorage, ILayoutRowBreaker decorate) {
         super(decorate);
         this.cacheStorage = cacheStorage;
     }

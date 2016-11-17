@@ -14,6 +14,7 @@ import java.util.Set;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.SpanLayoutChildGravity;
+import com.beloo.widget.chipslayoutmanager.layouter.breaker.ILayoutRowBreaker;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IRowBreaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.GravityModifiersFactory;
@@ -52,7 +53,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     @NonNull
     private IPlacer placer;
     @NonNull
-    private IRowBreaker breaker;
+    private ILayoutRowBreaker breaker;
     /** Max items in row restriction. Layout of row should be stopped when this count of views reached*/
     @Nullable
     private Integer maxViewsInRow = null;
@@ -86,11 +87,6 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
 
     void setFinishingCriteria(@NonNull IFinishingCriteria finishingCriteria) {
         this.finishingCriteria = finishingCriteria;
-    }
-
-    @NonNull
-    IRowBreaker getBreaker() {
-        return breaker;
     }
 
     @Override
@@ -190,8 +186,8 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
 
     /** check if we can not add current view to row
      * we determine it on the next layouter step, because we need next view size to determine whether it fits in row or not */
-    boolean canNotBePlacedInCurrentRow() {
-        return (maxViewsInRow!= null && rowSize >= maxViewsInRow);
+    final boolean canNotBePlacedInCurrentRow() {
+        return breaker.isRowBroke(this);
     }
 
     /** factory method for Rect, where view will be placed. Creation based on inner layouter parameters */
@@ -325,7 +321,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         private IChildGravityResolver childGravityResolver;
         private IFinishingCriteria finishingCriteria;
         private IPlacer placer;
-        private IRowBreaker breaker;
+        private ILayoutRowBreaker breaker;
         private Rect offsetRect;
         private Integer maxCountInRow;
         private HashSet<ILayouterListener> layouterListeners = new HashSet<>();
@@ -388,7 +384,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         }
 
         @NonNull
-        final Builder breaker(@NonNull IRowBreaker breaker) {
+        final Builder breaker(@NonNull ILayoutRowBreaker breaker) {
             AssertionUtils.assertNotNull(breaker, "breaker shouldn't be null");
             this.breaker = breaker;
             return this;

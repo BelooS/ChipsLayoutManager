@@ -7,7 +7,7 @@ public class MaxViewsBreaker extends RowBreakerDecorator {
 
     private int maxViewsInRow;
 
-    MaxViewsBreaker(ILayoutRowBreaker decorate, int maxViewsInRow) {
+    MaxViewsBreaker(int maxViewsInRow, ILayoutRowBreaker decorate) {
         super(decorate);
         this.maxViewsInRow = maxViewsInRow;
     }

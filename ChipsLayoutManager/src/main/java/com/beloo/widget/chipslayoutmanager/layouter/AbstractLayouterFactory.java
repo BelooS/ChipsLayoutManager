@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
-import com.beloo.widget.chipslayoutmanager.layouter.breaker.IRowBreaker;
+import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.DefaultCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.DisappearingCriteriaFactory;
@@ -22,8 +22,6 @@ import java.util.List;
 public abstract class AbstractLayouterFactory {
     ChipsLayoutManager layoutManager;
     private IViewCacheStorage cacheStorage;
-    @NonNull
-    private IRowBreaker breaker;
     @Nullable
     private Integer maxViewsInRow = null;
 
@@ -34,10 +32,12 @@ public abstract class AbstractLayouterFactory {
 
     private int additionalHeight;
 
-    AbstractLayouterFactory(ChipsLayoutManager layoutManager, IViewCacheStorage cacheStorage, @NonNull IRowBreaker breaker) {
+    private IBreakerFactory breakerFactory;
+
+    AbstractLayouterFactory(ChipsLayoutManager layoutManager, IViewCacheStorage cacheStorage, IBreakerFactory breakerFactory) {
         this.cacheStorage = cacheStorage;
         this.layoutManager = layoutManager;
-        this.breaker = breaker;
+        this.breakerFactory = breakerFactory;
     }
 
     public void addLayouterListener(@Nullable ILayouterListener layouterListener) {
@@ -76,6 +76,7 @@ public abstract class AbstractLayouterFactory {
     abstract AbstractLayouter.Builder createDownBuilder();
     abstract Rect createOffsetRectForUpLayouter(Rect anchorRect);
     abstract Rect createOffsetRectForDownLayouter(Rect anchorRect);
+    abstract IBreakerFactory createBreakerFactory();
 
     @NonNull
     private AbstractLayouter.Builder fillBasicBuilder(AbstractLayouter.Builder builder) {
@@ -83,7 +84,6 @@ public abstract class AbstractLayouterFactory {
                 .canvas(new Square(layoutManager))
                 .childGravityResolver(layoutManager.getChildGravityResolver())
                 .cacheStorage(cacheStorage)
-                .breaker(breaker)
                 .maxCountInRow(getMaxViewsInRow())
                 .addLayouterListeners(layouterListeners);
     }
@@ -99,6 +99,7 @@ public abstract class AbstractLayouterFactory {
 
         return fillBasicBuilder(createUpBuilder())
                 .offsetRect(createOffsetRectForUpLayouter(anchorRect))
+                .breaker(breakerFactory.createBackwardRowBreaker())
                 .finishingCriteria(criteriaFactory.getUpFinishingCriteria())
                 .placer(placerFactory.getAtStartPlacer())
                 .build();
@@ -115,6 +116,7 @@ public abstract class AbstractLayouterFactory {
 
         return fillBasicBuilder(createDownBuilder())
                 .offsetRect(createOffsetRectForDownLayouter(anchorRect))
+                .breaker(breakerFactory.createForwardRowBreaker())
                 .finishingCriteria(criteriaFactory.getDownFinishingCriteria())
                 .placer(placerFactory.getAtEndPlacer())
                 .build();

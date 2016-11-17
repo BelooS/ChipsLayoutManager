@@ -3,13 +3,15 @@ package com.beloo.widget.chipslayoutmanager.layouter;
 import android.graphics.Rect;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IRowBreaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
+import com.beloo.widget.chipslayoutmanager.layouter.breaker.LTRBreakerFactory;
 
 public class LTRLayouterFactory extends AbstractLayouterFactory {
 
-    public LTRLayouterFactory(ChipsLayoutManager layoutManager, IViewCacheStorage cacheStorage, IRowBreaker breaker) {
-        super(layoutManager, cacheStorage, breaker);
+    public LTRLayouterFactory(ChipsLayoutManager layoutManager, IViewCacheStorage cacheStorage, IBreakerFactory breakerFactory) {
+        super(layoutManager, cacheStorage, breakerFactory);
     }
 
     @Override
@@ -30,6 +32,11 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
                 anchorRect == null ? layoutManager.getPaddingTop() : anchorRect.top,
                 0,
                 anchorRect == null ? layoutManager.getPaddingBottom() : anchorRect.bottom);
+    }
+
+    @Override
+    IBreakerFactory createBreakerFactory() {
+        return new LTRBreakerFactory();
     }
 
     @Override

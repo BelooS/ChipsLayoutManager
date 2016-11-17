@@ -49,13 +49,6 @@ class LTRDownLayouter extends AbstractLayouter {
     }
 
     @Override
-    public boolean canNotBePlacedInCurrentRow() {
-        return super.canNotBePlacedInCurrentRow()
-                || (getCurrentViewPosition() != 0 && getBreaker().isItemBreakRow(getCurrentViewPosition() - 1))
-                || (viewLeft > getCanvasLeftBorder() && viewLeft + getCurrentViewWidth() > getCanvasRightBorder());
-    }
-
-    @Override
     AbstractPositionIterator createPositionIterator() {
         return new IncrementalPositionIterator(getLayoutManager().getItemCount());
     }
