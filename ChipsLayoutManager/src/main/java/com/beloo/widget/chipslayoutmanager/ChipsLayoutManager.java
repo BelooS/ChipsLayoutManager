@@ -176,6 +176,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /**
      * change max count of row views in runtime
      */
+    @SuppressWarnings("unused")
     public void setMaxViewsInRow(@IntRange(from = 1) Integer maxViewsInRow) {
         if (maxViewsInRow < 1)
             throw new IllegalArgumentException("maxViewsInRow should be positive, but is = " + maxViewsInRow);
@@ -213,6 +214,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         /**
          * set vertical gravity in a row for all children. Default = CENTER_VERTICAL
          */
+        @SuppressWarnings("unused")
         public Builder setChildGravity(@SpanLayoutChildGravity int gravity) {
             this.gravity = gravity;
             return this;
@@ -221,6 +223,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         /**
          * set gravity resolver in case you need special gravity for items. This method have priority over {@link #setChildGravity(int)}
          */
+        @SuppressWarnings("unused")
         public Builder setGravityResolver(@NonNull IChildGravityResolver gravityResolver) {
             AssertionUtils.assertNotNull(gravityResolver, "gravity resolver couldn't be null");
             childGravityResolver = gravityResolver;
@@ -230,6 +233,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         /**
          * strictly disable scrolling if needed
          */
+        @SuppressWarnings("unused")
         public Builder setScrollingEnabled(boolean isEnabled) {
             ChipsLayoutManager.this.setScrollingEnabledContract(isEnabled);
             return this;
@@ -238,6 +242,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         /**
          * set maximum possible count of views in row
          */
+        @SuppressWarnings("unused")
         public Builder setMaxViewsInRow(@IntRange(from = 1) int maxViewsInRow) {
             if (maxViewsInRow < 1)
                 throw new IllegalArgumentException("maxViewsInRow should be positive, but is = " + maxViewsInRow);
@@ -246,6 +251,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
 
         /** @param breaker override to determine whether ChipsLayoutManager should breaks row due to position of view. */
+        @SuppressWarnings("unused")
         public Builder setRowBreaker(@NonNull IRowBreaker breaker) {
             AssertionUtils.assertNotNull(breaker, "breaker couldn't be null");
             ChipsLayoutManager.this.rowBreaker = breaker;
@@ -444,16 +450,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         int size() {
             return upViews.size() + downViews.size();
         }
-
-        void remove(int position) {
-            upViews.remove(position);
-            downViews.remove(position);
-        }
-
-
     }
 
-    public DisappearingViewsContainer getDisappearingViews(RecyclerView.Recycler recycler) {
+    DisappearingViewsContainer getDisappearingViews(RecyclerView.Recycler recycler) {
         final List<RecyclerView.ViewHolder> scrapList = recycler.getScrapList();
         //views which moved from screen, but not deleted
         DisappearingViewsContainer container = new DisappearingViewsContainer();
