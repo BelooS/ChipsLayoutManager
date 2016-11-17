@@ -46,9 +46,4 @@ public class RTLLayouterFactory extends AbstractLayouterFactory {
                 anchorRect == null ? layoutManager.getPaddingRight() : anchorRect.right,
                 anchorRect == null ? layoutManager.getPaddingBottom() : anchorRect.bottom);
     }
-
-    @Override
-    IBreakerFactory createBreakerFactory() {
-        return new RTLBreakerFactory();
-    }
 }

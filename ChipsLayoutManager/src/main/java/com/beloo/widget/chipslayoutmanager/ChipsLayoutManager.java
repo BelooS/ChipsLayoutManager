@@ -31,6 +31,8 @@ import com.beloo.widget.chipslayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.chipslayoutmanager.layouter.ILayouter;
 import com.beloo.widget.chipslayoutmanager.layouter.LTRLayouterFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.RTLLayouterFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.breaker.LTRBreakerFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.breaker.RTLBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.logger.IAdapterActionsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IFillLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IPredictiveAnimationsLogger;
@@ -151,10 +153,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     private AbstractLayouterFactory createLayouterFactory() {
-        DecoratorBreakerFactory decoratorBreakerFactory = new DecoratorBreakerFactory(viewPositionsStorage, rowBreaker, maxViewsInRow);
         AbstractLayouterFactory layouterFactory = isLayoutRTL() ?
-                new RTLLayouterFactory(this, viewPositionsStorage, decoratorBreakerFactory)
-                : new LTRLayouterFactory(this, viewPositionsStorage, decoratorBreakerFactory);
+                new RTLLayouterFactory(this, viewPositionsStorage, new DecoratorBreakerFactory(viewPositionsStorage, rowBreaker, maxViewsInRow, new RTLBreakerFactory()))
+                : new LTRLayouterFactory(this, viewPositionsStorage, new DecoratorBreakerFactory(viewPositionsStorage, rowBreaker, maxViewsInRow, new LTRBreakerFactory()));
         return layouterFactory;
     }
 

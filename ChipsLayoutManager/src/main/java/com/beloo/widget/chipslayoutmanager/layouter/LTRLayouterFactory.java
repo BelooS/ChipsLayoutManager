@@ -35,11 +35,6 @@ public class LTRLayouterFactory extends AbstractLayouterFactory {
     }
 
     @Override
-    IBreakerFactory createBreakerFactory() {
-        return new LTRBreakerFactory();
-    }
-
-    @Override
     AbstractLayouter.Builder createUpBuilder() {
         return LTRUpLayouter.newBuilder();
     }

@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
-import com.beloo.widget.chipslayoutmanager.layouter.breaker.DecoratorBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.DefaultCriteriaFactory;
@@ -37,8 +36,6 @@ public abstract class AbstractLayouterFactory {
         this.cacheStorage = cacheStorage;
         this.layoutManager = layoutManager;
         this.breakerFactory = breakerFactory;
-        //todo refactor it, maybe with outer factory
-        ((DecoratorBreakerFactory) breakerFactory).withBreakerFactory(createBreakerFactory());
     }
 
     public void addLayouterListener(@Nullable ILayouterListener layouterListener) {
@@ -68,7 +65,6 @@ public abstract class AbstractLayouterFactory {
     abstract AbstractLayouter.Builder createDownBuilder();
     abstract Rect createOffsetRectForUpLayouter(Rect anchorRect);
     abstract Rect createOffsetRectForDownLayouter(Rect anchorRect);
-    abstract IBreakerFactory createBreakerFactory();
 
     @NonNull
     private AbstractLayouter.Builder fillBasicBuilder(AbstractLayouter.Builder builder) {
