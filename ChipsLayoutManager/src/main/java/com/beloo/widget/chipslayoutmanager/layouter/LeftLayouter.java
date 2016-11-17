@@ -5,9 +5,9 @@ import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.view.View;
 
-class HorizontalBackwardLayouter extends AbstractLayouter {
+class LeftLayouter extends AbstractLayouter {
 
-    private HorizontalBackwardLayouter(Builder builder) {
+    private LeftLayouter(Builder builder) {
         super(builder);
     }
 
@@ -77,8 +77,8 @@ class HorizontalBackwardLayouter extends AbstractLayouter {
         }
 
         @NonNull
-        public HorizontalBackwardLayouter build() {
-            return new HorizontalBackwardLayouter(this);
+        public LeftLayouter build() {
+            return new LeftLayouter(this);
         }
     }
 }

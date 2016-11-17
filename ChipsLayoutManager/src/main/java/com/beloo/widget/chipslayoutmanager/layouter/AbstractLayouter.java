@@ -58,7 +58,8 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
 
     private AbstractPositionIterator positionIterator;
 
-    private IGravityModifiersFactory IGravityModifiersFactory = new RowGravityModifiersFactory();
+    @NonNull
+    private IGravityModifiersFactory gravityModifiersFactory;
 
     private Set<ILayouterListener> layouterListeners = new HashSet<>();
 
@@ -76,6 +77,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         this.viewLeft = builder.offsetRect.left;
         this.layouterListeners = builder.layouterListeners;
         this.breaker = builder.breaker;
+        this.gravityModifiersFactory = builder.gravityModifiersFactory;
         //--- end read builder
 
         positionIterator = createPositionIterator();
@@ -258,7 +260,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     private void applyChildGravity(View view, Rect viewRect, int rowTop, int rowBottom) {
         @SpanLayoutChildGravity
         int viewGravity = childGravityResolver.getItemGravity(getLayoutManager().getPosition(view));
-        IGravityModifier gravityModifier = IGravityModifiersFactory.getGravityModifier(viewGravity);
+        IGravityModifier gravityModifier = gravityModifiersFactory.getGravityModifier(viewGravity);
         gravityModifier.modifyChildRect(rowTop, rowBottom, viewRect);
     }
 
@@ -314,6 +316,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         private ILayoutRowBreaker breaker;
         private Rect offsetRect;
         private HashSet<ILayouterListener> layouterListeners = new HashSet<>();
+        private IGravityModifiersFactory gravityModifiersFactory;
 
         Builder() {}
 
@@ -338,6 +341,12 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         @NonNull
         final Builder canvas(@NonNull ICanvas canvas) {
             this.canvas = canvas;
+            return this;
+        }
+
+        @NonNull
+        final Builder gravityModifiersFactory(@NonNull IGravityModifiersFactory gravityModifiersFactory) {
+            this.gravityModifiersFactory = gravityModifiersFactory;
             return this;
         }
 

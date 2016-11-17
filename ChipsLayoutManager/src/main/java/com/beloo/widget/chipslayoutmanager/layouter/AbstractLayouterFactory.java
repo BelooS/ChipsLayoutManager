@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.chipslayoutmanager.gravity.RowGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.DefaultCriteriaFactory;
@@ -72,6 +73,7 @@ public abstract class AbstractLayouterFactory {
                 .canvas(new Square(layoutManager))
                 .childGravityResolver(layoutManager.getChildGravityResolver())
                 .cacheStorage(cacheStorage)
+                .gravityModifiersFactory(new RowGravityModifiersFactory())
                 .addLayouterListeners(layouterListeners);
     }
 
