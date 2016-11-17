@@ -12,14 +12,14 @@ public class GravityModifiersFactory {
     public GravityModifiersFactory() {
         gravityModifierMap = new SparseArray<>();
 
-        CenterGravityModifier centerGravityModifier = new CenterGravityModifier();
+        CenterInRowGravityModifier centerInRowGravityModifier = new CenterInRowGravityModifier();
         TopGravityModifier topGravityModifier = new TopGravityModifier();
         BottomGravityModifier bottomGravityModifier = new BottomGravityModifier();
 
         gravityModifierMap.put(Gravity.TOP, topGravityModifier);
         gravityModifierMap.put(Gravity.BOTTOM, bottomGravityModifier);
-        gravityModifierMap.put(Gravity.CENTER, centerGravityModifier);
-        gravityModifierMap.put(Gravity.CENTER_VERTICAL, centerGravityModifier);
+        gravityModifierMap.put(Gravity.CENTER, centerInRowGravityModifier);
+        gravityModifierMap.put(Gravity.CENTER_VERTICAL, centerInRowGravityModifier);
     }
 
     public IGravityModifier getGravityModifier(@SpanLayoutChildGravity int gravity) {
