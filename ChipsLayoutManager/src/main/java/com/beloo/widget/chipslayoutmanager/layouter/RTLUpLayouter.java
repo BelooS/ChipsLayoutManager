@@ -72,12 +72,11 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     public boolean canNotBePlacedInCurrentRow() {
         //when go up, check cache to layout according previous down algorithm
         boolean stopDueToCache = getCacheStorage().isPositionEndsRow(getCurrentViewPosition());
-        if (stopDueToCache) return true;
-
-        int bufRight = viewLeft + getCurrentViewWidth();
-        return super.canNotBePlacedInCurrentRow()
+        return stopDueToCache
+                || super.canNotBePlacedInCurrentRow()
                 || (getBreaker().isItemBreakRow(getCurrentViewPosition()))
-                || (bufRight > getCanvasRightBorder() && viewLeft > getCanvasLeftBorder());
+                || (viewLeft + getCurrentViewWidth() > getCanvasRightBorder() && viewLeft > getCanvasLeftBorder());
+
     }
 
     @Override

@@ -3,7 +3,7 @@ package com.beloo.widget.chipslayoutmanager.layouter;
 import android.graphics.Rect;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
-import com.beloo.widget.chipslayoutmanager.breaker.IRowBreaker;
+import com.beloo.widget.chipslayoutmanager.layouter.breaker.IRowBreaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 
 public class LTRLayouterFactory extends AbstractLayouterFactory {

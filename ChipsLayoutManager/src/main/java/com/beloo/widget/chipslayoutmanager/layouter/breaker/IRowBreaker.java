@@ -1,4 +1,4 @@
-package com.beloo.widget.chipslayoutmanager.breaker;
+package com.beloo.widget.chipslayoutmanager.layouter.breaker;
 
 import android.support.annotation.IntRange;
 

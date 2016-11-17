@@ -74,12 +74,11 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     public boolean canNotBePlacedInCurrentRow() {
         //when go up, check cache to layout according previous down algorithm
         boolean stopDueToCache = getCacheStorage().isPositionEndsRow(getCurrentViewPosition());
-        if (stopDueToCache) return true;
-
-        int bufLeft = viewRight - getCurrentViewWidth();
-        return super.canNotBePlacedInCurrentRow()
+        return stopDueToCache
+                || super.canNotBePlacedInCurrentRow()
                 || (getBreaker().isItemBreakRow(getCurrentViewPosition()))
-                || (bufLeft < getCanvasLeftBorder() && viewRight < getCanvasRightBorder());
+                || (viewRight - getCurrentViewWidth() < getCanvasLeftBorder() && viewRight < getCanvasRightBorder());
+
     }
 
     @Override

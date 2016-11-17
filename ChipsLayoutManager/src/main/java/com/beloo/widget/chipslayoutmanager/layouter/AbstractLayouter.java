@@ -4,7 +4,6 @@ import android.graphics.Rect;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
@@ -15,7 +14,7 @@ import java.util.Set;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.SpanLayoutChildGravity;
-import com.beloo.widget.chipslayoutmanager.breaker.IRowBreaker;
+import com.beloo.widget.chipslayoutmanager.layouter.breaker.IRowBreaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.GravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
@@ -123,7 +122,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         return items;
     }
 
-    final int getCurrentViewPosition() {
+    public final int getCurrentViewPosition() {
         return currentViewPosition;
     }
 
@@ -299,23 +298,23 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         return rowBottom;
     }
 
-    Rect getOffsetRect() {
+    final Rect getOffsetRect() {
         return new Rect(viewLeft, rowTop, viewRight, rowBottom);
     }
 
-    int getLeftOffset() {
+    public final int getLeftOffset() {
         return viewRight;
     }
 
-    int getRightOffset() {
+    public final int getRightOffset() {
         return viewLeft;
     }
 
-    int getCurrentViewWidth() {
+    public final int getCurrentViewWidth() {
         return currentViewWidth;
     }
 
-    int getCurrentViewHeight() {
+    public final int getCurrentViewHeight() {
         return currentViewHeight;
     }
 

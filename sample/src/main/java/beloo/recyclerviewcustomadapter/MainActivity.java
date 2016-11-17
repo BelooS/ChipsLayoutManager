@@ -1,6 +1,5 @@
 package beloo.recyclerviewcustomadapter;
 
-import android.support.annotation.IntRange;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -12,7 +11,6 @@ import android.widget.Spinner;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
-import com.beloo.widget.chipslayoutmanager.breaker.IRowBreaker;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 
 import java.util.ArrayList;
