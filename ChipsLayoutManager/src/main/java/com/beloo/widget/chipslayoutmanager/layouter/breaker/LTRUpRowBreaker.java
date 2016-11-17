@@ -6,7 +6,7 @@ import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouter;
 class LTRUpRowBreaker implements ILayoutRowBreaker {
     @Override
     public boolean isRowBroke(AbstractLayouter al) {
-        return al.getRightOffset() - al.getCurrentViewWidth() < al.getCanvasLeftBorder()
-                && al.getRightOffset() < al.getCanvasRightBorder();
+        return al.getViewRight() - al.getCurrentViewWidth() < al.getCanvasLeftBorder()
+                && al.getViewRight() < al.getCanvasRightBorder();
     }
 }

@@ -18,6 +18,7 @@ import android.view.animation.LinearInterpolator;
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorFactory;
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.breaker.DecoratorBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.EmptyRowBreaker;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IRowBreaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
@@ -150,9 +151,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     private AbstractLayouterFactory createLayouterFactory() {
+        DecoratorBreakerFactory decoratorBreakerFactory = new DecoratorBreakerFactory(viewPositionsStorage, rowBreaker, maxViewsInRow);
         AbstractLayouterFactory layouterFactory = isLayoutRTL() ?
-                new RTLLayouterFactory(this, viewPositionsStorage, rowBreaker) : new LTRLayouterFactory(this, viewPositionsStorage, rowBreaker);
-        layouterFactory.setMaxViewsInRow(maxViewsInRow);
+                new RTLLayouterFactory(this, viewPositionsStorage, decoratorBreakerFactory)
+                : new LTRLayouterFactory(this, viewPositionsStorage, decoratorBreakerFactory);
         return layouterFactory;
     }
 

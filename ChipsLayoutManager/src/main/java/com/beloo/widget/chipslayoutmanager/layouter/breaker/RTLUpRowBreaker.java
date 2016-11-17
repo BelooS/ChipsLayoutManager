@@ -7,7 +7,7 @@ class RTLUpRowBreaker implements ILayoutRowBreaker {
 
     @Override
     public boolean isRowBroke(AbstractLayouter al) {
-        return al.getLeftOffset() + al.getCurrentViewWidth() > al.getCanvasRightBorder()
-                && al.getLeftOffset() > al.getCanvasLeftBorder();
+        return al.getViewLeft() + al.getCurrentViewWidth() > al.getCanvasRightBorder()
+                && al.getViewLeft() > al.getCanvasLeftBorder();
     }
 }

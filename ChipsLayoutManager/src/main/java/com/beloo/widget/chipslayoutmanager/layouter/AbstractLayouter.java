@@ -54,9 +54,6 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     private IPlacer placer;
     @NonNull
     private ILayoutRowBreaker breaker;
-    /** Max items in row restriction. Layout of row should be stopped when this count of views reached*/
-    @Nullable
-    private Integer maxViewsInRow = null;
     //--- end input dependencies
 
     private AbstractPositionIterator positionIterator;
@@ -71,13 +68,12 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         cacheStorage = builder.cacheStorage;
         canvas = builder.canvas;
         childGravityResolver = builder.childGravityResolver;
-        setFinishingCriteria(builder.finishingCriteria);
+        this.finishingCriteria = builder.finishingCriteria;
         placer = builder.placer;
         this.rowTop = builder.offsetRect.top;
         this.rowBottom = builder.offsetRect.bottom;
         this.viewRight = builder.offsetRect.right;
         this.viewLeft = builder.offsetRect.left;
-        this.maxViewsInRow = builder.maxCountInRow;
         this.layouterListeners = builder.layouterListeners;
         this.breaker = builder.breaker;
         //--- end read builder
@@ -145,10 +141,6 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     @Override
     public final int getPreviousRowSize() {
         return previousRowSize;
-    }
-
-    final void setMaxViewsInRow(@Nullable Integer maxViewsInRow) {
-        this.maxViewsInRow = maxViewsInRow;
     }
 
     /** read view params to memory */
@@ -298,12 +290,12 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         return new Rect(viewLeft, rowTop, viewRight, rowBottom);
     }
 
-    public final int getLeftOffset() {
-        return viewRight;
+    public final int getViewLeft() {
+        return viewLeft;
     }
 
-    public final int getRightOffset() {
-        return viewLeft;
+    public final int getViewRight() {
+        return viewRight;
     }
 
     public final int getCurrentViewWidth() {
@@ -323,7 +315,6 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         private IPlacer placer;
         private ILayoutRowBreaker breaker;
         private Rect offsetRect;
-        private Integer maxCountInRow;
         private HashSet<ILayouterListener> layouterListeners = new HashSet<>();
 
         Builder() {}
@@ -337,11 +328,6 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         @NonNull
         public final Builder layoutManager(@NonNull ChipsLayoutManager layoutManager) {
             this.layoutManager = layoutManager;
-            return this;
-        }
-
-        Builder maxCountInRow(Integer maxCountInRow) {
-            this.maxCountInRow = maxCountInRow;
             return this;
         }
 

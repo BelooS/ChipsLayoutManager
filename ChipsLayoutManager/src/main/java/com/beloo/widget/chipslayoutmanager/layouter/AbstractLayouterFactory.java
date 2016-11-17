@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.chipslayoutmanager.layouter.breaker.DecoratorBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.DefaultCriteriaFactory;
@@ -22,8 +23,6 @@ import java.util.List;
 public abstract class AbstractLayouterFactory {
     ChipsLayoutManager layoutManager;
     private IViewCacheStorage cacheStorage;
-    @Nullable
-    private Integer maxViewsInRow = null;
 
     @IntRange(from = 0)
     private int additionalRowsCount;
@@ -38,16 +37,14 @@ public abstract class AbstractLayouterFactory {
         this.cacheStorage = cacheStorage;
         this.layoutManager = layoutManager;
         this.breakerFactory = breakerFactory;
+        //todo refactor it, maybe with outer factory
+        ((DecoratorBreakerFactory) breakerFactory).withBreakerFactory(createBreakerFactory());
     }
 
     public void addLayouterListener(@Nullable ILayouterListener layouterListener) {
         if (layouterListener != null) {
             layouterListeners.add(layouterListener);
         }
-    }
-
-    public void setMaxViewsInRow(@Nullable Integer maxViewsInRow) {
-        this.maxViewsInRow = maxViewsInRow;
     }
 
     public void setAdditionalHeight(@IntRange(from = 0) int additionalHeight) {
@@ -61,11 +58,6 @@ public abstract class AbstractLayouterFactory {
 
     private int getAdditionalRowsCount() {
         return additionalRowsCount;
-    }
-
-    @Nullable
-    private Integer getMaxViewsInRow() {
-        return maxViewsInRow;
     }
 
     private int getAdditionalHeight() {
@@ -84,7 +76,6 @@ public abstract class AbstractLayouterFactory {
                 .canvas(new Square(layoutManager))
                 .childGravityResolver(layoutManager.getChildGravityResolver())
                 .cacheStorage(cacheStorage)
-                .maxCountInRow(getMaxViewsInRow())
                 .addLayouterListeners(layouterListeners);
     }
 
