@@ -1,13 +1,14 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.view.View;
 
-public class VerticalForwardLayouter extends AbstractLayouter {
+class VerticalForwardLayouter extends AbstractLayouter {
 
     private boolean isPurged;
 
-    VerticalForwardLayouter(Builder builder) {
+    private VerticalForwardLayouter(Builder builder) {
         super(builder);
     }
 
@@ -60,5 +61,15 @@ public class VerticalForwardLayouter extends AbstractLayouter {
         viewTop = getLayoutManager().getDecoratedBottom(view);
         viewLeft = getLayoutManager().getDecoratedLeft(view);
         viewRight = Math.max(viewRight, getLayoutManager().getDecoratedRight(view));
+    }
+
+    public static final class Builder extends AbstractLayouter.Builder {
+        private Builder() {
+        }
+
+        @NonNull
+        public VerticalForwardLayouter build() {
+            return new VerticalForwardLayouter(this);
+        }
     }
 }

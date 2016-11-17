@@ -12,9 +12,15 @@ class LTRDownLayouter extends AbstractLayouter {
         super(builder);
     }
 
-    public static Builder newBuilder() {
-        return new Builder();
+    @Override
+    Rect createViewRect(View view) {
+        Rect viewRect = new Rect(viewLeft, viewTop, viewLeft + getCurrentViewWidth(), viewTop + getCurrentViewHeight());
+
+        viewLeft = viewRect.right;
+        viewBottom = Math.max(viewBottom, viewRect.bottom);
+        return viewRect;
     }
+
 
     @Override
     void onPreLayout() {
@@ -51,15 +57,6 @@ class LTRDownLayouter extends AbstractLayouter {
     @Override
     AbstractPositionIterator createPositionIterator() {
         return new IncrementalPositionIterator(getLayoutManager().getItemCount());
-    }
-
-    @Override
-    Rect createViewRect(View view) {
-        Rect viewRect = new Rect(viewLeft, viewTop, viewLeft + getCurrentViewWidth(), viewTop + getCurrentViewHeight());
-
-        viewLeft = viewRect.right;
-        viewBottom = Math.max(viewBottom, viewRect.bottom);
-        return viewRect;
     }
 
     @Override
