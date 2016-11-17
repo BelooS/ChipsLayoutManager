@@ -2,7 +2,7 @@ package com.beloo.widget.chipslayoutmanager.layouter.criteria;
 
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouter;
 
-public class CriteriaDownLayouterFinished implements IFinishingCriteria {
+class CriteriaDownLayouterFinished implements IFinishingCriteria {
 
     private boolean isFinished;
 
@@ -12,8 +12,4 @@ public class CriteriaDownLayouterFinished implements IFinishingCriteria {
         return isFinished;
     }
 
-    @Override
-    public boolean isFinishedLayouting() {
-        return isFinished;
-    }
 }

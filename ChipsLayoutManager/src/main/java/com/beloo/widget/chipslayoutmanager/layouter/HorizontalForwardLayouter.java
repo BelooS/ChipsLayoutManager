@@ -4,11 +4,11 @@ import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.view.View;
 
-class VerticalForwardLayouter extends AbstractLayouter {
+class HorizontalForwardLayouter extends AbstractLayouter {
 
     private boolean isPurged;
 
-    private VerticalForwardLayouter(Builder builder) {
+    private HorizontalForwardLayouter(Builder builder) {
         super(builder);
     }
 
@@ -68,8 +68,8 @@ class VerticalForwardLayouter extends AbstractLayouter {
         }
 
         @NonNull
-        public VerticalForwardLayouter build() {
-            return new VerticalForwardLayouter(this);
+        public HorizontalForwardLayouter build() {
+            return new HorizontalForwardLayouter(this);
         }
     }
 }
