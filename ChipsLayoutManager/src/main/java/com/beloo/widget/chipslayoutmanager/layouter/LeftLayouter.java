@@ -76,6 +76,16 @@ class LeftLayouter extends AbstractLayouter {
         viewLeft = Math.min(viewLeft, getLayoutManager().getDecoratedLeft(view));
     }
 
+    @Override
+    int getStart() {
+        return getViewLeft();
+    }
+
+    @Override
+    int getEnd() {
+        return getViewRight();
+    }
+
     public static final class Builder extends AbstractLayouter.Builder {
         private Builder() {
         }

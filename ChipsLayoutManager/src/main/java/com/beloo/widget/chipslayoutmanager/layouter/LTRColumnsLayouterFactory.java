@@ -9,7 +9,7 @@ import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacerFactory;
 
-public class LTRColumnsLayouterFactory extends AbstractLayouterFactory {
+class LTRColumnsLayouterFactory extends AbstractLayouterFactory {
 
     LTRColumnsLayouterFactory(ChipsLayoutManager layoutManager,
                               IViewCacheStorage cacheStorage,

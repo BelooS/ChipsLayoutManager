@@ -1,6 +1,6 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
-public interface ICanvas {
+interface ICanvas {
     int getCanvasRightBorder();
 
     int getCanvasBottomBorder();

@@ -27,8 +27,14 @@ public class LayouterStateFactory {
     public AbstractLayouterFactory createLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory) {
         IViewCacheStorage cacheStorage = lm.getViewPositionsStorage();
 
-        AbstractLayouterFactory layouterFactory = lm.isLayoutRTL() ?
-                createRTLRowLayouterFactory(criteriaFactory, placerFactory, cacheStorage) : createLTRRowLayouterFactory(criteriaFactory, placerFactory, cacheStorage);
+        AbstractLayouterFactory layouterFactory;
+
+        if (lm.orientation() == IStateHolder.ROWS) {
+            layouterFactory = lm.isLayoutRTL() ?
+                    createRTLRowLayouterFactory(criteriaFactory, placerFactory, cacheStorage) : createLTRRowLayouterFactory(criteriaFactory, placerFactory, cacheStorage);
+        } else {
+            layouterFactory = createLTRColumnLayouterFactory(criteriaFactory, placerFactory, cacheStorage);
+        }
 
         return layouterFactory;
     }

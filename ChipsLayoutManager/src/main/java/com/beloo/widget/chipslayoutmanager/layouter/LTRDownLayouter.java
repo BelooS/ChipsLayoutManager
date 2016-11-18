@@ -70,6 +70,16 @@ class LTRDownLayouter extends AbstractLayouter {
         viewBottom = Math.max(viewBottom, getLayoutManager().getDecoratedBottom(view));
     }
 
+    @Override
+    int getStart() {
+        return getViewTop();
+    }
+
+    @Override
+    int getEnd() {
+        return getViewBottom();
+    }
+
     public static final class Builder extends AbstractLayouter.Builder {
         private Builder() {
         }

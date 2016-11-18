@@ -362,6 +362,19 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return super.getItemCount() + deletingItemsOnScreenCount;
     }
 
+    /**
+     * @return true if RTL mode enabled in RecyclerView
+     */
+    public boolean isLayoutRTL() {
+        return getLayoutDirection() == ViewCompat.LAYOUT_DIRECTION_RTL;
+    }
+
+    @Override
+    @Orientation
+    public int orientation() {
+        return ROWS;
+    }
+
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
         //We have nothing to show for an empty data set but clear any existing views
@@ -617,19 +630,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     /**
-     * @return true if RTL mode enabled in RecyclerView
-     */
-    public boolean isLayoutRTL() {
-        return getLayoutDirection() == ViewCompat.LAYOUT_DIRECTION_RTL;
-    }
-
-    @Override
-    @Orientation
-    public int orientation() {
-        return ROWS;
-    }
-
-    /**
      * place views in layout started from chosen position with chosen layouter
      */
     private void fillWithLayouter(RecyclerView.Recycler recycler, ILayouter layouter) {
@@ -690,6 +690,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     @Override
     public boolean canScrollVertically() {
+        if (orientation() == COLUMNS) return false;
+
         findHighestAndLowestViews();
         if (getChildCount() > 0) {
             View view = getChildAt(0);

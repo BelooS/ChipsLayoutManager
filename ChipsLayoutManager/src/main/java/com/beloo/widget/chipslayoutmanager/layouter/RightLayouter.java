@@ -67,6 +67,16 @@ class RightLayouter extends AbstractLayouter {
         viewRight = Math.max(viewRight, getLayoutManager().getDecoratedRight(view));
     }
 
+    @Override
+    int getStart() {
+        return getViewLeft();
+    }
+
+    @Override
+    int getEnd() {
+        return getViewRight();
+    }
+
     public static final class Builder extends AbstractLayouter.Builder {
         private Builder() {
         }

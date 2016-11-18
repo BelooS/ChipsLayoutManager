@@ -237,7 +237,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
             Rect viewRect = rowViewRectPair.first;
             View view = rowViewRectPair.second;
 
-            applyChildGravity(view, viewRect, viewTop, viewBottom);
+            applyChildGravity(view, viewRect);
             //add view to layout
             placer.addView(view);
 
@@ -257,11 +257,11 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
 
     /** by default items placed and attached to a top of the row.
      * Modify theirs relative positions according to the selected child gravity */
-    private void applyChildGravity(View view, Rect viewRect, int rowTop, int rowBottom) {
+    private void applyChildGravity(View view, Rect viewRect) {
         @SpanLayoutChildGravity
         int viewGravity = childGravityResolver.getItemGravity(getLayoutManager().getPosition(view));
         IGravityModifier gravityModifier = gravityModifiersFactory.getGravityModifier(viewGravity);
-        gravityModifier.modifyChildRect(rowTop, rowBottom, viewRect);
+        gravityModifier.modifyChildRect(getStart(), getEnd(), viewRect);
     }
 
     public ChipsLayoutManager getLayoutManager() {
@@ -276,6 +276,10 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     public int getViewTop() {
         return viewTop;
     }
+
+    abstract int getStart();
+
+    abstract int getEnd();
 
     @Override
     public Rect getRowRect() {
