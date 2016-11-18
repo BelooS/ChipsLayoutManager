@@ -1,13 +1,13 @@
 package com.beloo.widget.chipslayoutmanager.layouter.breaker;
 
-public class RTLBreakerFactory implements IBreakerFactory {
+public class RTLRowBreakerFactory implements IBreakerFactory {
     @Override
     public ILayoutRowBreaker createBackwardRowBreaker() {
-        return new RTLUpRowBreaker();
+        return new RTLBackwardRowBreaker();
     }
 
     @Override
     public ILayoutRowBreaker createForwardRowBreaker() {
-        return new RTLDownRowBreaker();
+        return new RTLForwardRowBreaker();
     }
 }

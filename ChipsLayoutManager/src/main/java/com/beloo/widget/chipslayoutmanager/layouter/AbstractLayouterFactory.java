@@ -10,7 +10,6 @@ import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacerFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.placer.RealPlacerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,8 +59,6 @@ public abstract class AbstractLayouterFactory {
 
     @NonNull
     public final ILayouter getUpLayouter(@Nullable Rect anchorRect) {
-        IPlacerFactory placerFactory = new RealPlacerFactory(layoutManager);
-
         return fillBasicBuilder(createBackwardBuilder())
                 .offsetRect(createOffsetRectForBackwardLayouter(anchorRect))
                 .breaker(breakerFactory.createBackwardRowBreaker())
@@ -72,8 +69,6 @@ public abstract class AbstractLayouterFactory {
 
     @NonNull
     public final ILayouter getDownLayouter(@Nullable Rect anchorRect) {
-        IPlacerFactory placerFactory = new RealPlacerFactory(layoutManager);
-
         return fillBasicBuilder(createForwardBuilder())
                 .offsetRect(createOffsetRectForForwardLayouter(anchorRect))
                 .breaker(breakerFactory.createForwardRowBreaker())

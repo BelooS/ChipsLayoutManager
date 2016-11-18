@@ -18,7 +18,7 @@ import android.view.animation.LinearInterpolator;
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorFactory;
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.breaker.DecoratorBreakerFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.LayouterStateFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.EmptyRowBreaker;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IRowBreaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
@@ -29,15 +29,10 @@ import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouterFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.chipslayoutmanager.layouter.ILayouter;
-import com.beloo.widget.chipslayoutmanager.layouter.LTRLayouterFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.RTLLayouterFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.breaker.LTRBreakerFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.breaker.RTLBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractDefaultCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.InfiniteCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.RowsDefaultCriteriaFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.PlacerFactory;
 import com.beloo.widget.chipslayoutmanager.logger.IAdapterActionsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IFillLogger;
@@ -48,7 +43,7 @@ import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 
 import java.util.List;
 
-public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract {
+public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract, IStateHolder {
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
     private static final int INT_ROW_SIZE_APPROXIMATELY_FOR_CACHE = 10;
     private static final int APPROXIMATE_ADDITIONAL_ROWS_COUNT = 5;
@@ -145,6 +140,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     /** factory for placers factories*/
     private PlacerFactory placerFactory = new PlacerFactory(this);
+    /** factory for state-dependent layouter factories*/
+    private LayouterStateFactory stateFactory = new LayouterStateFactory(this);
 
     private ChipsLayoutManager(Context context) {
         @DeviceOrientation
@@ -159,21 +156,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         viewPositionsStorage = new ViewCacheFactory(this).createCacheStorage();
         setAutoMeasureEnabled(true);
-    }
-
-    @SuppressWarnings("UnnecessaryLocalVariable")
-    private AbstractLayouterFactory createLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory) {
-        AbstractLayouterFactory layouterFactory = isLayoutRTL() ?
-                new RTLLayouterFactory(this, viewPositionsStorage,
-                        new DecoratorBreakerFactory(viewPositionsStorage, rowBreaker, maxViewsInRow, new RTLBreakerFactory()),
-                        criteriaFactory,
-                        placerFactory)
-                : new LTRLayouterFactory(this, viewPositionsStorage,
-                        new DecoratorBreakerFactory(viewPositionsStorage, rowBreaker, maxViewsInRow, new LTRBreakerFactory()),
-                        criteriaFactory,
-                        placerFactory);
-
-        return layouterFactory;
     }
 
     private AbstractDefaultCriteriaFactory createDefaultFinishingCriteriaFactory() {
@@ -209,6 +191,18 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         cacheNormalizationPosition = 0;
         viewPositionsStorage.purge();
         requestLayoutWithAnimations();
+    }
+
+    public IViewCacheStorage getViewPositionsStorage() {
+        return viewPositionsStorage;
+    }
+
+    public Integer getMaxViewsInRow() {
+        return maxViewsInRow;
+    }
+
+    public IRowBreaker getRowBreaker() {
+        return rowBreaker;
     }
 
     /**
@@ -411,7 +405,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             AbstractDefaultCriteriaFactory criteriaFactory = createDefaultFinishingCriteriaFactory();
             criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
 
-            AbstractLayouterFactory layouterFactory = createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
+            AbstractLayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
             fill(recycler, layouterFactory, anchorView, true);
         } else {
@@ -429,7 +423,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
             criteriaFactory.setAdditionalHeight(additionalHeight);
 
-            AbstractLayouterFactory layouterFactory = createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
+            AbstractLayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
             fill(recycler, layouterFactory, anchorView, false);
         }
@@ -443,7 +437,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private void layoutDisappearingViews(RecyclerView.Recycler recycler, ILayouter upLayouter, ILayouter downLayouter) {
 
         ICriteriaFactory criteriaFactory = new InfiniteCriteriaFactory();
-        AbstractLayouterFactory layouterFactory = createLayouterFactory(criteriaFactory, placerFactory.createDisappearingPlacerFactory());
+        AbstractLayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createDisappearingPlacerFactory());
 
         DisappearingViewsContainer disappearingViews = getDisappearingViews(recycler);
 
@@ -629,8 +623,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /**
      * @return true if RTL mode enabled in RecyclerView
      */
-    private boolean isLayoutRTL() {
+    public boolean isLayoutRTL() {
         return getLayoutDirection() == ViewCompat.LAYOUT_DIRECTION_RTL;
+    }
+
+    @Override
+    @Orientation
+    public int orientation() {
+        return ROWS;
     }
 
     /**
@@ -734,7 +734,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         AbstractDefaultCriteriaFactory criteriaFactory = createDefaultFinishingCriteriaFactory();
         criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
 
-        AbstractLayouterFactory factory = createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
+        AbstractLayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
         fill(recycler, factory, anchorView, false);
         return dy;
