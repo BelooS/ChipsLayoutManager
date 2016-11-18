@@ -134,7 +134,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private int autoMeasureHeight = 0;
 
     /** factory which could retrieve anchorView on which layouting based*/
-    @NonNull
     private IAnchorFactory anchorFactory;
 
     /**
