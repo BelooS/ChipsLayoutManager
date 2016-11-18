@@ -15,7 +15,7 @@ import android.util.SparseArray;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 
-import com.beloo.widget.chipslayoutmanager.anchor.AnchorFactory;
+import com.beloo.widget.chipslayoutmanager.anchor.RowsAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.LayouterStateFactory;
@@ -134,12 +134,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private int autoMeasureHeight = 0;
 
     /** factory which could retrieve anchorView on which layouting based*/
-    private IAnchorFactory anchorFactory = new AnchorFactory(this);
+    @NonNull
+    private IAnchorFactory anchorFactory;
 
     /**
      * stored current anchor view due to scroll state changes
      */
-    private AnchorViewState anchorView = anchorFactory.createNotFound();
+    private AnchorViewState anchorView;
 
     /* in pre-layouter drawing we need item count with items will be actually deleted to pre-draw appearing items properly
     * buf value*/
@@ -148,6 +149,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /** factory for placers factories*/
     private PlacerFactory placerFactory = new PlacerFactory(this);
     /** factory for state-dependent layouter factories*/
+    @NonNull
     private LayouterStateFactory stateFactory = new LayouterStateFactory(this);
 
     private ChipsLayoutManager(Context context) {
@@ -298,6 +300,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                     childGravityResolver = new CenterChildGravity();
                 }
             }
+
+            anchorFactory = stateFactory.createAnchorFactory();
+            anchorView = anchorFactory.createNotFound();
+
             return ChipsLayoutManager.this;
         }
 
@@ -441,7 +447,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             int additionalHeight = calcDisappearingViewsHeight(recycler);
             predictiveAnimationsLogger.heightOfCanvas(this);
             predictiveAnimationsLogger.onSummarizedDeletingItemsHeightCalculated(additionalHeight);
-            anchorView = anchorFactory.getTopLeftAnchor();
+            anchorView = anchorFactory.getAnchor();
             detachAndScrapAttachedViews(recycler);
 
             //in case removing draw additional rows to show predictive animations for appearing views
@@ -712,7 +718,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         dx = scrollHorizontallyInternal(dx);
         offsetChildrenHorizontal(-dx);
 
-        anchorView = anchorFactory.getTopLeftAnchor();
+        anchorView = anchorFactory.getAnchor();
 
         AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
         criteriaFactory.setAdditionalRowsCount(1);
@@ -786,7 +792,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
         dy = scrollVerticallyInternal(dy);
         offsetChildrenVertical(-dy);
-        anchorView = anchorFactory.getTopLeftAnchor();
+        anchorView = anchorFactory.getAnchor();
 
         scrollingLogger.logChildCount(getChildCount());
 
@@ -827,7 +833,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private int onContentScrolledDown(int dy) {
         int delta;
 
-        AnchorViewState state = anchorFactory.getTopLeftAnchor();
+        AnchorViewState state = anchorFactory.getAnchor();
 
         if (state.getPosition() != 0) { //in case 0 position haven't added in layout yet
             delta = dy;
@@ -910,7 +916,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
 
         cacheNormalizationPosition = cacheNormalizationPosition != null ? cacheNormalizationPosition : viewPositionsStorage.getLastCachePosition();
-        anchorView = anchorFactory.getTopLeftAnchor();
+        anchorView = anchorFactory.getAnchor();
         anchorView.setPosition(position);
 
         //Trigger a new view layout

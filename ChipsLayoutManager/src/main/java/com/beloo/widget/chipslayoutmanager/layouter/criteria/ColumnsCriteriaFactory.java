@@ -4,13 +4,14 @@ import android.support.annotation.NonNull;
 
 public class ColumnsCriteriaFactory extends AbstractCriteriaFactory {
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
     @NonNull
     @Override
     public IFinishingCriteria getBackwardFinishingCriteria() {
         IFinishingCriteria criteria = new CriteriaLeftLayouterFinished();
-        if (additionalRowCount != 0) {
-            criteria = new CriteriaAdditionalRow(criteria, additionalRowCount);
-        }
+//        if (additionalRowCount != 0) {
+//            criteria = new CriteriaAdditionalRow(criteria, additionalRowCount);
+//        }
         return criteria;
     }
 

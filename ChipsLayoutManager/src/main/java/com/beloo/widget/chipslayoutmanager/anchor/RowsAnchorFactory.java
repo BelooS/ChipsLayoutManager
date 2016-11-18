@@ -4,16 +4,15 @@ import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-public class AnchorFactory implements IAnchorFactory {
+public class RowsAnchorFactory extends AbstractAnchorFactory {
 
-    private RecyclerView.LayoutManager lm;
-
-    public AnchorFactory(RecyclerView.LayoutManager lm) {
-        this.lm = lm;
+    public RowsAnchorFactory(RecyclerView.LayoutManager lm) {
+        super(lm);
     }
 
+    /** get the highest views in layout. The closest to left border view will be picked from it. */
     @Override
-    public AnchorViewState getTopLeftAnchor() {
+    public AnchorViewState getAnchor() {
         int childCount = lm.getChildCount();
         AnchorViewState topLeft = AnchorViewState.getNotFoundState();
 
@@ -21,7 +20,7 @@ public class AnchorFactory implements IAnchorFactory {
                 lm.getPaddingTop(),
                 lm.getWidth() - lm.getPaddingRight(),
                 lm.getHeight() - lm.getPaddingBottom());
-//        Rect mainRect = new Rect(0, 0, getWidth(), getHeight());
+
         int minTop = Integer.MAX_VALUE;
         for (int i = 0; i < childCount; i++) {
             View view = lm.getChildAt(i);
@@ -47,21 +46,6 @@ public class AnchorFactory implements IAnchorFactory {
         }
 
         return topLeft;
-    }
-
-    @Override
-    public AnchorViewState createAnchorState(View view) {
-        int left = lm.getDecoratedLeft(view);
-        int top = lm.getDecoratedTop(view);
-        int right = lm.getDecoratedRight(view);
-        int bottom = lm.getDecoratedBottom(view);
-        Rect viewRect = new Rect(left, top, right, bottom);
-        return new AnchorViewState(lm.getPosition(view), viewRect);
-    }
-
-    @Override
-    public AnchorViewState createNotFound() {
-        return AnchorViewState.getNotFoundState();
     }
 
 }

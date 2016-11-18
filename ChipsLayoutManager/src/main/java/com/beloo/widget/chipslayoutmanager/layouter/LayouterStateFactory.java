@@ -1,6 +1,9 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.chipslayoutmanager.anchor.ColumnsAnchorFactory;
+import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
+import com.beloo.widget.chipslayoutmanager.anchor.RowsAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.ColumnGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.RowGravityModifiersFactory;
@@ -43,6 +46,14 @@ public class LayouterStateFactory {
             return new RowsCriteriaFactory();
         } else {
             return new ColumnsCriteriaFactory();
+        }
+    }
+
+    public IAnchorFactory createAnchorFactory() {
+        if (lm.layoutOrientation() == ChipsLayoutManager.ROWS) {
+            return new RowsAnchorFactory(lm);
+        } else {
+            return new ColumnsAnchorFactory(lm);
         }
     }
 
