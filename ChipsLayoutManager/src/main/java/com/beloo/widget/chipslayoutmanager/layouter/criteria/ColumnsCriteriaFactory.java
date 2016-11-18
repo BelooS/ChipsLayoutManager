@@ -7,12 +7,20 @@ public class ColumnsCriteriaFactory extends AbstractCriteriaFactory {
     @NonNull
     @Override
     public IFinishingCriteria getBackwardFinishingCriteria() {
-        return new CriteriaLeftLayouterFinished();
+        IFinishingCriteria criteria = new CriteriaLeftLayouterFinished();
+        if (additionalRowCount != 0) {
+            criteria = new CriteriaAdditionalRow(criteria, additionalRowCount);
+        }
+        return criteria;
     }
 
     @NonNull
     @Override
     public IFinishingCriteria getForwardFinishingCriteria() {
-        return new CriteriaRightLayouterFinished();
+        IFinishingCriteria criteria = new CriteriaRightLayouterFinished();
+        if (additionalRowCount != 0) {
+            criteria = new CriteriaAdditionalRow(criteria, additionalRowCount);
+        }
+        return criteria;
     }
 }

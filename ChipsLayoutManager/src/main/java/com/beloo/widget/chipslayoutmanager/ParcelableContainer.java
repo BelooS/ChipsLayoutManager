@@ -18,7 +18,7 @@ class ParcelableContainer implements Parcelable {
     private SparseArray<Object> cacheNormalizationPositionMap = new SparseArray<>();
 
     ParcelableContainer() {
-        //initial values. We should normalize cache when scrolled to zero in case first time of changing orientation state
+        //initial values. We should normalize cache when scrolled to zero in case first time of changing layoutOrientation state
         cacheNormalizationPositionMap.put(Configuration.ORIENTATION_PORTRAIT, 0);
         cacheNormalizationPositionMap.put(Configuration.ORIENTATION_LANDSCAPE, 0);
     }

@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                         return Gravity.CENTER;
                     }
                 })
-                //an orientation of layout manager
+                //an layoutOrientation of layout manager
                 .setOrientation(ChipsLayoutManager.COLUMNS)
                 .build();
 

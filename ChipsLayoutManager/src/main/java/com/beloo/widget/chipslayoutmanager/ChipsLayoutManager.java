@@ -80,7 +80,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private SparseArray<View> viewCache = new SparseArray<>();
 
     /**
-     * storing state due orientation changes
+     * storing state due layoutOrientation changes
      */
     private ParcelableContainer container = new ParcelableContainer();
 
@@ -90,7 +90,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private IPredictiveAnimationsLogger predictiveAnimationsLogger;
     private IScrollingLogger scrollingLogger;
     @Orientation
-    /** orientation of layout. Could have ROWS or COLUMNS style */
+    /** layoutOrientation of layout. Could have ROWS or COLUMNS style */
     private int layoutOrientation = ROWS;
     //--- end loggers
 
@@ -110,7 +110,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private View lowestView;
 
     /**
-     * current device orientation
+     * current device layoutOrientation
      */
     @DeviceOrientation
     private int orientation;
@@ -345,7 +345,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
         viewPositionsStorage.purgeCacheFromPosition(container.getAnchorPosition());
         Log.d(TAG, "RESTORE. anchor position =" + container.getAnchorPosition());
-        Log.d(TAG, "RESTORE. orientation = " + orientation + " normalizationPos = " + cacheNormalizationPosition);
+        Log.d(TAG, "RESTORE. layoutOrientation = " + orientation + " normalizationPos = " + cacheNormalizationPosition);
         Log.d(TAG, "RESTORE. last cache position = " + viewPositionsStorage.getLastCachePosition());
     }
 
@@ -360,7 +360,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         Integer storedNormalizationPosition = cacheNormalizationPosition != null ? cacheNormalizationPosition : viewPositionsStorage.getLastCachePosition();
 
-        Log.d(TAG, "STORE. orientation = " + orientation + " normalizationPos = " + storedNormalizationPosition);
+        Log.d(TAG, "STORE. layoutOrientation = " + orientation + " normalizationPos = " + storedNormalizationPosition);
 
         container.putNormalizationPosition(orientation, storedNormalizationPosition);
 
@@ -388,7 +388,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     @Orientation
-    public int orientation() {
+    public int layoutOrientation() {
         return layoutOrientation;
     }
 
@@ -436,7 +436,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             fill(recycler, layouterFactory, anchorView, true);
         } else {
             //inside pre-layout stage. It is called when item animation reconstruction will be played
-            //it is NOT called on orientation changes
+            //it is NOT called on layoutOrientation changes
 
             int additionalHeight = calcDisappearingViewsHeight(recycler);
             predictiveAnimationsLogger.heightOfCanvas(this);
@@ -470,7 +470,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         if (disappearingViews.size() > 0) {
             Log.d("disappearing views", "count = " + disappearingViews.size());
             Log.d("fill disappearing views", "");
-            downLayouter = layouterFactory.buildDownLayouter(downLayouter);
+            downLayouter = layouterFactory.buildForwardLayouter(downLayouter);
 
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
             for (int i = 0; i< disappearingViews.downViews.size(); i++) {
@@ -480,7 +480,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             //layout last row
             downLayouter.layoutRow();
 
-            upLayouter = layouterFactory.buildUpLayouter(upLayouter);
+            upLayouter = layouterFactory.buildBackwardLayouter(upLayouter);
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
             for (int i = 0; i< disappearingViews.upViews.size(); i++) {
                 int position = disappearingViews.upViews.keyAt(i);
@@ -611,7 +611,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         logger.onBeforeLayouter(anchorView);
 
         //up layouter should be invoked earlier than down layouter, because views with lower positions positioned above anchorView
-        ILayouter upLayouter = layouterFactory.getUpLayouter(anchorRect);
+        ILayouter upLayouter = layouterFactory.getBackwardLayouter(anchorRect);
 
         AbstractPositionIterator iterator = upLayouter.positionIterator();
         //start from anchor position
@@ -619,7 +619,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         logger.onStartLayouter(startingPos - 1);
 
         fillWithLayouter(recycler, upLayouter);
-        ILayouter downLayouter = layouterFactory.getDownLayouter(anchorRect);
+        ILayouter downLayouter = layouterFactory.getForwardLayouter(anchorRect);
 
         iterator = downLayouter.positionIterator();
         //start from anchor position
@@ -702,12 +702,58 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         recycler.setViewCacheSize((int) (viewsInRow * FAST_SCROLLING_COEFFICIENT));
     }
 
+    @Override
+    public boolean canScrollHorizontally() {
+        return layoutOrientation() != ROWS && isScrollingEnabledContract;
+    }
+
+    @Override
+    public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
+        dx = scrollHorizontallyInternal(dx);
+        offsetChildrenHorizontal(-dx);
+
+        anchorView = anchorFactory.getTopLeftAnchor();
+
+        AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
+        criteriaFactory.setAdditionalRowsCount(1);
+        AbstractLayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
+
+        fill(recycler, factory, anchorView, false);
+        return dx;
+    }
+
+    private int scrollHorizontallyInternal(int dx) {
+        int childCount = getChildCount();
+        if (childCount == 0) {
+            return 0;
+        }
+
+        int delta = 0;
+        if (dx < 0) {   //if content scrolled forward
+            delta = onContentScrolledRight(dx);
+        } else if (dx > 0) { //if content scrolled backward
+            delta = onContentScrolledLeft(dx);
+        }
+
+        performNormalizationIfNeeded();
+
+        return delta;
+    }
+
+    private int onContentScrolledRight(int dx) {
+        return dx;
+    }
+
+    private int onContentScrolledLeft(int dx) {
+        return dx;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean canScrollVertically() {
-        if (orientation() == COLUMNS) return false;
+        if (layoutOrientation() == COLUMNS) return false;
 
         findHighestAndLowestViews();
         if (getChildCount() > 0) {
@@ -733,7 +779,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return isScrollingEnabledContract;
     }
 
-
     /**
      * calculate offset of views while scrolling, layout items on new places
      */
@@ -747,7 +792,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         //some bugs connected with displaying views from the last row, which not fully showed, so just add additional row to avoid a lot of it.
         AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
-        criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
+        criteriaFactory.setAdditionalRowsCount(1);
 
         AbstractLayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 

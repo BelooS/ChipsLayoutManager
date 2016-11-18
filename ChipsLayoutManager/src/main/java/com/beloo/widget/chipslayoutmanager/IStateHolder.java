@@ -4,6 +4,6 @@ public interface IStateHolder {
     boolean isLayoutRTL();
 
     @Orientation
-    int orientation();
+    int layoutOrientation();
 
 }

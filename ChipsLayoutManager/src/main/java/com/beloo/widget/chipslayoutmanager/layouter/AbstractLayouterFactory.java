@@ -61,7 +61,7 @@ public abstract class AbstractLayouterFactory {
     }
 
     @NonNull
-    public final ILayouter getUpLayouter(@Nullable Rect anchorRect) {
+    public final ILayouter getBackwardLayouter(@Nullable Rect anchorRect) {
         return fillBasicBuilder(createBackwardBuilder())
                 .offsetRect(createOffsetRectForBackwardLayouter(anchorRect))
                 .breaker(breakerFactory.createBackwardRowBreaker())
@@ -71,7 +71,7 @@ public abstract class AbstractLayouterFactory {
     }
 
     @NonNull
-    public final ILayouter getDownLayouter(@Nullable Rect anchorRect) {
+    public final ILayouter getForwardLayouter(@Nullable Rect anchorRect) {
         return fillBasicBuilder(createForwardBuilder())
                 .offsetRect(createOffsetRectForForwardLayouter(anchorRect))
                 .breaker(breakerFactory.createForwardRowBreaker())
@@ -81,7 +81,7 @@ public abstract class AbstractLayouterFactory {
     }
 
     @NonNull
-    public final ILayouter buildDownLayouter(@NonNull ILayouter layouter) {
+    public final ILayouter buildForwardLayouter(@NonNull ILayouter layouter) {
         AbstractLayouter abstractLayouter = (AbstractLayouter) layouter;
         abstractLayouter.setFinishingCriteria(criteriaFactory.getForwardFinishingCriteria());
         abstractLayouter.setPlacer(placerFactory.getAtEndPlacer());
@@ -90,7 +90,7 @@ public abstract class AbstractLayouterFactory {
     }
 
     @NonNull
-    public final ILayouter buildUpLayouter(@NonNull ILayouter layouter) {
+    public final ILayouter buildBackwardLayouter(@NonNull ILayouter layouter) {
         AbstractLayouter abstractLayouter = (AbstractLayouter) layouter;
         abstractLayouter.setFinishingCriteria(criteriaFactory.getBackwardFinishingCriteria());
         abstractLayouter.setPlacer(placerFactory.getAtEndPlacer());

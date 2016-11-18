@@ -28,7 +28,7 @@ public class LayouterStateFactory {
 
         AbstractLayouterFactory layouterFactory;
 
-        if (lm.orientation() == ChipsLayoutManager.ROWS) {
+        if (lm.layoutOrientation() == ChipsLayoutManager.ROWS) {
             layouterFactory = lm.isLayoutRTL() ?
                     createRTLRowLayouterFactory(criteriaFactory, placerFactory, cacheStorage) : createLTRRowLayouterFactory(criteriaFactory, placerFactory, cacheStorage);
         } else {
@@ -39,7 +39,7 @@ public class LayouterStateFactory {
     }
 
     public AbstractCriteriaFactory createDefaultFinishingCriteriaFactory() {
-        if (lm.orientation() == ChipsLayoutManager.ROWS) {
+        if (lm.layoutOrientation() == ChipsLayoutManager.ROWS) {
             return new RowsCriteriaFactory();
         } else {
             return new ColumnsCriteriaFactory();
