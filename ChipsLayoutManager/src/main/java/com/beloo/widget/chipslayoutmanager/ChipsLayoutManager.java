@@ -33,6 +33,12 @@ import com.beloo.widget.chipslayoutmanager.layouter.LTRLayouterFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.RTLLayouterFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.LTRBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.RTLBreakerFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractDefaultCriteriaFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.InfiniteCriteriaFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.RowsDefaultCriteriaFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacerFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.PlacerFactory;
 import com.beloo.widget.chipslayoutmanager.logger.IAdapterActionsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IFillLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IPredictiveAnimationsLogger;
@@ -137,6 +143,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     * buf value*/
     private int deletingItemsOnScreenCount;
 
+    /** factory for placers factories*/
+    private PlacerFactory placerFactory = new PlacerFactory(this);
+
     private ChipsLayoutManager(Context context) {
         @DeviceOrientation
         int orientation = context.getResources().getConfiguration().orientation;
@@ -152,11 +161,23 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         setAutoMeasureEnabled(true);
     }
 
-    private AbstractLayouterFactory createLayouterFactory() {
+    @SuppressWarnings("UnnecessaryLocalVariable")
+    private AbstractLayouterFactory createLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory) {
         AbstractLayouterFactory layouterFactory = isLayoutRTL() ?
-                new RTLLayouterFactory(this, viewPositionsStorage, new DecoratorBreakerFactory(viewPositionsStorage, rowBreaker, maxViewsInRow, new RTLBreakerFactory()))
-                : new LTRLayouterFactory(this, viewPositionsStorage, new DecoratorBreakerFactory(viewPositionsStorage, rowBreaker, maxViewsInRow, new LTRBreakerFactory()));
+                new RTLLayouterFactory(this, viewPositionsStorage,
+                        new DecoratorBreakerFactory(viewPositionsStorage, rowBreaker, maxViewsInRow, new RTLBreakerFactory()),
+                        criteriaFactory,
+                        placerFactory)
+                : new LTRLayouterFactory(this, viewPositionsStorage,
+                        new DecoratorBreakerFactory(viewPositionsStorage, rowBreaker, maxViewsInRow, new LTRBreakerFactory()),
+                        criteriaFactory,
+                        placerFactory);
+
         return layouterFactory;
+    }
+
+    private AbstractDefaultCriteriaFactory createDefaultFinishingCriteriaFactory() {
+        return new RowsDefaultCriteriaFactory();
     }
 
     public static Builder newBuilder(Context context) {
@@ -380,15 +401,18 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 cacheNormalizationPosition = null;
             }
 
-            AbstractLayouterFactory layouterFactory = createLayouterFactory();
             /** In case some moving views
              * we should place it at layout to support predictive animations
              * we can't place all possible moves on theirs real place, because concrete layout position of particular view depends on placing of previous views
              * and there could be moving from 0 position to 10k. But it is preferably to place nearest moved view to real positions to make moving more natural
              * like moving from 0 position to 15 for example, where user could scroll fast and check
+             * so we fill additional rows to cover nearest moves
              */
-            //so we fill additional rows to cover nearest moves
-            layouterFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
+            AbstractDefaultCriteriaFactory criteriaFactory = createDefaultFinishingCriteriaFactory();
+            criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
+
+            AbstractLayouterFactory layouterFactory = createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
+
             fill(recycler, layouterFactory, anchorView, true);
         } else {
             //inside pre-layout stage. It is called when item animation reconstruction will be played
@@ -401,9 +425,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             detachAndScrapAttachedViews(recycler);
 
             //in case removing draw additional rows to show predictive animations for appearing views
-            AbstractLayouterFactory layouterFactory = createLayouterFactory();
-            layouterFactory.setAdditionalHeight(additionalHeight);
-            layouterFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
+            AbstractDefaultCriteriaFactory criteriaFactory = createDefaultFinishingCriteriaFactory();
+            criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
+            criteriaFactory.setAdditionalHeight(additionalHeight);
+
+            AbstractLayouterFactory layouterFactory = createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
             fill(recycler, layouterFactory, anchorView, false);
         }
@@ -414,14 +440,17 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     /** layout disappearing view to support predictive animations */
-    private void layoutDisappearingViews(RecyclerView.Recycler recycler, AbstractLayouterFactory layouterFactory,
-                                         ILayouter upLayouter, ILayouter downLayouter) {
+    private void layoutDisappearingViews(RecyclerView.Recycler recycler, ILayouter upLayouter, ILayouter downLayouter) {
+
+        ICriteriaFactory criteriaFactory = new InfiniteCriteriaFactory();
+        AbstractLayouterFactory layouterFactory = createLayouterFactory(criteriaFactory, placerFactory.createDisappearingPlacerFactory());
+
         DisappearingViewsContainer disappearingViews = getDisappearingViews(recycler);
 
         if (disappearingViews.size() > 0) {
             Log.d("disappearing views", "count = " + disappearingViews.size());
             Log.d("fill disappearing views", "");
-            downLayouter = layouterFactory.buildInfiniteLayouter(layouterFactory.buildDisappearingDownLayouter(downLayouter));
+            downLayouter = layouterFactory.buildDownLayouter(downLayouter);
 
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
             for (int i = 0; i< disappearingViews.downViews.size(); i++) {
@@ -431,7 +460,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             //layout last row
             downLayouter.layoutRow();
 
-            upLayouter = layouterFactory.buildInfiniteLayouter(layouterFactory.buildDisappearingUpLayouter(upLayouter));
+            upLayouter = layouterFactory.buildUpLayouter(upLayouter);
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
             for (int i = 0; i< disappearingViews.upViews.size(); i++) {
                 int position = disappearingViews.upViews.keyAt(i);
@@ -593,7 +622,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         logger.onAfterRemovingViews();
 
         if (isLayoutDisappearing) {
-            layoutDisappearingViews(recycler, layouterFactory, upLayouter, downLayouter);
+            layoutDisappearingViews(recycler, upLayouter, downLayouter);
         }
     }
 
@@ -701,9 +730,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         scrollingLogger.logChildCount(getChildCount());
 
-        AbstractLayouterFactory factory = createLayouterFactory();
         //some bugs connected with displaying views from the last row, which not fully showed, so just add additional row to avoid a lot of it.
-        factory.setAdditionalRowsCount(1);
+        AbstractDefaultCriteriaFactory criteriaFactory = createDefaultFinishingCriteriaFactory();
+        criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
+
+        AbstractLayouterFactory factory = createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
+
         fill(recycler, factory, anchorView, false);
         return dy;
     }

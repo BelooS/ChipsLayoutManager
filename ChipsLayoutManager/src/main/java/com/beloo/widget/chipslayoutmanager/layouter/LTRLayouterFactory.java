@@ -7,11 +7,17 @@ import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IRowBreaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.LTRBreakerFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacerFactory;
 
 public class LTRLayouterFactory extends AbstractLayouterFactory {
 
-    public LTRLayouterFactory(ChipsLayoutManager layoutManager, IViewCacheStorage cacheStorage, IBreakerFactory breakerFactory) {
-        super(layoutManager, cacheStorage, breakerFactory);
+    public LTRLayouterFactory(ChipsLayoutManager layoutManager,
+                              IViewCacheStorage cacheStorage,
+                              IBreakerFactory breakerFactory,
+                              ICriteriaFactory criteriaFactory,
+                              IPlacerFactory placerFactory) {
+        super(layoutManager, cacheStorage, breakerFactory, criteriaFactory, placerFactory);
     }
 
     @Override

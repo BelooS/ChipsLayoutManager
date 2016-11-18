@@ -2,11 +2,11 @@ package com.beloo.widget.chipslayoutmanager.layouter.placer;
 
 import android.support.v7.widget.RecyclerView;
 
-public class RealPlacerFactory implements IPlacerFactory {
+class RealPlacerFactory implements IPlacerFactory {
 
     private RecyclerView.LayoutManager layoutManager;
 
-    public RealPlacerFactory(RecyclerView.LayoutManager layoutManager) {
+    RealPlacerFactory(RecyclerView.LayoutManager layoutManager) {
         this.layoutManager = layoutManager;
     }
 

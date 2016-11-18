@@ -5,11 +5,17 @@ import android.graphics.Rect;
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacerFactory;
 
-public class HorizontalLayouterFactory extends AbstractLayouterFactory {
+public class ColumnsLayouterFactory extends AbstractLayouterFactory {
 
-    HorizontalLayouterFactory(ChipsLayoutManager layoutManager, IViewCacheStorage cacheStorage, IBreakerFactory breakerFactory) {
-        super(layoutManager, cacheStorage, breakerFactory);
+    ColumnsLayouterFactory(ChipsLayoutManager layoutManager,
+                           IViewCacheStorage cacheStorage,
+                           IBreakerFactory breakerFactory,
+                           ICriteriaFactory criteriaFactory,
+                           IPlacerFactory placerFactory) {
+        super(layoutManager, cacheStorage, breakerFactory, criteriaFactory, placerFactory);
     }
 
     @Override

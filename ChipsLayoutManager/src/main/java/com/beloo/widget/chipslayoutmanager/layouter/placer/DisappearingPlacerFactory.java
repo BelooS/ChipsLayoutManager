@@ -2,11 +2,11 @@ package com.beloo.widget.chipslayoutmanager.layouter.placer;
 
 import android.support.v7.widget.RecyclerView;
 
-public class DisappearingPlacerFactory implements IPlacerFactory {
+class DisappearingPlacerFactory implements IPlacerFactory {
 
     private RecyclerView.LayoutManager layoutManager;
 
-    public DisappearingPlacerFactory(RecyclerView.LayoutManager layoutManager) {
+    DisappearingPlacerFactory(RecyclerView.LayoutManager layoutManager) {
         this.layoutManager = layoutManager;
     }
 

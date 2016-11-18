@@ -1,7 +1,6 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
-import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -9,11 +8,7 @@ import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.gravity.RowGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.VerticalDefaultCriteriaFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.DisappearingCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.InfiniteCriteria;
-import com.beloo.widget.chipslayoutmanager.layouter.placer.DisappearingPlacerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.RealPlacerFactory;
 
@@ -24,42 +19,28 @@ public abstract class AbstractLayouterFactory {
     ChipsLayoutManager layoutManager;
     private IViewCacheStorage cacheStorage;
 
-    @IntRange(from = 0)
-    private int additionalRowsCount;
-
     private List<ILayouterListener> layouterListeners = new ArrayList<>();
 
-    private int additionalHeight;
-
     private IBreakerFactory breakerFactory;
+    private ICriteriaFactory criteriaFactory;
+    private IPlacerFactory placerFactory;
 
-    AbstractLayouterFactory(ChipsLayoutManager layoutManager, IViewCacheStorage cacheStorage, IBreakerFactory breakerFactory) {
+    AbstractLayouterFactory(ChipsLayoutManager layoutManager,
+                            IViewCacheStorage cacheStorage,
+                            IBreakerFactory breakerFactory,
+                            ICriteriaFactory criteriaFactory,
+                            IPlacerFactory placerFactory) {
         this.cacheStorage = cacheStorage;
         this.layoutManager = layoutManager;
         this.breakerFactory = breakerFactory;
+        this.criteriaFactory = criteriaFactory;
+        this.placerFactory = placerFactory;
     }
 
     public void addLayouterListener(@Nullable ILayouterListener layouterListener) {
         if (layouterListener != null) {
             layouterListeners.add(layouterListener);
         }
-    }
-
-    public void setAdditionalHeight(@IntRange(from = 0) int additionalHeight) {
-        if (additionalHeight < 0) throw new IllegalArgumentException("additional height can't be negative");
-        this.additionalHeight = additionalHeight;
-    }
-
-    public void setAdditionalRowsCount(int additionalRowsCount) {
-        this.additionalRowsCount = additionalRowsCount;
-    }
-
-    private int getAdditionalRowsCount() {
-        return additionalRowsCount;
-    }
-
-    private int getAdditionalHeight() {
-        return additionalHeight;
     }
 
     abstract AbstractLayouter.Builder createBackwardBuilder();
@@ -79,11 +60,6 @@ public abstract class AbstractLayouterFactory {
 
     @NonNull
     public final ILayouter getUpLayouter(@Nullable Rect anchorRect) {
-        ICriteriaFactory criteriaFactory = VerticalDefaultCriteriaFactory.newBuilder()
-                .additionalHeight(getAdditionalHeight())
-                .additionalRowCount(getAdditionalRowsCount())
-                .build();
-
         IPlacerFactory placerFactory = new RealPlacerFactory(layoutManager);
 
         return fillBasicBuilder(createBackwardBuilder())
@@ -96,11 +72,6 @@ public abstract class AbstractLayouterFactory {
 
     @NonNull
     public final ILayouter getDownLayouter(@Nullable Rect anchorRect) {
-        ICriteriaFactory criteriaFactory = VerticalDefaultCriteriaFactory.newBuilder()
-                .additionalHeight(getAdditionalHeight())
-                .additionalRowCount(getAdditionalRowsCount())
-                .build();
-
         IPlacerFactory placerFactory = new RealPlacerFactory(layoutManager);
 
         return fillBasicBuilder(createForwardBuilder())
@@ -112,10 +83,7 @@ public abstract class AbstractLayouterFactory {
     }
 
     @NonNull
-    public final ILayouter buildDisappearingDownLayouter(@NonNull ILayouter layouter) {
-        ICriteriaFactory criteriaFactory = new DisappearingCriteriaFactory(getAdditionalRowsCount());
-        IPlacerFactory placerFactory = new DisappearingPlacerFactory(layoutManager);
-
+    public final ILayouter buildDownLayouter(@NonNull ILayouter layouter) {
         AbstractLayouter abstractLayouter = (AbstractLayouter) layouter;
         abstractLayouter.setFinishingCriteria(criteriaFactory.getDownFinishingCriteria());
         abstractLayouter.setPlacer(placerFactory.getAtEndPlacer());
@@ -124,21 +92,11 @@ public abstract class AbstractLayouterFactory {
     }
 
     @NonNull
-    public final ILayouter buildDisappearingUpLayouter(@NonNull ILayouter layouter) {
-        ICriteriaFactory criteriaFactory = new DisappearingCriteriaFactory(getAdditionalRowsCount());
-        IPlacerFactory placerFactory = new DisappearingPlacerFactory(layoutManager);
-
+    public final ILayouter buildUpLayouter(@NonNull ILayouter layouter) {
         AbstractLayouter abstractLayouter = (AbstractLayouter) layouter;
         abstractLayouter.setFinishingCriteria(criteriaFactory.getUpFinishingCriteria());
         abstractLayouter.setPlacer(placerFactory.getAtEndPlacer());
 
         return abstractLayouter;
-    }
-
-
-    @NonNull
-    public ILayouter buildInfiniteLayouter(ILayouter layouter) {
-        ((AbstractLayouter)layouter).setFinishingCriteria(new InfiniteCriteria());
-        return layouter;
     }
 }
