@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
-import com.beloo.widget.chipslayoutmanager.gravity.RowGravityModifiersFactory;
+import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
@@ -23,17 +23,20 @@ public abstract class AbstractLayouterFactory {
     private IBreakerFactory breakerFactory;
     private ICriteriaFactory criteriaFactory;
     private IPlacerFactory placerFactory;
+    private IGravityModifiersFactory gravityModifiersFactory;
 
     AbstractLayouterFactory(ChipsLayoutManager layoutManager,
                             IViewCacheStorage cacheStorage,
                             IBreakerFactory breakerFactory,
                             ICriteriaFactory criteriaFactory,
-                            IPlacerFactory placerFactory) {
+                            IPlacerFactory placerFactory,
+                            IGravityModifiersFactory gravityModifiersFactory) {
         this.cacheStorage = cacheStorage;
         this.layoutManager = layoutManager;
         this.breakerFactory = breakerFactory;
         this.criteriaFactory = criteriaFactory;
         this.placerFactory = placerFactory;
+        this.gravityModifiersFactory = gravityModifiersFactory;
     }
 
     public void addLayouterListener(@Nullable ILayouterListener layouterListener) {
@@ -53,7 +56,7 @@ public abstract class AbstractLayouterFactory {
                 .canvas(new Square(layoutManager))
                 .childGravityResolver(layoutManager.getChildGravityResolver())
                 .cacheStorage(cacheStorage)
-                .gravityModifiersFactory(new RowGravityModifiersFactory())
+                .gravityModifiersFactory(gravityModifiersFactory)
                 .addLayouterListeners(layouterListeners);
     }
 
@@ -62,7 +65,7 @@ public abstract class AbstractLayouterFactory {
         return fillBasicBuilder(createBackwardBuilder())
                 .offsetRect(createOffsetRectForBackwardLayouter(anchorRect))
                 .breaker(breakerFactory.createBackwardRowBreaker())
-                .finishingCriteria(criteriaFactory.getUpFinishingCriteria())
+                .finishingCriteria(criteriaFactory.getBackwardFinishingCriteria())
                 .placer(placerFactory.getAtStartPlacer())
                 .build();
     }
@@ -72,7 +75,7 @@ public abstract class AbstractLayouterFactory {
         return fillBasicBuilder(createForwardBuilder())
                 .offsetRect(createOffsetRectForForwardLayouter(anchorRect))
                 .breaker(breakerFactory.createForwardRowBreaker())
-                .finishingCriteria(criteriaFactory.getDownFinishingCriteria())
+                .finishingCriteria(criteriaFactory.getForwardFinishingCriteria())
                 .placer(placerFactory.getAtEndPlacer())
                 .build();
     }
@@ -80,7 +83,7 @@ public abstract class AbstractLayouterFactory {
     @NonNull
     public final ILayouter buildDownLayouter(@NonNull ILayouter layouter) {
         AbstractLayouter abstractLayouter = (AbstractLayouter) layouter;
-        abstractLayouter.setFinishingCriteria(criteriaFactory.getDownFinishingCriteria());
+        abstractLayouter.setFinishingCriteria(criteriaFactory.getForwardFinishingCriteria());
         abstractLayouter.setPlacer(placerFactory.getAtEndPlacer());
 
         return abstractLayouter;
@@ -89,7 +92,7 @@ public abstract class AbstractLayouterFactory {
     @NonNull
     public final ILayouter buildUpLayouter(@NonNull ILayouter layouter) {
         AbstractLayouter abstractLayouter = (AbstractLayouter) layouter;
-        abstractLayouter.setFinishingCriteria(criteriaFactory.getUpFinishingCriteria());
+        abstractLayouter.setFinishingCriteria(criteriaFactory.getBackwardFinishingCriteria());
         abstractLayouter.setPlacer(placerFactory.getAtEndPlacer());
 
         return abstractLayouter;

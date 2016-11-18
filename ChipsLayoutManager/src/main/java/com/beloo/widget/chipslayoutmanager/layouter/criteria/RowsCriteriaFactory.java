@@ -2,11 +2,11 @@ package com.beloo.widget.chipslayoutmanager.layouter.criteria;
 
 import android.support.annotation.NonNull;
 
-public class RowsDefaultCriteriaFactory extends AbstractDefaultCriteriaFactory implements ICriteriaFactory {
+public class RowsCriteriaFactory extends AbstractCriteriaFactory implements ICriteriaFactory {
 
     @NonNull
     @Override
-    public IFinishingCriteria getUpFinishingCriteria() {
+    public IFinishingCriteria getBackwardFinishingCriteria() {
         IFinishingCriteria criteria = new CriteriaUpLayouterFinished();
         if (additionalHeight != 0) {
             criteria = new CriteriaUpAdditionalHeight(criteria, additionalHeight);
@@ -16,7 +16,7 @@ public class RowsDefaultCriteriaFactory extends AbstractDefaultCriteriaFactory i
 
     @NonNull
     @Override
-    public IFinishingCriteria getDownFinishingCriteria() {
+    public IFinishingCriteria getForwardFinishingCriteria() {
         IFinishingCriteria criteria = new CriteriaDownLayouterFinished();
         if (additionalHeight != 0) {
             criteria = new CriteriaUpAdditionalHeight(criteria, additionalHeight);

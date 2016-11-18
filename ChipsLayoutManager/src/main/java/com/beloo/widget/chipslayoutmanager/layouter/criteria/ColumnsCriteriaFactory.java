@@ -2,16 +2,17 @@ package com.beloo.widget.chipslayoutmanager.layouter.criteria;
 
 import android.support.annotation.NonNull;
 
-public class InfiniteCriteriaFactory implements ICriteriaFactory {
+public class ColumnsCriteriaFactory extends AbstractCriteriaFactory {
+
     @NonNull
     @Override
     public IFinishingCriteria getBackwardFinishingCriteria() {
-        return new InfiniteCriteria();
+        return new CriteriaLeftLayouterFinished();
     }
 
     @NonNull
     @Override
     public IFinishingCriteria getForwardFinishingCriteria() {
-        return new InfiniteCriteria();
+        return new CriteriaRightLayouterFinished();
     }
 }

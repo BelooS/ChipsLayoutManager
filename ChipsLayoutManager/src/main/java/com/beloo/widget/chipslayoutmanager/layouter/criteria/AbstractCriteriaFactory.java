@@ -2,7 +2,7 @@ package com.beloo.widget.chipslayoutmanager.layouter.criteria;
 
 import android.support.annotation.IntRange;
 
-public abstract class AbstractDefaultCriteriaFactory implements ICriteriaFactory {
+public abstract class AbstractCriteriaFactory implements ICriteriaFactory {
     int additionalHeight;
     int additionalRowCount;
 

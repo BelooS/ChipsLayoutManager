@@ -4,8 +4,8 @@ import android.support.annotation.NonNull;
 
 public interface ICriteriaFactory {
     @NonNull
-    IFinishingCriteria getUpFinishingCriteria();
+    IFinishingCriteria getBackwardFinishingCriteria();
 
     @NonNull
-    IFinishingCriteria getDownFinishingCriteria();
+    IFinishingCriteria getForwardFinishingCriteria();
 }

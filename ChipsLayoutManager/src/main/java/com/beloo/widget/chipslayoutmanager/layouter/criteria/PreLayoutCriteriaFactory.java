@@ -14,13 +14,13 @@ public class PreLayoutCriteriaFactory implements ICriteriaFactory {
 
     @NonNull
     @Override
-    public IFinishingCriteria getUpFinishingCriteria() {
+    public IFinishingCriteria getBackwardFinishingCriteria() {
         return new CriteriaUpAdditionalHeight(new CriteriaUpLayouterFinished(), additionalHeight);
     }
 
     @NonNull
     @Override
-    public IFinishingCriteria getDownFinishingCriteria() {
+    public IFinishingCriteria getForwardFinishingCriteria() {
         return new CriteriaAdditionalRow(
                 new CriteriaDownAdditionalHeight(new CriteriaDownLayouterFinished(), additionalHeight),
                 additionalRowsCount);

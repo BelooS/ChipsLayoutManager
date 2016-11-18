@@ -3,19 +3,21 @@ package com.beloo.widget.chipslayoutmanager.layouter;
 import android.graphics.Rect;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacerFactory;
 
-public class LTRLayouterFactory extends AbstractLayouterFactory {
+class LTRRowsLayouterFactory extends AbstractLayouterFactory {
 
-    public LTRLayouterFactory(ChipsLayoutManager layoutManager,
-                              IViewCacheStorage cacheStorage,
-                              IBreakerFactory breakerFactory,
-                              ICriteriaFactory criteriaFactory,
-                              IPlacerFactory placerFactory) {
-        super(layoutManager, cacheStorage, breakerFactory, criteriaFactory, placerFactory);
+    LTRRowsLayouterFactory(ChipsLayoutManager layoutManager,
+                           IViewCacheStorage cacheStorage,
+                           IBreakerFactory breakerFactory,
+                           ICriteriaFactory criteriaFactory,
+                           IPlacerFactory placerFactory,
+                           IGravityModifiersFactory gravityModifiersFactory) {
+        super(layoutManager, cacheStorage, breakerFactory, criteriaFactory, placerFactory, gravityModifiersFactory);
     }
 
     @Override

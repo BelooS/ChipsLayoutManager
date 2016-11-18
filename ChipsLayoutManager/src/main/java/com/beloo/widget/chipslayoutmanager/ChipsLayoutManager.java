@@ -29,10 +29,10 @@ import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouterFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.chipslayoutmanager.layouter.ILayouter;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractDefaultCriteriaFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.InfiniteCriteriaFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.RowsDefaultCriteriaFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.RowsCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.PlacerFactory;
 import com.beloo.widget.chipslayoutmanager.logger.IAdapterActionsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IFillLogger;
@@ -156,10 +156,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         viewPositionsStorage = new ViewCacheFactory(this).createCacheStorage();
         setAutoMeasureEnabled(true);
-    }
-
-    private AbstractDefaultCriteriaFactory createDefaultFinishingCriteriaFactory() {
-        return new RowsDefaultCriteriaFactory();
     }
 
     public static Builder newBuilder(Context context) {
@@ -402,7 +398,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
              * like moving from 0 position to 15 for example, where user could scroll fast and check
              * so we fill additional rows to cover nearest moves
              */
-            AbstractDefaultCriteriaFactory criteriaFactory = createDefaultFinishingCriteriaFactory();
+            AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
             criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
 
             AbstractLayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
@@ -419,7 +415,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             detachAndScrapAttachedViews(recycler);
 
             //in case removing draw additional rows to show predictive animations for appearing views
-            AbstractDefaultCriteriaFactory criteriaFactory = createDefaultFinishingCriteriaFactory();
+            AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
             criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
             criteriaFactory.setAdditionalHeight(additionalHeight);
 
@@ -731,7 +727,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         scrollingLogger.logChildCount(getChildCount());
 
         //some bugs connected with displaying views from the last row, which not fully showed, so just add additional row to avoid a lot of it.
-        AbstractDefaultCriteriaFactory criteriaFactory = createDefaultFinishingCriteriaFactory();
+        AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
         criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
 
         AbstractLayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
