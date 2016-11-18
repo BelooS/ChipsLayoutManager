@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.chipslayoutmanager.IStateHolder;
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 
@@ -81,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
                         return Gravity.CENTER;
                     }
                 })
+                //an orientation of layout manager
+                .setOrientation(ChipsLayoutManager.COLUMNS)
                 .build();
 
         rvTest.addItemDecoration(new SpacingItemDecoration(getResources().getDimensionPixelOffset(R.dimen.item_space),

@@ -1,7 +1,6 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
-import com.beloo.widget.chipslayoutmanager.IStateHolder;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.ColumnGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.RowGravityModifiersFactory;
@@ -29,7 +28,7 @@ public class LayouterStateFactory {
 
         AbstractLayouterFactory layouterFactory;
 
-        if (lm.orientation() == IStateHolder.ROWS) {
+        if (lm.orientation() == ChipsLayoutManager.ROWS) {
             layouterFactory = lm.isLayoutRTL() ?
                     createRTLRowLayouterFactory(criteriaFactory, placerFactory, cacheStorage) : createLTRRowLayouterFactory(criteriaFactory, placerFactory, cacheStorage);
         } else {
@@ -40,7 +39,7 @@ public class LayouterStateFactory {
     }
 
     public AbstractCriteriaFactory createDefaultFinishingCriteriaFactory() {
-        if (lm.orientation() == IStateHolder.ROWS) {
+        if (lm.orientation() == ChipsLayoutManager.ROWS) {
             return new RowsCriteriaFactory();
         } else {
             return new ColumnsCriteriaFactory();

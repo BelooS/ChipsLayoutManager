@@ -32,7 +32,6 @@ import com.beloo.widget.chipslayoutmanager.layouter.ILayouter;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.InfiniteCriteriaFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.RowsCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.PlacerFactory;
 import com.beloo.widget.chipslayoutmanager.logger.IAdapterActionsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IFillLogger;
@@ -44,6 +43,11 @@ import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 import java.util.List;
 
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract, IStateHolder {
+    @SuppressWarnings("WeakerAccess")
+    public static final int ROWS = 1;
+    @SuppressWarnings("WeakerAccess")
+    public static final int COLUMNS = 2;
+
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
     private static final int INT_ROW_SIZE_APPROXIMATELY_FOR_CACHE = 10;
     private static final int APPROXIMATE_ADDITIONAL_ROWS_COUNT = 5;
@@ -85,6 +89,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private IAdapterActionsLogger adapterActionsLogger;
     private IPredictiveAnimationsLogger predictiveAnimationsLogger;
     private IScrollingLogger scrollingLogger;
+    @Orientation
+    /** orientation of layout. Could have ROWS or COLUMNS style */
+    private int layoutOrientation = ROWS;
     //--- end loggers
 
 
@@ -166,7 +173,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return childGravityResolver;
     }
 
-    /** use it to strcitly disable scrolling.
+    /** use it to strictly disable scrolling.
      * If scrolling enabled it would be disabled in case all items fit on the screen */
     public void setScrollingEnabledContract(boolean isEnabled) {
         isScrollingEnabledContract = isEnabled;
@@ -266,6 +273,16 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         public Builder setRowBreaker(@NonNull IRowBreaker breaker) {
             AssertionUtils.assertNotNull(breaker, "breaker couldn't be null");
             ChipsLayoutManager.this.rowBreaker = breaker;
+            return this;
+        }
+
+        /** @param orientation of layout manager. Could be {@link #ROWS} or {@link #COLUMNS}
+         * {@link #ROWS} by default */
+        public Builder setOrientation(@Orientation int orientation) {
+            if (orientation != ROWS && orientation != COLUMNS) {
+                return this;
+            }
+            ChipsLayoutManager.this.layoutOrientation = orientation;
             return this;
         }
 
@@ -372,7 +389,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     @Orientation
     public int orientation() {
-        return ROWS;
+        return layoutOrientation;
     }
 
     @Override
