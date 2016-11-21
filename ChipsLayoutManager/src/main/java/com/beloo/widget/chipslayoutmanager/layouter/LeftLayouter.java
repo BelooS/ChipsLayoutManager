@@ -39,7 +39,7 @@ class LeftLayouter extends AbstractLayouter {
             viewRect.bottom = viewRect.bottom - topOffsetOfRow;
 
             viewLeft = Math.min(viewLeft, viewRect.left);
-            viewRight = Math.max(viewBottom, viewRect.bottom);
+            viewRight = Math.max(viewRight, viewRect.right);
         }
     }
 
