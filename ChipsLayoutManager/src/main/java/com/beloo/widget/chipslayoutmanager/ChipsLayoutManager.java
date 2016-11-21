@@ -17,7 +17,9 @@ import android.view.animation.LinearInterpolator;
 
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.LayouterStateFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.ColumnsStateFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.IStateFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.RowsStateFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.EmptyRowBreaker;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IRowBreaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
@@ -147,8 +149,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /** factory for placers factories*/
     private PlacerFactory placerFactory = new PlacerFactory(this);
     /** factory for state-dependent layouter factories*/
-    @NonNull
-    private LayouterStateFactory stateFactory = new LayouterStateFactory(this);
+    private IStateFactory stateFactory;
 
     private ChipsLayoutManager(Context context) {
         @DeviceOrientation
@@ -289,6 +290,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         /**
          * create SpanLayoutManager
          */
+        //todo create static builder
         public ChipsLayoutManager build() {
             // setGravityResolver always have priority
             if (childGravityResolver == null) {
@@ -299,6 +301,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 }
             }
 
+            stateFactory = layoutOrientation == ROWS? new RowsStateFactory(ChipsLayoutManager.this) : new ColumnsStateFactory(ChipsLayoutManager.this);
             anchorFactory = stateFactory.createAnchorFactory();
             anchorView = anchorFactory.createNotFound();
 
