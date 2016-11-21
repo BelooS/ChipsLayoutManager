@@ -50,11 +50,19 @@ public class RowsAnchorFactory extends AbstractAnchorFactory {
 
         if (!minPosView.isNotFoundState()) {
             minPosView.getAnchorViewRect().top = minTop;
-            minPosView.getAnchorViewRect().bottom = 0;
             minPosView.setPosition(minPosition);
         }
 
         return minPosView;
     }
+
+    @Override
+    public void afterPreLayout(AnchorViewState anchorView, RecyclerView.Recycler recycler) {
+        if (!anchorView.isNotFoundState() && recycler.convertPreLayoutPositionToPostLayout(anchorView.getPosition()) == -1) {
+            //view going to remove
+            anchorView.getAnchorViewRect().bottom = 0;
+        }
+    }
+
 
 }

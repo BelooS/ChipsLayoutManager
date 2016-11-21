@@ -20,6 +20,6 @@ public class LoggerFactory {
 
     @NonNull
     public IScrollingLogger getScrollingLogger() {
-        return new AnchorScrollingLogger();
+        return new EmtpyScrollingLogger();
     }
 }

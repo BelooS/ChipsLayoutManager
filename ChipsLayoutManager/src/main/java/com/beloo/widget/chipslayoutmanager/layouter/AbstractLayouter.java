@@ -185,7 +185,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
 
     /** check if we can not add current view to row
      * we determine it on the next layouter step, because we need next view size to determine whether it fits in row or not */
-    final boolean canNotBePlacedInCurrentRow() {
+    public final boolean canNotBePlacedInCurrentRow() {
         return breaker.isRowBroke(this);
     }
 

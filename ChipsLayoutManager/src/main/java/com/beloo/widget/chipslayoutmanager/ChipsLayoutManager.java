@@ -460,6 +460,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             AbstractLayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
             fill(recycler, layouterFactory, anchorView, false);
+
+            anchorFactory.afterPreLayout(anchorView, recycler);
         }
 
         deletingItemsOnScreenCount = 0;
