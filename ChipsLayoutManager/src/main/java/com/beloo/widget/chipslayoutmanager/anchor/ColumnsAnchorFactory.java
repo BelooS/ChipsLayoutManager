@@ -50,6 +50,7 @@ public class ColumnsAnchorFactory extends AbstractAnchorFactory {
 
         if (!minPosView.isNotFoundState()) {
             minPosView.getAnchorViewRect().left = minLeft;
+            minPosView.getAnchorViewRect().right = 0;
             minPosView.setPosition(minPosition);
         }
 
@@ -58,9 +59,9 @@ public class ColumnsAnchorFactory extends AbstractAnchorFactory {
 
     @Override
     public void afterPreLayout(AnchorViewState anchorView, RecyclerView.Recycler recycler) {
-        if (!anchorView.isNotFoundState() && recycler.convertPreLayoutPositionToPostLayout(anchorView.getPosition()) == -1) {
-            //view going to remove
-            anchorView.getAnchorViewRect().right = 0;
-        }
+//        if (!anchorView.isNotFoundState() && recycler.convertPreLayoutPositionToPostLayout(anchorView.getPosition()) == -1) {
+//            //view going to remove
+//            anchorView.getAnchorViewRect().right = 0;
+//        }
     }
 }

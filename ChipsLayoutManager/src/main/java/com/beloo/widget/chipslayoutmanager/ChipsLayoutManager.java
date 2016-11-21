@@ -51,7 +51,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
     private static final int INT_ROW_SIZE_APPROXIMATELY_FOR_CACHE = 10;
-    private static final int APPROXIMATE_ADDITIONAL_ROWS_COUNT = 5;
+    private static final int APPROXIMATE_ADDITIONAL_ROWS_COUNT = 3;
     /**
      * coefficient to support fast scrolling, caching views only for one row may not be enough
      */
@@ -104,11 +104,22 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /**
      * highest view in layout. Have always actual value, because it set in {@link #onLayoutChildren}
      */
-    private View highestView;
+    private View topView;
     /**
      * lowest view in layout. Have always actual value, because it set in {@link #onLayoutChildren}
      */
-    private View lowestView;
+    private View bottomView;
+
+    /**
+     * The view have placed in the closest to the left border. Have always actual value, because it set in {@link #onLayoutChildren}
+     */
+    private View leftView;
+
+    /** The view have placed in the closest to the right border. Have always actual value, because it set in {@link #onLayoutChildren} */
+    private View rightView;
+
+    private Integer minPositionOnScreen;
+    private Integer maxPositionOnScreen;
 
     /**
      * current device layoutOrientation
@@ -483,8 +494,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             downLayouter = layouterFactory.buildForwardLayouter(downLayouter);
 
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
-            for (int i = 0; i< disappearingViews.downViews.size(); i++) {
-                int position = disappearingViews.downViews.keyAt(i);
+            for (int i = 0; i< disappearingViews.forwardViews.size(); i++) {
+                int position = disappearingViews.forwardViews.keyAt(i);
                 downLayouter.placeView(recycler.getViewForPosition(position));
             }
             //layout last row
@@ -492,8 +503,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             upLayouter = layouterFactory.buildBackwardLayouter(upLayouter);
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
-            for (int i = 0; i< disappearingViews.upViews.size(); i++) {
-                int position = disappearingViews.upViews.keyAt(i);
+            for (int i = 0; i< disappearingViews.backwardViews.size(); i++) {
+                int position = disappearingViews.backwardViews.keyAt(i);
                 upLayouter.placeView(recycler.getViewForPosition(position));
             }
 
@@ -503,11 +514,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     private class DisappearingViewsContainer {
-        private SparseArray<View> upViews = new SparseArray<>();
-        private SparseArray<View> downViews = new SparseArray<>();
+        private SparseArray<View> backwardViews = new SparseArray<>();
+        private SparseArray<View> forwardViews = new SparseArray<>();
 
         int size() {
-            return upViews.size() + downViews.size();
+            return backwardViews.size() + forwardViews.size();
         }
     }
 
@@ -516,17 +527,17 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         //views which moved from screen, but not deleted
         DisappearingViewsContainer container = new DisappearingViewsContainer();
 
-        int highestViewPosition = getPosition(highestView);
-        int lowestViewPosition = getPosition(lowestView);
+        int highestViewPosition = getPosition(topView);
+        int lowestViewPosition = getPosition(bottomView);
 
         for (RecyclerView.ViewHolder holder : scrapList) {
             final View child = holder.itemView;
             final RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) child.getLayoutParams();
             if (!lp.isItemRemoved()) {
                 if (lp.getViewAdapterPosition() < highestViewPosition) {
-                    container.upViews.put(lp.getViewAdapterPosition(), child);
+                    container.backwardViews.put(lp.getViewAdapterPosition(), child);
                 } else if (lp.getViewAdapterPosition() > lowestViewPosition) {
-                    container.downViews.put(lp.getViewAdapterPosition(), child);
+                    container.forwardViews.put(lp.getViewAdapterPosition(), child);
                 }
             }
         }
@@ -549,11 +560,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             if (!lp.isItemRemoved()) {
                 //view won't be removed, but maybe it is moved offscreen
                 int pos = lp.getViewLayoutPosition();
-                int lowestPosition = getPosition(highestView);
-                int highestPosition = getPosition(lowestView);
 
                 pos = recycler.convertPreLayoutPositionToPostLayout(pos);
-                probablyMovedFromScreen = pos < lowestPosition || pos > highestPosition;
+                probablyMovedFromScreen = pos < minPositionOnScreen || pos > maxPositionOnScreen;
             }
 
             if (lp.isItemRemoved() || probablyMovedFromScreen) {
@@ -584,21 +593,40 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /**
      * find highest & lowest views
      */
-    private void findHighestAndLowestViews() {
-        highestView = null;
-        lowestView = null;
+    private void findBorderViews() {
+        topView = null;
+        bottomView = null;
+        leftView = null;
+        rightView = null;
+        minPositionOnScreen = null;
+        maxPositionOnScreen = null;
 
         if (getChildCount() > 0) {
-            highestView = getChildAt(0);
-            lowestView = highestView;
-            for (int i = 1; i < getChildCount(); i++) {
-                View view = getChildAt(i);
-                if (getDecoratedTop(view) < getDecoratedTop(highestView)) {
-                    highestView = view;
+            for (View view : childViews) {
+                int position = getPosition(view);
+
+                if (topView == null || getDecoratedTop(view) < getDecoratedTop(topView)) {
+                    topView = view;
                 }
 
-                if (getDecoratedBottom(view) > getDecoratedBottom(lowestView)) {
-                    lowestView = view;
+                if (bottomView == null || getDecoratedBottom(view) > getDecoratedBottom(bottomView)) {
+                    bottomView = view;
+                }
+
+                if (leftView == null || getDecoratedLeft(view) < getDecoratedLeft(leftView)) {
+                    leftView = view;
+                }
+
+                if (rightView == null || getDecoratedRight(view) > getDecoratedRight(rightView)) {
+                    rightView = view;
+                }
+
+                if (minPositionOnScreen == null || position < minPositionOnScreen) {
+                    minPositionOnScreen = position;
+                }
+
+                if (maxPositionOnScreen == null || position > maxPositionOnScreen) {
+                    maxPositionOnScreen = position;
                 }
             }
         }
@@ -638,7 +666,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         fillWithLayouter(recycler, downLayouter);
 
-        findHighestAndLowestViews();
+        findBorderViews();
 
         logger.onAfterLayouter();
         //move to trash everything, which haven't used in this layout cycle
@@ -830,7 +858,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public boolean canScrollVertically() {
         if (layoutOrientation() == COLUMNS) return false;
 
-        findHighestAndLowestViews();
+        findBorderViews();
         if (getChildCount() > 0) {
             View view = getChildAt(0);
             View lastChild = getChildAt(getChildCount() - 1);
@@ -838,8 +866,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             int firstViewPosition = getPosition(view);
             int lastViewPosition = getPosition(lastChild);
 
-            int top = getDecoratedTop(highestView);
-            int bottom = getDecoratedBottom(lowestView);
+            int top = getDecoratedTop(topView);
+            int bottom = getDecoratedBottom(bottomView);
 
             if (firstViewPosition == 0
                     && lastViewPosition == getItemCount() - 1
@@ -943,7 +971,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
             delta = dy;
         } else { //in case lower view is the last view in adapter and wouldn't be any other view below
-            int viewBottom = getDecoratedBottom(lowestView);
+            int viewBottom = getDecoratedBottom(bottomView);
             int parentBottom = getHeight() - getPaddingBottom();
             delta = Math.min(viewBottom - parentBottom, dy);
         }
