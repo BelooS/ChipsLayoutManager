@@ -16,6 +16,8 @@ public class ColumnGravityModifiersFactory implements IGravityModifiersFactory {
 
         gravityModifierMap.put(Gravity.CENTER, centerGravityModifier);
         gravityModifierMap.put(Gravity.CENTER_HORIZONTAL, centerGravityModifier);
+        gravityModifierMap.put(Gravity.LEFT, new LeftGravityModifier());
+        gravityModifierMap.put(Gravity.RIGHT, new RightGravityModifier());
     }
 
     public IGravityModifier getGravityModifier(@SpanLayoutChildGravity int gravity) {
