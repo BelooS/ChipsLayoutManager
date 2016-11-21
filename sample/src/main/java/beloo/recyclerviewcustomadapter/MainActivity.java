@@ -2,6 +2,7 @@ package beloo.recyclerviewcustomadapter;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
@@ -100,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
         spinnerMoveTo.setAdapter(spinnerAdapterMoveTo);
 
         rvTest.setLayoutManager(spanLayoutManager);
+//        rvTest.setLayoutManager(new LinearLayoutManager(this));
         rvTest.getRecycledViewPool().setMaxRecycledViews(0, 10);
         rvTest.getRecycledViewPool().setMaxRecycledViews(1, 10);
         rvTest.setAdapter(adapter);

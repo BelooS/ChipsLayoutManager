@@ -756,9 +756,39 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return false;
     }
 
+    private View getBorderRightView() {
+        int maxRight = Integer.MIN_VALUE;
+        View rightest = null;
+
+        for (View view : childViews) {
+            int viewRight = getDecoratedRight(view);
+            if (maxRight < viewRight) {
+                rightest = view;
+                maxRight = viewRight;
+            }
+        }
+
+        return rightest;
+    }
+
     /** calculate dx, stop scrolling whether items bounds reached*/
     private int onContentScrolledRight(int dx) {
-        return dx;
+        int childCount = getChildCount();
+        int itemCount = getItemCount();
+        int delta;
+
+        View lastView = getChildAt(childCount - 1);
+        int lastViewAdapterPos = getPosition(lastView);
+        if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
+            delta = dx;
+        } else { //in case lower view is the last view in adapter and wouldn't be any other view below
+            int viewRight = getDecoratedRight(getBorderRightView());
+            int parentRight = getWidth() - getPaddingRight();
+            int distance = viewRight - parentRight;
+            delta = Math.min(distance, dx);
+        }
+
+        return delta;
     }
 
     private int onContentScrolledLeft(int dx) {
