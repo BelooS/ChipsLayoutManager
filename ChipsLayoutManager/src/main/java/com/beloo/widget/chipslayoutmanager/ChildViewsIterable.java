@@ -5,7 +5,7 @@ import android.view.View;
 
 import java.util.Iterator;
 
-class ChildViewsIterable implements Iterable<View> {
+public class ChildViewsIterable implements Iterable<View> {
 
     private RecyclerView.LayoutManager layoutManager;
 

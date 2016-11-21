@@ -449,6 +449,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             predictiveAnimationsLogger.heightOfCanvas(this);
             predictiveAnimationsLogger.onSummarizedDeletingItemsHeightCalculated(additionalHeight);
             anchorView = anchorFactory.getAnchor();
+            Log.w(TAG, "anchor state in pre-layout = " + anchorView);
             detachAndScrapAttachedViews(recycler);
 
             //in case removing draw additional rows to show predictive animations for appearing views

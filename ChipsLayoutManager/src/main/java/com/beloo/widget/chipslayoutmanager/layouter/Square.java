@@ -1,29 +1,35 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
-import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
+import android.graphics.Rect;
+import android.support.v7.widget.RecyclerView;
 
 class Square implements ICanvas {
 
-    private ChipsLayoutManager chipsLayoutManager;
+    private RecyclerView.LayoutManager lm;
 
-    Square(ChipsLayoutManager chipsLayoutManager) {
-        this.chipsLayoutManager = chipsLayoutManager;
+    Square(RecyclerView.LayoutManager lm) {
+        this.lm = lm;
     }
 
     public final int getCanvasRightBorder() {
-        return chipsLayoutManager.getWidth() - chipsLayoutManager.getPaddingRight();
+        return lm.getWidth() - lm.getPaddingRight();
     }
 
     public final int getCanvasBottomBorder() {
-        return chipsLayoutManager.getHeight() - chipsLayoutManager.getPaddingBottom();
+        return lm.getHeight() - lm.getPaddingBottom();
     }
 
     public final int getCanvasLeftBorder() {
-        return chipsLayoutManager.getPaddingLeft();
+        return lm.getPaddingLeft();
     }
 
     public final int getCanvasTopBorder() {
-        return chipsLayoutManager.getPaddingTop();
+        return lm.getPaddingTop();
+    }
+
+    @Override
+    public Rect getCanvasRect() {
+        return new Rect(getCanvasLeftBorder(), getCanvasTopBorder(), getCanvasRightBorder(), getCanvasBottomBorder());
     }
 
 }

@@ -92,6 +92,11 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         return positionIterator;
     }
 
+    @Override
+    public Rect getCanvasRect() {
+        return canvas.getCanvasRect();
+    }
+
     public final int getCanvasRightBorder() {
         return canvas.getCanvasRightBorder();
     }

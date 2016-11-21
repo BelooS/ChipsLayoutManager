@@ -41,7 +41,7 @@ public class RowsStateFactory implements IStateFactory {
 
     @Override
     public IAnchorFactory createAnchorFactory() {
-        return new RowsAnchorFactory(lm);
+        return new RowsAnchorFactory(lm, new Square(lm));
     }
 
     private AbstractLayouterFactory createLTRRowLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {

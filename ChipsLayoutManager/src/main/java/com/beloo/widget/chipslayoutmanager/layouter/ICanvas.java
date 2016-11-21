@@ -1,6 +1,8 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
-interface ICanvas {
+import android.graphics.Rect;
+
+public interface ICanvas {
     int getCanvasRightBorder();
 
     int getCanvasBottomBorder();
@@ -8,4 +10,6 @@ interface ICanvas {
     int getCanvasLeftBorder();
 
     int getCanvasTopBorder();
+
+    Rect getCanvasRect();
 }

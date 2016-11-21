@@ -42,7 +42,7 @@ public class ColumnsStateFactory implements IStateFactory {
 
     @Override
     public IAnchorFactory createAnchorFactory() {
-        return new ColumnsAnchorFactory(lm);
+        return new ColumnsAnchorFactory(lm, new Square(lm));
     }
 
     //    private AbstractLayouterFactory createRTLColumnLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {

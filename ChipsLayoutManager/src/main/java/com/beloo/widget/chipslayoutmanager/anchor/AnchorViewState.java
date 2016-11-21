@@ -5,8 +5,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import java.util.Locale;
+
 /**
- * @return View, which is highest visible left view
+ * represents View, which is highest visible left view
  */
 
 public class AnchorViewState implements Parcelable {
@@ -74,4 +76,9 @@ public class AnchorViewState implements Parcelable {
             return new AnchorViewState[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return String.format(Locale.getDefault(), "AnchorState. Position = %d, Rect = %s", position, String.valueOf(anchorViewRect));
+    }
 }

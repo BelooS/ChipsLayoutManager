@@ -4,48 +4,57 @@ import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.beloo.widget.chipslayoutmanager.ChildViewsIterable;
+import com.beloo.widget.chipslayoutmanager.layouter.ICanvas;
+
 public class RowsAnchorFactory extends AbstractAnchorFactory {
 
-    public RowsAnchorFactory(RecyclerView.LayoutManager lm) {
-        super(lm);
+    private ChildViewsIterable childViews;
+
+    public RowsAnchorFactory(RecyclerView.LayoutManager lm, ICanvas canvas) {
+        super(lm, canvas);
+        childViews = new ChildViewsIterable(lm);
     }
 
     /** get the highest views in layout. The closest to left border view will be picked from it. */
     @Override
     public AnchorViewState getAnchor() {
-        int childCount = lm.getChildCount();
-        AnchorViewState topLeft = AnchorViewState.getNotFoundState();
 
-        Rect mainRect = new Rect(lm.getPaddingLeft(),
-                lm.getPaddingTop(),
-                lm.getWidth() - lm.getPaddingRight(),
-                lm.getHeight() - lm.getPaddingBottom());
+        AnchorViewState minPosView = AnchorViewState.getNotFoundState();
 
+        Rect mainRect = getCanvasRect();
+
+        int minPosition = Integer.MAX_VALUE;
         int minTop = Integer.MAX_VALUE;
-        for (int i = 0; i < childCount; i++) {
-            View view = lm.getChildAt(i);
+
+        for (View view : childViews) {
             AnchorViewState anchorViewState = createAnchorState(view);
+            int pos = lm.getPosition(view);
+            int top = lm.getDecoratedTop(view);
+
             //intersection changes rect!!!
             Rect viewRect = new Rect(anchorViewState.getAnchorViewRect());
             boolean intersect = viewRect.intersect(mainRect);
+
             if (intersect && !anchorViewState.isRemoving()) {
-                if (topLeft.isNotFoundState()) {
-                    topLeft = anchorViewState;
+                if (minPosition > pos) {
+                    minPosition = pos;
+                    minPosView = anchorViewState;
                 }
-                minTop = Math.min(minTop, anchorViewState.getAnchorViewRect().top);
+
+                if (minTop > top) {
+                    minTop = top;
+                }
             }
         }
 
-        if (!topLeft.isNotFoundState()) {
-            assert topLeft.getAnchorViewRect() != null;
-            topLeft.getAnchorViewRect().top = minTop;
-            /* we don't need bottom coordinate for layouter
-            also this helps to normalize row properly when anchor deleted and was the biggest view in a row
-            */
-            topLeft.getAnchorViewRect().bottom = 0;
+        if (!minPosView.isNotFoundState()) {
+            minPosView.getAnchorViewRect().top = minTop;
+            minPosView.getAnchorViewRect().bottom = 0;
+            minPosView.setPosition(minPosition);
         }
 
-        return topLeft;
+        return minPosView;
     }
 
 }
