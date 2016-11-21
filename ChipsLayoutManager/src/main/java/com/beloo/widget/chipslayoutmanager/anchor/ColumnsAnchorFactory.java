@@ -30,7 +30,7 @@ public class ColumnsAnchorFactory extends AbstractAnchorFactory {
             Rect viewRect = new Rect(anchorViewState.getAnchorViewRect());
             boolean intersect = viewRect.intersect(mainRect);
             if (intersect && !anchorViewState.isRemoving()) {
-                if (!topLeft.isNotFoundState() && minLeft > anchorViewState.getAnchorViewRect().left) {
+                if (minLeft > anchorViewState.getAnchorViewRect().left) {
                     topLeft = anchorViewState;
                     minLeft = anchorViewState.getAnchorViewRect().left;
                 }

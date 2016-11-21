@@ -736,10 +736,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
 
         int delta = 0;
-        if (dx < 0) {   //if content scrolled forward
-            delta = onContentScrolledRight(dx);
-        } else if (dx > 0) { //if content scrolled backward
+        if (dx < 0) { //if content scrolled backward
             delta = onContentScrolledLeft(dx);
+        } else if (dx > 0) { //if content scrolled forward
+            delta = onContentScrolledRight(dx);
         }
 
         performNormalizationIfNeeded();
@@ -747,12 +747,44 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return delta;
     }
 
+    private boolean isZeroViewAdded() {
+        for (View view : childViews) {
+            if (getPosition(view) == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** calculate dx, stop scrolling whether items bounds reached*/
     private int onContentScrolledRight(int dx) {
         return dx;
     }
 
     private int onContentScrolledLeft(int dx) {
-        return dx;
+        int delta;
+        AnchorViewState state = anchorFactory.getAnchor();
+
+        if (!isZeroViewAdded()) { //in case 0 position haven't added in layout yet
+            delta = dx;
+        } else {
+
+            int leftBorder = getPaddingLeft();
+            int viewLeft = state.getAnchorViewRect().left;
+            int distance;
+            distance = viewLeft - leftBorder;
+
+            scrollingLogger.logUpScrollingNormalizationDistance(distance);
+
+            if (distance >= 0) {
+                // in case over scroll on top border
+                delta = distance;
+            } else {
+                //in case first child showed partially
+                delta = Math.max(distance, dx);
+            }
+        }
+        return delta;
     }
 
     /**
