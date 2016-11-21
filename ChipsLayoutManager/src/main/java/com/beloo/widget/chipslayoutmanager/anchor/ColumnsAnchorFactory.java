@@ -30,20 +30,11 @@ public class ColumnsAnchorFactory extends AbstractAnchorFactory {
             Rect viewRect = new Rect(anchorViewState.getAnchorViewRect());
             boolean intersect = viewRect.intersect(mainRect);
             if (intersect && !anchorViewState.isRemoving()) {
-                if (topLeft.isNotFoundState()) {
+                if (!topLeft.isNotFoundState() && minLeft > anchorViewState.getAnchorViewRect().left) {
                     topLeft = anchorViewState;
+                    minLeft = anchorViewState.getAnchorViewRect().left;
                 }
-                minLeft = Math.min(minLeft, anchorViewState.getAnchorViewRect().left);
             }
-        }
-
-        if (!topLeft.isNotFoundState()) {
-            assert topLeft.getAnchorViewRect() != null;
-            topLeft.getAnchorViewRect().left = minLeft;
-            /* we don't need right coordinate for layouter
-            also this helps to normalize column properly when anchor deleted and was the longest view in a column
-            */
-            topLeft.getAnchorViewRect().right = 0;
         }
 
         return topLeft;

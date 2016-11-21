@@ -15,7 +15,6 @@ import android.util.SparseArray;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 
-import com.beloo.widget.chipslayoutmanager.anchor.RowsAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.LayouterStateFactory;
@@ -717,7 +716,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         dx = scrollHorizontallyInternal(dx);
         offsetChildrenHorizontal(-dx);
 
+        scrollingLogger.logChildCount(getChildCount());
+
         anchorView = anchorFactory.getAnchor();
+        scrollingLogger.logAnchorView(anchorView);
 
         AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
         criteriaFactory.setAdditionalRowsCount(1);
