@@ -52,7 +52,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
     private static final int INT_ROW_SIZE_APPROXIMATELY_FOR_CACHE = 10;
-    private static final int APPROXIMATE_ADDITIONAL_ROWS_COUNT = 3;
+    private static final int APPROXIMATE_ADDITIONAL_ROWS_COUNT = 5;
     /**
      * coefficient to support fast scrolling, caching views only for one row may not be enough
      */
@@ -999,8 +999,15 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return;
         }
 
-        cacheNormalizationPosition = cacheNormalizationPosition != null ? cacheNormalizationPosition : viewPositionsStorage.getLastCachePosition();
-        anchorView = anchorFactory.getAnchor();
+        Integer lastCachePosition = viewPositionsStorage.getLastCachePosition();
+
+        cacheNormalizationPosition = cacheNormalizationPosition != null ? cacheNormalizationPosition : lastCachePosition;
+
+        if (lastCachePosition != null && position < lastCachePosition) {
+            position = viewPositionsStorage.getStartOfRow(position);
+        }
+
+        anchorView = anchorFactory.createNotFound();
         anchorView.setPosition(position);
 
         //Trigger a new view layout
