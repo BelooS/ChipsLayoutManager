@@ -1,5 +1,7 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
+import android.view.View;
+
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.HorizontalScrollingController;
 import com.beloo.widget.chipslayoutmanager.IScrollingController;
@@ -55,6 +57,16 @@ public class ColumnsStateFactory implements IStateFactory {
     @Override
     public IScrollingController scrollingController() {
         return new HorizontalScrollingController(lm);
+    }
+
+    @Override
+    public int getStart(View view) {
+        return lm.getDecoratedLeft(view);
+    }
+
+    @Override
+    public int getEnd(View view) {
+        return lm.getDecoratedRight(view);
     }
 
     //    private AbstractLayouterFactory createRTLColumnLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {

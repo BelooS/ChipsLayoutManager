@@ -9,9 +9,9 @@ public class ColumnsCriteriaFactory extends AbstractCriteriaFactory {
     @Override
     public IFinishingCriteria getBackwardFinishingCriteria() {
         IFinishingCriteria criteria = new CriteriaLeftLayouterFinished();
-//        if (additionalRowCount != 0) {
-//            criteria = new CriteriaAdditionalRow(criteria, additionalRowCount);
-//        }
+        if (additionalLength != 0) {
+            criteria = new CriteriaLeftAdditionalWidth(criteria, additionalLength);
+        }
         return criteria;
     }
 
@@ -19,6 +19,9 @@ public class ColumnsCriteriaFactory extends AbstractCriteriaFactory {
     @Override
     public IFinishingCriteria getForwardFinishingCriteria() {
         IFinishingCriteria criteria = new CriteriaRightLayouterFinished();
+        if (additionalLength != 0) {
+            criteria = new CriteriaRightAdditionalWidth(criteria, additionalLength);
+        }
         if (additionalRowCount != 0) {
             criteria = new CriteriaAdditionalRow(criteria, additionalRowCount);
         }

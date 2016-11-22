@@ -3,12 +3,12 @@ package com.beloo.widget.chipslayoutmanager.layouter.criteria;
 import android.support.annotation.IntRange;
 
 public abstract class AbstractCriteriaFactory implements ICriteriaFactory {
-    int additionalHeight;
+    int additionalLength;
     int additionalRowCount;
 
-    public void setAdditionalHeight(@IntRange(from = 0) int additionalHeight) {
+    public void setAdditionalLength(@IntRange(from = 0) int additionalHeight) {
         if (additionalHeight < 0) throw new IllegalArgumentException("additional height can't be negative");
-        this.additionalHeight = additionalHeight;
+        this.additionalLength = additionalHeight;
     }
 
     public void setAdditionalRowsCount(int additionalRowCount) {

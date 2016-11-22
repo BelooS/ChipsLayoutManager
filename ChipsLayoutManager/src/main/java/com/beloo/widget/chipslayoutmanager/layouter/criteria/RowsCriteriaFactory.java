@@ -8,8 +8,8 @@ public class RowsCriteriaFactory extends AbstractCriteriaFactory implements ICri
     @Override
     public IFinishingCriteria getBackwardFinishingCriteria() {
         IFinishingCriteria criteria = new CriteriaUpLayouterFinished();
-        if (additionalHeight != 0) {
-            criteria = new CriteriaUpAdditionalHeight(criteria, additionalHeight);
+        if (additionalLength != 0) {
+            criteria = new CriteriaUpAdditionalHeight(criteria, additionalLength);
         }
         return criteria;
     }
@@ -18,8 +18,8 @@ public class RowsCriteriaFactory extends AbstractCriteriaFactory implements ICri
     @Override
     public IFinishingCriteria getForwardFinishingCriteria() {
         IFinishingCriteria criteria = new CriteriaDownLayouterFinished();
-        if (additionalHeight != 0) {
-            criteria = new CriteriaUpAdditionalHeight(criteria, additionalHeight);
+        if (additionalLength != 0) {
+            criteria = new CriteriaDownAdditionalHeight(criteria, additionalLength);
         }
         if (additionalRowCount != 0) {
             criteria = new CriteriaAdditionalRow(criteria, additionalRowCount);

@@ -1,5 +1,7 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
+import android.view.View;
+
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.IScrollingController;
 import com.beloo.widget.chipslayoutmanager.VerticalScrollingController;
@@ -54,6 +56,16 @@ public class RowsStateFactory implements IStateFactory {
     @Override
     public IScrollingController scrollingController() {
         return new VerticalScrollingController(lm);
+    }
+
+    @Override
+    public int getStart(View view) {
+        return lm.getDecoratedTop(view);
+    }
+
+    @Override
+    public int getEnd(View view) {
+        return lm.getDecoratedBottom(view);
     }
 
     private AbstractLayouterFactory createLTRRowLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {

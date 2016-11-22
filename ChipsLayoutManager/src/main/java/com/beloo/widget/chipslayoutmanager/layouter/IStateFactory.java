@@ -1,5 +1,7 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
+import android.view.View;
+
 import com.beloo.widget.chipslayoutmanager.IScrollingController;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractCriteriaFactory;
@@ -17,4 +19,8 @@ public interface IStateFactory {
     IMeasureSupporter measureSupporter();
 
     IScrollingController scrollingController();
+
+    int getStart(View view);
+
+    int getEnd(View view);
 }

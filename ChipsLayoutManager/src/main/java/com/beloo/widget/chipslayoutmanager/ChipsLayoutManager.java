@@ -449,9 +449,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             //inside pre-layout stage. It is called when item animation reconstruction will be played
             //it is NOT called on layoutOrientation changes
 
-            int additionalHeight = calcDisappearingViewsHeight(recycler);
+            int additionalLength = calcDisappearingViewsLength(recycler);
             predictiveAnimationsLogger.heightOfCanvas(this);
-            predictiveAnimationsLogger.onSummarizedDeletingItemsHeightCalculated(additionalHeight);
+            predictiveAnimationsLogger.onSummarizedDeletingItemsHeightCalculated(additionalLength);
             anchorView = anchorFactory.getAnchor();
             anchorFactory.onPreLayout(anchorView, recycler);
             Log.w(TAG, "anchor state in pre-layout = " + anchorView);
@@ -460,7 +460,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             //in case removing draw additional rows to show predictive animations for appearing views
             AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
             criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
-            criteriaFactory.setAdditionalHeight(additionalHeight);
+            criteriaFactory.setAdditionalLength(additionalLength);
 
             AbstractLayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
@@ -521,9 +521,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
     }
 
-    DisappearingViewsContainer getDisappearingViews(RecyclerView.Recycler recycler) {
+    /** @return views which moved from screen, but not deleted*/
+    private DisappearingViewsContainer getDisappearingViews(RecyclerView.Recycler recycler) {
         final List<RecyclerView.ViewHolder> scrapList = recycler.getScrapList();
-        //views which moved from screen, but not deleted
         DisappearingViewsContainer container = new DisappearingViewsContainer();
 
         for (RecyclerView.ViewHolder holder : scrapList) {
@@ -542,11 +542,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
     /** during pre-layout calculate approximate height which will be free after moving items offscreen (removed or moved)
      * @return approximate height of disappearing views. Could be bigger, than accurate value. */
-    private int calcDisappearingViewsHeight(RecyclerView.Recycler recycler) {
-        int removedHeight = 0;
+    private int calcDisappearingViewsLength(RecyclerView.Recycler recycler) {
+        int removedLength = 0;
 
-        Integer minRemovedTop = Integer.MAX_VALUE;
-        Integer maxRemovedBottom = Integer.MIN_VALUE;
+        Integer minStart = Integer.MAX_VALUE;
+        Integer maxEnd = Integer.MIN_VALUE;
 
         for (View view : childViews) {
             RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) view.getLayoutParams();
@@ -563,16 +563,17 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             if (lp.isItemRemoved() || probablyMovedFromScreen) {
                 deletingItemsOnScreenCount++;
-                minRemovedTop = Math.min(minRemovedTop, getDecoratedTop(view));
-                maxRemovedBottom = Math.max(maxRemovedBottom, getDecoratedBottom(view));
+
+                minStart = Math.min(minStart, stateFactory.getStart(view));
+                maxEnd = Math.max(maxEnd, stateFactory.getEnd(view));
             }
         }
 
-        if (minRemovedTop != Integer.MAX_VALUE) {
-            removedHeight = maxRemovedBottom - minRemovedTop;
+        if (minStart != Integer.MAX_VALUE) {
+            removedLength = maxEnd - minStart;
         }
 
-        return removedHeight;
+        return removedLength;
     }
 
     /**
@@ -611,7 +612,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
                 if (leftView == null || getDecoratedLeft(view) < getDecoratedLeft(leftView)) {
                     leftView = view;
-                    Log.d("border left", "is " + getDecoratedLeft(view));
                 }
 
                 if (rightView == null || getDecoratedRight(view) > getDecoratedRight(rightView)) {
