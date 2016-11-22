@@ -12,4 +12,6 @@ public interface IStateFactory {
     AbstractCriteriaFactory createDefaultFinishingCriteriaFactory();
 
     IAnchorFactory createAnchorFactory();
+
+    IMeasureSupporter measureSupporter();
 }

@@ -45,6 +45,11 @@ public class ColumnsStateFactory implements IStateFactory {
         return new ColumnsAnchorFactory(lm, new Square(lm));
     }
 
+    @Override
+    public IMeasureSupporter measureSupporter() {
+        return new HorizontalMeasureSupporter(lm);
+    }
+
     //    private AbstractLayouterFactory createRTLColumnLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {
 //        return new RTLRowsLayouterFactory(lm, cacheStorage,
 //                new DecoratorBreakerFactory(cacheStorage, lm.getRowBreaker(), lm.getMaxViewsInRow(), new LTRColumnBreakerFactory()),

@@ -44,6 +44,11 @@ public class RowsStateFactory implements IStateFactory {
         return new RowsAnchorFactory(lm, new Square(lm));
     }
 
+    @Override
+    public IMeasureSupporter measureSupporter() {
+        return new VerticalMeasureSupporter(lm);
+    }
+
     private AbstractLayouterFactory createLTRRowLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {
         return new LTRRowsLayouterFactory(lm, cacheStorage,
                 new DecoratorBreakerFactory(cacheStorage, lm.getRowBreaker(), lm.getMaxViewsInRow(), new LTRRowBreakerFactory()),
