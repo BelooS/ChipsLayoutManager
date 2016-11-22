@@ -1,19 +1,16 @@
 package com.beloo.widget.chipslayoutmanager;
 
 import android.content.Context;
-import android.graphics.PointF;
 import android.graphics.Rect;
 import android.os.Parcelable;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
-import android.view.animation.LinearInterpolator;
 
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
@@ -61,7 +58,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /** iterable over views added to RecyclerView */
     private ChildViewsIterable childViews = new ChildViewsIterable(this);
 
-    //---- contract parameters
+    ///////////////////////////////////////////////////////////////////////////
+    // contract parameters
+    ///////////////////////////////////////////////////////////////////////////
     /** determine gravity of child inside row*/
     private IChildGravityResolver childGravityResolver;
     private boolean isScrollingEnabledContract = true;
@@ -86,7 +85,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     private ParcelableContainer container = new ParcelableContainer();
 
-    //---loggers below
+    ///////////////////////////////////////////////////////////////////////////
+    // loggers
+    ///////////////////////////////////////////////////////////////////////////
     private IFillLogger logger;
     private IAdapterActionsLogger adapterActionsLogger;
     private IPredictiveAnimationsLogger predictiveAnimationsLogger;
@@ -135,10 +136,21 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Nullable
     private Integer cacheNormalizationPosition = null;
 
+    ///////////////////////////////////////////////////////////////////////////
+    // state-dependent vars
+    ///////////////////////////////////////////////////////////////////////////
+    /** factory for state-dependent layouter factories*/
+    private IStateFactory stateFactory;
+
+    /** manage auto-measuring */
     private IMeasureSupporter measureSupporter;
 
     /** factory which could retrieve anchorView on which layouting based*/
     private IAnchorFactory anchorFactory;
+
+    /** manage scrolling of layout manager according to current state */
+    private IScrollingController scrollingController;
+    //--- end state-dependent vars
 
     /**
      * stored current anchor view due to scroll state changes
@@ -151,8 +163,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     /** factory for placers factories*/
     private PlacerFactory placerFactory = new PlacerFactory(this);
-    /** factory for state-dependent layouter factories*/
-    private IStateFactory stateFactory;
 
     private ChipsLayoutManager(Context context) {
         @DeviceOrientation
@@ -304,8 +314,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             }
 
             stateFactory = layoutOrientation == ROWS? new RowsStateFactory(ChipsLayoutManager.this) : new ColumnsStateFactory(ChipsLayoutManager.this);
-            anchorFactory = stateFactory.createAnchorFactory();
+            anchorFactory = stateFactory.anchorFactory();
             measureSupporter = stateFactory.measureSupporter();
+            scrollingController = stateFactory.scrollingController();
             anchorView = anchorFactory.createNotFound();
 
             return ChipsLayoutManager.this;
@@ -784,21 +795,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return false;
     }
 
-    private View getBorderRightView() {
-        int maxRight = Integer.MIN_VALUE;
-        View rightest = null;
-
-        for (View view : childViews) {
-            int viewRight = getDecoratedRight(view);
-            if (maxRight < viewRight) {
-                rightest = view;
-                maxRight = viewRight;
-            }
-        }
-
-        return rightest;
-    }
-
     /** calculate dx, stop scrolling whether items bounds reached*/
     private int onContentScrolledRight(int dx) {
         int childCount = getChildCount();
@@ -810,7 +806,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
             delta = dx;
         } else { //in case lower view is the last view in adapter and wouldn't be any other view below
-            int viewRight = getDecoratedRight(getBorderRightView());
+            int viewRight = getDecoratedRight(rightView);
             int parentRight = getWidth() - getPaddingRight();
             int distance = viewRight - parentRight;
             delta = Math.min(distance, dx);
@@ -1024,31 +1020,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return;
         }
 
-        LinearSmoothScroller scroller = new LinearSmoothScroller(recyclerView.getContext()) {
-            /*
-             * LinearSmoothScroller, at a minimum, just need to know the vector
-             * (x/y distance) to travel in order to get from the current positioning
-             * to the target.
-             */
-            @Override
-            public PointF computeScrollVectorForPosition(int targetPosition) {
-                int visiblePosition = anchorView.getPosition();
-                //determine scroll up or scroll down needed
-                return new PointF(0, position > visiblePosition ? 1 : -1);
-            }
-
-            @Override
-            protected void onTargetFound(View targetView, RecyclerView.State state, Action action) {
-                super.onTargetFound(targetView, state, action);
-                int desiredTop = getPaddingTop();
-                int currentTop = getDecoratedTop(targetView);
-
-                int dy = currentTop - desiredTop;
-
-                //perform fit animation to move target view at top of layout
-                action.update(0, dy, 50, new LinearInterpolator());
-            }
-        };
+        RecyclerView.SmoothScroller scroller = scrollingController.createSmoothScroller(recyclerView.getContext(), position, 150, anchorView);
         scroller.setTargetPosition(position);
         startSmoothScroll(scroller);
     }

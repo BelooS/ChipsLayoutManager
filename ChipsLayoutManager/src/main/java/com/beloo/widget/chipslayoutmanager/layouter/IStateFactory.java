@@ -1,5 +1,6 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
+import com.beloo.widget.chipslayoutmanager.IScrollingController;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
@@ -11,7 +12,9 @@ public interface IStateFactory {
 
     AbstractCriteriaFactory createDefaultFinishingCriteriaFactory();
 
-    IAnchorFactory createAnchorFactory();
+    IAnchorFactory anchorFactory();
 
     IMeasureSupporter measureSupporter();
+
+    IScrollingController scrollingController();
 }

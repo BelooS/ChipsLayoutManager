@@ -1,6 +1,8 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.chipslayoutmanager.HorizontalScrollingController;
+import com.beloo.widget.chipslayoutmanager.IScrollingController;
 import com.beloo.widget.chipslayoutmanager.anchor.ColumnsAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
@@ -41,13 +43,18 @@ public class ColumnsStateFactory implements IStateFactory {
     }
 
     @Override
-    public IAnchorFactory createAnchorFactory() {
+    public IAnchorFactory anchorFactory() {
         return new ColumnsAnchorFactory(lm, new Square(lm));
     }
 
     @Override
     public IMeasureSupporter measureSupporter() {
         return new HorizontalMeasureSupporter(lm);
+    }
+
+    @Override
+    public IScrollingController scrollingController() {
+        return new HorizontalScrollingController(lm);
     }
 
     //    private AbstractLayouterFactory createRTLColumnLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {
