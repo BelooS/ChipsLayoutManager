@@ -527,16 +527,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         //views which moved from screen, but not deleted
         DisappearingViewsContainer container = new DisappearingViewsContainer();
 
-        int highestViewPosition = getPosition(topView);
-        int lowestViewPosition = getPosition(bottomView);
-
         for (RecyclerView.ViewHolder holder : scrapList) {
             final View child = holder.itemView;
             final RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) child.getLayoutParams();
             if (!lp.isItemRemoved()) {
-                if (lp.getViewAdapterPosition() < highestViewPosition) {
+                if (lp.getViewAdapterPosition() < minPositionOnScreen) {
                     container.backwardViews.put(lp.getViewAdapterPosition(), child);
-                } else if (lp.getViewAdapterPosition() > lowestViewPosition) {
+                } else if (lp.getViewAdapterPosition() > maxPositionOnScreen) {
                     container.forwardViews.put(lp.getViewAdapterPosition(), child);
                 }
             }
@@ -742,7 +739,23 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public boolean canScrollHorizontally() {
-        return layoutOrientation() != ROWS && isScrollingEnabledContract;
+        if (layoutOrientation() == ROWS) return false;
+
+        if (getChildCount() > 0) {
+            int left = getDecoratedTop(leftView);
+            int right = getDecoratedBottom(rightView);
+
+            if (minPositionOnScreen == 0
+                    && maxPositionOnScreen == getItemCount() - 1
+                    && left >= getPaddingLeft()
+                    && right <= getWidth() - getPaddingRight()) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+        return isScrollingEnabledContract;
     }
 
     @Override
@@ -860,17 +873,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         findBorderViews();
         if (getChildCount() > 0) {
-            View view = getChildAt(0);
-            View lastChild = getChildAt(getChildCount() - 1);
-
-            int firstViewPosition = getPosition(view);
-            int lastViewPosition = getPosition(lastChild);
-
             int top = getDecoratedTop(topView);
             int bottom = getDecoratedBottom(bottomView);
 
-            if (firstViewPosition == 0
-                    && lastViewPosition == getItemCount() - 1
+            if (minPositionOnScreen == 0
+                    && maxPositionOnScreen == getItemCount() - 1
                     && top >= getPaddingTop()
                     && bottom <= getHeight() - getPaddingBottom()) {
                 return false;
