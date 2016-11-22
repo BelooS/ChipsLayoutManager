@@ -721,9 +721,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public boolean canScrollHorizontally() {
         if (layoutOrientation() == ROWS) return false;
 
+        findBorderViews();
         if (getChildCount() > 0) {
-            int left = getDecoratedTop(leftView);
-            int right = getDecoratedBottom(rightView);
+            int left = getDecoratedLeft(leftView);
+            int right = getDecoratedRight(rightView);
 
             if (minPositionOnScreen == 0
                     && maxPositionOnScreen == getItemCount() - 1

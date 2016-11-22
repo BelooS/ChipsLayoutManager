@@ -50,7 +50,7 @@ public class ColumnsAnchorFactory extends AbstractAnchorFactory {
 
         if (!minPosView.isNotFoundState()) {
             minPosView.getAnchorViewRect().left = minLeft;
-            minPosView.getAnchorViewRect().right = 0;
+//            minPosView.getAnchorViewRect().right = 0;
             minPosView.setPosition(minPosition);
         }
 
