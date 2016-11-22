@@ -50,6 +50,9 @@ public class RowsAnchorFactory extends AbstractAnchorFactory {
 
         if (!minPosView.isNotFoundState()) {
             minPosView.getAnchorViewRect().top = minTop;
+            /* we don't need bottom coordinate for layouter
+            also this helps to normalize row properly when anchor deleted and was the biggest view in a row
+            */
             minPosView.getAnchorViewRect().bottom = 0;
             minPosView.setPosition(minPosition);
         }
@@ -58,7 +61,12 @@ public class RowsAnchorFactory extends AbstractAnchorFactory {
     }
 
     @Override
-    public void afterPreLayout(AnchorViewState anchorView, RecyclerView.Recycler recycler) {
+    public boolean normalize(AnchorViewState anchor) {
+        return false;
+    }
+
+    @Override
+    public void onPreLayout(AnchorViewState anchorView, RecyclerView.Recycler recycler) {
 
     }
 

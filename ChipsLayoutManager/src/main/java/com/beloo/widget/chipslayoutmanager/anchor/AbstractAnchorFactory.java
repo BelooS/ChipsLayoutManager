@@ -10,9 +10,15 @@ abstract class AbstractAnchorFactory implements IAnchorFactory {
     RecyclerView.LayoutManager lm;
     private ICanvas canvas;
 
+    RecyclerView.Recycler recycler;
+
     AbstractAnchorFactory(RecyclerView.LayoutManager lm, ICanvas canvas) {
         this.lm = lm;
         this.canvas = canvas;
+    }
+
+    public void setRecycler(RecyclerView.Recycler recycler) {
+        this.recycler = recycler;
     }
 
     public Rect getCanvasRect() {

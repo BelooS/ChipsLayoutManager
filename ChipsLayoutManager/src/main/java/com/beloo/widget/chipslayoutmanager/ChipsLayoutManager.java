@@ -409,6 +409,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return;
         }
 
+        anchorFactory.setRecycler(recycler);
+
         predictiveAnimationsLogger.logState(state);
 
         if (isLayoutRTL() != isLayoutRTL) {
@@ -451,6 +453,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             predictiveAnimationsLogger.heightOfCanvas(this);
             predictiveAnimationsLogger.onSummarizedDeletingItemsHeightCalculated(additionalHeight);
             anchorView = anchorFactory.getAnchor();
+            anchorFactory.onPreLayout(anchorView, recycler);
             Log.w(TAG, "anchor state in pre-layout = " + anchorView);
             detachAndScrapAttachedViews(recycler);
 
@@ -463,12 +466,17 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             fill(recycler, layouterFactory, anchorView, false);
 
-            anchorFactory.afterPreLayout(anchorView, recycler);
         }
 
         deletingItemsOnScreenCount = 0;
 
         measureSupporter.afterOnLayoutChildren();
+
+        //we should re-layout if previous anchor was removed or moved.
+        anchorView = anchorFactory.getAnchor();
+        if (anchorFactory.normalize(anchorView)) {
+            requestLayoutWithAnimations();
+        }
     }
 
     /** layout disappearing view to support predictive animations */
@@ -603,6 +611,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
                 if (leftView == null || getDecoratedLeft(view) < getDecoratedLeft(leftView)) {
                     leftView = view;
+                    Log.d("border left", "is " + getDecoratedLeft(view));
                 }
 
                 if (rightView == null || getDecoratedRight(view) > getDecoratedRight(rightView)) {
@@ -654,8 +663,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         fillWithLayouter(recycler, downLayouter);
 
-        findBorderViews();
-
         logger.onAfterLayouter();
         //move to trash everything, which haven't used in this layout cycle
         //that views gone from a screen or was removed outside from adapter
@@ -666,6 +673,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         viewCache.clear();
         logger.onAfterRemovingViews();
+
+        findBorderViews();
 
         if (isLayoutDisappearing) {
             layoutDisappearingViews(recycler, upLayouter, downLayouter);
@@ -754,6 +763,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
         dx = scrollHorizontallyInternal(dx);
         offsetChildrenHorizontal(-dx);
+
+        anchorFactory.setRecycler(recycler);
 
         scrollingLogger.logChildCount(getChildCount());
 
@@ -873,6 +884,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
         dy = scrollVerticallyInternal(dy);
         offsetChildrenVertical(-dy);
+        anchorFactory.setRecycler(recycler);
         anchorView = anchorFactory.getAnchor();
 
         scrollingLogger.logChildCount(getChildCount());

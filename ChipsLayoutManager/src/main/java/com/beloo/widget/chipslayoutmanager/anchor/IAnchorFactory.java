@@ -11,6 +11,10 @@ public interface IAnchorFactory {
 
     AnchorViewState createNotFound();
 
+    boolean normalize(AnchorViewState anchor);
+
     /** modify anchorView state according to pre-layout state */
-    void afterPreLayout(AnchorViewState anchorView, RecyclerView.Recycler recycler);
+    void onPreLayout(AnchorViewState anchorView, RecyclerView.Recycler recycler);
+
+    void setRecycler(RecyclerView.Recycler recycler);
 }

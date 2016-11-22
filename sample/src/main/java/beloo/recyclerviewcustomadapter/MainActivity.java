@@ -149,14 +149,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onDeleteClicked(View view) {
-//        int position = spinnerPosition.getSelectedItemPosition();
-//        if (position == Spinner.INVALID_POSITION)
-//            return;
-//        items.remove(position);
-//        Log.i("activity", "delete at " + position);
-//        adapter.notifyItemRemoved(position);
-//        updateSpinners();
-        rvTest.scrollToPosition(36);
+        int position = spinnerPosition.getSelectedItemPosition();
+        if (position == Spinner.INVALID_POSITION)
+            return;
+        items.remove(position);
+        Log.i("activity", "delete at " + position);
+        adapter.notifyItemRemoved(position);
+        updateSpinners();
     }
 
     public void onMoveClicked(View view) {
