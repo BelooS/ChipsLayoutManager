@@ -2,7 +2,7 @@ package com.beloo.widget.chipslayoutmanager.layouter.breaker;
 
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouter;
 
-public class BackwardColumnBreaker implements ILayoutRowBreaker {
+public class LTRBackwardColumnBreaker implements ILayoutRowBreaker {
 
     @Override
     public boolean isRowBroke(AbstractLayouter al) {
