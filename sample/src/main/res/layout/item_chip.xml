@@ -80,7 +80,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginBottom="4dp"
         android:layout_marginTop="4dp"
-        android:maxWidth="110dp"
+        android:maxWidth="150dp"
         android:visibility="gone"
         tools:text="Trevor Hansen is our best friend"
         />

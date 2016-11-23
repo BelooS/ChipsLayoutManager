@@ -83,7 +83,7 @@ ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
                 return position == 6 || position == 11 || position == 2;
             }
         })
-        //an layoutOrientation of layout manager, horizontal by default
+        //an layoutOrientation of layout manager, could be VERTICAL OR HORIZONTAL. HORIZONTAL by default
         .setOrientation(ChipsLayoutManager.HORIZONTAL)
         .build();
 rv.setLayoutManager(chipsLayoutManager);
