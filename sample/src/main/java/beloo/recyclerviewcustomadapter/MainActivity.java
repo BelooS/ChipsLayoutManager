@@ -70,18 +70,6 @@ public class MainActivity extends AppCompatActivity {
         adapter = createAdapter(savedInstanceState);
 
         ChipsLayoutManager spanLayoutManager = ChipsLayoutManager.newBuilder(this)
-                //set vertical gravity for all items in a row. Default = Gravity.CENTER_VERTICAL
-                .setChildGravity(Gravity.TOP)
-                //whether RecyclerView can scroll
-                .setScrollingEnabled(true)
-                //set gravity resolver where you can determine gravity for item in position. This method have priority over previous one
-                .setGravityResolver(new IChildGravityResolver() {
-                    @Override
-                    public int getItemGravity(int position) {
-                        return Gravity.CENTER;
-                    }
-                })
-                //an layoutOrientation of layout manager, horizontal by default
                 .setOrientation(ChipsLayoutManager.HORIZONTAL)
                 .build();
 
