@@ -44,9 +44,9 @@ import java.util.List;
 
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract, IStateHolder {
     @SuppressWarnings("WeakerAccess")
-    public static final int ROWS = 1;
+    public static final int HORIZONTAL = 1;
     @SuppressWarnings("WeakerAccess")
-    public static final int COLUMNS = 2;
+    public static final int VERTICAL = 2;
 
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
     private static final int INT_ROW_SIZE_APPROXIMATELY_FOR_CACHE = 10;
@@ -94,8 +94,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private IPredictiveAnimationsLogger predictiveAnimationsLogger;
     private IScrollingLogger scrollingLogger;
     @Orientation
-    /** layoutOrientation of layout. Could have ROWS or COLUMNS style */
-    private int layoutOrientation = ROWS;
+    /** layoutOrientation of layout. Could have HORIZONTAL or VERTICAL style */
+    private int layoutOrientation = HORIZONTAL;
     //--- end loggers
 
 
@@ -292,10 +292,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return this;
         }
 
-        /** @param orientation of layout manager. Could be {@link #ROWS} or {@link #COLUMNS}
-         * {@link #ROWS} by default */
+        /** @param orientation of layout manager. Could be {@link #HORIZONTAL} or {@link #VERTICAL}
+         * {@link #HORIZONTAL} by default */
         public Builder setOrientation(@Orientation int orientation) {
-            if (orientation != ROWS && orientation != COLUMNS) {
+            if (orientation != HORIZONTAL && orientation != VERTICAL) {
                 return this;
             }
             ChipsLayoutManager.this.layoutOrientation = orientation;
@@ -315,7 +315,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 }
             }
 
-            stateFactory = layoutOrientation == ROWS? new RowsStateFactory(ChipsLayoutManager.this) : new ColumnsStateFactory(ChipsLayoutManager.this);
+            stateFactory = layoutOrientation == HORIZONTAL ? new RowsStateFactory(ChipsLayoutManager.this) : new ColumnsStateFactory(ChipsLayoutManager.this);
             anchorFactory = stateFactory.anchorFactory();
             scrollingController = stateFactory.scrollingController();
             anchorView = anchorFactory.createNotFound();
@@ -742,7 +742,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public boolean canScrollHorizontally() {
-        if (layoutOrientation() == ROWS) return false;
+        if (layoutOrientation() == HORIZONTAL) return false;
 
         findBorderViews();
         if (getChildCount() > 0) {
@@ -860,7 +860,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     @Override
     public boolean canScrollVertically() {
-        if (layoutOrientation() == COLUMNS) return false;
+        if (layoutOrientation() == VERTICAL) return false;
 
         findBorderViews();
         if (getChildCount() > 0) {

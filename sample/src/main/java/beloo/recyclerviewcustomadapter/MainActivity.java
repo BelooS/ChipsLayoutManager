@@ -2,7 +2,6 @@ package beloo.recyclerviewcustomadapter;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
@@ -11,7 +10,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
-import com.beloo.widget.chipslayoutmanager.IStateHolder;
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 
@@ -83,8 +81,8 @@ public class MainActivity extends AppCompatActivity {
                         return Gravity.CENTER;
                     }
                 })
-                //an layoutOrientation of layout manager
-                .setOrientation(ChipsLayoutManager.COLUMNS)
+                //an layoutOrientation of layout manager, horizontal by default
+                .setOrientation(ChipsLayoutManager.HORIZONTAL)
                 .build();
 
         rvTest.addItemDecoration(new SpacingItemDecoration(getResources().getDimensionPixelOffset(R.dimen.item_space),

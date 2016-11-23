@@ -16,7 +16,7 @@ but with support of CRUD animations i decided to make such stuff and share it.
 
 with gradle
 ```GRADLE 
-compile 'com.beloo.widget:ChipsLayoutManager:0.2.4@aar'
+compile 'com.beloo.widget:ChipsLayoutManager:0.3.0@aar'
 ```
 
 Assuming you have installed jCenter provider:
@@ -54,8 +54,8 @@ or custom `FlowLayout`s.
 
 |  | Left to Right  | Right to Left  |
 |---|---|---|
-|   <b>Rows</b>  |![Left to Right implementation of ChipsLayoutManager](/images/ltr.png) |![Right to Left implementation of ChipsLayoutManager](/images/rtl.png)|
-| <b>Columns</b> |![Left to Right implementation of ChipsLayoutManager](/images/ltr.png) | haven't implemented|
+|   <b>Rows</b>  |![Left to Right Rows implementation of ChipsLayoutManager](/images/ltr.png) |![Right to Left implementation of ChipsLayoutManager](/images/rtl.png)|
+| <b>Columns</b> |![Left to Right Columns implementation of ChipsLayoutManager](/images/ltr.png) ||
 
 </center>
 
@@ -83,6 +83,8 @@ ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
                 return position == 6 || position == 11 || position == 2;
             }
         })
+        //an layoutOrientation of layout manager, horizontal by default
+        .setOrientation(ChipsLayoutManager.HORIZONTAL)
         .build();
 rv.setLayoutManager(chipsLayoutManager);
 ```
