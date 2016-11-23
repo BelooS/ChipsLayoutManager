@@ -70,10 +70,24 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /** determines whether LM should break row from view position */
     private IRowBreaker rowBreaker = new EmptyRowBreaker();
     //--- end contract parameters
+    @Orientation
+    /** layoutOrientation of layout. Could have HORIZONTAL or VERTICAL style */
+    private int layoutOrientation = HORIZONTAL;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // cache
+    ///////////////////////////////////////////////////////////////////////////
 
     /** store positions of placed view to know when LM should break row while moving back
      * this cache mostly needed to place views when scrolling down to the same places, where they have been previously */
     private IViewCacheStorage viewPositionsStorage;
+
+    /**
+     * when scrolling reached this position {@link ChipsLayoutManager} is able to restore items layout according to cached items with positions above.
+     * That layout would exactly correspond to current item view situation
+     */
+    @Nullable
+    private Integer cacheNormalizationPosition = null;
 
     /**
      * store detached views to probably reattach it if them still visible.
@@ -93,16 +107,27 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private IAdapterActionsLogger adapterActionsLogger;
     private IPredictiveAnimationsLogger predictiveAnimationsLogger;
     private IScrollingLogger scrollingLogger;
-    @Orientation
-    /** layoutOrientation of layout. Could have HORIZONTAL or VERTICAL style */
-    private int layoutOrientation = HORIZONTAL;
     //--- end loggers
-
 
     /**
      * is layout in RTL mode. Variable needed to detect mode changes
      */
     private boolean isLayoutRTL = false;
+
+    /**
+     * current device layoutOrientation
+     */
+    @DeviceOrientation
+    private int orientation;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // borders
+    ///////////////////////////////////////////////////////////////////////////
+
+    /**
+     * stored current anchor view due to scroll state changes
+     */
+    private AnchorViewState anchorView;
 
     /**
      * highest view in layout. Have always actual value, because it set in {@link #onLayoutChildren}
@@ -124,21 +149,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private Integer minPositionOnScreen;
     private Integer maxPositionOnScreen;
 
-    /**
-     * current device layoutOrientation
-     */
-    @DeviceOrientation
-    private int orientation;
-
-    /**
-     * when scrolling reached this position {@link ChipsLayoutManager} is able to restore items layout according to cached items with positions above.
-     * That layout would exactly correspond to current item view situation
-     */
-    @Nullable
-    private Integer cacheNormalizationPosition = null;
-
     ///////////////////////////////////////////////////////////////////////////
-    // state-dependent vars
+    // state-dependent
     ///////////////////////////////////////////////////////////////////////////
     /** factory for state-dependent layouter factories*/
     private IStateFactory stateFactory;
@@ -152,11 +164,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /** manage scrolling of layout manager according to current state */
     private IScrollingController scrollingController;
     //--- end state-dependent vars
-
-    /**
-     * stored current anchor view due to scroll state changes
-     */
-    private AnchorViewState anchorView;
 
     /* in pre-layouter drawing we need item count with items will be actually deleted to pre-draw appearing items properly
     * buf value*/
