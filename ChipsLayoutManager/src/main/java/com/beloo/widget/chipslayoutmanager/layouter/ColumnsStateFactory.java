@@ -50,11 +50,6 @@ public class ColumnsStateFactory implements IStateFactory {
     }
 
     @Override
-    public IMeasureSupporter measureSupporter() {
-        return new HorizontalMeasureSupporter(lm);
-    }
-
-    @Override
     public IScrollingController scrollingController() {
         return new HorizontalScrollingController(lm);
     }

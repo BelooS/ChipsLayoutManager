@@ -17,6 +17,7 @@ import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.ColumnsStateFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.IMeasureSupporter;
 import com.beloo.widget.chipslayoutmanager.layouter.IStateFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.MeasureSupporter;
 import com.beloo.widget.chipslayoutmanager.layouter.RowsStateFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.EmptyRowBreaker;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IRowBreaker;
@@ -176,6 +177,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         scrollingLogger = loggerFactory.getScrollingLogger();
 
         viewPositionsStorage = new ViewCacheFactory(this).createCacheStorage();
+        measureSupporter = new MeasureSupporter(this);
         setAutoMeasureEnabled(true);
     }
 
@@ -315,7 +317,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             stateFactory = layoutOrientation == ROWS? new RowsStateFactory(ChipsLayoutManager.this) : new ColumnsStateFactory(ChipsLayoutManager.this);
             anchorFactory = stateFactory.anchorFactory();
-            measureSupporter = stateFactory.measureSupporter();
             scrollingController = stateFactory.scrollingController();
             anchorView = anchorFactory.createNotFound();
 
@@ -470,7 +471,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         deletingItemsOnScreenCount = 0;
 
-        measureSupporter.afterOnLayoutChildren();
+        if (!state.isMeasuring()) {
+            measureSupporter.onSizeChanged();
+        }
 
         //we should re-layout if previous anchor was removed or moved.
         anchorView = anchorFactory.getAnchor();
@@ -1037,13 +1040,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         startSmoothScroll(scroller);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void onMeasure(RecyclerView.Recycler recycler, RecyclerView.State state, int widthSpec, int heightSpec) {
-        super.onMeasure(recycler, state, widthSpec, heightSpec);
-        measureSupporter.onMeasure(recycler, state, widthSpec, heightSpec);
+    public void setMeasuredDimension(int widthSize, int heightSize) {
+        measureSupporter.measure(widthSize, heightSize);
+        super.setMeasuredDimension(measureSupporter.getMeasuredWidth(), measureSupporter.getMeasuredHeight());
     }
 
     /**

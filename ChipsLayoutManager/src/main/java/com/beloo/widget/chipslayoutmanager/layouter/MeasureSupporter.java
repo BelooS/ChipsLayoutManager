@@ -1,13 +1,81 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
+import android.support.annotation.CallSuper;
 import android.support.v7.widget.RecyclerView;
 
-abstract class MeasureSupporter extends RecyclerView.AdapterDataObserver implements IMeasureSupporter {
+public class MeasureSupporter extends RecyclerView.AdapterDataObserver implements IMeasureSupporter {
 
     RecyclerView.LayoutManager lm;
+    private boolean isAfterRemoving;
 
-    MeasureSupporter(RecyclerView.LayoutManager lm) {
+    private int measuredWidth;
+    private int measuredHeight;
+
+
+    /**
+     * width of RecyclerView before removing item
+     */
+    private Integer beforeRemovingWidth = null;
+
+    /**
+     * width which we receive after {@link RecyclerView.LayoutManager#onLayoutChildren} method finished.
+     * Contains correct width after auto-measuring
+     */
+    private int autoMeasureWidth = 0;
+
+    /**
+     * height of RecyclerView before removing item
+     */
+    private Integer beforeRemovingHeight = null;
+
+    /**
+     * height which we receive after {@link RecyclerView.LayoutManager#onLayoutChildren} method finished.
+     * Contains correct height after auto-measuring
+     */
+    private int autoMeasureHeight = 0;
+
+    public MeasureSupporter(RecyclerView.LayoutManager lm) {
         this.lm = lm;
+    }
+
+    @Override
+    public void onSizeChanged() {
+        autoMeasureWidth = lm.getWidth();
+        autoMeasureHeight = lm.getHeight();
+    }
+
+    boolean isAfterRemoving() {
+        return isAfterRemoving;
+    }
+
+    @Override
+    public int getMeasuredWidth() {
+        return measuredWidth;
+    }
+
+    private void setMeasuredWidth(int measuredWidth) {
+        this.measuredWidth = measuredWidth;
+    }
+
+    @Override
+    public int getMeasuredHeight() {
+        return measuredHeight;
+    }
+
+    private void setMeasuredHeight(int measuredHeight) {
+        this.measuredHeight = measuredHeight;
+    }
+
+    @Override
+    @CallSuper
+    public void measure(int autoWidth, int autoHeight) {
+        if (isAfterRemoving()) {
+            setMeasuredWidth(Math.max(autoWidth, beforeRemovingWidth));
+            setMeasuredHeight(Math.max(autoHeight, beforeRemovingHeight));
+        } else {
+            setMeasuredWidth(autoWidth);
+            setMeasuredHeight(autoHeight);
+        }
     }
 
     @Override
@@ -21,8 +89,8 @@ abstract class MeasureSupporter extends RecyclerView.AdapterDataObserver impleme
                     @Override
                     public void onAnimationsFinished() {
                         //when removing animation finished return auto-measuring back
-                        lm.setAutoMeasureEnabled(true);
-                        // and process onMeasure again
+                        isAfterRemoving = false;
+                        // and process measure again
                         lm.requestLayout();
                     }
                 });
@@ -30,4 +98,16 @@ abstract class MeasureSupporter extends RecyclerView.AdapterDataObserver impleme
         });
     }
 
+    @Override
+    @CallSuper
+    public void onItemRangeRemoved(int positionStart, int itemCount) {
+        super.onItemRangeRemoved(positionStart, itemCount);
+        /** we detected removing event, so should process measuring manually
+         * @see <a href="http://stackoverflow.com/questions/40242011/custom-recyclerviews-layoutmanager-automeasuring-after-animation-finished-on-i">Stack Overflow issue</a>
+         */
+        isAfterRemoving = true;
+
+        beforeRemovingWidth = autoMeasureWidth;
+        beforeRemovingHeight = autoMeasureHeight;
+    }
 }

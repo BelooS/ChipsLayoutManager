@@ -16,8 +16,6 @@ public interface IStateFactory {
 
     IAnchorFactory anchorFactory();
 
-    IMeasureSupporter measureSupporter();
-
     IScrollingController scrollingController();
 
     int getStart(View view);

@@ -5,7 +5,11 @@ import android.support.v7.widget.RecyclerView;
 public interface IMeasureSupporter {
     void onItemsRemoved(RecyclerView recyclerView);
 
-    void afterOnLayoutChildren();
+    void onSizeChanged();
 
-    void onMeasure(RecyclerView.Recycler recycler, RecyclerView.State state, int widthSpec, int heightSpec);
+    void measure(int autoWidth, int autoHeight);
+
+    int getMeasuredWidth();
+
+    int getMeasuredHeight();
 }

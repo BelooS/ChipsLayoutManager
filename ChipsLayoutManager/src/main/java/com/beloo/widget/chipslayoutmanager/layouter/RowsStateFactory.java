@@ -49,11 +49,6 @@ public class RowsStateFactory implements IStateFactory {
     }
 
     @Override
-    public IMeasureSupporter measureSupporter() {
-        return new VerticalMeasureSupporter(lm);
-    }
-
-    @Override
     public IScrollingController scrollingController() {
         return new VerticalScrollingController(lm);
     }
