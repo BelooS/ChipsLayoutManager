@@ -54,7 +54,7 @@ or custom `FlowLayout`s.
 
 |  | Left to Right  | Right to Left  |
 |---|---|---|
-|  <b>Horizontal</b> |![Left to Right Rows implementation of ChipsLayoutManager](/images/ltr.png) |![Right to Left implementation of ChipsLayoutManager](/images/rtl.png)|
+|  <b>Horizontal</b> |![Left to Right Rows implementation of ChipsLayoutManager](/images/ltr_horizontal.png) |![Right to Left implementation of ChipsLayoutManager](/images/rtl_horizontal.png)|
 |  <b>Vertical</b>   |![Left to Right Columns implementation of ChipsLayoutManager](/images/ltr_vertical.png) ||
 
 </center>
