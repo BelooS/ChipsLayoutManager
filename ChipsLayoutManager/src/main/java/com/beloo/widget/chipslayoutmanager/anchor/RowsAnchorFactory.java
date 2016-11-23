@@ -53,7 +53,6 @@ public class RowsAnchorFactory extends AbstractAnchorFactory {
             /* we don't need bottom coordinate for layouter
             also this helps to normalize row properly when anchor deleted and was the biggest view in a row
             */
-            minPosView.getAnchorViewRect().bottom = 0;
             minPosView.setPosition(minPosition);
         }
 
@@ -61,7 +60,15 @@ public class RowsAnchorFactory extends AbstractAnchorFactory {
     }
 
     @Override
-    public boolean normalize(AnchorViewState anchor) {
+    public boolean normalize(AnchorViewState anchorView) {
+        if (!anchorView.isNotFoundState() && anchorView.getAnchorViewRect().top > lm.getPaddingTop()) {
+            if (!anchorView.isNotFoundState()) {
+                int d = anchorView.getAnchorViewRect().top - lm.getPaddingTop();
+                anchorView.getAnchorViewRect().top -= d;
+                anchorView.getAnchorViewRect().bottom -= d;
+            }
+            return true;
+        }
         return false;
     }
 
