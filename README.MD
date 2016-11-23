@@ -52,9 +52,10 @@ or custom `FlowLayout`s.
 ###Layout Directions
 <center>
 
-| Left to Right  | Right to Left  |
-|---|---|
-|![Left to Right implementation of ChipsLayoutManager](/images/ltr.png) |![Right to Left implementation of ChipsLayoutManager](/images/rtl.png)|
+|  | Left to Right  | Right to Left  |
+|---|---|---|
+|   <b>Rows</b>  |![Left to Right implementation of ChipsLayoutManager](/images/ltr.png) |![Right to Left implementation of ChipsLayoutManager](/images/rtl.png)|
+| <b>Columns</b> |![Left to Right implementation of ChipsLayoutManager](/images/ltr.png) | haven't implemented|
 
 </center>
 
