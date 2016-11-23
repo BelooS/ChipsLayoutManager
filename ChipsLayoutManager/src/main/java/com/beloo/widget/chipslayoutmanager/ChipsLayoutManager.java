@@ -149,6 +149,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private Integer minPositionOnScreen;
     private Integer maxPositionOnScreen;
 
+    private boolean isFirstItemAdded;
+
     ///////////////////////////////////////////////////////////////////////////
     // state-dependent
     ///////////////////////////////////////////////////////////////////////////
@@ -608,6 +610,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         minPositionOnScreen = null;
         maxPositionOnScreen = null;
 
+        isFirstItemAdded = false;
+
         if (getChildCount() > 0) {
             for (View view : childViews) {
                 int position = getPosition(view);
@@ -634,6 +638,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
                 if (maxPositionOnScreen == null || position > maxPositionOnScreen) {
                     maxPositionOnScreen = position;
+                }
+
+                if (position == 0) {
+                    isFirstItemAdded = true;
                 }
             }
         }
@@ -807,15 +815,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return delta;
     }
 
-    private boolean isZeroViewAdded() {
-        for (View view : childViews) {
-            if (getPosition(view) == 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /** calculate dx, stop scrolling whether items bounds reached*/
     private int onContentScrolledRight(int dx) {
         int childCount = getChildCount();
@@ -840,7 +839,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         int delta;
         AnchorViewState state = anchorFactory.getAnchor();
 
-        if (!isZeroViewAdded()) { //in case 0 position haven't added in layout yet
+        if (!isFirstItemAdded) { //in case 0 position haven't added in layout yet
             delta = dx;
         } else {
 
