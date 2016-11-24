@@ -69,12 +69,12 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
-    int getStart() {
+    int getStartRowBorder() {
         return getViewTop();
     }
 
     @Override
-    int getEnd() {
+    int getEndRowBorder() {
         return getViewBottom();
     }
 

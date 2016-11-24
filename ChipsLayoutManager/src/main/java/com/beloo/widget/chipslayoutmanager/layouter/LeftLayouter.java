@@ -77,12 +77,12 @@ class LeftLayouter extends AbstractLayouter {
     }
 
     @Override
-    int getStart() {
+    int getStartRowBorder() {
         return getViewLeft();
     }
 
     @Override
-    int getEnd() {
+    int getEndRowBorder() {
         return getViewRight();
     }
 

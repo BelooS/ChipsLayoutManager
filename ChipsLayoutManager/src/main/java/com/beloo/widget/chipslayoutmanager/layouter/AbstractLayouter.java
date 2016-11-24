@@ -17,7 +17,6 @@ import com.beloo.widget.chipslayoutmanager.SpanLayoutChildGravity;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.ILayoutRowBreaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
-import com.beloo.widget.chipslayoutmanager.gravity.RowGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifier;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
@@ -42,7 +41,9 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     private int rowSize = 0;
     private int previousRowSize;
 
-    //--- input dependencies
+    ///////////////////////////////////////////////////////////////////////////
+    // input dependencies
+    ///////////////////////////////////////////////////////////////////////////
     private ChipsLayoutManager layoutManager;
     private IViewCacheStorage cacheStorage;
     private ICanvas canvas;
@@ -266,7 +267,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         @SpanLayoutChildGravity
         int viewGravity = childGravityResolver.getItemGravity(getLayoutManager().getPosition(view));
         IGravityModifier gravityModifier = gravityModifiersFactory.getGravityModifier(viewGravity);
-        gravityModifier.modifyChildRect(getStart(), getEnd(), viewRect);
+        gravityModifier.modifyChildRect(getStartRowBorder(), getEndRowBorder(), viewRect);
     }
 
     public ChipsLayoutManager getLayoutManager() {
@@ -282,9 +283,9 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         return viewTop;
     }
 
-    abstract int getStart();
+    abstract int getStartRowBorder();
 
-    abstract int getEnd();
+    abstract int getEndRowBorder();
 
     @Override
     public Rect getRowRect() {
