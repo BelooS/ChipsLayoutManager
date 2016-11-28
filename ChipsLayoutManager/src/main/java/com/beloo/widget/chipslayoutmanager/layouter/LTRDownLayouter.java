@@ -71,12 +71,12 @@ class LTRDownLayouter extends AbstractLayouter {
     }
 
     @Override
-    int getStartRowBorder() {
+    public int getStartRowBorder() {
         return getViewTop();
     }
 
     @Override
-    int getEndRowBorder() {
+    public int getEndRowBorder() {
         return getViewBottom();
     }
 

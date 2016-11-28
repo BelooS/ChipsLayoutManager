@@ -2,10 +2,13 @@ package com.beloo.widget.chipslayoutmanager.gravity;
 
 import android.graphics.Rect;
 
-public class CenterInColumnGravityModifier implements IGravityModifier {
+import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouter;
+
+class CenterInColumnGravityModifier extends PerpendicularItemGravity implements IGravityModifier {
 
     @Override
-    public void modifyChildRect(int minStart, int maxEnd, Rect childRect) {
+    public void modifyChildRect(AbstractLayouter layouter, Rect childRect) {
+        super.modifyChildRect(layouter, childRect);
         int placeWidth = maxEnd - minStart;
 
         int rectWidth = childRect.right - childRect.left;

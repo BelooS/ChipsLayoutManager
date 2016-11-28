@@ -68,12 +68,12 @@ class RightLayouter extends AbstractLayouter {
     }
 
     @Override
-    int getStartRowBorder() {
+    public int getStartRowBorder() {
         return getViewLeft();
     }
 
     @Override
-    int getEndRowBorder() {
+    public int getEndRowBorder() {
         return getViewRight();
     }
 

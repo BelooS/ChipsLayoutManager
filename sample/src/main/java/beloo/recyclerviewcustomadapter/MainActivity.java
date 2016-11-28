@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         adapter = createAdapter(savedInstanceState);
 
         ChipsLayoutManager spanLayoutManager = ChipsLayoutManager.newBuilder(this)
+                .setChildGravity(Gravity.CENTER | Gravity.FILL)
                 .setOrientation(ChipsLayoutManager.HORIZONTAL)
                 .build();
 

@@ -20,12 +20,15 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     void onPreLayout() {
         int leftOffsetOfRow = -(getCanvasRightBorder() - viewLeft);
 
+        viewLeft = 0;
+
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
 
             viewRect.left = viewRect.left - leftOffsetOfRow;
             viewRect.right = viewRect.right - leftOffsetOfRow;
 
+            viewLeft = Math.min(viewLeft, viewRect.left);
             viewTop = Math.min(viewTop, viewRect.top);
             viewBottom = Math.max(viewBottom, viewRect.bottom);
         }
@@ -69,12 +72,12 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
-    int getStartRowBorder() {
+    public int getStartRowBorder() {
         return getViewTop();
     }
 
     @Override
-    int getEndRowBorder() {
+    public int getEndRowBorder() {
         return getViewBottom();
     }
 

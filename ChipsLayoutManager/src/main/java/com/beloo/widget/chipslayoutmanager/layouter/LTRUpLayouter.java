@@ -28,12 +28,14 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     @Override
     void onPreLayout() {
         int leftOffsetOfRow = viewRight - getCanvasLeftBorder();
+        viewLeft = 0;
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
 
             viewRect.left = viewRect.left - leftOffsetOfRow;
             viewRect.right = viewRect.right - leftOffsetOfRow;
 
+            viewLeft = Math.max(viewRect.right, viewLeft);
             viewTop = Math.min(viewTop, viewRect.top);
             viewBottom = Math.max(viewBottom, viewRect.bottom);
         }
@@ -69,12 +71,12 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
-    int getStartRowBorder() {
+    public int getStartRowBorder() {
         return getViewTop();
     }
 
     @Override
-    int getEndRowBorder() {
+    public int getEndRowBorder() {
         return getViewBottom();
     }
 

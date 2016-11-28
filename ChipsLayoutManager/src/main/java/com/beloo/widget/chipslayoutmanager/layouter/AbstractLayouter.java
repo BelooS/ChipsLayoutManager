@@ -219,7 +219,6 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
 
         if (isAttachedViewFromNewRow(view)) {
             //new row, reset row size
-//            Log.d("onAttachView", "on attached new row");
             notifyLayouterListeners();
             rowSize = 0;
         }
@@ -267,13 +266,14 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         @SpanLayoutChildGravity
         int viewGravity = childGravityResolver.getItemGravity(getLayoutManager().getPosition(view));
         IGravityModifier gravityModifier = gravityModifiersFactory.getGravityModifier(viewGravity);
-        gravityModifier.modifyChildRect(getStartRowBorder(), getEndRowBorder(), viewRect);
+        gravityModifier.modifyChildRect(this, viewRect);
     }
 
     public ChipsLayoutManager getLayoutManager() {
         return layoutManager;
     }
 
+    /** get count of items inside current row */
     @Override
     public int getRowSize() {
         return rowSize;
@@ -283,13 +283,15 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         return viewTop;
     }
 
-    abstract int getStartRowBorder();
+    /** get a start coordinate of row border which is perpendicular to row general extension*/
+    public abstract int getStartRowBorder();
 
-    abstract int getEndRowBorder();
+    /** get an end coordinate of row border which is perpendicular to row general extension*/
+    public abstract int getEndRowBorder();
 
     @Override
     public Rect getRowRect() {
-        return new Rect(getCanvasLeftBorder(), viewTop, getCanvasRightBorder(), getViewBottom());
+        return new Rect(getCanvasLeftBorder(), getViewTop(), getCanvasRightBorder(), getViewBottom());
     }
 
     public int getViewBottom() {
