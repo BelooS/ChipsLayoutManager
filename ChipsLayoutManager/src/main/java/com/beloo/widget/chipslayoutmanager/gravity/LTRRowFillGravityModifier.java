@@ -4,9 +4,9 @@ import android.graphics.Rect;
 
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouter;
 
-class RowFillGravityModifier extends GravityDecorator implements IGravityModifier {
+class LTRRowFillGravityModifier extends GravityDecorator implements IGravityModifier {
 
-    RowFillGravityModifier(IGravityModifier gravityModifier) {
+    LTRRowFillGravityModifier(IGravityModifier gravityModifier) {
         super(gravityModifier);
     }
 
@@ -15,7 +15,7 @@ class RowFillGravityModifier extends GravityDecorator implements IGravityModifie
         super.modifyChildRect(abstractLayouter, childRect);
         int difference = GravityUtil.getParallelDifference(abstractLayouter);
 
-        if (childRect.left == abstractLayouter.getCanvasLeftBorder() || childRect.left == abstractLayouter.getViewLeft()) {
+        if (childRect.left == abstractLayouter.getCanvasLeftBorder()) {
             //left view of row
 
             int leftDif = childRect.left - abstractLayouter.getCanvasLeftBorder();
@@ -27,7 +27,7 @@ class RowFillGravityModifier extends GravityDecorator implements IGravityModifie
             return;
         }
 
-        if (childRect.right == abstractLayouter.getCanvasRightBorder() || childRect.right == abstractLayouter.getViewLeft()) {
+        if (childRect.right == abstractLayouter.getCanvasLeftBorder() + abstractLayouter.getRowLength()) {
             //right view of row
 
             int rightDif = abstractLayouter.getCanvasRightBorder() - childRect.right;

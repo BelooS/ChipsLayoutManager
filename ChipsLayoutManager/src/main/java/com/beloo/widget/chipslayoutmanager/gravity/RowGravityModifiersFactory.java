@@ -20,8 +20,8 @@ public class RowGravityModifiersFactory implements IGravityModifiersFactory {
         }
 
         //fill gravity could set together with other types
-        if ((gravity & Gravity.FILL) == Gravity.FILL) {
-            gravityModifier = new RowFillGravityModifier(gravityModifier);
+        if ((gravity & Gravity.FILL_HORIZONTAL) == Gravity.FILL_HORIZONTAL) {
+            gravityModifier = new RTLRowFillGravityModifier(gravityModifier);
         }
 
         return gravityModifier;

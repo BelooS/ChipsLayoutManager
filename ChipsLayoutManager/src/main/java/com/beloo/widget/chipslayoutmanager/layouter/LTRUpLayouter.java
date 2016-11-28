@@ -29,6 +29,7 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     void onPreLayout() {
         int leftOffsetOfRow = viewRight - getCanvasLeftBorder();
         viewLeft = 0;
+
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
 

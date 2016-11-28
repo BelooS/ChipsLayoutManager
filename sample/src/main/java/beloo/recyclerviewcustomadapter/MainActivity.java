@@ -11,7 +11,6 @@ import android.widget.Spinner;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
-import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -70,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         adapter = createAdapter(savedInstanceState);
 
         ChipsLayoutManager spanLayoutManager = ChipsLayoutManager.newBuilder(this)
-                .setChildGravity(Gravity.CENTER | Gravity.FILL)
+                .setChildGravity(Gravity.CENTER | Gravity.FILL_HORIZONTAL)
                 .setOrientation(ChipsLayoutManager.HORIZONTAL)
                 .build();
 
