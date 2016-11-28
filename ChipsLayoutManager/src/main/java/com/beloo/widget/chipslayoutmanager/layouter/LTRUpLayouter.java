@@ -79,6 +79,11 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
+    public int getRowLength() {
+        return getCanvasRightBorder() - viewRight;
+    }
+
+    @Override
     AbstractPositionIterator createPositionIterator() {
         return new DecrementalPositionIterator();
     }

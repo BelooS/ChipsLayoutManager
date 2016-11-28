@@ -77,6 +77,11 @@ class RightLayouter extends AbstractLayouter {
         return getViewRight();
     }
 
+    @Override
+    public int getRowLength() {
+        return viewTop - getCanvasTopBorder();
+    }
+
     public static final class Builder extends AbstractLayouter.Builder {
         private Builder() {
         }

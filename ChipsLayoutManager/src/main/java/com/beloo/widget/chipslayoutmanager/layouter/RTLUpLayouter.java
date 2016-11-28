@@ -79,6 +79,11 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
+    public int getRowLength() {
+        return viewLeft - getCanvasLeftBorder();
+    }
+
+    @Override
     AbstractPositionIterator createPositionIterator() {
         return new DecrementalPositionIterator();
     }

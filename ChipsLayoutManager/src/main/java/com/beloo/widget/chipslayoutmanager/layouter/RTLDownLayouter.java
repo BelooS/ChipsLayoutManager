@@ -77,6 +77,11 @@ class RTLDownLayouter extends AbstractLayouter {
         return getViewBottom();
     }
 
+    @Override
+    public int getRowLength() {
+        return getCanvasRightBorder() - viewRight;
+    }
+
 
     public static final class Builder extends AbstractLayouter.Builder {
         private Builder() {

@@ -316,6 +316,8 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         return currentViewHeight;
     }
 
+    public abstract int getRowLength();
+
     public abstract static class Builder {
         private ChipsLayoutManager layoutManager;
         private IViewCacheStorage cacheStorage;
