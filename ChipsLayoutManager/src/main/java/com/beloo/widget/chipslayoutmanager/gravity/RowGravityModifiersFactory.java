@@ -4,12 +4,11 @@ import android.view.Gravity;
 
 import com.beloo.widget.chipslayoutmanager.SpanLayoutChildGravity;
 
-public class RowGravityModifiersFactory implements IGravityModifiersFactory {
+abstract class RowGravityModifiersFactory implements IGravityModifiersFactory {
 
+    RowGravityModifiersFactory() {}
 
-    public RowGravityModifiersFactory() {}
-
-    public IGravityModifier getGravityModifier(@SpanLayoutChildGravity int gravity) {
+    public final IGravityModifier getGravityModifier(@SpanLayoutChildGravity int gravity) {
 
         IGravityModifier gravityModifier = new CenterInRowGravityModifier();
 
@@ -27,4 +26,5 @@ public class RowGravityModifiersFactory implements IGravityModifiersFactory {
         return gravityModifier;
     }
 
+    public abstract IGravityModifier createFillModifier(IGravityModifier gravityModifier);
 }
