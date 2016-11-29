@@ -9,7 +9,7 @@ public class ColumnStrategyFactory implements IRowStrategyFactory {
     public IRowStrategy createRowStrategy(@RowStrategy int rowStrategy) {
         switch (rowStrategy) {
             case ChipsLayoutManager.STRATEGY_FILL_SPACE_CENTER:
-                return new ColumnFillStrategy();
+                return new ColumnFillSpaceCenterStrategy();
             case ChipsLayoutManager.STRATEGY_FILL_SPACE:
                 return new ColumnFillSpaceStrategy();
             case ChipsLayoutManager.STRATEGY_FILL_VIEW:
