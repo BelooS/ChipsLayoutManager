@@ -93,6 +93,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private int layoutOrientation = HORIZONTAL;
     @RowStrategy
     private int rowStrategy = STRATEGY_DEFAULT;
+    private boolean isStrategyAppliedWithLastRow = true;
 
     ///////////////////////////////////////////////////////////////////////////
     // cache
@@ -211,7 +212,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     public static Builder newBuilder(Context context) {
-        return new ChipsLayoutManager(context).new Builder();
+        return new ChipsLayoutManager(context).new StrategyBuilder();
     }
 
     public IChildGravityResolver getChildGravityResolver() {
@@ -271,6 +272,16 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         });
     }
 
+    //create decorator if any other builders would be added
+    public class StrategyBuilder extends Builder {
+
+        public Builder withLastRow(boolean withLastRow) {
+            ChipsLayoutManager.this.isStrategyAppliedWithLastRow = withLastRow;
+            return this;
+        }
+
+    }
+
     public class Builder {
 
         @SpanLayoutChildGravity
@@ -308,9 +319,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
 
         @SuppressWarnings("unused")
-        public Builder setRowStrategy(@RowStrategy int rowStrategy) {
+        public StrategyBuilder setRowStrategy(@RowStrategy int rowStrategy) {
             ChipsLayoutManager.this.rowStrategy = rowStrategy;
-            return this;
+            return (StrategyBuilder) this;
         }
 
         /**
