@@ -22,8 +22,10 @@
             android:id="@+id/ivPhoto"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:src="@drawable/shape_oval"
+            tools:src="@drawable/shape_oval"
             android:scaleType="centerCrop"
+            android:visibility="gone"
+            tools:visibility="visible"
             />
 
         <TextView

@@ -9,7 +9,7 @@ public class LTRRowStrategyFactory implements IRowStrategyFactory {
     public IRowStrategy createRowStrategy(@RowStrategy int rowStrategy) {
         switch (rowStrategy) {
             case ChipsLayoutManager.STRATEGY_FILL_SPACE:
-                return new LTRRowFillStrategy();
+                return new LTRRowFillSpaceStrategy();
             case ChipsLayoutManager.STRATEGY_FILL_VIEW:
                 return new LTRRowFillStrategy();
             case ChipsLayoutManager.STRATEGY_DEFAULT:

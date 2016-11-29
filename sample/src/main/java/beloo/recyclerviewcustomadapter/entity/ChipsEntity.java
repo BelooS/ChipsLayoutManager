@@ -47,7 +47,8 @@ public class ChipsEntity implements Parcelable {
     }
 
     public static final class Builder {
-        private int drawableResId;
+        @Nullable
+        private Integer drawableResId;
         private String description;
         private String name;
 

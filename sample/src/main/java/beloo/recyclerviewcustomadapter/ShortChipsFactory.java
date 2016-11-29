@@ -9,7 +9,7 @@ import java.util.List;
 import beloo.recyclerviewcustomadapter.adapter.ChipsAdapter;
 import beloo.recyclerviewcustomadapter.entity.ChipsEntity;
 
-class ChipsFactory implements IItemsFactory<ChipsEntity> {
+class ShortChipsFactory implements IItemsFactory<ChipsEntity> {
 
     @Override
     public List<ChipsEntity> getFewItems() {
@@ -20,8 +20,7 @@ class ChipsFactory implements IItemsFactory<ChipsEntity> {
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
-                .drawableResId(R.drawable.girl1)
-                .name("Veronic Cloyd")
+                .name("V")
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
@@ -36,13 +35,11 @@ class ChipsFactory implements IItemsFactory<ChipsEntity> {
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
-                .drawableResId(R.drawable.girl2)
-                .name("Jess")
+                .name("J")
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
-                .drawableResId(R.drawable.girl4)
-                .name("Ann Ackerman")
+                .name("A")
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
@@ -52,8 +49,7 @@ class ChipsFactory implements IItemsFactory<ChipsEntity> {
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
-                .drawableResId(R.drawable.girl5)
-                .name("Claudette")
+                .name("C")
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()

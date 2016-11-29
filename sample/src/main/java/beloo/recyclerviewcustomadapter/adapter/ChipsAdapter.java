@@ -78,6 +78,7 @@ public class ChipsAdapter extends  RecyclerView.Adapter<ChipsAdapter.ViewHolder>
             }
 
             if (entity.getDrawableResId() != null) {
+                ivPhoto.setVisibility(View.VISIBLE);
                 Glide.with(ivPhoto.getContext()).load(entity.getDrawableResId())
                         .transform(new CircleTransform(ivPhoto.getContext())).into(ivPhoto);
             }
