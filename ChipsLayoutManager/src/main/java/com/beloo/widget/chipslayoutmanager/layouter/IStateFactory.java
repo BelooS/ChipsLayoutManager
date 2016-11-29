@@ -10,7 +10,7 @@ import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacerFactory;
 
 public interface IStateFactory {
     @SuppressWarnings("UnnecessaryLocalVariable")
-    AbstractLayouterFactory createLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory);
+    LayouterFactory createLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory);
 
     AbstractCriteriaFactory createDefaultFinishingCriteriaFactory();
 

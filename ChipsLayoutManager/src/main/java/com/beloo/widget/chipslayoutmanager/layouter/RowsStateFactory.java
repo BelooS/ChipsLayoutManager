@@ -7,6 +7,8 @@ import com.beloo.widget.chipslayoutmanager.IScrollingController;
 import com.beloo.widget.chipslayoutmanager.VerticalScrollingController;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.anchor.RowsAnchorFactory;
+import com.beloo.widget.chipslayoutmanager.gravity.RowGravityModifiersFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.breaker.DecoratorBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.RowsCriteriaFactory;
@@ -21,13 +23,24 @@ public class RowsStateFactory implements IStateFactory {
     }
 
     private IOrientationStateFactory createOrientationStateFactory() {
-        return lm.isLayoutRTL() ? new RTLRowsOrientationStateFactory(lm) : new LTRRowsOrientationStateFactory(lm);
+        return lm.isLayoutRTL() ? new RTLRowsOrientationStateFactory() : new LTRRowsOrientationStateFactory();
     }
 
     @Override
-    public AbstractLayouterFactory createLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory) {
+    public LayouterFactory createLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory) {
         IOrientationStateFactory orientationStateFactory = createOrientationStateFactory();
-        return orientationStateFactory.createLayouterFactory(criteriaFactory, placerFactory);
+
+        return new LayouterFactory(lm,
+                orientationStateFactory.createLayouterCreator(lm),
+                new DecoratorBreakerFactory(
+                        lm.getViewPositionsStorage(),
+                        lm.getRowBreaker(),
+                        lm.getMaxViewsInRow(),
+                        orientationStateFactory.createDefaultBreaker()),
+                criteriaFactory,
+                placerFactory,
+                new RowGravityModifiersFactory(),
+                orientationStateFactory.createRowStrategyFactory().createRowStrategy(lm.getRowStrategy()));
     }
 
     @Override

@@ -1,36 +1,26 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
-import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
-import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
+import android.support.v7.widget.RecyclerView;
+
 import com.beloo.widget.chipslayoutmanager.gravity.IRowStrategyFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.RTLRowStrategyFactory;
-import com.beloo.widget.chipslayoutmanager.gravity.RowGravityModifiersFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.breaker.DecoratorBreakerFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.RTLRowBreakerFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacerFactory;
 
 class RTLRowsOrientationStateFactory implements IOrientationStateFactory {
 
-    private ChipsLayoutManager lm;
-    private IRowStrategyFactory rowStrategyFactory;
-
-    RTLRowsOrientationStateFactory(ChipsLayoutManager lm) {
-        this.lm = lm;
-        rowStrategyFactory = new RTLRowStrategyFactory();
+    @Override
+    public ILayouterCreator createLayouterCreator(RecyclerView.LayoutManager lm) {
+        return new RTLRowsCreator(lm);
     }
 
     @Override
-    public AbstractLayouterFactory createLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory) {
-        return createRTLRowLayouterFactory(criteriaFactory, placerFactory, lm.getViewPositionsStorage());
+    public IRowStrategyFactory createRowStrategyFactory() {
+        return new RTLRowStrategyFactory();
     }
 
-    private AbstractLayouterFactory createRTLRowLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {
-        return new RTLRowsLayouterFactory(lm, cacheStorage,
-                new DecoratorBreakerFactory(cacheStorage, lm.getRowBreaker(), lm.getMaxViewsInRow(), new RTLRowBreakerFactory()),
-                criteriaFactory,
-                placerFactory,
-                new RowGravityModifiersFactory(),
-                rowStrategyFactory.createRowStrategy(lm.getRowStrategy()));
+    @Override
+    public IBreakerFactory createDefaultBreaker() {
+        return new RTLRowBreakerFactory();
     }
 }

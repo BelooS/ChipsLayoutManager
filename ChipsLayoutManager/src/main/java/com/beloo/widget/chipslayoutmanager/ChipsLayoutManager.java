@@ -26,7 +26,7 @@ import com.beloo.widget.chipslayoutmanager.cache.ViewCacheFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.CenterChildGravity;
 import com.beloo.widget.chipslayoutmanager.gravity.CustomGravityResolver;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
-import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouterFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.LayouterFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.chipslayoutmanager.layouter.ILayouter;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractCriteriaFactory;
@@ -481,7 +481,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
             criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
 
-            AbstractLayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
+            LayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
             fill(recycler, layouterFactory, anchorView, true);
         } else {
@@ -501,7 +501,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
             criteriaFactory.setAdditionalLength(additionalLength);
 
-            AbstractLayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
+            LayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
             fill(recycler, layouterFactory, anchorView, false);
 
@@ -524,7 +524,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private void layoutDisappearingViews(RecyclerView.Recycler recycler, ILayouter upLayouter, ILayouter downLayouter) {
 
         ICriteriaFactory criteriaFactory = new InfiniteCriteriaFactory();
-        AbstractLayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createDisappearingPlacerFactory());
+        LayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createDisappearingPlacerFactory());
 
         DisappearingViewsContainer disappearingViews = getDisappearingViews(recycler);
 
@@ -679,7 +679,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /**
      * place all views on theirs right places according to current state
      */
-    private void fill(RecyclerView.Recycler recycler, AbstractLayouterFactory layouterFactory, @NonNull AnchorViewState anchorView, boolean isLayoutDisappearing) {
+    private void fill(RecyclerView.Recycler recycler, LayouterFactory layouterFactory, @NonNull AnchorViewState anchorView, boolean isLayoutDisappearing) {
         int startingPos = anchorView.getPosition();
         Rect anchorRect = anchorView.getAnchorViewRect();
 
@@ -820,7 +820,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
         criteriaFactory.setAdditionalRowsCount(1);
-        AbstractLayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
+        LayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
         fill(recycler, factory, anchorView, false);
         return dx;
@@ -931,7 +931,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
         criteriaFactory.setAdditionalRowsCount(1);
 
-        AbstractLayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
+        LayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
         fill(recycler, factory, anchorView, false);
         return dy;

@@ -1,6 +1,6 @@
 package com.beloo.widget.chipslayoutmanager.layouter.breaker;
 
-public class LTRColumnBreakerFactory implements IBreakerFactory {
+public class ColumnBreakerFactory implements IBreakerFactory {
     @Override
     public ILayoutRowBreaker createBackwardRowBreaker() {
         return new LTRBackwardColumnBreaker();

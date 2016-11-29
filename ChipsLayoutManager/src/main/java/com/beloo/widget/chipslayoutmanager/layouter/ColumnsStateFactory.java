@@ -12,7 +12,7 @@ import com.beloo.widget.chipslayoutmanager.gravity.ColumnGravityModifiersFactory
 import com.beloo.widget.chipslayoutmanager.gravity.ColumnStrategyFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.IRowStrategyFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.DecoratorBreakerFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.breaker.LTRColumnBreakerFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.breaker.ColumnBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ColumnsCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
@@ -29,15 +29,16 @@ public class ColumnsStateFactory implements IStateFactory {
     }
 
     @Override
-    public AbstractLayouterFactory createLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory) {
+    public LayouterFactory createLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory) {
         IViewCacheStorage cacheStorage = lm.getViewPositionsStorage();
 
         return createColumnLayouterFactory(criteriaFactory, placerFactory, cacheStorage);
     }
 
-    private AbstractLayouterFactory createColumnLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {
-        return new LTRColumnsLayouterFactory(lm, cacheStorage,
-                new DecoratorBreakerFactory(cacheStorage, lm.getRowBreaker(), lm.getMaxViewsInRow(), new LTRColumnBreakerFactory()),
+    private LayouterFactory createColumnLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {
+         return new LayouterFactory(lm,
+                new ColumnsCreator(lm),
+                new DecoratorBreakerFactory(cacheStorage, lm.getRowBreaker(), lm.getMaxViewsInRow(), new ColumnBreakerFactory()),
                 criteriaFactory,
                 placerFactory,
                 new ColumnGravityModifiersFactory(),
