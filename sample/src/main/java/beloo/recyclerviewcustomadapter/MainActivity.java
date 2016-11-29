@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private List items;
 
     /** replace here different data sets */
-    private IItemsFactory itemsFactory = new ChipsFactory();
+    private IItemsFactory itemsFactory = new ShortChipsFactory();
 
     private OnRemoveListener onRemoveListener = new OnRemoveListener() {
         @Override
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         ChipsLayoutManager spanLayoutManager = ChipsLayoutManager.newBuilder(this)
 //                .setChildGravity(Gravity.CENTER | Gravity.FILL_VERTICAL)
                 .setOrientation(ChipsLayoutManager.VERTICAL)
-                .setRowStrategy(ChipsLayoutManager.STRATEGY_FILL_VIEW)
+                .setRowStrategy(ChipsLayoutManager.STRATEGY_FILL_SPACE)
                 .build();
 
         rvTest.addItemDecoration(new SpacingItemDecoration(getResources().getDimensionPixelOffset(R.dimen.item_space),
