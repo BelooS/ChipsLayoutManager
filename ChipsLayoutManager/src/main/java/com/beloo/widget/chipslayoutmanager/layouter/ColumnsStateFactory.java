@@ -9,6 +9,8 @@ import com.beloo.widget.chipslayoutmanager.anchor.ColumnsAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.ColumnGravityModifiersFactory;
+import com.beloo.widget.chipslayoutmanager.gravity.ColumnStrategyFactory;
+import com.beloo.widget.chipslayoutmanager.gravity.IRowStrategyFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.DecoratorBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.LTRColumnBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractCriteriaFactory;
@@ -19,9 +21,11 @@ import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacerFactory;
 public class ColumnsStateFactory implements IStateFactory {
 
     private ChipsLayoutManager lm;
+    private IRowStrategyFactory rowStrategyFactory;
 
     public ColumnsStateFactory(ChipsLayoutManager lm) {
         this.lm = lm;
+        rowStrategyFactory = new ColumnStrategyFactory();
     }
 
     @Override
@@ -36,7 +40,8 @@ public class ColumnsStateFactory implements IStateFactory {
                 new DecoratorBreakerFactory(cacheStorage, lm.getRowBreaker(), lm.getMaxViewsInRow(), new LTRColumnBreakerFactory()),
                 criteriaFactory,
                 placerFactory,
-                new ColumnGravityModifiersFactory());
+                new ColumnGravityModifiersFactory(),
+                rowStrategyFactory.createRowStrategy(lm.getRowStrategy()));
     }
 
     @Override

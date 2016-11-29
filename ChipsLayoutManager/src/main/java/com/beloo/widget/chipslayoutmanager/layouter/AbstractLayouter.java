@@ -14,7 +14,6 @@ import java.util.Set;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.SpanLayoutChildGravity;
-import com.beloo.widget.chipslayoutmanager.gravity.ColumnFillGravityModifier;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.IRowStrategy;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.ILayoutRowBreaker;
@@ -58,7 +57,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     @NonNull
     private ILayoutRowBreaker breaker;
     @NonNull
-    private IRowStrategy rowStrategy = new ColumnFillGravityModifier();
+    private IRowStrategy rowStrategy;
     //--- end input dependencies
 
     private AbstractPositionIterator positionIterator;
@@ -83,6 +82,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         this.layouterListeners = builder.layouterListeners;
         this.breaker = builder.breaker;
         this.gravityModifiersFactory = builder.gravityModifiersFactory;
+        this.rowStrategy = builder.rowStrategy;
         //--- end read builder
 
         positionIterator = createPositionIterator();
@@ -340,9 +340,11 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         private Rect offsetRect;
         private HashSet<ILayouterListener> layouterListeners = new HashSet<>();
         private IGravityModifiersFactory gravityModifiersFactory;
+        private IRowStrategy rowStrategy;
 
         Builder() {}
 
+        @SuppressWarnings("WeakerAccess")
         @NonNull
         public Builder offsetRect(@NonNull Rect offsetRect) {
             this.offsetRect = offsetRect;
@@ -358,6 +360,12 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         @NonNull
         final Builder cacheStorage(@NonNull IViewCacheStorage cacheStorage) {
             this.cacheStorage = cacheStorage;
+            return this;
+        }
+
+        @NonNull
+        public Builder rowStrategy(IRowStrategy rowStrategy) {
+            this.rowStrategy = rowStrategy;
             return this;
         }
 

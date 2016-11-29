@@ -14,7 +14,6 @@
         android:layout_above="@+id/bottomContainer"
         android:padding="4dp"
         android:clipToPadding="false"
-        android:layoutDirection="rtl"
         />
 
     <RelativeLayout

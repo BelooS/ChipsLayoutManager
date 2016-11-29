@@ -7,7 +7,7 @@ import com.beloo.widget.chipslayoutmanager.layouter.Item;
 
 import java.util.List;
 
-public class ColumnFillGravityModifier implements IRowStrategy {
+class ColumnFillGravityStrategy implements IRowStrategy {
 
     @Override
     public void applyStrategy(AbstractLayouter abstractLayouter, List<Item> row) {

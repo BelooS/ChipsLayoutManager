@@ -4,6 +4,7 @@ import android.graphics.Rect;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifiersFactory;
+import com.beloo.widget.chipslayoutmanager.gravity.IRowStrategy;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
@@ -16,8 +17,15 @@ class RTLRowsLayouterFactory extends AbstractLayouterFactory {
                            IBreakerFactory breakerFactory,
                            ICriteriaFactory criteriaFactory,
                            IPlacerFactory placerFactory,
-                           IGravityModifiersFactory gravityModifiersFactory) {
-        super(layoutManager, cacheStorage, breakerFactory, criteriaFactory, placerFactory, gravityModifiersFactory);
+                           IGravityModifiersFactory gravityModifiersFactory,
+                           IRowStrategy rowStrategy) {
+        super(layoutManager,
+                cacheStorage,
+                breakerFactory,
+                criteriaFactory,
+                placerFactory,
+                gravityModifiersFactory,
+                rowStrategy);
     }
 
     //---- up layouter below

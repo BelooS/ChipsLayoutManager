@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifiersFactory;
+import com.beloo.widget.chipslayoutmanager.gravity.IRowStrategy;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
@@ -24,19 +25,22 @@ public abstract class AbstractLayouterFactory {
     private ICriteriaFactory criteriaFactory;
     private IPlacerFactory placerFactory;
     private IGravityModifiersFactory gravityModifiersFactory;
+    private IRowStrategy rowStrategy;
 
     AbstractLayouterFactory(ChipsLayoutManager layoutManager,
                             IViewCacheStorage cacheStorage,
                             IBreakerFactory breakerFactory,
                             ICriteriaFactory criteriaFactory,
                             IPlacerFactory placerFactory,
-                            IGravityModifiersFactory gravityModifiersFactory) {
+                            IGravityModifiersFactory gravityModifiersFactory,
+                            IRowStrategy rowStrategy) {
         this.cacheStorage = cacheStorage;
         this.layoutManager = layoutManager;
         this.breakerFactory = breakerFactory;
         this.criteriaFactory = criteriaFactory;
         this.placerFactory = placerFactory;
         this.gravityModifiersFactory = gravityModifiersFactory;
+        this.rowStrategy = rowStrategy;
     }
 
     public void addLayouterListener(@Nullable ILayouterListener layouterListener) {
@@ -57,6 +61,7 @@ public abstract class AbstractLayouterFactory {
                 .childGravityResolver(layoutManager.getChildGravityResolver())
                 .cacheStorage(cacheStorage)
                 .gravityModifiersFactory(gravityModifiersFactory)
+                .rowStrategy(rowStrategy)
                 .addLayouterListeners(layouterListeners);
     }
 

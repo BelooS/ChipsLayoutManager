@@ -69,8 +69,9 @@ public class MainActivity extends AppCompatActivity {
         adapter = createAdapter(savedInstanceState);
 
         ChipsLayoutManager spanLayoutManager = ChipsLayoutManager.newBuilder(this)
-                .setChildGravity(Gravity.CENTER | Gravity.FILL_HORIZONTAL)
+//                .setChildGravity(Gravity.CENTER | Gravity.FILL_VERTICAL)
                 .setOrientation(ChipsLayoutManager.HORIZONTAL)
+                .setRowStrategy(ChipsLayoutManager.STRATEGY_FILL_VIEW)
                 .build();
 
         rvTest.addItemDecoration(new SpacingItemDecoration(getResources().getDimensionPixelOffset(R.dimen.item_space),
