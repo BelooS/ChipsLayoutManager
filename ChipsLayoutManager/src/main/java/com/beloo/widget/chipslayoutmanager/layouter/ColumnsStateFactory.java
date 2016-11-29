@@ -28,10 +28,10 @@ public class ColumnsStateFactory implements IStateFactory {
     public AbstractLayouterFactory createLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory) {
         IViewCacheStorage cacheStorage = lm.getViewPositionsStorage();
 
-        return createLTRColumnLayouterFactory(criteriaFactory, placerFactory, cacheStorage);
+        return createColumnLayouterFactory(criteriaFactory, placerFactory, cacheStorage);
     }
 
-    private AbstractLayouterFactory createLTRColumnLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {
+    private AbstractLayouterFactory createColumnLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {
         return new LTRColumnsLayouterFactory(lm, cacheStorage,
                 new DecoratorBreakerFactory(cacheStorage, lm.getRowBreaker(), lm.getMaxViewsInRow(), new LTRColumnBreakerFactory()),
                 criteriaFactory,
@@ -63,12 +63,4 @@ public class ColumnsStateFactory implements IStateFactory {
     public int getEnd(View view) {
         return lm.getDecoratedRight(view);
     }
-
-    //    private AbstractLayouterFactory createRTLColumnLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {
-//        return new RTLRowsLayouterFactory(lm, cacheStorage,
-//                new DecoratorBreakerFactory(cacheStorage, lm.getRowBreaker(), lm.getMaxViewsInRow(), new LTRColumnBreakerFactory()),
-//                criteriaFactory,
-//                placerFactory,
-//                new ColumnGravityModifiersFactory());
-//    }
 }

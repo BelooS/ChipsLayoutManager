@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.view.View;
 
+import java.util.Collections;
+
 class LeftLayouter extends AbstractLayouter {
 
     private LeftLayouter(Builder builder) {
@@ -31,6 +33,7 @@ class LeftLayouter extends AbstractLayouter {
     @Override
     void onPreLayout() {
         int topOffsetOfRow = viewBottom - getCanvasTopBorder();
+        viewBottom = 0;
 
         for (Pair<Rect, View> columnViewRectPair : rowViews) {
             Rect viewRect = columnViewRectPair.first;
@@ -38,9 +41,13 @@ class LeftLayouter extends AbstractLayouter {
             viewRect.top = viewRect.top - topOffsetOfRow;
             viewRect.bottom = viewRect.bottom - topOffsetOfRow;
 
+            viewBottom = Math.max(viewBottom, viewRect.bottom);
             viewLeft = Math.min(viewLeft, viewRect.left);
             viewRight = Math.max(viewRight, viewRect.right);
         }
+
+        //return to natural order
+        Collections.reverse(rowViews);
     }
 
     @Override

@@ -20,7 +20,8 @@ class RightLayouter extends AbstractLayouter {
     Rect createViewRect(View view) {
         Rect viewRect = new Rect(viewLeft, viewTop, viewLeft + getCurrentViewWidth(), viewTop + getCurrentViewHeight());
 
-        viewTop = viewRect.bottom;
+        viewBottom = viewRect.bottom;
+        viewTop = viewBottom;
         viewRight = Math.max(viewRight, viewRect.right);
         return viewRect;
     }

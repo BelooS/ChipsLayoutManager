@@ -2,8 +2,7 @@ package com.beloo.widget.chipslayoutmanager.layouter;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
-import com.beloo.widget.chipslayoutmanager.gravity.LTRRowGravittyModifiersFactory;
-import com.beloo.widget.chipslayoutmanager.gravity.RTLRowGravittyModifiersFactory;
+import com.beloo.widget.chipslayoutmanager.gravity.RowGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.DecoratorBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.LTRRowBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.RTLRowBreakerFactory;
@@ -29,7 +28,7 @@ class RowsOrientationStateFactory {
                 new DecoratorBreakerFactory(cacheStorage, lm.getRowBreaker(), lm.getMaxViewsInRow(), new LTRRowBreakerFactory()),
                 criteriaFactory,
                 placerFactory,
-                new LTRRowGravittyModifiersFactory());
+                new RowGravityModifiersFactory());
     }
 
     private AbstractLayouterFactory createRTLRowLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {
@@ -37,6 +36,6 @@ class RowsOrientationStateFactory {
                 new DecoratorBreakerFactory(cacheStorage, lm.getRowBreaker(), lm.getMaxViewsInRow(), new RTLRowBreakerFactory()),
                 criteriaFactory,
                 placerFactory,
-                new RTLRowGravittyModifiersFactory());
+                new RowGravityModifiersFactory());
     }
 }

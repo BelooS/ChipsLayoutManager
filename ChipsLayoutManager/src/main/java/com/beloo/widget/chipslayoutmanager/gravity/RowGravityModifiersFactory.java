@@ -1,30 +1,33 @@
 package com.beloo.widget.chipslayoutmanager.gravity;
 
+import android.util.SparseArray;
 import android.view.Gravity;
 
 import com.beloo.widget.chipslayoutmanager.SpanLayoutChildGravity;
 
-abstract class RowGravityModifiersFactory implements IGravityModifiersFactory {
+public class RowGravityModifiersFactory implements IGravityModifiersFactory {
 
-    RowGravityModifiersFactory() {}
+    private SparseArray<IGravityModifier> gravityModifierMap;
 
-    public final IGravityModifier getGravityModifier(@SpanLayoutChildGravity int gravity) {
+    public RowGravityModifiersFactory() {
+        gravityModifierMap = new SparseArray<>();
 
-        IGravityModifier gravityModifier = new CenterInRowGravityModifier();
+        CenterInRowGravityModifier centerInRowGravityModifier = new CenterInRowGravityModifier();
+        TopGravityModifier topGravityModifier = new TopGravityModifier();
+        BottomGravityModifier bottomGravityModifier = new BottomGravityModifier();
 
-        if ((gravity & Gravity.TOP) == Gravity.TOP) {
-            gravityModifier = new TopGravityModifier();
-        } else if ((gravity & Gravity.BOTTOM) == Gravity.BOTTOM) {
-            gravityModifier = new BottomGravityModifier();
+        gravityModifierMap.put(Gravity.TOP, topGravityModifier);
+        gravityModifierMap.put(Gravity.BOTTOM, bottomGravityModifier);
+        gravityModifierMap.put(Gravity.CENTER, centerInRowGravityModifier);
+        gravityModifierMap.put(Gravity.CENTER_VERTICAL, centerInRowGravityModifier);
+    }
+
+    public IGravityModifier getGravityModifier(@SpanLayoutChildGravity int gravity) {
+        IGravityModifier gravityModifier = gravityModifierMap.get(gravity);
+        if (gravityModifier == null) {
+            gravityModifier = gravityModifierMap.get(Gravity.CENTER_VERTICAL);
         }
-
-        //fill gravity could set together with other types
-        if ((gravity & Gravity.FILL_HORIZONTAL) == Gravity.FILL_HORIZONTAL) {
-            gravityModifier = new RTLRowFillGravityModifier(gravityModifier);
-        }
-
         return gravityModifier;
     }
 
-    public abstract IGravityModifier createFillModifier(IGravityModifier gravityModifier);
 }

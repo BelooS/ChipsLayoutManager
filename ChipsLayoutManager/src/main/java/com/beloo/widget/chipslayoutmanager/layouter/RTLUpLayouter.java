@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.view.View;
 
+import java.util.Collections;
+
 class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     private static final String TAG = RTLUpLayouter.class.getSimpleName();
 
@@ -32,6 +34,9 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
             viewTop = Math.min(viewTop, viewRect.top);
             viewBottom = Math.max(viewBottom, viewRect.bottom);
         }
+
+        //return to natural order
+        Collections.reverse(rowViews);
     }
 
     @Override

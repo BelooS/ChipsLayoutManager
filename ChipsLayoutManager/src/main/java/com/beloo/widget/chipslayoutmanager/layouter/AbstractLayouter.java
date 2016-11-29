@@ -15,6 +15,8 @@ import java.util.Set;
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.SpanLayoutChildGravity;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifiersFactory;
+import com.beloo.widget.chipslayoutmanager.gravity.IRowStrategy;
+import com.beloo.widget.chipslayoutmanager.gravity.LTRRowFillStrategy;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.ILayoutRowBreaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
@@ -55,6 +57,8 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     private IPlacer placer;
     @NonNull
     private ILayoutRowBreaker breaker;
+    @NonNull
+    private IRowStrategy rowStrategy = new LTRRowFillStrategy();
     //--- end input dependencies
 
     private AbstractPositionIterator positionIterator;
@@ -237,6 +241,11 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     public final void layoutRow() {
         onPreLayout();
 
+        //apply modifiers to whole row
+        if (rowSize > 0) {
+            rowStrategy.applyStrategy(this, getCurrentRowItems());
+        }
+
         /** layout pre-calculated row on a recyclerView canvas */
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
@@ -266,7 +275,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         @SpanLayoutChildGravity
         int viewGravity = childGravityResolver.getItemGravity(getLayoutManager().getPosition(view));
         IGravityModifier gravityModifier = gravityModifiersFactory.getGravityModifier(viewGravity);
-        gravityModifier.modifyChildRect(this, viewRect);
+        gravityModifier.modifyChildRect(getStartRowBorder(), getEndRowBorder(), viewRect);
     }
 
     public ChipsLayoutManager getLayoutManager() {

@@ -4,8 +4,12 @@ import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouter;
 
 abstract class GravityUtil {
 
-    static int getParallelDifference(AbstractLayouter layouter) {
+    static int getHorizontalDifference(AbstractLayouter layouter) {
         return (layouter.getCanvasRightBorder() - layouter.getCanvasLeftBorder() - layouter.getRowLength()) / layouter.getRowSize();
+    }
+
+    static int getVerticalDifference(AbstractLayouter layouter) {
+        return (layouter.getCanvasBottomBorder() - layouter.getCanvasTopBorder() - layouter.getRowLength()) / layouter.getRowSize();
     }
 
 }

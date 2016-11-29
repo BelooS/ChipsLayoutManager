@@ -5,5 +5,5 @@ import android.graphics.Rect;
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouter;
 
 public interface IGravityModifier {
-    void modifyChildRect(AbstractLayouter abstractLayouter, Rect childRect);
+    void modifyChildRect(int minStart, int maxEnd, Rect childRect);
 }

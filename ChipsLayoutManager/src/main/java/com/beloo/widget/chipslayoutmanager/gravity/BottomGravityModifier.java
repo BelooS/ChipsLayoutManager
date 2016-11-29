@@ -2,12 +2,9 @@ package com.beloo.widget.chipslayoutmanager.gravity;
 
 import android.graphics.Rect;
 
-import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouter;
-
-class BottomGravityModifier extends PerpendicularItemGravity implements IGravityModifier {
+class BottomGravityModifier implements IGravityModifier {
     @Override
-    public void modifyChildRect(AbstractLayouter abstractLayouter, Rect childRect) {
-        super.modifyChildRect(abstractLayouter, childRect);
+    public void modifyChildRect(int minStart, int maxEnd, Rect childRect) {
         if (childRect.bottom < maxEnd) {
             childRect.top += maxEnd - childRect.bottom;
             childRect.bottom = maxEnd;

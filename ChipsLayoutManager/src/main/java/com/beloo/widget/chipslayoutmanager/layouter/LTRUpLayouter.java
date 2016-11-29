@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.view.View;
 
+import java.util.Collections;
+
 class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
     private LTRUpLayouter(Builder builder) {
@@ -40,6 +42,9 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
             viewTop = Math.min(viewTop, viewRect.top);
             viewBottom = Math.max(viewBottom, viewRect.bottom);
         }
+
+        //return to natural order
+        Collections.reverse(rowViews);
     }
 
     @Override
