@@ -65,11 +65,12 @@ or custom `FlowLayout`s.
 ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
         //set vertical gravity for all items in a row. Default = Gravity.CENTER_VERTICAL
         .setChildGravity(Gravity.TOP)
-        //whether RecyclerView can scroll
+        //whether RecyclerView can scroll. TRUE by default
         .setScrollingEnabled(true)
         //set maximum views count in a particular row
         .setMaxViewsInRow(2)
-        //set gravity resolver where you can determine gravity for item in position. This method have priority over previous one
+        //set gravity resolver where you can determine gravity for item in position. 
+        //This method have priority over previous one
         .setGravityResolver(new IChildGravityResolver() {
             @Override
             public int getItemGravity(int position) {
