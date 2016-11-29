@@ -15,7 +15,7 @@ import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacerFactory;
 public class RowsStateFactory implements IStateFactory {
 
     private ChipsLayoutManager lm;
-    private RowsOrientationStateFactory orientationStateFactory;
+    private IOrientationStateFactory orientationStateFactory;
 
     public RowsStateFactory(ChipsLayoutManager lm) {
         this.lm = lm;

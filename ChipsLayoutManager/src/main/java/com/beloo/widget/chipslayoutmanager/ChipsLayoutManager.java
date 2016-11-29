@@ -43,11 +43,27 @@ import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 import java.util.List;
 
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract, IStateHolder {
+    ///////////////////////////////////////////////////////////////////////////
+    // orientation types
+    ///////////////////////////////////////////////////////////////////////////
     @SuppressWarnings("WeakerAccess")
     public static final int HORIZONTAL = 1;
     @SuppressWarnings("WeakerAccess")
     public static final int VERTICAL = 2;
 
+    ///////////////////////////////////////////////////////////////////////////
+    // row strategy types
+    ///////////////////////////////////////////////////////////////////////////
+    @SuppressWarnings("WeakerAccess")
+    public static final int STRATEGY_DEFAULT = 1;
+    @SuppressWarnings("WeakerAccess")
+    public static final int STRATEGY_FILL_VIEW = 2;
+    @SuppressWarnings("WeakerAccess")
+    public static final int STRATEGY_FILL_SPACE = 4;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // inner constants
+    ///////////////////////////////////////////////////////////////////////////
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
     private static final int INT_ROW_SIZE_APPROXIMATELY_FOR_CACHE = 10;
     private static final int APPROXIMATE_ADDITIONAL_ROWS_COUNT = 5;
@@ -73,6 +89,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Orientation
     /** layoutOrientation of layout. Could have HORIZONTAL or VERTICAL style */
     private int layoutOrientation = HORIZONTAL;
+    @RowStrategy
+    private int rowStrategy = STRATEGY_DEFAULT;
 
     ///////////////////////////////////////////////////////////////////////////
     // cache
@@ -233,6 +251,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return rowBreaker;
     }
 
+    @RowStrategy
+    public int getRowStrategy() {
+        return rowStrategy;
+    }
+
     /**
      * perform changing layout with playing RecyclerView animations
      */
@@ -257,7 +280,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         /**
          * set vertical gravity in a row for all children. Default = CENTER_VERTICAL
          */
-        @SuppressWarnings("unused")
+        @SuppressWarnings({"unused", "WeakerAccess"})
         public Builder setChildGravity(@SpanLayoutChildGravity int gravity) {
             this.gravity = gravity;
             return this;
@@ -279,6 +302,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         @SuppressWarnings("unused")
         public Builder setScrollingEnabled(boolean isEnabled) {
             ChipsLayoutManager.this.setScrollingEnabledContract(isEnabled);
+            return this;
+        }
+
+        @SuppressWarnings("unused")
+        public Builder setRowStrategy(@RowStrategy int rowStrategy) {
+            ChipsLayoutManager.this.rowStrategy = rowStrategy;
             return this;
         }
 
