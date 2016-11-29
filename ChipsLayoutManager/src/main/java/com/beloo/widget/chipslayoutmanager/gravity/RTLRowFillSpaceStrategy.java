@@ -7,7 +7,7 @@ import com.beloo.widget.chipslayoutmanager.layouter.Item;
 
 import java.util.List;
 
-class LTRRowFillSpaceStrategy implements IRowStrategy {
+class RTLRowFillSpaceStrategy implements IRowStrategy {
 
     @Override
     public void applyStrategy(AbstractLayouter abstractLayouter, List<Item> row) {
@@ -17,19 +17,20 @@ class LTRRowFillSpaceStrategy implements IRowStrategy {
         for (Item item : row) {
             Rect childRect = item.getViewRect();
 
-            if (childRect.left == abstractLayouter.getCanvasLeftBorder()) {
-                //left view of row
+            if (childRect.right == abstractLayouter.getCanvasRightBorder()) {
+                //right view of row
 
-                int leftDif = childRect.left - abstractLayouter.getCanvasLeftBorder();
-                //press view to left border
-                childRect.left = abstractLayouter.getCanvasLeftBorder();
-                childRect.right -= leftDif;
+                int rightDif = abstractLayouter.getCanvasRightBorder() - childRect.right;
+                //press view to right border
+                childRect.left += rightDif;
+                childRect.right = abstractLayouter.getCanvasRightBorder();
                 continue;
             }
             offsetDifference += difference;
 
-            childRect.left += offsetDifference;
-            childRect.right += offsetDifference;
+            childRect.right -= offsetDifference;
+            childRect.left -= offsetDifference;
         }
+
     }
 }

@@ -9,7 +9,7 @@ public class RTLRowStrategyFactory implements IRowStrategyFactory {
     public IRowStrategy createRowStrategy(@RowStrategy int rowStrategy) {
         switch (rowStrategy) {
             case ChipsLayoutManager.STRATEGY_FILL_SPACE:
-                return new RTLRowFillStrategy();
+                return new RTLRowFillSpaceStrategy();
             case ChipsLayoutManager.STRATEGY_FILL_VIEW:
                 return new RTLRowFillStrategy();
             case ChipsLayoutManager.STRATEGY_DEFAULT:
