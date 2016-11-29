@@ -93,7 +93,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private int layoutOrientation = HORIZONTAL;
     @RowStrategy
     private int rowStrategy = STRATEGY_DEFAULT;
-    private boolean isStrategyAppliedWithLastRow = true;
+    private boolean isStrategyAppliedWithLastRow;
 
     ///////////////////////////////////////////////////////////////////////////
     // cache
