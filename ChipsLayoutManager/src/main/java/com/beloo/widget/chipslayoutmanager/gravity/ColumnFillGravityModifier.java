@@ -3,39 +3,37 @@ package com.beloo.widget.chipslayoutmanager.gravity;
 import android.graphics.Rect;
 
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouter;
+import com.beloo.widget.chipslayoutmanager.layouter.Item;
 
-class ColumnFillGravityModifier  {
+import java.util.List;
 
-    public void modifyChildRect(AbstractLayouter abstractLayouter, Rect childRect) {
+public class ColumnFillGravityModifier implements IRowStrategy {
 
+    @Override
+    public void applyStrategy(AbstractLayouter abstractLayouter, List<Item> row) {
         int difference = GravityUtil.getVerticalDifference(abstractLayouter);
+        int offsetDifference = difference;
 
-        if (childRect.top == abstractLayouter.getCanvasTopBorder()) {
-            //highest view of row
+        for (Item item : row) {
+            Rect childRect = item.getViewRect();
 
-            int topDif = childRect.top - abstractLayouter.getCanvasTopBorder();
-            //press view to top border
-            childRect.top = abstractLayouter.getCanvasTopBorder();
-            childRect.bottom -= topDif;
+            if (childRect.top == abstractLayouter.getCanvasTopBorder()) {
+                //highest view of row
 
-            //increase view height from bottom
-            childRect.bottom += difference;
-            return;
+                int topDif = childRect.top - abstractLayouter.getCanvasTopBorder();
+                //press view to top border
+                childRect.top = abstractLayouter.getCanvasTopBorder();
+                childRect.bottom -= topDif;
+
+                //increase view height from bottom
+                childRect.bottom += offsetDifference;
+                continue;
+            }
+
+            childRect.top += offsetDifference;
+            offsetDifference += difference;
+            childRect.bottom += offsetDifference;
         }
 
-        if (childRect.bottom == abstractLayouter.getCanvasTopBorder() + abstractLayouter.getRowLength()) {
-            //lowest view of row
-
-            int bottomDif = abstractLayouter.getCanvasBottomBorder() - childRect.bottom;
-            //press view to bottom border
-            childRect.top += bottomDif;
-            childRect.bottom = abstractLayouter.getCanvasBottomBorder();
-            return;
-        }
-
-        //split whole difference to top/bottom differences
-//        difference /= 2;
-
-        childRect.bottom += difference;
     }
 }

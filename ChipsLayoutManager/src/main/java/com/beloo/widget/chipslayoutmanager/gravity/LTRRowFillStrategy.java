@@ -11,7 +11,8 @@ public class LTRRowFillStrategy implements IRowStrategy {
 
     @Override
     public void applyStrategy(AbstractLayouter abstractLayouter, List<Item> row) {
-        int offsetDifference = GravityUtil.getHorizontalDifference(abstractLayouter);
+        int difference = GravityUtil.getHorizontalDifference(abstractLayouter);
+        int offsetDifference = difference;
 
         for (Item item : row) {
 
@@ -31,7 +32,7 @@ public class LTRRowFillStrategy implements IRowStrategy {
             }
 
             childRect.left += offsetDifference;
-            offsetDifference += offsetDifference;
+            offsetDifference += difference;
             childRect.right += offsetDifference;
         }
 

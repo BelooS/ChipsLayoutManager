@@ -14,9 +14,9 @@ import java.util.Set;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.SpanLayoutChildGravity;
+import com.beloo.widget.chipslayoutmanager.gravity.ColumnFillGravityModifier;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.IRowStrategy;
-import com.beloo.widget.chipslayoutmanager.gravity.LTRRowFillStrategy;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.ILayoutRowBreaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
@@ -58,7 +58,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     @NonNull
     private ILayoutRowBreaker breaker;
     @NonNull
-    private IRowStrategy rowStrategy = new LTRRowFillStrategy();
+    private IRowStrategy rowStrategy = new ColumnFillGravityModifier();
     //--- end input dependencies
 
     private AbstractPositionIterator positionIterator;
