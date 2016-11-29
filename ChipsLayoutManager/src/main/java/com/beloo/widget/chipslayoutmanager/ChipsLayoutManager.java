@@ -259,6 +259,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return rowStrategy;
     }
 
+    public boolean isStrategyAppliedWithLastRow() {
+        return isStrategyAppliedWithLastRow;
+    }
+
     /**
      * perform changing layout with playing RecyclerView animations
      */
