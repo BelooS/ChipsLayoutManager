@@ -11,7 +11,7 @@ class LTRRowFillStrategy implements IRowStrategy {
 
     @Override
     public void applyStrategy(AbstractLayouter abstractLayouter, List<Item> row) {
-        int difference = GravityUtil.getHorizontalDifference(abstractLayouter);
+        int difference = GravityUtil.getHorizontalDifference(abstractLayouter) / abstractLayouter.getRowSize();
         int offsetDifference = difference;
 
         for (Item item : row) {

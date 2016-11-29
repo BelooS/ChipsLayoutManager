@@ -8,7 +8,8 @@ import java.lang.annotation.RetentionPolicy;
 
 @IntDef({ChipsLayoutManager.STRATEGY_DEFAULT,
         ChipsLayoutManager.STRATEGY_FILL_SPACE,
-        ChipsLayoutManager.STRATEGY_FILL_VIEW
+        ChipsLayoutManager.STRATEGY_FILL_VIEW,
+        ChipsLayoutManager.STRATEGY_FILL_SPACE_CENTER
 })
 @Retention(RetentionPolicy.SOURCE)
 public @interface RowStrategy {}

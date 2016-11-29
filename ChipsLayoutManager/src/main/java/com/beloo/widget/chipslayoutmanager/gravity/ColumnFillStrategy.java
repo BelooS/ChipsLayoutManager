@@ -7,11 +7,11 @@ import com.beloo.widget.chipslayoutmanager.layouter.Item;
 
 import java.util.List;
 
-class ColumnFillGravityStrategy implements IRowStrategy {
+class ColumnFillStrategy implements IRowStrategy {
 
     @Override
     public void applyStrategy(AbstractLayouter abstractLayouter, List<Item> row) {
-        int difference = GravityUtil.getVerticalDifference(abstractLayouter);
+        int difference = GravityUtil.getVerticalDifference(abstractLayouter) / abstractLayouter.getRowSize();
         int offsetDifference = difference;
 
         for (Item item : row) {

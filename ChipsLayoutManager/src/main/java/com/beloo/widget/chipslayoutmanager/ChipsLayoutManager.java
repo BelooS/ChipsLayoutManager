@@ -60,6 +60,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public static final int STRATEGY_FILL_VIEW = 2;
     @SuppressWarnings("WeakerAccess")
     public static final int STRATEGY_FILL_SPACE = 4;
+    @SuppressWarnings("WeakerAccess")
+    public static final int STRATEGY_FILL_SPACE_CENTER = 5;
 
     ///////////////////////////////////////////////////////////////////////////
     // inner constants
