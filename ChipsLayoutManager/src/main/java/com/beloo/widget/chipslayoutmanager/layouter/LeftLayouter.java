@@ -95,7 +95,7 @@ class LeftLayouter extends AbstractLayouter {
 
     @Override
     public int getRowLength() {
-        return getCanvasBottomBorder() - viewBottom;
+        return viewBottom - getCanvasTopBorder();
     }
 
     public static final class Builder extends AbstractLayouter.Builder {
