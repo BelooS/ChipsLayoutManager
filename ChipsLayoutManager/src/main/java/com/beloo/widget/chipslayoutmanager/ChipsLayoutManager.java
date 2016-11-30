@@ -511,7 +511,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             predictiveAnimationsLogger.heightOfCanvas(this);
             predictiveAnimationsLogger.onSummarizedDeletingItemsHeightCalculated(additionalLength);
             anchorView = anchorFactory.getAnchor();
-            anchorFactory.onPreLayout(anchorView, recycler);
+            if (!anchorView.isNotFoundState()) {
+                Rect rect = anchorView.getAnchorViewRect();
+                rect.left = getPaddingLeft();
+                rect.right = getPaddingRight();
+            }
             Log.w(TAG, "anchor state in pre-layout = " + anchorView);
             detachAndScrapAttachedViews(recycler);
 
@@ -534,6 +538,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         //we should re-layout if previous anchor was removed or moved.
         anchorView = anchorFactory.getAnchor();
+        if (!anchorView.isNotFoundState()) {
+            Rect rect = anchorView.getAnchorViewRect();
+            rect.left = getPaddingLeft();
+            rect.right = getPaddingRight();
+        }
         if (anchorFactory.normalize(anchorView)) {
             requestLayoutWithAnimations();
         }
