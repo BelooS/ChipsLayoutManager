@@ -41,7 +41,7 @@ public class RowsStateFactory implements IStateFactory {
                 criteriaFactory,
                 placerFactory,
                 new RowGravityModifiersFactory(),
-                new SkipLastRowStrategy(orientationStateFactory.createRowStrategyFactory().createRowStrategy(lm.getRowStrategy()), !lm.isStrategyAppliedWithLastRow()));
+                orientationStateFactory.createRowStrategyFactory().createRowStrategy(lm.getRowStrategy()));
     }
 
     @Override

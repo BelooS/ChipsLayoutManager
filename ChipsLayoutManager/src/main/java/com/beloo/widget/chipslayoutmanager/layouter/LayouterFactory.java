@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.IRowStrategy;
+import com.beloo.widget.chipslayoutmanager.gravity.SkipLastRowStrategy;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
@@ -75,7 +76,6 @@ public class LayouterFactory {
                 .childGravityResolver(layoutManager.getChildGravityResolver())
                 .cacheStorage(cacheStorage)
                 .gravityModifiersFactory(gravityModifiersFactory)
-                .rowStrategy(rowStrategy)
                 .addLayouterListeners(layouterListeners);
     }
 
@@ -85,6 +85,7 @@ public class LayouterFactory {
                 .offsetRect(createOffsetRectForBackwardLayouter(anchorRect))
                 .breaker(breakerFactory.createBackwardRowBreaker())
                 .finishingCriteria(criteriaFactory.getBackwardFinishingCriteria())
+                .rowStrategy(rowStrategy)
                 .placer(placerFactory.getAtStartPlacer())
                 .build();
     }
@@ -95,6 +96,7 @@ public class LayouterFactory {
                 .offsetRect(createOffsetRectForForwardLayouter(anchorRect))
                 .breaker(breakerFactory.createForwardRowBreaker())
                 .finishingCriteria(criteriaFactory.getForwardFinishingCriteria())
+                .rowStrategy(new SkipLastRowStrategy(rowStrategy, !layoutManager.isStrategyAppliedWithLastRow()))
                 .placer(placerFactory.getAtEndPlacer())
                 .build();
     }

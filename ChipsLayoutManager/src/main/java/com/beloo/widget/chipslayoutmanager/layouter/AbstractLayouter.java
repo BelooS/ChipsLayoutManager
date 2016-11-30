@@ -242,7 +242,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         onPreLayout();
 
         //apply modifiers to whole row
-        if (rowSize > 0) {
+        if (rowViews.size() > 0) {
             rowStrategy.applyStrategy(this, getCurrentRowItems());
         }
 

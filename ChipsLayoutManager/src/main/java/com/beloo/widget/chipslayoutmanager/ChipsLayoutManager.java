@@ -277,6 +277,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     //create decorator if any other builders would be added
+    @SuppressWarnings("WeakerAccess")
     public class StrategyBuilder extends Builder {
 
         public Builder withLastRow(boolean withLastRow) {
@@ -286,6 +287,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     }
 
+    @SuppressWarnings("WeakerAccess")
     public class Builder {
 
         @SpanLayoutChildGravity
