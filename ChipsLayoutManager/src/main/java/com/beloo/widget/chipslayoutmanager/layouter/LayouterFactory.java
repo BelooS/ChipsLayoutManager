@@ -5,7 +5,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.chipslayoutmanager.ICanvas;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifiersFactory;
+import com.beloo.widget.chipslayoutmanager.gravity.IRowStrategy;
+import com.beloo.widget.chipslayoutmanager.gravity.SkipLastRowStrategy;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
@@ -14,8 +17,8 @@ import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractLayouterFactory {
-    ChipsLayoutManager layoutManager;
+public class LayouterFactory {
+    private ChipsLayoutManager layoutManager;
     private IViewCacheStorage cacheStorage;
 
     private List<ILayouterListener> layouterListeners = new ArrayList<>();
@@ -24,19 +27,24 @@ public abstract class AbstractLayouterFactory {
     private ICriteriaFactory criteriaFactory;
     private IPlacerFactory placerFactory;
     private IGravityModifiersFactory gravityModifiersFactory;
+    private IRowStrategy rowStrategy;
+    private ILayouterCreator layouterCreator;
 
-    AbstractLayouterFactory(ChipsLayoutManager layoutManager,
-                            IViewCacheStorage cacheStorage,
-                            IBreakerFactory breakerFactory,
-                            ICriteriaFactory criteriaFactory,
-                            IPlacerFactory placerFactory,
-                            IGravityModifiersFactory gravityModifiersFactory) {
-        this.cacheStorage = cacheStorage;
+    LayouterFactory(ChipsLayoutManager layoutManager,
+                    ILayouterCreator layouterCreator,
+                    IBreakerFactory breakerFactory,
+                    ICriteriaFactory criteriaFactory,
+                    IPlacerFactory placerFactory,
+                    IGravityModifiersFactory gravityModifiersFactory,
+                    IRowStrategy rowStrategy) {
+        this.layouterCreator = layouterCreator;
+        this.cacheStorage = layoutManager.getViewPositionsStorage();
         this.layoutManager = layoutManager;
         this.breakerFactory = breakerFactory;
         this.criteriaFactory = criteriaFactory;
         this.placerFactory = placerFactory;
         this.gravityModifiersFactory = gravityModifiersFactory;
+        this.rowStrategy = rowStrategy;
     }
 
     public void addLayouterListener(@Nullable ILayouterListener layouterListener) {
@@ -45,15 +53,27 @@ public abstract class AbstractLayouterFactory {
         }
     }
 
-    abstract AbstractLayouter.Builder createBackwardBuilder();
-    abstract AbstractLayouter.Builder createForwardBuilder();
-    abstract Rect createOffsetRectForBackwardLayouter(Rect anchorRect);
-    abstract Rect createOffsetRectForForwardLayouter(Rect anchorRect);
+    private AbstractLayouter.Builder createBackwardBuilder() {
+        return layouterCreator.createBackwardBuilder();
+    }
+
+    private AbstractLayouter.Builder createForwardBuilder() {
+        return layouterCreator.createForwardBuilder();
+    }
+    private Rect createOffsetRectForBackwardLayouter(Rect anchorRect) {
+        return layouterCreator.createOffsetRectForBackwardLayouter(anchorRect);
+    }
+    private Rect createOffsetRectForForwardLayouter(Rect anchorRect) {
+        return layouterCreator.createOffsetRectForForwardLayouter(anchorRect);
+    }
+    private ICanvas createCanvas() {
+        return layoutManager.getCanvas();
+    }
 
     @NonNull
     private AbstractLayouter.Builder fillBasicBuilder(AbstractLayouter.Builder builder) {
         return builder.layoutManager(layoutManager)
-                .canvas(new Square(layoutManager))
+                .canvas(createCanvas())
                 .childGravityResolver(layoutManager.getChildGravityResolver())
                 .cacheStorage(cacheStorage)
                 .gravityModifiersFactory(gravityModifiersFactory)
@@ -66,6 +86,7 @@ public abstract class AbstractLayouterFactory {
                 .offsetRect(createOffsetRectForBackwardLayouter(anchorRect))
                 .breaker(breakerFactory.createBackwardRowBreaker())
                 .finishingCriteria(criteriaFactory.getBackwardFinishingCriteria())
+                .rowStrategy(rowStrategy)
                 .placer(placerFactory.getAtStartPlacer())
                 .build();
     }
@@ -76,6 +97,7 @@ public abstract class AbstractLayouterFactory {
                 .offsetRect(createOffsetRectForForwardLayouter(anchorRect))
                 .breaker(breakerFactory.createForwardRowBreaker())
                 .finishingCriteria(criteriaFactory.getForwardFinishingCriteria())
+                .rowStrategy(new SkipLastRowStrategy(rowStrategy, !layoutManager.isStrategyAppliedWithLastRow()))
                 .placer(placerFactory.getAtEndPlacer())
                 .build();
     }

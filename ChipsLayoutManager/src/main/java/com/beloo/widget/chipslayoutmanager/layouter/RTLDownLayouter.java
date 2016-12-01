@@ -68,13 +68,18 @@ class RTLDownLayouter extends AbstractLayouter {
     }
 
     @Override
-    int getStart() {
+    public int getStartRowBorder() {
         return getViewTop();
     }
 
     @Override
-    int getEnd() {
+    public int getEndRowBorder() {
         return getViewBottom();
+    }
+
+    @Override
+    public int getRowLength() {
+        return getCanvasRightBorder() - viewRight;
     }
 
 
@@ -83,7 +88,7 @@ class RTLDownLayouter extends AbstractLayouter {
         }
 
         @NonNull
-        public RTLDownLayouter build() {
+        public RTLDownLayouter createLayouter() {
             return new RTLDownLayouter(this);
         }
     }

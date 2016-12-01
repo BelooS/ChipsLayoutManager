@@ -7,6 +7,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
@@ -26,7 +27,7 @@ import com.beloo.widget.chipslayoutmanager.cache.ViewCacheFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.CenterChildGravity;
 import com.beloo.widget.chipslayoutmanager.gravity.CustomGravityResolver;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
-import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouterFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.LayouterFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractPositionIterator;
 import com.beloo.widget.chipslayoutmanager.layouter.ILayouter;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractCriteriaFactory;
@@ -42,12 +43,30 @@ import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 
 import java.util.List;
 
-public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract, IStateHolder {
+public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract, IStateHolder, IPositionsContract {
+    ///////////////////////////////////////////////////////////////////////////
+    // orientation types
+    ///////////////////////////////////////////////////////////////////////////
     @SuppressWarnings("WeakerAccess")
     public static final int HORIZONTAL = 1;
     @SuppressWarnings("WeakerAccess")
     public static final int VERTICAL = 2;
 
+    ///////////////////////////////////////////////////////////////////////////
+    // row strategy types
+    ///////////////////////////////////////////////////////////////////////////
+    @SuppressWarnings("WeakerAccess")
+    public static final int STRATEGY_DEFAULT = 1;
+    @SuppressWarnings("WeakerAccess")
+    public static final int STRATEGY_FILL_VIEW = 2;
+    @SuppressWarnings("WeakerAccess")
+    public static final int STRATEGY_FILL_SPACE = 4;
+    @SuppressWarnings("WeakerAccess")
+    public static final int STRATEGY_CENTER = 5;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // inner constants
+    ///////////////////////////////////////////////////////////////////////////
     private static final String TAG = ChipsLayoutManager.class.getSimpleName();
     private static final int INT_ROW_SIZE_APPROXIMATELY_FOR_CACHE = 10;
     private static final int APPROXIMATE_ADDITIONAL_ROWS_COUNT = 5;
@@ -55,6 +74,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      * coefficient to support fast scrolling, caching views only for one row may not be enough
      */
     private static final float FAST_SCROLLING_COEFFICIENT = 2;
+
+    /** delegate which represents available canvas for drawing views according to layout*/
+    private ICanvas canvas = new Square(this);
 
     /** iterable over views added to RecyclerView */
     private ChildViewsIterable childViews = new ChildViewsIterable(this);
@@ -73,6 +95,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Orientation
     /** layoutOrientation of layout. Could have HORIZONTAL or VERTICAL style */
     private int layoutOrientation = HORIZONTAL;
+    @RowStrategy
+    private int rowStrategy = STRATEGY_DEFAULT;
+    private boolean isStrategyAppliedWithLastRow;
 
     ///////////////////////////////////////////////////////////////////////////
     // cache
@@ -149,6 +174,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private Integer minPositionOnScreen;
     private Integer maxPositionOnScreen;
 
+    private boolean isFirstItemAdded;
+
     ///////////////////////////////////////////////////////////////////////////
     // state-dependent
     ///////////////////////////////////////////////////////////////////////////
@@ -172,6 +199,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /** factory for placers factories*/
     private PlacerFactory placerFactory = new PlacerFactory(this);
 
+    private OrientationHelper orientationHelper = OrientationHelper.createOrientationHelper(this, OrientationHelper.VERTICAL);
+
     private ChipsLayoutManager(Context context) {
         @DeviceOrientation
         int orientation = context.getResources().getConfiguration().orientation;
@@ -189,7 +218,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     public static Builder newBuilder(Context context) {
-        return new ChipsLayoutManager(context).new Builder();
+        return new ChipsLayoutManager(context).new StrategyBuilder();
     }
 
     public IChildGravityResolver getChildGravityResolver() {
@@ -223,12 +252,25 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return viewPositionsStorage;
     }
 
+    public ICanvas getCanvas() {
+        return canvas;
+    }
+
     public Integer getMaxViewsInRow() {
         return maxViewsInRow;
     }
 
     public IRowBreaker getRowBreaker() {
         return rowBreaker;
+    }
+
+    @RowStrategy
+    public int getRowStrategyType() {
+        return rowStrategy;
+    }
+
+    public boolean isStrategyAppliedWithLastRow() {
+        return isStrategyAppliedWithLastRow;
     }
 
     /**
@@ -244,6 +286,21 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         });
     }
 
+    //create decorator if any other builders would be added
+    @SuppressWarnings("WeakerAccess")
+    public class StrategyBuilder extends Builder {
+
+        /** @param withLastRow true, if row strategy should be applied to last row.
+         * @see Builder#setRowStrategy(int) */
+        @SuppressWarnings("unused")
+        public Builder withLastRow(boolean withLastRow) {
+            ChipsLayoutManager.this.isStrategyAppliedWithLastRow = withLastRow;
+            return this;
+        }
+
+    }
+
+    @SuppressWarnings("WeakerAccess")
     public class Builder {
 
         @SpanLayoutChildGravity
@@ -255,7 +312,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         /**
          * set vertical gravity in a row for all children. Default = CENTER_VERTICAL
          */
-        @SuppressWarnings("unused")
+        @SuppressWarnings({"unused", "WeakerAccess"})
         public Builder setChildGravity(@SpanLayoutChildGravity int gravity) {
             this.gravity = gravity;
             return this;
@@ -278,6 +335,25 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         public Builder setScrollingEnabled(boolean isEnabled) {
             ChipsLayoutManager.this.setScrollingEnabledContract(isEnabled);
             return this;
+        }
+
+        /** row strategy for views in completed row.
+         * Any row has some space left, where is impossible to place the next view, because that space is too small.
+         * But we could distribute that space for available views in that row
+         * @param rowStrategy is a mode of distribution left space<br/>
+         * {@link #STRATEGY_DEFAULT} is used by default. Left space is placed at the end of the row.<br/>
+         * {@link #STRATEGY_FILL_VIEW} available space is distributed among views<br/>
+         * {@link #STRATEGY_FILL_SPACE} available space is distributed among spaces between views, start & end views are docked to a nearest border<br/>
+         * {@link #STRATEGY_CENTER} available space is distributed among spaces between views, start & end spaces included. Views are placed in center of canvas<br/>
+         * <br/>
+         * In such layouts by default last row isn't considered completed. So strategy isn't applied for last row.<br/>
+         * But you can also enable opposite behaviour.
+         * @see StrategyBuilder#withLastRow(boolean)
+         */
+        @SuppressWarnings("unused")
+        public StrategyBuilder setRowStrategy(@RowStrategy int rowStrategy) {
+            ChipsLayoutManager.this.rowStrategy = rowStrategy;
+            return (StrategyBuilder) this;
         }
 
         /**
@@ -389,12 +465,63 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return true;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // positions contract
+    ///////////////////////////////////////////////////////////////////////////
 
     @Override
-    public int getItemCount() {
-        //in pre-layouter drawing we need item count with items will be actually deleted to pre-draw appearing items properly
-        return super.getItemCount() + deletingItemsOnScreenCount;
+    public int findFirstVisibleItemPosition() {
+        for (View view : childViews) {
+            if (canvas.isInside(view)) {
+                return getPosition(view);
+            }
+        }
+        return RecyclerView.NO_POSITION;
     }
+
+    @Override
+    public int findFirstCompletelyVisibleItemPosition() {
+        for (View view : childViews) {
+            Rect rect = canvas.getViewRect(view);
+            if (!canvas.isFullyVisible(rect)) continue;
+            if (canvas.isInside(rect)) {
+                return getPosition(view);
+            }
+        }
+
+        return RecyclerView.NO_POSITION;
+    }
+
+    @Override
+    public int findLastVisibleItemPosition() {
+        for (int i = getChildCount() - 1; i >=0; i--) {
+            View view = getChildAt(i);
+            if (canvas.isInside(view)) {
+                return getPosition(view);
+            }
+        }
+
+        return RecyclerView.NO_POSITION;
+    }
+
+    @Override
+    public int findLastCompletelyVisibleItemPosition() {
+
+        for (int i = getChildCount() - 1; i >=0; i--) {
+            View view = getChildAt(i);
+            Rect rect = canvas.getViewRect(view);
+            if (!canvas.isFullyVisible(rect)) continue;
+            if (canvas.isInside(view)) {
+                return getPosition(view);
+            }
+        }
+
+        return RecyclerView.NO_POSITION;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // orientation
+    ///////////////////////////////////////////////////////////////////////////
 
     /**
      * @return true if RTL mode enabled in RecyclerView
@@ -410,14 +537,18 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     @Override
+    public int getItemCount() {
+        //in pre-layouter drawing we need item count with items will be actually deleted to pre-draw appearing items properly
+        return super.getItemCount() + deletingItemsOnScreenCount;
+    }
+
+    @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
         //We have nothing to show for an empty data set but clear any existing views
         if (getItemCount() == 0) {
             detachAndScrapAttachedViews(recycler);
             return;
         }
-
-        anchorFactory.setRecycler(recycler);
 
         predictiveAnimationsLogger.logState(state);
 
@@ -450,7 +581,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
             criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
 
-            AbstractLayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
+            LayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
             fill(recycler, layouterFactory, anchorView, true);
         } else {
@@ -461,7 +592,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             predictiveAnimationsLogger.heightOfCanvas(this);
             predictiveAnimationsLogger.onSummarizedDeletingItemsHeightCalculated(additionalLength);
             anchorView = anchorFactory.getAnchor();
-            anchorFactory.onPreLayout(anchorView, recycler);
+            anchorFactory.resetRowCoordinates(anchorView);
             Log.w(TAG, "anchor state in pre-layout = " + anchorView);
             detachAndScrapAttachedViews(recycler);
 
@@ -470,7 +601,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
             criteriaFactory.setAdditionalLength(additionalLength);
 
-            AbstractLayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
+            LayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
             fill(recycler, layouterFactory, anchorView, false);
 
@@ -481,19 +612,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         if (!state.isMeasuring()) {
             measureSupporter.onSizeChanged();
         }
-
-        //we should re-layout if previous anchor was removed or moved.
-        anchorView = anchorFactory.getAnchor();
-        if (anchorFactory.normalize(anchorView)) {
-            requestLayoutWithAnimations();
-        }
     }
 
     /** layout disappearing view to support predictive animations */
     private void layoutDisappearingViews(RecyclerView.Recycler recycler, ILayouter upLayouter, ILayouter downLayouter) {
 
         ICriteriaFactory criteriaFactory = new InfiniteCriteriaFactory();
-        AbstractLayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createDisappearingPlacerFactory());
+        LayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createDisappearingPlacerFactory());
 
         DisappearingViewsContainer disappearingViews = getDisappearingViews(recycler);
 
@@ -608,6 +733,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         minPositionOnScreen = null;
         maxPositionOnScreen = null;
 
+        isFirstItemAdded = false;
+
         if (getChildCount() > 0) {
             for (View view : childViews) {
                 int position = getPosition(view);
@@ -635,6 +762,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 if (maxPositionOnScreen == null || position > maxPositionOnScreen) {
                     maxPositionOnScreen = position;
                 }
+
+                if (position == 0) {
+                    isFirstItemAdded = true;
+                }
             }
         }
     }
@@ -642,7 +773,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /**
      * place all views on theirs right places according to current state
      */
-    private void fill(RecyclerView.Recycler recycler, AbstractLayouterFactory layouterFactory, @NonNull AnchorViewState anchorView, boolean isLayoutDisappearing) {
+    private void fill(RecyclerView.Recycler recycler, LayouterFactory layouterFactory, @NonNull AnchorViewState anchorView, boolean isLayoutDisappearing) {
         int startingPos = anchorView.getPosition();
         Rect anchorRect = anchorView.getAnchorViewRect();
 
@@ -774,8 +905,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         dx = scrollHorizontallyInternal(dx);
         offsetChildrenHorizontal(-dx);
 
-        anchorFactory.setRecycler(recycler);
-
         scrollingLogger.logChildCount(getChildCount());
 
         anchorView = anchorFactory.getAnchor();
@@ -783,7 +912,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
         criteriaFactory.setAdditionalRowsCount(1);
-        AbstractLayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
+        LayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
         fill(recycler, factory, anchorView, false);
         return dx;
@@ -805,15 +934,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         performNormalizationIfNeeded();
 
         return delta;
-    }
-
-    private boolean isZeroViewAdded() {
-        for (View view : childViews) {
-            if (getPosition(view) == 0) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /** calculate dx, stop scrolling whether items bounds reached*/
@@ -840,7 +960,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         int delta;
         AnchorViewState state = anchorFactory.getAnchor();
 
-        if (!isZeroViewAdded()) { //in case 0 position haven't added in layout yet
+        if (!isFirstItemAdded) { //in case 0 position haven't added in layout yet
             delta = dx;
         } else {
 
@@ -892,9 +1012,15 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     @Override
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
+
+        int firstPos = findFirstCompletelyVisibleItemPosition();
+        int lastPost = findLastCompletelyVisibleItemPosition();
+
+        Log.d(TAG, "first pos = " + firstPos);
+        Log.d(TAG, "last pos = " + lastPost);
+
         dy = scrollVerticallyInternal(dy);
         offsetChildrenVertical(-dy);
-        anchorFactory.setRecycler(recycler);
         anchorView = anchorFactory.getAnchor();
 
         scrollingLogger.logChildCount(getChildCount());
@@ -903,7 +1029,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
         criteriaFactory.setAdditionalRowsCount(1);
 
-        AbstractLayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
+        LayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
         fill(recycler, factory, anchorView, false);
         return dy;

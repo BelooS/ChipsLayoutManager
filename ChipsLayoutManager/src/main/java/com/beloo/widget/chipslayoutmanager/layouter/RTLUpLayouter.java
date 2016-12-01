@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.view.View;
 
+import java.util.Collections;
+
 class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     private static final String TAG = RTLUpLayouter.class.getSimpleName();
 
@@ -20,15 +22,21 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     void onPreLayout() {
         int leftOffsetOfRow = -(getCanvasRightBorder() - viewLeft);
 
+        viewLeft = rowViews.size() > 0 ? Integer.MAX_VALUE : 0;
+
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
 
             viewRect.left = viewRect.left - leftOffsetOfRow;
             viewRect.right = viewRect.right - leftOffsetOfRow;
 
+            viewLeft = Math.min(viewLeft, viewRect.left);
             viewTop = Math.min(viewTop, viewRect.top);
             viewBottom = Math.max(viewBottom, viewRect.bottom);
         }
+
+        //return to natural order
+        Collections.reverse(rowViews);
     }
 
     @Override
@@ -69,13 +77,18 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
-    int getStart() {
+    public int getStartRowBorder() {
         return getViewTop();
     }
 
     @Override
-    int getEnd() {
+    public int getEndRowBorder() {
         return getViewBottom();
+    }
+
+    @Override
+    public int getRowLength() {
+        return getCanvasRightBorder() - viewLeft;
     }
 
     @Override
@@ -88,7 +101,7 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
         }
 
         @NonNull
-        public RTLUpLayouter build() {
+        public RTLUpLayouter createLayouter() {
             return new RTLUpLayouter(this);
         }
     }

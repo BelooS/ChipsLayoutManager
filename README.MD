@@ -44,12 +44,13 @@ or custom `FlowLayout`s.
 * predictive animations supported (animate view movement outside of visible bounds)
 * setting max count of view in row
 * you are able to break row due to your conditions
+* justified views in row with spaces or additional view size
 
 | Insert/delete | Move |
 |---|---|
 |![Insert/delete animations with ChipsLayoutManager](/images/insert_delete_animations.gif) |![Move animations with ChipsLayoutManager](/images/move_animations.gif)|
 
-###Layout Directions
+####Layout Directions
 <center>
 
 |  | Left to Right  | Right to Left  |
@@ -59,17 +60,32 @@ or custom `FlowLayout`s.
 
 </center>
 
+####Fill strategy
+Any row has some space left, where is impossible to place the next view, because that space is too small.
+But we could distribute that space for available views in that row.
+
+Row strategy is a mode of distribution left space.
+
+* `STRATEGY_DEFAULT` - is used by default. Left space is placed at the end of the row.
+* `STRATEGY_FILL_VIEW` - available space is distributed among views.
+* `STRATEGY_FILL_SPACE` - available space is distributed among spaces between views, start & end views are docked to a nearest border.
+* `STRATEGY_CENTER` - available space is distributed among spaces between views, start & end spaces included. Views are placed in center of canvas.
+
+In such layouts by default last row isn't considered completed. So strategy isn't applied for last row.
+But you can also enable opposite behaviour.
+
 ### Usage
 
 ```JAVA 
 ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
         //set vertical gravity for all items in a row. Default = Gravity.CENTER_VERTICAL
         .setChildGravity(Gravity.TOP)
-        //whether RecyclerView can scroll
+        //whether RecyclerView can scroll. TRUE by default
         .setScrollingEnabled(true)
         //set maximum views count in a particular row
         .setMaxViewsInRow(2)
-        //set gravity resolver where you can determine gravity for item in position. This method have priority over previous one
+        //set gravity resolver where you can determine gravity for item in position. 
+        //This method have priority over previous one
         .setGravityResolver(new IChildGravityResolver() {
             @Override
             public int getItemGravity(int position) {
@@ -85,6 +101,11 @@ ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
         })
         //a layoutOrientation of layout manager, could be VERTICAL OR HORIZONTAL. HORIZONTAL by default
         .setOrientation(ChipsLayoutManager.HORIZONTAL)
+        // row strategy for views in completed row, could be STRATEGY_DEFAULT, STRATEGY_FILL_VIEW, 
+                STRATEGY_FILL_SPACE or STRATEGY_CENTER
+        .setRowStrategy(ChipsLayoutManager.STRATEGY_FILL_SPACE)
+        // whether strategy is applied to last row. FALSE by default
+        .withLastRow(true)
         .build();
 rv.setLayoutManager(chipsLayoutManager);
 ```

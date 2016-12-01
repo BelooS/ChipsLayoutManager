@@ -7,11 +7,8 @@ import com.beloo.widget.chipslayoutmanager.IScrollingController;
 import com.beloo.widget.chipslayoutmanager.VerticalScrollingController;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.anchor.RowsAnchorFactory;
-import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.RowGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.DecoratorBreakerFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.breaker.LTRRowBreakerFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.breaker.RTLRowBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.RowsCriteriaFactory;
@@ -25,17 +22,25 @@ public class RowsStateFactory implements IStateFactory {
         this.lm = lm;
     }
 
+    private IOrientationStateFactory createOrientationStateFactory() {
+        return lm.isLayoutRTL() ? new RTLRowsOrientationStateFactory() : new LTRRowsOrientationStateFactory();
+    }
+
     @Override
-    @SuppressWarnings("UnnecessaryLocalVariable")
-    public AbstractLayouterFactory createLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory) {
-        IViewCacheStorage cacheStorage = lm.getViewPositionsStorage();
+    public LayouterFactory createLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory) {
+        IOrientationStateFactory orientationStateFactory = createOrientationStateFactory();
 
-        AbstractLayouterFactory layouterFactory;
-
-        layouterFactory = lm.isLayoutRTL() ?
-                createRTLRowLayouterFactory(criteriaFactory, placerFactory, cacheStorage) : createLTRRowLayouterFactory(criteriaFactory, placerFactory, cacheStorage);
-
-        return layouterFactory;
+        return new LayouterFactory(lm,
+                orientationStateFactory.createLayouterCreator(lm),
+                new DecoratorBreakerFactory(
+                        lm.getViewPositionsStorage(),
+                        lm.getRowBreaker(),
+                        lm.getMaxViewsInRow(),
+                        orientationStateFactory.createDefaultBreaker()),
+                criteriaFactory,
+                placerFactory,
+                new RowGravityModifiersFactory(),
+                orientationStateFactory.createRowStrategyFactory().createRowStrategy(lm.getRowStrategyType()));
     }
 
     @Override
@@ -45,7 +50,7 @@ public class RowsStateFactory implements IStateFactory {
 
     @Override
     public IAnchorFactory anchorFactory() {
-        return new RowsAnchorFactory(lm, new Square(lm));
+        return new RowsAnchorFactory(lm, lm.getCanvas());
     }
 
     @Override
@@ -61,22 +66,6 @@ public class RowsStateFactory implements IStateFactory {
     @Override
     public int getEnd(View view) {
         return lm.getDecoratedBottom(view);
-    }
-
-    private AbstractLayouterFactory createLTRRowLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {
-        return new LTRRowsLayouterFactory(lm, cacheStorage,
-                new DecoratorBreakerFactory(cacheStorage, lm.getRowBreaker(), lm.getMaxViewsInRow(), new LTRRowBreakerFactory()),
-                criteriaFactory,
-                placerFactory,
-                new RowGravityModifiersFactory());
-    }
-
-    private AbstractLayouterFactory createRTLRowLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {
-        return new RTLRowsLayouterFactory(lm, cacheStorage,
-                new DecoratorBreakerFactory(cacheStorage, lm.getRowBreaker(), lm.getMaxViewsInRow(), new RTLRowBreakerFactory()),
-                criteriaFactory,
-                placerFactory,
-                new RowGravityModifiersFactory());
     }
 
 }

@@ -12,7 +12,8 @@ import java.lang.annotation.RetentionPolicy;
         Gravity.CENTER_VERTICAL,
         Gravity.CENTER_HORIZONTAL,
         Gravity.LEFT,
-        Gravity.RIGHT
+        Gravity.RIGHT,
+        Gravity.FILL
 })
 @Retention(RetentionPolicy.SOURCE)
 public @interface SpanLayoutChildGravity {}

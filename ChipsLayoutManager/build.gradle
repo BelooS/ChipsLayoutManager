@@ -13,7 +13,7 @@ ext {
     libraryName = 'ChipsLayoutManager'
     publishedGroupId = 'com.beloo.widget'
     artifact = 'ChipsLayoutManager'
-    libraryVersion = '0.3.0'
+    libraryVersion = '0.3.1'
 
     libraryDescription = 'Android. A custom layout manager for RecyclerView which mimicric TextView span behaviour, flow layouts behaviour with support of amazing recyclerView features'
 
@@ -36,7 +36,7 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 8
+        versionCode 9
         versionName libraryVersion
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

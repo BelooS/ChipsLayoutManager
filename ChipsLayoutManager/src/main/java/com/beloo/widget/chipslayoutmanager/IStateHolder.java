@@ -1,6 +1,6 @@
 package com.beloo.widget.chipslayoutmanager;
 
-public interface IStateHolder {
+interface IStateHolder {
     boolean isLayoutRTL();
 
     @Orientation

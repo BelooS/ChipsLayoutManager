@@ -2,7 +2,7 @@ package com.beloo.widget.chipslayoutmanager.gravity;
 
 import android.graphics.Rect;
 
-public class CenterInColumnGravityModifier implements IGravityModifier {
+class CenterInColumnGravityModifier implements IGravityModifier {
 
     @Override
     public void modifyChildRect(int minStart, int maxEnd, Rect childRect) {

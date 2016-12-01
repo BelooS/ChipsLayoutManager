@@ -20,7 +20,8 @@ class RightLayouter extends AbstractLayouter {
     Rect createViewRect(View view) {
         Rect viewRect = new Rect(viewLeft, viewTop, viewLeft + getCurrentViewWidth(), viewTop + getCurrentViewHeight());
 
-        viewTop = viewRect.bottom;
+        viewBottom = viewRect.bottom;
+        viewTop = viewBottom;
         viewRight = Math.max(viewRight, viewRect.right);
         return viewRect;
     }
@@ -68,13 +69,18 @@ class RightLayouter extends AbstractLayouter {
     }
 
     @Override
-    int getStart() {
+    public int getStartRowBorder() {
         return getViewLeft();
     }
 
     @Override
-    int getEnd() {
+    public int getEndRowBorder() {
         return getViewRight();
+    }
+
+    @Override
+    public int getRowLength() {
+        return viewTop - getCanvasTopBorder();
     }
 
     public static final class Builder extends AbstractLayouter.Builder {
@@ -82,7 +88,7 @@ class RightLayouter extends AbstractLayouter {
         }
 
         @NonNull
-        public RightLayouter build() {
+        public RightLayouter createLayouter() {
             return new RightLayouter(this);
         }
     }

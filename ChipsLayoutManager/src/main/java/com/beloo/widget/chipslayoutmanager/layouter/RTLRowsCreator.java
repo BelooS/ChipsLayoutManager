@@ -1,28 +1,27 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
+import android.support.v7.widget.RecyclerView;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifiersFactory;
+import com.beloo.widget.chipslayoutmanager.gravity.IRowStrategy;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacerFactory;
 
-class RTLRowsLayouterFactory extends AbstractLayouterFactory {
+class RTLRowsCreator implements ILayouterCreator {
 
-    RTLRowsLayouterFactory(ChipsLayoutManager layoutManager,
-                           IViewCacheStorage cacheStorage,
-                           IBreakerFactory breakerFactory,
-                           ICriteriaFactory criteriaFactory,
-                           IPlacerFactory placerFactory,
-                           IGravityModifiersFactory gravityModifiersFactory) {
-        super(layoutManager, cacheStorage, breakerFactory, criteriaFactory, placerFactory, gravityModifiersFactory);
+    private RecyclerView.LayoutManager layoutManager;
+
+    RTLRowsCreator(RecyclerView.LayoutManager layoutManager) {
+        this.layoutManager = layoutManager;
     }
 
     //---- up layouter below
     @Override
-    Rect createOffsetRectForBackwardLayouter(Rect anchorRect) {
+    public Rect createOffsetRectForBackwardLayouter(Rect anchorRect) {
         return new Rect(
                 //we shouldn't include anchor view here, so anchorLeft is a rightOffset
                 anchorRect == null ? layoutManager.getPaddingLeft() : anchorRect.right,
@@ -32,19 +31,19 @@ class RTLRowsLayouterFactory extends AbstractLayouterFactory {
     }
 
     @Override
-    AbstractLayouter.Builder createBackwardBuilder() {
+    public AbstractLayouter.Builder createBackwardBuilder() {
         return RTLUpLayouter.newBuilder();
     }
 
     //---- down layouter below
 
     @Override
-    AbstractLayouter.Builder createForwardBuilder() {
+    public AbstractLayouter.Builder createForwardBuilder() {
         return RTLDownLayouter.newBuilder();
     }
 
     @Override
-    Rect createOffsetRectForForwardLayouter(Rect anchorRect) {
+    public Rect createOffsetRectForForwardLayouter(Rect anchorRect) {
         return new Rect(
                 0,
                 anchorRect == null ? layoutManager.getPaddingTop() : anchorRect.top,

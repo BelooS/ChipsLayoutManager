@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.ChildViewsIterable;
-import com.beloo.widget.chipslayoutmanager.layouter.ICanvas;
+import com.beloo.widget.chipslayoutmanager.ICanvas;
 
 public class RowsAnchorFactory extends AbstractAnchorFactory {
 
@@ -22,8 +22,6 @@ public class RowsAnchorFactory extends AbstractAnchorFactory {
 
         AnchorViewState minPosView = AnchorViewState.getNotFoundState();
 
-        Rect mainRect = getCanvasRect();
-
         int minPosition = Integer.MAX_VALUE;
         int minTop = Integer.MAX_VALUE;
 
@@ -32,11 +30,9 @@ public class RowsAnchorFactory extends AbstractAnchorFactory {
             int pos = lm.getPosition(view);
             int top = lm.getDecoratedTop(view);
 
-            //intersection changes rect!!!
             Rect viewRect = new Rect(anchorViewState.getAnchorViewRect());
-            boolean intersect = viewRect.intersect(mainRect);
 
-            if (intersect && !anchorViewState.isRemoving()) {
+            if (getCanvas().isInside(viewRect) && !anchorViewState.isRemoving()) {
                 if (minPosition > pos) {
                     minPosition = pos;
                     minPosView = anchorViewState;
@@ -60,21 +56,12 @@ public class RowsAnchorFactory extends AbstractAnchorFactory {
     }
 
     @Override
-    public boolean normalize(AnchorViewState anchorView) {
-        if (!anchorView.isNotFoundState() && anchorView.getAnchorViewRect().top > lm.getPaddingTop()) {
-            if (!anchorView.isNotFoundState()) {
-                int d = anchorView.getAnchorViewRect().top - lm.getPaddingTop();
-                anchorView.getAnchorViewRect().top -= d;
-                anchorView.getAnchorViewRect().bottom -= d;
-            }
-            return true;
+    public void resetRowCoordinates(AnchorViewState anchorView) {
+        if (!anchorView.isNotFoundState()) {
+            Rect rect = anchorView.getAnchorViewRect();
+            rect.left = getCanvas().getCanvasLeftBorder();
+            rect.right = getCanvas().getCanvasRightBorder();
         }
-        return false;
-    }
-
-    @Override
-    public void onPreLayout(AnchorViewState anchorView, RecyclerView.Recycler recycler) {
-
     }
 
 }

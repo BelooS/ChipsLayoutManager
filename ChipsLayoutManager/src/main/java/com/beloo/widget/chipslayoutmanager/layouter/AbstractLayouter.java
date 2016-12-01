@@ -13,18 +13,20 @@ import java.util.List;
 import java.util.Set;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.chipslayoutmanager.IBorder;
 import com.beloo.widget.chipslayoutmanager.SpanLayoutChildGravity;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifiersFactory;
+import com.beloo.widget.chipslayoutmanager.gravity.IRowStrategy;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.ILayoutRowBreaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
-import com.beloo.widget.chipslayoutmanager.gravity.RowGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifier;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 
-public abstract class AbstractLayouter implements ILayouter, ICanvas {
+/** this class performs measuring, calculation, and placing of views on border (layout manager) according to state criterias */
+public abstract class AbstractLayouter implements ILayouter, IBorder {
     private int currentViewWidth;
     private int currentViewHeight;
     private int currentViewPosition;
@@ -42,10 +44,18 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     private int rowSize = 0;
     private int previousRowSize;
 
-    //--- input dependencies
+    /** is row completed when {@link #layoutRow()} called*/
+    private boolean isRowCompleted;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // input dependencies
+    ///////////////////////////////////////////////////////////////////////////
+    @NonNull
     private ChipsLayoutManager layoutManager;
+    @NonNull
     private IViewCacheStorage cacheStorage;
-    private ICanvas canvas;
+    @NonNull
+    private IBorder border;
     @NonNull
     private IChildGravityResolver childGravityResolver;
     @NonNull
@@ -54,20 +64,21 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     private IPlacer placer;
     @NonNull
     private ILayoutRowBreaker breaker;
-    //--- end input dependencies
-
-    private AbstractPositionIterator positionIterator;
-
+    @NonNull
+    private IRowStrategy rowStrategy;
+    private Set<ILayouterListener> layouterListeners = new HashSet<>();
     @NonNull
     private IGravityModifiersFactory gravityModifiersFactory;
 
-    private Set<ILayouterListener> layouterListeners = new HashSet<>();
+    //--- end input dependencies
+
+    private AbstractPositionIterator positionIterator;
 
     AbstractLayouter(Builder builder) {
         //--- read builder
         layoutManager = builder.layoutManager;
         cacheStorage = builder.cacheStorage;
-        canvas = builder.canvas;
+        border = builder.border;
         childGravityResolver = builder.childGravityResolver;
         this.finishingCriteria = builder.finishingCriteria;
         placer = builder.placer;
@@ -78,6 +89,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         this.layouterListeners = builder.layouterListeners;
         this.breaker = builder.breaker;
         this.gravityModifiersFactory = builder.gravityModifiersFactory;
+        this.rowStrategy = builder.rowStrategy;
         //--- end read builder
 
         positionIterator = createPositionIterator();
@@ -92,25 +104,8 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         return positionIterator;
     }
 
-    @Override
-    public Rect getCanvasRect() {
-        return canvas.getCanvasRect();
-    }
-
-    public final int getCanvasRightBorder() {
-        return canvas.getCanvasRightBorder();
-    }
-
-    public final int getCanvasBottomBorder() {
-        return canvas.getCanvasBottomBorder();
-    }
-
-    public final int getCanvasLeftBorder() {
-        return canvas.getCanvasLeftBorder();
-    }
-
-    public final int getCanvasTopBorder() {
-        return canvas.getCanvasTopBorder();
+    public boolean isRowCompleted() {
+        return isRowCompleted;
     }
 
     public List<Item> getCurrentRowItems() {
@@ -166,6 +161,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         calculateView(view);
 
         if (canNotBePlacedInCurrentRow()) {
+            isRowCompleted = true;
             layoutRow();
         }
 
@@ -179,12 +175,13 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     }
 
     /** if all necessary view have placed*/
-    boolean isFinishedLayouting() {
+    public final boolean isFinishedLayouting() {
         return finishingCriteria.isFinishedLayouting(this);
     }
 
     /** check if we can not add current view to row
      * we determine it on the next layouter step, because we need next view size to determine whether it fits in row or not */
+    @SuppressWarnings("WeakerAccess")
     public final boolean canNotBePlacedInCurrentRow() {
         return breaker.isRowBroke(this);
     }
@@ -192,7 +189,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     /** factory method for Rect, where view will be placed. Creation based on inner layouter parameters */
     abstract Rect createViewRect(View view);
 
-    /** called when layouter ready to add row to canvas. Children could perform normalization actions on created row*/
+    /** called when layouter ready to add row to border. Children could perform normalization actions on created row*/
     abstract void onPreLayout();
 
     /** called after row have been layouted. Children should prepare new row here. */
@@ -218,7 +215,6 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
 
         if (isAttachedViewFromNewRow(view)) {
             //new row, reset row size
-//            Log.d("onAttachView", "on attached new row");
             notifyLayouterListeners();
             rowSize = 0;
         }
@@ -237,7 +233,12 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     public final void layoutRow() {
         onPreLayout();
 
-        /** layout pre-calculated row on a recyclerView canvas */
+        //apply modifiers to whole row
+        if (rowViews.size() > 0) {
+            rowStrategy.applyStrategy(this, getCurrentRowItems());
+        }
+
+        /** layout pre-calculated row on a recyclerView border */
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
             View view = rowViewRectPair.second;
@@ -250,14 +251,16 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
             layoutManager.layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
         }
 
-        notifyLayouterListeners();
-
         onAfterLayout();
 
+        notifyLayouterListeners();
+
+
         previousRowSize = rowSize;
-        this.rowSize = 0;
         //clear row data
+        this.rowSize = 0;
         rowViews.clear();
+        isRowCompleted = false;
     }
 
     /** by default items placed and attached to a top of the row.
@@ -266,13 +269,15 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         @SpanLayoutChildGravity
         int viewGravity = childGravityResolver.getItemGravity(getLayoutManager().getPosition(view));
         IGravityModifier gravityModifier = gravityModifiersFactory.getGravityModifier(viewGravity);
-        gravityModifier.modifyChildRect(getStart(), getEnd(), viewRect);
+        gravityModifier.modifyChildRect(getStartRowBorder(), getEndRowBorder(), viewRect);
     }
 
+    @NonNull
     public ChipsLayoutManager getLayoutManager() {
         return layoutManager;
     }
 
+    /** get count of items inside current row */
     @Override
     public int getRowSize() {
         return rowSize;
@@ -282,13 +287,15 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         return viewTop;
     }
 
-    abstract int getStart();
+    /** get a start coordinate of row border which is perpendicular to row general extension*/
+    public abstract int getStartRowBorder();
 
-    abstract int getEnd();
+    /** get an end coordinate of row border which is perpendicular to row general extension*/
+    public abstract int getEndRowBorder();
 
     @Override
     public Rect getRowRect() {
-        return new Rect(getCanvasLeftBorder(), viewTop, getCanvasRightBorder(), getViewBottom());
+        return new Rect(getCanvasLeftBorder(), getViewTop(), getCanvasRightBorder(), getViewBottom());
     }
 
     public int getViewBottom() {
@@ -315,10 +322,12 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         return currentViewHeight;
     }
 
+    public abstract int getRowLength();
+
     public abstract static class Builder {
         private ChipsLayoutManager layoutManager;
         private IViewCacheStorage cacheStorage;
-        private ICanvas canvas;
+        private IBorder border;
         private IChildGravityResolver childGravityResolver;
         private IFinishingCriteria finishingCriteria;
         private IPlacer placer;
@@ -326,9 +335,11 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         private Rect offsetRect;
         private HashSet<ILayouterListener> layouterListeners = new HashSet<>();
         private IGravityModifiersFactory gravityModifiersFactory;
+        private IRowStrategy rowStrategy;
 
         Builder() {}
 
+        @SuppressWarnings("WeakerAccess")
         @NonNull
         public Builder offsetRect(@NonNull Rect offsetRect) {
             this.offsetRect = offsetRect;
@@ -348,8 +359,14 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         }
 
         @NonNull
-        final Builder canvas(@NonNull ICanvas canvas) {
-            this.canvas = canvas;
+        Builder rowStrategy(IRowStrategy rowStrategy) {
+            this.rowStrategy = rowStrategy;
+            return this;
+        }
+
+        @NonNull
+        final Builder canvas(@NonNull IBorder border) {
+            this.border = border;
             return this;
         }
 
@@ -377,6 +394,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
             return this;
         }
 
+        @SuppressWarnings("unused")
         @NonNull
         final Builder addLayouterListener(@Nullable ILayouterListener layouterListener) {
             if (layouterListener != null) {
@@ -399,6 +417,61 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         }
 
         @NonNull
-        public abstract AbstractLayouter build();
+        protected abstract AbstractLayouter createLayouter();
+
+        public final AbstractLayouter build() {
+            if (layoutManager == null)
+                throw new IllegalStateException("layoutManager can't be null, call #layoutManager()");
+
+            if (breaker == null)
+                throw new IllegalStateException("breaker can't be null, call #breaker()");
+
+            if (border == null)
+                throw new IllegalStateException("border can't be null, call #border()");
+
+            if (cacheStorage == null)
+                throw new IllegalStateException("cacheStorage can't be null, call #cacheStorage()");
+
+            if (rowStrategy == null)
+                throw new IllegalStateException("rowStrategy can't be null, call #rowStrategy()");
+
+            if (offsetRect == null)
+                throw new IllegalStateException("offsetRect can't be null, call #offsetRect()");
+
+            if (finishingCriteria == null)
+                throw new IllegalStateException("finishingCriteria can't be null, call #finishingCriteria()");
+
+            if (placer == null)
+                throw new IllegalStateException("placer can't be null, call #placer()");
+
+            if (gravityModifiersFactory == null)
+                throw new IllegalStateException("gravityModifiersFactory can't be null, call #gravityModifiersFactory()");
+
+            if (childGravityResolver == null)
+                throw new IllegalStateException("childGravityResolver can't be null, call #childGravityResolver()");
+
+            return createLayouter();
+        }
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // border delegate
+    ///////////////////////////////////////////////////////////////////////////
+
+    public final int getCanvasRightBorder() {
+        return border.getCanvasRightBorder();
+    }
+
+    public final int getCanvasBottomBorder() {
+        return border.getCanvasBottomBorder();
+    }
+
+    public final int getCanvasLeftBorder() {
+        return border.getCanvasLeftBorder();
+    }
+
+    public final int getCanvasTopBorder() {
+        return border.getCanvasTopBorder();
+    }
+
 }

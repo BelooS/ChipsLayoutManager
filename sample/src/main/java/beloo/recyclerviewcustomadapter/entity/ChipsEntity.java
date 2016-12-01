@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 
 public class ChipsEntity implements Parcelable {
     @DrawableRes
-    @Nullable
     private Integer drawableResId;
 
     @Nullable
@@ -17,7 +16,6 @@ public class ChipsEntity implements Parcelable {
     @NonNull
     private String name;
 
-    @Nullable
     public Integer getDrawableResId() {
         return drawableResId;
     }

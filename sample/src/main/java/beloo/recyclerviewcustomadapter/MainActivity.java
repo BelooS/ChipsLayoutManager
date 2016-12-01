@@ -11,7 +11,6 @@ import android.widget.Spinner;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
-import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -27,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private List items;
 
     /** replace here different data sets */
-    private IItemsFactory itemsFactory = new ChipsFactory();
+    private IItemsFactory itemsFactory = new ShortChipsFactory();
 
     private OnRemoveListener onRemoveListener = new OnRemoveListener() {
         @Override

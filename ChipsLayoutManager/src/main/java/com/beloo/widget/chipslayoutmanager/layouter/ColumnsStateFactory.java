@@ -9,8 +9,10 @@ import com.beloo.widget.chipslayoutmanager.anchor.ColumnsAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.gravity.ColumnGravityModifiersFactory;
+import com.beloo.widget.chipslayoutmanager.gravity.ColumnStrategyFactory;
+import com.beloo.widget.chipslayoutmanager.gravity.IRowStrategyFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.DecoratorBreakerFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.breaker.LTRColumnBreakerFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.breaker.ColumnBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ColumnsCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
@@ -19,24 +21,28 @@ import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacerFactory;
 public class ColumnsStateFactory implements IStateFactory {
 
     private ChipsLayoutManager lm;
+    private IRowStrategyFactory rowStrategyFactory;
 
     public ColumnsStateFactory(ChipsLayoutManager lm) {
         this.lm = lm;
+        rowStrategyFactory = new ColumnStrategyFactory();
     }
 
     @Override
-    public AbstractLayouterFactory createLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory) {
+    public LayouterFactory createLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory) {
         IViewCacheStorage cacheStorage = lm.getViewPositionsStorage();
 
-        return createLTRColumnLayouterFactory(criteriaFactory, placerFactory, cacheStorage);
+        return createColumnLayouterFactory(criteriaFactory, placerFactory, cacheStorage);
     }
 
-    private AbstractLayouterFactory createLTRColumnLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {
-        return new LTRColumnsLayouterFactory(lm, cacheStorage,
-                new DecoratorBreakerFactory(cacheStorage, lm.getRowBreaker(), lm.getMaxViewsInRow(), new LTRColumnBreakerFactory()),
-                criteriaFactory,
-                placerFactory,
-                new ColumnGravityModifiersFactory());
+    private LayouterFactory createColumnLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {
+         return new LayouterFactory(lm,
+                 new ColumnsCreator(lm),
+                 new DecoratorBreakerFactory(cacheStorage, lm.getRowBreaker(), lm.getMaxViewsInRow(), new ColumnBreakerFactory()),
+                 criteriaFactory,
+                 placerFactory,
+                 new ColumnGravityModifiersFactory(),
+                 rowStrategyFactory.createRowStrategy(lm.getRowStrategyType()));
     }
 
     @Override
@@ -46,7 +52,7 @@ public class ColumnsStateFactory implements IStateFactory {
 
     @Override
     public IAnchorFactory anchorFactory() {
-        return new ColumnsAnchorFactory(lm, new Square(lm));
+        return new ColumnsAnchorFactory(lm, lm.getCanvas());
     }
 
     @Override
@@ -63,12 +69,4 @@ public class ColumnsStateFactory implements IStateFactory {
     public int getEnd(View view) {
         return lm.getDecoratedRight(view);
     }
-
-    //    private AbstractLayouterFactory createRTLColumnLayouterFactory(ICriteriaFactory criteriaFactory, IPlacerFactory placerFactory, IViewCacheStorage cacheStorage) {
-//        return new RTLRowsLayouterFactory(lm, cacheStorage,
-//                new DecoratorBreakerFactory(cacheStorage, lm.getRowBreaker(), lm.getMaxViewsInRow(), new LTRColumnBreakerFactory()),
-//                criteriaFactory,
-//                placerFactory,
-//                new ColumnGravityModifiersFactory());
-//    }
 }

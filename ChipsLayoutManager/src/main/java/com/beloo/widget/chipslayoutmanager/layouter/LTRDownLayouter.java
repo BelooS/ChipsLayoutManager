@@ -71,13 +71,18 @@ class LTRDownLayouter extends AbstractLayouter {
     }
 
     @Override
-    int getStart() {
+    public int getStartRowBorder() {
         return getViewTop();
     }
 
     @Override
-    int getEnd() {
+    public int getEndRowBorder() {
         return getViewBottom();
+    }
+
+    @Override
+    public int getRowLength() {
+        return viewLeft - getCanvasLeftBorder();
     }
 
     public static final class Builder extends AbstractLayouter.Builder {
@@ -85,7 +90,7 @@ class LTRDownLayouter extends AbstractLayouter {
         }
 
         @NonNull
-        public LTRDownLayouter build() {
+        public LTRDownLayouter createLayouter() {
             return new LTRDownLayouter(this);
         }
     }

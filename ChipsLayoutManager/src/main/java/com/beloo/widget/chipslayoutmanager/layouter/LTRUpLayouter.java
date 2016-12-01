@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.view.View;
 
+import java.util.Collections;
+
 class LTRUpLayouter extends AbstractLayouter implements ILayouter {
 
     private LTRUpLayouter(Builder builder) {
@@ -28,15 +30,21 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     @Override
     void onPreLayout() {
         int leftOffsetOfRow = viewRight - getCanvasLeftBorder();
+        viewLeft = 0;
+
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
 
             viewRect.left = viewRect.left - leftOffsetOfRow;
             viewRect.right = viewRect.right - leftOffsetOfRow;
 
+            viewLeft = Math.max(viewRect.right, viewLeft);
             viewTop = Math.min(viewTop, viewRect.top);
             viewBottom = Math.max(viewBottom, viewRect.bottom);
         }
+
+        //return to natural order
+        Collections.reverse(rowViews);
     }
 
     @Override
@@ -69,13 +77,18 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
-    int getStart() {
+    public int getStartRowBorder() {
         return getViewTop();
     }
 
     @Override
-    int getEnd() {
+    public int getEndRowBorder() {
         return getViewBottom();
+    }
+
+    @Override
+    public int getRowLength() {
+        return getCanvasRightBorder() - viewRight;
     }
 
     @Override
@@ -89,7 +102,7 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
         }
 
         @NonNull
-        public LTRUpLayouter build() {
+        public LTRUpLayouter createLayouter() {
             return new LTRUpLayouter(this);
         }
     }
