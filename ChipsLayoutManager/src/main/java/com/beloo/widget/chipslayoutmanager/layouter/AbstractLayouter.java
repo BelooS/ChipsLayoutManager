@@ -14,7 +14,6 @@ import java.util.Set;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.IBorder;
-import com.beloo.widget.chipslayoutmanager.ICanvas;
 import com.beloo.widget.chipslayoutmanager.SpanLayoutChildGravity;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.IRowStrategy;
@@ -51,8 +50,11 @@ public abstract class AbstractLayouter implements ILayouter, IBorder {
     ///////////////////////////////////////////////////////////////////////////
     // input dependencies
     ///////////////////////////////////////////////////////////////////////////
+    @NonNull
     private ChipsLayoutManager layoutManager;
+    @NonNull
     private IViewCacheStorage cacheStorage;
+    @NonNull
     private IBorder border;
     @NonNull
     private IChildGravityResolver childGravityResolver;
@@ -270,6 +272,7 @@ public abstract class AbstractLayouter implements ILayouter, IBorder {
         gravityModifier.modifyChildRect(getStartRowBorder(), getEndRowBorder(), viewRect);
     }
 
+    @NonNull
     public ChipsLayoutManager getLayoutManager() {
         return layoutManager;
     }
@@ -414,7 +417,41 @@ public abstract class AbstractLayouter implements ILayouter, IBorder {
         }
 
         @NonNull
-        public abstract AbstractLayouter build();
+        protected abstract AbstractLayouter createLayouter();
+
+        public final AbstractLayouter build() {
+            if (layoutManager == null)
+                throw new IllegalStateException("layoutManager can't be null, call #layoutManager()");
+
+            if (breaker == null)
+                throw new IllegalStateException("breaker can't be null, call #breaker()");
+
+            if (border == null)
+                throw new IllegalStateException("border can't be null, call #border()");
+
+            if (cacheStorage == null)
+                throw new IllegalStateException("cacheStorage can't be null, call #cacheStorage()");
+
+            if (rowStrategy == null)
+                throw new IllegalStateException("rowStrategy can't be null, call #rowStrategy()");
+
+            if (offsetRect == null)
+                throw new IllegalStateException("offsetRect can't be null, call #offsetRect()");
+
+            if (finishingCriteria == null)
+                throw new IllegalStateException("finishingCriteria can't be null, call #finishingCriteria()");
+
+            if (placer == null)
+                throw new IllegalStateException("placer can't be null, call #placer()");
+
+            if (gravityModifiersFactory == null)
+                throw new IllegalStateException("gravityModifiersFactory can't be null, call #gravityModifiersFactory()");
+
+            if (childGravityResolver == null)
+                throw new IllegalStateException("childGravityResolver can't be null, call #childGravityResolver()");
+
+            return createLayouter();
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
