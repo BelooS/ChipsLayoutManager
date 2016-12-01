@@ -102,7 +102,7 @@ ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
         //a layoutOrientation of layout manager, could be VERTICAL OR HORIZONTAL. HORIZONTAL by default
         .setOrientation(ChipsLayoutManager.HORIZONTAL)
         // row strategy for views in completed row, could be STRATEGY_DEFAULT, STRATEGY_FILL_VIEW, 
-                STRATEGY_FILL_SPACE or STRATEGY_CENTER
+        //STRATEGY_FILL_SPACE or STRATEGY_CENTER
         .setRowStrategy(ChipsLayoutManager.STRATEGY_FILL_SPACE)
         // whether strategy is applied to last row. FALSE by default
         .withLastRow(true)
