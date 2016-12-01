@@ -44,6 +44,7 @@ or custom `FlowLayout`s.
 * predictive animations supported (animate view movement outside of visible bounds)
 * setting max count of view in row
 * you are able to break row due to your conditions
+* justified views in row with spaces or additional view size
 
 | Insert/delete | Move |
 |---|---|
@@ -86,6 +87,10 @@ ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
         })
         //an layoutOrientation of layout manager, could be VERTICAL OR HORIZONTAL. HORIZONTAL by default
         .setOrientation(ChipsLayoutManager.HORIZONTAL)
+        // row strategy for views in completed row, could be STRATEGY_DEFAULT, STRATEGY_FILL_VIEW, STRATEGY_FILL_SPACE or STRATEGY_FILL_SPACE_CENTER 
+        .setRowStrategy(ChipsLayoutManager.STRATEGY_FILL_SPACE)
+        // whether strategy is applied to last row. FALSE by default
+        .withLastRow(true)
         .build();
 rv.setLayoutManager(chipsLayoutManager);
 ```
