@@ -452,11 +452,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public int findFirstVisibleItemPosition() {
-
-//        for (View view : childViews) {
-//            if canvas.isInside()
-//        }
-
+        for (View view : childViews) {
+            if (canvas.isInside(view)) {
+                return getPosition(view);
+            }
+        }
         return RecyclerView.NO_POSITION;
     }
 
@@ -467,6 +467,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public int findLastVisibleItemPosition() {
+        for (int i = getChildCount() - 1; i >=0; i--) {
+            View view = getChildAt(i);
+            if (canvas.isInside(view)) {
+                return getPosition(view);
+            }
+        }
+
         return RecyclerView.NO_POSITION;
     }
 
