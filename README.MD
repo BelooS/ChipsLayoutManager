@@ -61,7 +61,7 @@ or custom `FlowLayout`s.
 </center>
 
 ####Fill strategy
-Any row have some space left, where is impossible to place the next view, because that space is too small.
+Any row has some space left, where is impossible to place the next view, because that space is too small.
 But we could distribute that space for available views in that row.
 
 Row strategy is a mode of distribution left space.
@@ -69,7 +69,7 @@ Row strategy is a mode of distribution left space.
 * `STRATEGY_DEFAULT` - is used by default. Left space is placed at the end of the row.
 * `STRATEGY_FILL_VIEW` - available space is distributed among views.
 * `STRATEGY_FILL_SPACE` - available space is distributed among spaces between views, start & end views are docked to a nearest border.
-* `STRATEGY_FILL_SPACE_CENTER` - available space is distributed among spaces between views, start & end spaces included. Views are placed in center of canvas.
+* `STRATEGY_CENTER` - available space is distributed among spaces between views, start & end spaces included. Views are placed in center of canvas.
 
 In such layouts by default last row isn't considered completed. So strategy isn't applied for last row.
 But you can also enable opposite behaviour.
@@ -102,7 +102,7 @@ ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
         //an layoutOrientation of layout manager, could be VERTICAL OR HORIZONTAL. HORIZONTAL by default
         .setOrientation(ChipsLayoutManager.HORIZONTAL)
         // row strategy for views in completed row, could be STRATEGY_DEFAULT, STRATEGY_FILL_VIEW, 
-                STRATEGY_FILL_SPACE or STRATEGY_FILL_SPACE_CENTER 
+                STRATEGY_FILL_SPACE or STRATEGY_CENTER
         .setRowStrategy(ChipsLayoutManager.STRATEGY_FILL_SPACE)
         // whether strategy is applied to last row. FALSE by default
         .withLastRow(true)

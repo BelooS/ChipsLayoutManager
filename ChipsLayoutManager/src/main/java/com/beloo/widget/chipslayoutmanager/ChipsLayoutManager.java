@@ -62,7 +62,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @SuppressWarnings("WeakerAccess")
     public static final int STRATEGY_FILL_SPACE = 4;
     @SuppressWarnings("WeakerAccess")
-    public static final int STRATEGY_FILL_SPACE_CENTER = 5;
+    public static final int STRATEGY_CENTER = 5;
 
     ///////////////////////////////////////////////////////////////////////////
     // inner constants
@@ -338,13 +338,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
 
         /** row strategy for views in completed row.
-         * Any row have some space left, where is impossible to place the next view, because that space is too small.
+         * Any row has some space left, where is impossible to place the next view, because that space is too small.
          * But we could distribute that space for available views in that row
          * @param rowStrategy is a mode of distribution left space<br/>
          * {@link #STRATEGY_DEFAULT} is used by default. Left space is placed at the end of the row.<br/>
          * {@link #STRATEGY_FILL_VIEW} available space is distributed among views<br/>
          * {@link #STRATEGY_FILL_SPACE} available space is distributed among spaces between views, start & end views are docked to a nearest border<br/>
-         * {@link #STRATEGY_FILL_SPACE_CENTER} available space is distributed among spaces between views, start & end spaces included. Views are placed in center of canvas<br/>
+         * {@link #STRATEGY_CENTER} available space is distributed among spaces between views, start & end spaces included. Views are placed in center of canvas<br/>
          * <br/>
          * In such layouts by default last row isn't considered completed. So strategy isn't applied for last row.<br/>
          * But you can also enable opposite behaviour.
