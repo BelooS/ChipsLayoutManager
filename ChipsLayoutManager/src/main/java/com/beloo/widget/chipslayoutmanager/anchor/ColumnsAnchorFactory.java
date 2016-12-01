@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.ChildViewsIterable;
-import com.beloo.widget.chipslayoutmanager.layouter.ICanvas;
+import com.beloo.widget.chipslayoutmanager.ICanvas;
 
 public class ColumnsAnchorFactory extends AbstractAnchorFactory {
 
@@ -22,8 +22,6 @@ public class ColumnsAnchorFactory extends AbstractAnchorFactory {
 
         AnchorViewState minPosView = AnchorViewState.getNotFoundState();
 
-        Rect mainRect = getCanvasRect();
-
         int minPosition = Integer.MAX_VALUE;
         int minLeft = Integer.MAX_VALUE;
         int maxRight = Integer.MIN_VALUE;
@@ -34,14 +32,11 @@ public class ColumnsAnchorFactory extends AbstractAnchorFactory {
             int left = lm.getDecoratedLeft(view);
             int right = lm.getDecoratedRight(view);
 
-            //intersection changes rect!!!
             Rect viewRect = new Rect(anchorViewState.getAnchorViewRect());
-            boolean intersect = viewRect.intersect(mainRect);
 
-            if (intersect && !anchorViewState.isRemoving()) {
+            if (getCanvas().isInside(viewRect) && !anchorViewState.isRemoving()) {
                 if (minPosition > pos) {
                     minPosition = pos;
-
                     minPosView = anchorViewState;
                 }
 

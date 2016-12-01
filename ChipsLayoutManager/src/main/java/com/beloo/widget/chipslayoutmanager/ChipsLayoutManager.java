@@ -42,7 +42,7 @@ import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 
 import java.util.List;
 
-public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract, IStateHolder {
+public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract, IStateHolder, IPositionsContract {
     ///////////////////////////////////////////////////////////////////////////
     // orientation types
     ///////////////////////////////////////////////////////////////////////////
@@ -73,6 +73,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      * coefficient to support fast scrolling, caching views only for one row may not be enough
      */
     private static final float FAST_SCROLLING_COEFFICIENT = 2;
+
+    private ICanvas canvas = new Square(this);
 
     /** iterable over views added to RecyclerView */
     private ChildViewsIterable childViews = new ChildViewsIterable(this);
@@ -246,6 +248,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return viewPositionsStorage;
     }
 
+    public ICanvas getCanvas() {
+        return canvas;
+    }
+
     public Integer getMaxViewsInRow() {
         return maxViewsInRow;
     }
@@ -280,6 +286,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @SuppressWarnings("WeakerAccess")
     public class StrategyBuilder extends Builder {
 
+        @SuppressWarnings("unused")
         public Builder withLastRow(boolean withLastRow) {
             ChipsLayoutManager.this.isStrategyAppliedWithLastRow = withLastRow;
             return this;
@@ -439,12 +446,38 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return true;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // positions contract
+    ///////////////////////////////////////////////////////////////////////////
 
     @Override
-    public int getItemCount() {
-        //in pre-layouter drawing we need item count with items will be actually deleted to pre-draw appearing items properly
-        return super.getItemCount() + deletingItemsOnScreenCount;
+    public int findFirstVisibleItemPosition() {
+
+//        for (View view : childViews) {
+//            if canvas.isInside()
+//        }
+
+        return RecyclerView.NO_POSITION;
     }
+
+    @Override
+    public int findFirstCompletelyVisibleItemPosition() {
+        return RecyclerView.NO_POSITION;
+    }
+
+    @Override
+    public int findLastVisibleItemPosition() {
+        return RecyclerView.NO_POSITION;
+    }
+
+    @Override
+    public int findLastCompletelyVisibleItemPosition() {
+        return RecyclerView.NO_POSITION;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // orientation
+    ///////////////////////////////////////////////////////////////////////////
 
     /**
      * @return true if RTL mode enabled in RecyclerView
@@ -457,6 +490,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Orientation
     public int layoutOrientation() {
         return layoutOrientation;
+    }
+
+    @Override
+    public int getItemCount() {
+        //in pre-layouter drawing we need item count with items will be actually deleted to pre-draw appearing items properly
+        return super.getItemCount() + deletingItemsOnScreenCount;
     }
 
     @Override

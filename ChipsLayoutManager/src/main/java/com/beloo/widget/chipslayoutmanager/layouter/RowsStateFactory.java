@@ -50,7 +50,7 @@ public class RowsStateFactory implements IStateFactory {
 
     @Override
     public IAnchorFactory anchorFactory() {
-        return new RowsAnchorFactory(lm, new Square(lm));
+        return new RowsAnchorFactory(lm, lm.getCanvas());
     }
 
     @Override

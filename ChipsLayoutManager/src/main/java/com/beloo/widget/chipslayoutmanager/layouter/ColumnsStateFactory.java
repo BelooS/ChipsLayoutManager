@@ -52,7 +52,7 @@ public class ColumnsStateFactory implements IStateFactory {
 
     @Override
     public IAnchorFactory anchorFactory() {
-        return new ColumnsAnchorFactory(lm, new Square(lm));
+        return new ColumnsAnchorFactory(lm, lm.getCanvas());
     }
 
     @Override

@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.chipslayoutmanager.ICanvas;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.IRowStrategy;
 import com.beloo.widget.chipslayoutmanager.gravity.SkipLastRowStrategy;
@@ -66,7 +67,7 @@ public class LayouterFactory {
         return layouterCreator.createOffsetRectForForwardLayouter(anchorRect);
     }
     private ICanvas createCanvas() {
-        return new Square(layoutManager);
+        return layoutManager.getCanvas();
     }
 
     @NonNull

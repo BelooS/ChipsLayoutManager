@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.chipslayoutmanager.ICanvas;
 import com.beloo.widget.chipslayoutmanager.SpanLayoutChildGravity;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.IRowStrategy;
@@ -24,6 +25,7 @@ import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 
+/** this class performs measuring, calculation, and placing of views on canvas (layout manager) according to state criterias */
 public abstract class AbstractLayouter implements ILayouter, ICanvas {
     private int currentViewWidth;
     private int currentViewHeight;
@@ -62,12 +64,12 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     @NonNull
     private IRowStrategy rowStrategy;
     private Set<ILayouterListener> layouterListeners = new HashSet<>();
+    @NonNull
+    private IGravityModifiersFactory gravityModifiersFactory;
+
     //--- end input dependencies
 
     private AbstractPositionIterator positionIterator;
-
-    @NonNull
-    private IGravityModifiersFactory gravityModifiersFactory;
 
     AbstractLayouter(Builder builder) {
         //--- read builder
@@ -100,24 +102,8 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     }
 
     @Override
-    public Rect getCanvasRect() {
-        return canvas.getCanvasRect();
-    }
-
-    public final int getCanvasRightBorder() {
-        return canvas.getCanvasRightBorder();
-    }
-
-    public final int getCanvasBottomBorder() {
-        return canvas.getCanvasBottomBorder();
-    }
-
-    public final int getCanvasLeftBorder() {
-        return canvas.getCanvasLeftBorder();
-    }
-
-    public final int getCanvasTopBorder() {
-        return canvas.getCanvasTopBorder();
+    public Rect getViewRect(View view) {
+        return canvas.getViewRect(view);
     }
 
     public boolean isRowCompleted() {
@@ -197,6 +183,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
 
     /** check if we can not add current view to row
      * we determine it on the next layouter step, because we need next view size to determine whether it fits in row or not */
+    @SuppressWarnings("WeakerAccess")
     public final boolean canNotBePlacedInCurrentRow() {
         return breaker.isRowBroke(this);
     }
@@ -373,7 +360,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         }
 
         @NonNull
-        public Builder rowStrategy(IRowStrategy rowStrategy) {
+        Builder rowStrategy(IRowStrategy rowStrategy) {
             this.rowStrategy = rowStrategy;
             return this;
         }
@@ -408,6 +395,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
             return this;
         }
 
+        @SuppressWarnings("unused")
         @NonNull
         final Builder addLayouterListener(@Nullable ILayouterListener layouterListener) {
             if (layouterListener != null) {
@@ -431,5 +419,40 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
 
         @NonNull
         public abstract AbstractLayouter build();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // canvas delegate
+    ///////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public Rect getCanvasRect() {
+        return canvas.getCanvasRect();
+    }
+
+    public final int getCanvasRightBorder() {
+        return canvas.getCanvasRightBorder();
+    }
+
+    public final int getCanvasBottomBorder() {
+        return canvas.getCanvasBottomBorder();
+    }
+
+    public final int getCanvasLeftBorder() {
+        return canvas.getCanvasLeftBorder();
+    }
+
+    public final int getCanvasTopBorder() {
+        return canvas.getCanvasTopBorder();
+    }
+
+    @Override
+    public boolean isInside(Rect rectCandidate) {
+        return canvas.isInside(rectCandidate);
+    }
+
+    @Override
+    public boolean isInside(View viewCandidate) {
+        return canvas.isInside(viewCandidate);
     }
 }
