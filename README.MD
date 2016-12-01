@@ -50,7 +50,7 @@ or custom `FlowLayout`s.
 |---|---|
 |![Insert/delete animations with ChipsLayoutManager](/images/insert_delete_animations.gif) |![Move animations with ChipsLayoutManager](/images/move_animations.gif)|
 
-###Layout Directions
+####Layout Directions
 <center>
 
 |  | Left to Right  | Right to Left  |
@@ -59,6 +59,20 @@ or custom `FlowLayout`s.
 |  <b>Vertical</b>   |![Left to Right Columns implementation of ChipsLayoutManager](/images/ltr_vertical.png) ||
 
 </center>
+
+####Fill strategy
+Any row have some space left, where is impossible to place the next view, because that space is too small.
+But we could distribute that space for available views in that row.
+
+Row strategy is a mode of distribution left space.
+
+* `STRATEGY_DEFAULT` - is used by default. Left space is placed at the end of the row.
+* `STRATEGY_FILL_VIEW` - available space is distributed among views.
+* `STRATEGY_FILL_SPACE` - available space is distributed among spaces between views, start & end views are docked to a nearest border.
+* `STRATEGY_FILL_SPACE_CENTER` - available space is distributed among spaces between views, start & end spaces included. Views are placed in center of canvas.
+
+In such layouts by default last row isn't considered completed. So strategy isn't applied for last row.
+But you can also enable opposite behaviour.
 
 ### Usage
 
@@ -87,7 +101,8 @@ ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
         })
         //an layoutOrientation of layout manager, could be VERTICAL OR HORIZONTAL. HORIZONTAL by default
         .setOrientation(ChipsLayoutManager.HORIZONTAL)
-        // row strategy for views in completed row, could be STRATEGY_DEFAULT, STRATEGY_FILL_VIEW, STRATEGY_FILL_SPACE or STRATEGY_FILL_SPACE_CENTER 
+        // row strategy for views in completed row, could be STRATEGY_DEFAULT, STRATEGY_FILL_VIEW, 
+                STRATEGY_FILL_SPACE or STRATEGY_FILL_SPACE_CENTER 
         .setRowStrategy(ChipsLayoutManager.STRATEGY_FILL_SPACE)
         // whether strategy is applied to last row. FALSE by default
         .withLastRow(true)
