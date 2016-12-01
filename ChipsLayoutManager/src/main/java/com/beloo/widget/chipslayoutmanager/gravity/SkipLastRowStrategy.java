@@ -20,7 +20,7 @@ public class SkipLastRowStrategy extends StrategyDecorator {
     public void applyStrategy(AbstractLayouter abstractLayouter, List<Item> row) {
         //if !canNotBePlacedInCurrentRow and apply strategy called probably it is last row
         //so skip applying strategy
-        if (skipLastRow && !abstractLayouter.canNotBePlacedInCurrentRow()) return;
+        if (skipLastRow && !abstractLayouter.isRowCompleted()) return;
         super.applyStrategy(abstractLayouter, row);
     }
 }

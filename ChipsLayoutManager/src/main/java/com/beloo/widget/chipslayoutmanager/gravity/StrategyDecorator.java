@@ -7,12 +7,12 @@ import com.beloo.widget.chipslayoutmanager.layouter.Item;
 
 import java.util.List;
 
-public class StrategyDecorator implements IRowStrategy {
+class StrategyDecorator implements IRowStrategy {
 
     @NonNull
     private IRowStrategy rowStrategy;
 
-    public StrategyDecorator(@NonNull IRowStrategy rowStrategy) {
+    StrategyDecorator(@NonNull IRowStrategy rowStrategy) {
         this.rowStrategy = rowStrategy;
     }
 

@@ -255,7 +255,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     @RowStrategy
-    public int getRowStrategy() {
+    public int getRowStrategyType() {
         return rowStrategy;
     }
 

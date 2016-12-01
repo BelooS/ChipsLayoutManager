@@ -42,6 +42,9 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     private int rowSize = 0;
     private int previousRowSize;
 
+    /** is row completed when {@link #layoutRow()} called*/
+    private boolean isRowCompleted;
+
     ///////////////////////////////////////////////////////////////////////////
     // input dependencies
     ///////////////////////////////////////////////////////////////////////////
@@ -58,14 +61,13 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     private ILayoutRowBreaker breaker;
     @NonNull
     private IRowStrategy rowStrategy;
+    private Set<ILayouterListener> layouterListeners = new HashSet<>();
     //--- end input dependencies
 
     private AbstractPositionIterator positionIterator;
 
     @NonNull
     private IGravityModifiersFactory gravityModifiersFactory;
-
-    private Set<ILayouterListener> layouterListeners = new HashSet<>();
 
     AbstractLayouter(Builder builder) {
         //--- read builder
@@ -116,6 +118,10 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
 
     public final int getCanvasTopBorder() {
         return canvas.getCanvasTopBorder();
+    }
+
+    public boolean isRowCompleted() {
+        return isRowCompleted;
     }
 
     public List<Item> getCurrentRowItems() {
@@ -171,6 +177,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         calculateView(view);
 
         if (canNotBePlacedInCurrentRow()) {
+            isRowCompleted = true;
             layoutRow();
         }
 
@@ -184,7 +191,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     }
 
     /** if all necessary view have placed*/
-    boolean isFinishedLayouting() {
+    public final boolean isFinishedLayouting() {
         return finishingCriteria.isFinishedLayouting(this);
     }
 
@@ -259,14 +266,16 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
             layoutManager.layoutDecorated(view, viewRect.left, viewRect.top, viewRect.right, viewRect.bottom);
         }
 
-        notifyLayouterListeners();
-
         onAfterLayout();
 
+        notifyLayouterListeners();
+
+
         previousRowSize = rowSize;
-        this.rowSize = 0;
         //clear row data
+        this.rowSize = 0;
         rowViews.clear();
+        isRowCompleted = false;
     }
 
     /** by default items placed and attached to a top of the row.

@@ -8,7 +8,6 @@ import com.beloo.widget.chipslayoutmanager.VerticalScrollingController;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.anchor.RowsAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.RowGravityModifiersFactory;
-import com.beloo.widget.chipslayoutmanager.gravity.SkipLastRowStrategy;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.DecoratorBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
@@ -41,7 +40,7 @@ public class RowsStateFactory implements IStateFactory {
                 criteriaFactory,
                 placerFactory,
                 new RowGravityModifiersFactory(),
-                orientationStateFactory.createRowStrategyFactory().createRowStrategy(lm.getRowStrategy()));
+                orientationStateFactory.createRowStrategyFactory().createRowStrategy(lm.getRowStrategyType()));
     }
 
     @Override
