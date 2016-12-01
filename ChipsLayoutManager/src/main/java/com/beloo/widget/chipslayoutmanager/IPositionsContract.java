@@ -1,6 +1,6 @@
 package com.beloo.widget.chipslayoutmanager;
 
-public interface IPositionsContract {
+interface IPositionsContract {
     int findFirstVisibleItemPosition();
     int findFirstCompletelyVisibleItemPosition();
     int findLastVisibleItemPosition();

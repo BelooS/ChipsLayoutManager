@@ -102,7 +102,7 @@ ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
         //a layoutOrientation of layout manager, could be VERTICAL OR HORIZONTAL. HORIZONTAL by default
         .setOrientation(ChipsLayoutManager.HORIZONTAL)
         // row strategy for views in completed row, could be STRATEGY_DEFAULT, STRATEGY_FILL_VIEW, 
-                STRATEGY_FILL_SPACE or STRATEGY_CENTER
+        //STRATEGY_FILL_SPACE or STRATEGY_CENTER
         .setRowStrategy(ChipsLayoutManager.STRATEGY_FILL_SPACE)
         // whether strategy is applied to last row. FALSE by default
         .withLastRow(true)
@@ -110,7 +110,7 @@ ChipsLayoutManager chipsLayoutManager = ChipsLayoutManager.newBuilder()
 rv.setLayoutManager(chipsLayoutManager);
 ```
 
-Notice that if you changed gravity resolver or row breaker conditions in runtime - it won't affect already drew items and cached item positions. 
+Notice that if you changed gravity resolver or row breaker conditions in runtime - it won't affect already drown items and cached item positions.
 You have to call `notifyItemChanged` on `ChipsLayoutManager` otherwise layout won't be predictable. 
 
 **Device current direction** have been chosen by default.
