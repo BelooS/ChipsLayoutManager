@@ -467,8 +467,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return;
         }
 
-        anchorFactory.setRecycler(recycler);
-
         predictiveAnimationsLogger.logState(state);
 
         if (isLayoutRTL() != isLayoutRTL) {
@@ -511,11 +509,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             predictiveAnimationsLogger.heightOfCanvas(this);
             predictiveAnimationsLogger.onSummarizedDeletingItemsHeightCalculated(additionalLength);
             anchorView = anchorFactory.getAnchor();
-            if (!anchorView.isNotFoundState()) {
-                Rect rect = anchorView.getAnchorViewRect();
-                rect.left = getPaddingLeft();
-                rect.right = getPaddingRight();
-            }
+            anchorFactory.resetRowCoordinates(anchorView);
             Log.w(TAG, "anchor state in pre-layout = " + anchorView);
             detachAndScrapAttachedViews(recycler);
 
@@ -534,17 +528,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         if (!state.isMeasuring()) {
             measureSupporter.onSizeChanged();
-        }
-
-        //we should re-layout if previous anchor was removed or moved.
-        anchorView = anchorFactory.getAnchor();
-        if (!anchorView.isNotFoundState()) {
-            Rect rect = anchorView.getAnchorViewRect();
-            rect.left = getPaddingLeft();
-            rect.right = getPaddingRight();
-        }
-        if (anchorFactory.normalize(anchorView)) {
-            requestLayoutWithAnimations();
         }
     }
 
@@ -839,8 +822,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         dx = scrollHorizontallyInternal(dx);
         offsetChildrenHorizontal(-dx);
 
-        anchorFactory.setRecycler(recycler);
-
         scrollingLogger.logChildCount(getChildCount());
 
         anchorView = anchorFactory.getAnchor();
@@ -950,7 +931,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
         dy = scrollVerticallyInternal(dy);
         offsetChildrenVertical(-dy);
-        anchorFactory.setRecycler(recycler);
         anchorView = anchorFactory.getAnchor();
 
         scrollingLogger.logChildCount(getChildCount());

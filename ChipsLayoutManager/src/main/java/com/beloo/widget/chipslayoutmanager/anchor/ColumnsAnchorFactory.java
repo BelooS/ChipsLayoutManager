@@ -66,23 +66,11 @@ public class ColumnsAnchorFactory extends AbstractAnchorFactory {
     }
 
     @Override
-    public boolean normalize(AnchorViewState anchorView) {
-        if (!anchorView.isNotFoundState() && anchorView.getAnchorViewRect().left > lm.getPaddingLeft()) {
-            if (!anchorView.isNotFoundState()) {
-                int d = anchorView.getAnchorViewRect().left - lm.getPaddingLeft();
-                anchorView.getAnchorViewRect().left -= d;
-                anchorView.getAnchorViewRect().right -= d;
-            }
-            return true;
+    public void resetRowCoordinates(AnchorViewState anchorView) {
+        if (!anchorView.isNotFoundState()) {
+            Rect rect = anchorView.getAnchorViewRect();
+            rect.top = getCanvas().getCanvasTopBorder();
+            rect.bottom = getCanvas().getCanvasBottomBorder();
         }
-        return false;
-    }
-
-    @Override
-    public void onPreLayout(AnchorViewState anchorView, RecyclerView.Recycler recycler) {
-//        if (!anchorView.isNotFoundState() && recycler.convertPreLayoutPositionToPostLayout(anchorView.getPosition()) == -1) {
-//            //view going to remove
-//            anchorView.getAnchorViewRect().right = 0;
-//        }
     }
 }
