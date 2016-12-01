@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.chipslayoutmanager.IBorder;
 import com.beloo.widget.chipslayoutmanager.ICanvas;
 import com.beloo.widget.chipslayoutmanager.SpanLayoutChildGravity;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifiersFactory;
@@ -25,8 +26,8 @@ import com.beloo.widget.chipslayoutmanager.layouter.criteria.IFinishingCriteria;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacer;
 import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 
-/** this class performs measuring, calculation, and placing of views on canvas (layout manager) according to state criterias */
-public abstract class AbstractLayouter implements ILayouter, ICanvas {
+/** this class performs measuring, calculation, and placing of views on border (layout manager) according to state criterias */
+public abstract class AbstractLayouter implements ILayouter, IBorder {
     private int currentViewWidth;
     private int currentViewHeight;
     private int currentViewPosition;
@@ -52,7 +53,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     ///////////////////////////////////////////////////////////////////////////
     private ChipsLayoutManager layoutManager;
     private IViewCacheStorage cacheStorage;
-    private ICanvas canvas;
+    private IBorder border;
     @NonNull
     private IChildGravityResolver childGravityResolver;
     @NonNull
@@ -75,7 +76,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         //--- read builder
         layoutManager = builder.layoutManager;
         cacheStorage = builder.cacheStorage;
-        canvas = builder.canvas;
+        border = builder.border;
         childGravityResolver = builder.childGravityResolver;
         this.finishingCriteria = builder.finishingCriteria;
         placer = builder.placer;
@@ -99,11 +100,6 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     @Override
     public AbstractPositionIterator positionIterator() {
         return positionIterator;
-    }
-
-    @Override
-    public Rect getViewRect(View view) {
-        return canvas.getViewRect(view);
     }
 
     public boolean isRowCompleted() {
@@ -191,7 +187,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     /** factory method for Rect, where view will be placed. Creation based on inner layouter parameters */
     abstract Rect createViewRect(View view);
 
-    /** called when layouter ready to add row to canvas. Children could perform normalization actions on created row*/
+    /** called when layouter ready to add row to border. Children could perform normalization actions on created row*/
     abstract void onPreLayout();
 
     /** called after row have been layouted. Children should prepare new row here. */
@@ -240,7 +236,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
             rowStrategy.applyStrategy(this, getCurrentRowItems());
         }
 
-        /** layout pre-calculated row on a recyclerView canvas */
+        /** layout pre-calculated row on a recyclerView border */
         for (Pair<Rect, View> rowViewRectPair : rowViews) {
             Rect viewRect = rowViewRectPair.first;
             View view = rowViewRectPair.second;
@@ -328,7 +324,7 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     public abstract static class Builder {
         private ChipsLayoutManager layoutManager;
         private IViewCacheStorage cacheStorage;
-        private ICanvas canvas;
+        private IBorder border;
         private IChildGravityResolver childGravityResolver;
         private IFinishingCriteria finishingCriteria;
         private IPlacer placer;
@@ -366,8 +362,8 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
         }
 
         @NonNull
-        final Builder canvas(@NonNull ICanvas canvas) {
-            this.canvas = canvas;
+        final Builder canvas(@NonNull IBorder border) {
+            this.border = border;
             return this;
         }
 
@@ -422,37 +418,23 @@ public abstract class AbstractLayouter implements ILayouter, ICanvas {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // canvas delegate
+    // border delegate
     ///////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public Rect getCanvasRect() {
-        return canvas.getCanvasRect();
-    }
-
     public final int getCanvasRightBorder() {
-        return canvas.getCanvasRightBorder();
+        return border.getCanvasRightBorder();
     }
 
     public final int getCanvasBottomBorder() {
-        return canvas.getCanvasBottomBorder();
+        return border.getCanvasBottomBorder();
     }
 
     public final int getCanvasLeftBorder() {
-        return canvas.getCanvasLeftBorder();
+        return border.getCanvasLeftBorder();
     }
 
     public final int getCanvasTopBorder() {
-        return canvas.getCanvasTopBorder();
+        return border.getCanvasTopBorder();
     }
 
-    @Override
-    public boolean isInside(Rect rectCandidate) {
-        return canvas.isInside(rectCandidate);
-    }
-
-    @Override
-    public boolean isInside(View viewCandidate) {
-        return canvas.isInside(viewCandidate);
-    }
 }

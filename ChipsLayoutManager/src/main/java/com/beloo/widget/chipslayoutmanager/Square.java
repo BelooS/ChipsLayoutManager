@@ -54,4 +54,18 @@ class Square implements ICanvas {
         return isInside(getViewRect(viewCandidate));
     }
 
+    @Override
+    public boolean isFullyVisible(View view) {
+        Rect rect = getViewRect(view);
+        return isFullyVisible(rect);
+    }
+
+    @Override
+    public boolean isFullyVisible(Rect rect) {
+        return rect.top >= getCanvasTopBorder()
+                && rect.bottom <= getCanvasBottomBorder()
+                && rect.left >= getCanvasLeftBorder()
+                && rect.right <= getCanvasRightBorder();
+    }
+
 }

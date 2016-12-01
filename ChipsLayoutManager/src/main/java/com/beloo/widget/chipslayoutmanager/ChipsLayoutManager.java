@@ -7,6 +7,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
@@ -74,6 +75,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     private static final float FAST_SCROLLING_COEFFICIENT = 2;
 
+    /** delegate which represents available canvas for drawing views according to layout*/
     private ICanvas canvas = new Square(this);
 
     /** iterable over views added to RecyclerView */
@@ -196,6 +198,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     /** factory for placers factories*/
     private PlacerFactory placerFactory = new PlacerFactory(this);
+
+    private OrientationHelper orientationHelper = OrientationHelper.createOrientationHelper(this, OrientationHelper.VERTICAL);
 
     private ChipsLayoutManager(Context context) {
         @DeviceOrientation
@@ -462,6 +466,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public int findFirstCompletelyVisibleItemPosition() {
+        for (View view : childViews) {
+            Rect rect = canvas.getViewRect(view);
+            if (!canvas.isFullyVisible(rect)) continue;
+            if (canvas.isInside(rect)) {
+                return getPosition(view);
+            }
+        }
+
         return RecyclerView.NO_POSITION;
     }
 
@@ -479,6 +491,16 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     @Override
     public int findLastCompletelyVisibleItemPosition() {
+
+        for (int i = getChildCount() - 1; i >=0; i--) {
+            View view = getChildAt(i);
+            Rect rect = canvas.getViewRect(view);
+            if (!canvas.isFullyVisible(rect)) continue;
+            if (canvas.isInside(view)) {
+                return getPosition(view);
+            }
+        }
+
         return RecyclerView.NO_POSITION;
     }
 
@@ -975,6 +997,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     @Override
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
+
+        int firstPos = findFirstCompletelyVisibleItemPosition();
+        int lastPost = findLastCompletelyVisibleItemPosition();
+
+        Log.d(TAG, "first pos = " + firstPos);
+        Log.d(TAG, "last pos = " + lastPost);
+
         dy = scrollVerticallyInternal(dy);
         offsetChildrenVertical(-dy);
         anchorView = anchorFactory.getAnchor();
