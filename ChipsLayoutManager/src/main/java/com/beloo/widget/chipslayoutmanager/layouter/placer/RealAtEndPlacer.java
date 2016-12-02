@@ -4,7 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 class RealAtEndPlacer extends AbstractPlacer implements IPlacer {
-    public RealAtEndPlacer(RecyclerView.LayoutManager layoutManager) {
+    RealAtEndPlacer(RecyclerView.LayoutManager layoutManager) {
         super(layoutManager);
     }
 

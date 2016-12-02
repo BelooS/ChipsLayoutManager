@@ -160,6 +160,10 @@ public class MainActivity extends AppCompatActivity {
         adapter.notifyItemMoved(position, positionMoveTo);
     }
 
+    public void onScrollClicked(View view) {
+        rvTest.scrollToPosition(spinnerPosition.getSelectedItemPosition());
+    }
+
     public void onInsertClicked(View view) {
         int position = spinnerPosition.getSelectedItemPosition();
         if (position == Spinner.INVALID_POSITION)

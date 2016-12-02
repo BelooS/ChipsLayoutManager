@@ -26,7 +26,7 @@
 
         <Button
             android:id="@+id/btnInsert"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:onClick="onInsertClicked"
             android:text="@string/insert"
@@ -37,7 +37,7 @@
 
         <Button
             android:id="@+id/btnDelete"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:onClick="onDeleteClicked"
             android:text="@string/delete"
@@ -48,12 +48,23 @@
 
         <Button
             android:id="@+id/btnMove"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:onClick="onMoveClicked"
             android:text="@string/move"
             android:layout_toRightOf="@+id/btnDelete"
             android:layout_toEndOf="@+id/btnDelete"
+            android:layout_alignParentBottom="true"
+            />
+
+        <Button
+            android:id="@+id/btnScroll"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:onClick="onScrollClicked"
+            android:text="@string/scroll"
+            android:layout_toRightOf="@+id/btnMove"
+            android:layout_toEndOf="@+id/btnMove"
             android:layout_alignParentBottom="true"
             />
 

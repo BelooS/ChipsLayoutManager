@@ -4,4 +4,5 @@
     <string name="insert">Insert</string>
     <string name="move_to">Move to:</string>
     <string name="move">Move</string>
+    <string name="scroll">Scroll</string>
 </resources>

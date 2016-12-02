@@ -770,8 +770,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         bottomView = null;
         leftView = null;
         rightView = null;
-        minPositionOnScreen = null;
-        maxPositionOnScreen = null;
+        minPositionOnScreen = RecyclerView.NO_POSITION;
+        maxPositionOnScreen = RecyclerView.NO_POSITION;
 
         isFirstItemAdded = false;
 
@@ -795,11 +795,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                     rightView = view;
                 }
 
-                if (minPositionOnScreen == null || position < minPositionOnScreen) {
+                if (canvas.isInside(view) && (minPositionOnScreen == RecyclerView.NO_POSITION || position < minPositionOnScreen)) {
                     minPositionOnScreen = position;
                 }
 
-                if (maxPositionOnScreen == null || position > maxPositionOnScreen) {
+                if (canvas.isInside(view) && (maxPositionOnScreen == RecyclerView.NO_POSITION || position > maxPositionOnScreen)) {
                     maxPositionOnScreen = position;
                 }
 
