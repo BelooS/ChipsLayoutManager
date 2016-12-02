@@ -416,14 +416,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     @Override
-    public void onAdapterChanged(RecyclerView.Adapter oldAdapter,
-                                 RecyclerView.Adapter newAdapter) {
-        newAdapter.registerAdapterDataObserver((RecyclerView.AdapterDataObserver) measureSupporter);
-        //Completely scrap the existing layout
-        removeAllViews();
-    }
-
-    @Override
     public void onRestoreInstanceState(Parcelable state) {
         container = (ParcelableContainer) state;
         anchorView = anchorFactory.createNotFound();
@@ -469,6 +461,19 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     // positions contract
     ///////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Returns the adapter position of the first visible view. This position does not include
+     * adapter changes that were dispatched after the last layout pass.
+     * If RecyclerView has item decorators, they will be considered in calculations as well.
+     * <p>
+     * LayoutManager may pre-cache some views that are not necessarily visible. Those views
+     * are ignored in this method.
+     *
+     * @return The adapter position of the first visible item or {@link RecyclerView#NO_POSITION} if
+     * there aren't any visible items.
+     * @see #findFirstCompletelyVisibleItemPosition()
+     * @see #findLastVisibleItemPosition()
+     */
     @Override
     public int findFirstVisibleItemPosition() {
         for (View view : childViews) {
@@ -479,6 +484,15 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return RecyclerView.NO_POSITION;
     }
 
+    /**
+     * Returns the adapter position of the first fully visible view. This position does not include
+     * adapter changes that were dispatched after the last layout pass.
+     *
+     * @return The adapter position of the first fully visible item or
+     * {@link RecyclerView#NO_POSITION} if there aren't any visible items.
+     * @see #findFirstVisibleItemPosition()
+     * @see #findLastCompletelyVisibleItemPosition()
+     */
     @Override
     public int findFirstCompletelyVisibleItemPosition() {
         for (View view : childViews) {
@@ -492,6 +506,19 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return RecyclerView.NO_POSITION;
     }
 
+    /**
+     * Returns the adapter position of the last visible view. This position does not include
+     * adapter changes that were dispatched after the last layout pass.
+     * If RecyclerView has item decorators, they will be considered in calculations as well.
+     * <p>
+     * LayoutManager may pre-cache some views that are not necessarily visible. Those views
+     * are ignored in this method.
+     *
+     * @return The adapter position of the last visible view or {@link RecyclerView#NO_POSITION} if
+     * there aren't any visible items.
+     * @see #findLastCompletelyVisibleItemPosition()
+     * @see #findFirstVisibleItemPosition()
+     */
     @Override
     public int findLastVisibleItemPosition() {
         for (int i = getChildCount() - 1; i >=0; i--) {
@@ -504,6 +531,15 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return RecyclerView.NO_POSITION;
     }
 
+    /**
+     * Returns the adapter position of the last fully visible view. This position does not include
+     * adapter changes that were dispatched after the last layout pass.
+     *
+     *  @return The adapter position of the last fully visible view or
+     * {@link RecyclerView#NO_POSITION} if there aren't any visible items.
+     * @see #findLastVisibleItemPosition()
+     * @see #findFirstCompletelyVisibleItemPosition()
+     */
     @Override
     public int findLastCompletelyVisibleItemPosition() {
 
@@ -1177,6 +1213,18 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public void setMeasuredDimension(int widthSize, int heightSize) {
         measureSupporter.measure(widthSize, heightSize);
         super.setMeasuredDimension(measureSupporter.getMeasuredWidth(), measureSupporter.getMeasuredHeight());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // data set changed events
+    ///////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public void onAdapterChanged(RecyclerView.Adapter oldAdapter,
+                                 RecyclerView.Adapter newAdapter) {
+        newAdapter.registerAdapterDataObserver((RecyclerView.AdapterDataObserver) measureSupporter);
+        //Completely scrap the existing layout
+        removeAllViews();
     }
 
     /**
