@@ -171,6 +171,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /** The view have placed in the closest to the right border. Have always actual value, because it set in {@link #onLayoutChildren} */
     private View rightView;
 
+    /** minimal position visible on screen*/
     private Integer minPositionOnScreen;
     private Integer maxPositionOnScreen;
 
@@ -207,7 +208,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         this.orientation = orientation;
 
         LoggerFactory loggerFactory = new LoggerFactory();
-        logger = loggerFactory.getFillLogger();
+        logger = loggerFactory.getFillLogger(viewCache);
         adapterActionsLogger = loggerFactory.getAdapterActionsLogger();
         predictiveAnimationsLogger = loggerFactory.getPredictiveAnimationsLogger();
         scrollingLogger = loggerFactory.getScrollingLogger();
@@ -476,12 +477,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     @Override
     public int findFirstVisibleItemPosition() {
-        for (View view : childViews) {
-            if (canvas.isInside(view)) {
-                return getPosition(view);
-            }
-        }
-        return RecyclerView.NO_POSITION;
+        if (getChildCount() == 0)
+            return RecyclerView.NO_POSITION;
+        return minPositionOnScreen;
     }
 
     /**
@@ -521,14 +519,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     @Override
     public int findLastVisibleItemPosition() {
-        for (int i = getChildCount() - 1; i >=0; i--) {
-            View view = getChildAt(i);
-            if (canvas.isInside(view)) {
-                return getPosition(view);
-            }
-        }
-
-        return RecyclerView.NO_POSITION;
+        if (getChildCount() == 0)
+            return RecyclerView.NO_POSITION;
+        return maxPositionOnScreen;
     }
 
     /**
@@ -791,11 +784,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                     rightView = view;
                 }
 
-                if (minPositionOnScreen == null || position < minPositionOnScreen) {
+                if (canvas.isInside(view) && (minPositionOnScreen == null || position < minPositionOnScreen)) {
                     minPositionOnScreen = position;
                 }
 
-                if (maxPositionOnScreen == null || position > maxPositionOnScreen) {
+                if (canvas.isInside(view) && (maxPositionOnScreen == null || position > maxPositionOnScreen)) {
                     maxPositionOnScreen = position;
                 }
 
@@ -1049,11 +1042,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
 
-        int firstPos = findFirstCompletelyVisibleItemPosition();
-        int lastPost = findLastCompletelyVisibleItemPosition();
-
-        Log.d(TAG, "first pos = " + firstPos);
-        Log.d(TAG, "last pos = " + lastPost);
+//        int firstPos = findFirstCompletelyVisibleItemPosition();
+//        int lastPost = findLastCompletelyVisibleItemPosition();
+//
+//        Log.d(TAG, "first pos = " + firstPos);
+//        Log.d(TAG, "last pos = " + lastPost);
 
         dy = scrollVerticallyInternal(dy);
         offsetChildrenVertical(-dy);

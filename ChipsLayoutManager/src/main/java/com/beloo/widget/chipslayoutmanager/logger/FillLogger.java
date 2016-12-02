@@ -6,14 +6,14 @@ import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 
-public class FillLogger implements IFillLogger {
+class FillLogger implements IFillLogger {
     private SparseArray<View> viewCache;
     private int requestedItems;
     private int recycledItems;
     private int startCacheSize;
     private int recycledSize;
 
-    public FillLogger(SparseArray<View> viewCache) {
+    FillLogger(SparseArray<View> viewCache) {
         this.viewCache = viewCache;
     }
 
@@ -65,4 +65,5 @@ public class FillLogger implements IFillLogger {
             Log.d("fill", "anchorTop " + anchorView.getAnchorViewRect().top);
         }
     }
+
 }
