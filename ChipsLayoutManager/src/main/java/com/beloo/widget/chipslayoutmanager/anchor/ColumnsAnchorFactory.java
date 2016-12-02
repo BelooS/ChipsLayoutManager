@@ -61,6 +61,19 @@ public class ColumnsAnchorFactory extends AbstractAnchorFactory {
     }
 
     @Override
+    public boolean normalize(AnchorViewState anchorView) {
+        if (!anchorView.isNotFoundState() && anchorView.getAnchorViewRect().left > lm.getPaddingLeft()) {
+            if (!anchorView.isNotFoundState()) {
+                int d = anchorView.getAnchorViewRect().left - lm.getPaddingLeft();
+                anchorView.getAnchorViewRect().left -= d;
+                anchorView.getAnchorViewRect().right -= d;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public void resetRowCoordinates(AnchorViewState anchorView) {
         if (!anchorView.isNotFoundState()) {
             Rect rect = anchorView.getAnchorViewRect();

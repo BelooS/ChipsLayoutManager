@@ -26,4 +26,5 @@ abstract class AbstractAnchorFactory implements IAnchorFactory {
     public AnchorViewState createNotFound() {
         return AnchorViewState.getNotFoundState();
     }
+
 }

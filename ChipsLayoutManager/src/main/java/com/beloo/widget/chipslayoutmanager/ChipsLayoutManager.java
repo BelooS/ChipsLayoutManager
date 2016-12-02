@@ -641,6 +641,17 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         if (!state.isMeasuring()) {
             measureSupporter.onSizeChanged();
         }
+
+        //we should re-layout if previous anchor was removed or moved.
+        anchorView = anchorFactory.getAnchor();
+        if (!anchorView.isNotFoundState()) {
+            Rect rect = anchorView.getAnchorViewRect();
+            rect.left = getPaddingLeft();
+            rect.right = getPaddingRight();
+        }
+        if (anchorFactory.normalize(anchorView)) {
+            requestLayoutWithAnimations();
+        }
     }
 
     /** layout disappearing view to support predictive animations */
@@ -784,11 +795,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                     rightView = view;
                 }
 
-                if (canvas.isInside(view) && (minPositionOnScreen == null || position < minPositionOnScreen)) {
+                if (minPositionOnScreen == null || position < minPositionOnScreen) {
                     minPositionOnScreen = position;
                 }
 
-                if (canvas.isInside(view) && (maxPositionOnScreen == null || position > maxPositionOnScreen)) {
+                if (maxPositionOnScreen == null || position > maxPositionOnScreen) {
                     maxPositionOnScreen = position;
                 }
 

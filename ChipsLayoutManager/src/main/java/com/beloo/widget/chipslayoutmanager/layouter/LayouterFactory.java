@@ -115,7 +115,7 @@ public class LayouterFactory {
     public final ILayouter buildBackwardLayouter(@NonNull ILayouter layouter) {
         AbstractLayouter abstractLayouter = (AbstractLayouter) layouter;
         abstractLayouter.setFinishingCriteria(criteriaFactory.getBackwardFinishingCriteria());
-        abstractLayouter.setPlacer(placerFactory.getAtEndPlacer());
+        abstractLayouter.setPlacer(placerFactory.getAtStartPlacer());
 
         return abstractLayouter;
     }

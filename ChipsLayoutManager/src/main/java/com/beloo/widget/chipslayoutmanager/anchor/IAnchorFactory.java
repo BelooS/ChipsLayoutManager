@@ -8,4 +8,7 @@ public interface IAnchorFactory {
 
     /** modify anchorView state according to pre-layout state */
     void resetRowCoordinates(AnchorViewState anchorView);
+
+    /** method in case deleting longest items from the first row*/
+    boolean normalize(AnchorViewState anchorView);
 }
