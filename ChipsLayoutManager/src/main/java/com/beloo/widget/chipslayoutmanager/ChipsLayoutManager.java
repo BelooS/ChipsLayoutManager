@@ -200,7 +200,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /** factory for placers factories*/
     private PlacerFactory placerFactory = new PlacerFactory(this);
 
-    private OrientationHelper orientationHelper = OrientationHelper.createOrientationHelper(this, OrientationHelper.VERTICAL);
+    private boolean isAfterPreLayout;
 
     private ChipsLayoutManager(Context context) {
         @DeviceOrientation
@@ -612,7 +612,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             LayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
-            fill(recycler, layouterFactory, anchorView, true);
+            fill(recycler, layouterFactory, anchorView, isAfterPreLayout);
+            isAfterPreLayout = false;
         } else {
             //inside pre-layout stage. It is called when item animation reconstruction will be played
             //it is NOT called on layoutOrientation changes
@@ -633,7 +634,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             LayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
             fill(recycler, layouterFactory, anchorView, false);
-
+            isAfterPreLayout = true;
         }
 
         deletingItemsOnScreenCount = 0;
@@ -1052,15 +1053,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     @Override
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
-
-//        int firstPos = findFirstCompletelyVisibleItemPosition();
-//        int lastPost = findLastCompletelyVisibleItemPosition();
-//
-//        Log.d(TAG, "first pos = " + firstPos);
-//        Log.d(TAG, "last pos = " + lastPost);
-
-        Log.d(TAG, "child count = " + getChildCount());
-        Log.d(TAG, "first item pos = " + getPosition(getChildAt(0)));
 
         dy = scrollVerticallyInternal(dy);
         offsetChildrenVertical(-dy);
