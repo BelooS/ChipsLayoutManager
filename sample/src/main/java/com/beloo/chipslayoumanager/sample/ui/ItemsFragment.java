@@ -42,6 +42,10 @@ public class ItemsFragment extends Fragment {
     private List<String> positions;
     private List items;
 
+    /** replace here different data sets */
+    private IItemsFactory itemsFactory = new ShortChipsFactory();
+
+
     @RestrictTo(RestrictTo.Scope.SUBCLASSES)
     public ItemsFragment() {
         // Required empty public constructor
@@ -61,6 +65,26 @@ public class ItemsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_items, container, false);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private RecyclerView.Adapter createAdapter(Bundle savedInstanceState) {
+
+        List<String> items;
+        if (savedInstanceState == null) {
+//            items = itemsFactory.getFewItems();
+//            items = itemsFactory.getALotOfItems();
+            items = itemsFactory.getItems();
+        } else {
+            items = savedInstanceState.getStringArrayList(EXTRA);
+        }
+
+        adapter = itemsFactory.createAdapter(items, onRemoveListener);
+        this.items = items;
+
+        return adapter;
+
     }
 
     @Override
@@ -93,9 +117,6 @@ public class ItemsFragment extends Fragment {
         rvTest.setAdapter(adapter);
     }
 
-    /** replace here different data sets */
-    private IItemsFactory itemsFactory = new ShortChipsFactory();
-
     private OnRemoveListener onRemoveListener = new OnRemoveListener() {
         @Override
         public void onItemRemoved(int position) {
@@ -105,25 +126,6 @@ public class ItemsFragment extends Fragment {
             updateSpinners();
         }
     };
-
-    @SuppressWarnings("unchecked")
-    private RecyclerView.Adapter createAdapter(Bundle savedInstanceState) {
-
-        List<String> items;
-        if (savedInstanceState == null) {
-//            items = itemsFactory.getFewItems();
-//            items = itemsFactory.getALotOfItems();
-            items = itemsFactory.getItems();
-        } else {
-            items = savedInstanceState.getStringArrayList(EXTRA);
-        }
-
-        adapter = itemsFactory.createAdapter(items, onRemoveListener);
-        this.items = items;
-
-        return adapter;
-
-    }
 
     @Override
     @SuppressWarnings("unchecked")

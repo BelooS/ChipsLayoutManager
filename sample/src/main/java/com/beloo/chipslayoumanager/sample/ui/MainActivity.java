@@ -21,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
+    private Drawer drawer;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         assert getSupportActionBar() != null;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        final Drawer drawer = new DrawerBuilder(this)
+        drawer = new DrawerBuilder(this)
                 .withToolbar(toolbar)
                 .addDrawerItems(new PrimaryDrawerItem().withName(R.string.main).withIdentifier(1))
                 .addDrawerItems(new PrimaryDrawerItem().withName(R.string.bottom_sheet).withIdentifier(2))
@@ -50,11 +52,13 @@ public class MainActivity extends AppCompatActivity {
                                 getSupportFragmentManager().beginTransaction()
                                         .replace(R.id.fragmentContainer, ItemsFragment.newInstance())
                                         .commit();
+                                drawer.closeDrawer();
                                 break;
                             case 2:
                                 getSupportFragmentManager().beginTransaction()
-                                        .replace(R.id.fragmentContainer, ItemsFragment.newInstance())
+                                        .replace(R.id.fragmentContainer, BottomSheetFragment.newInstance())
                                         .commit();
+                                drawer.closeDrawer();
                                 break;
                         }
                         return true;

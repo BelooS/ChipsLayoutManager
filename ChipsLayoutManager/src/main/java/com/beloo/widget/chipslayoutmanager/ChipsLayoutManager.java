@@ -1005,7 +1005,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         int delta;
         AnchorViewState state = anchorFactory.getAnchor();
         if (state.getAnchorViewRect() == null) {
-            state.setAnchorViewRect(getCanvas().getCanvasRect());
+            return 0;
         }
 
         if (!isFirstItemAdded) { //in case 0 position haven't added in layout yet
@@ -1058,7 +1058,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /**
      * calculate offset of views while scrolling, layout items on new places
      */
-    @RestrictTo(RestrictTo.Scope.GROUP_ID)
     @Override
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
 
@@ -1107,7 +1106,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         AnchorViewState state = anchorFactory.getAnchor();
         if (state.getAnchorViewRect() == null) {
-            state.setAnchorViewRect(getCanvas().getCanvasRect());
+            return 0;
         }
 
         if (state.getPosition() != 0) { //in case 0 position haven't added in layout yet

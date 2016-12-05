@@ -94,7 +94,7 @@ public class ChipsAdapter extends  RecyclerView.Adapter<ChipsAdapter.ViewHolder>
             ibClose.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (getAdapterPosition() != -1) {
+                    if (onRemoveListener != null && getAdapterPosition() != -1) {
                         onRemoveListener.onItemRemoved(getAdapterPosition());
                     }
                 }
