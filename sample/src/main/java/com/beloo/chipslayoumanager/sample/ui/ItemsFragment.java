@@ -95,7 +95,7 @@ public class ItemsFragment extends Fragment {
         adapter = createAdapter(savedInstanceState);
 
         ChipsLayoutManager spanLayoutManager = ChipsLayoutManager.newBuilder(getContext())
-                .setOrientation(ChipsLayoutManager.HORIZONTAL)
+                .setOrientation(ChipsLayoutManager.VERTICAL)
                 .build();
 
         rvTest.addItemDecoration(new SpacingItemDecoration(getResources().getDimensionPixelOffset(R.dimen.item_space),

@@ -4,7 +4,6 @@ import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.IScrollingController;
-import com.beloo.widget.chipslayoutmanager.VerticalScrollingController;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.anchor.RowsAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.RowGravityModifiersFactory;
@@ -57,7 +56,7 @@ public class RowsStateFactory implements IStateFactory {
 
     @Override
     public IScrollingController scrollingController() {
-        return new VerticalScrollingController(lm);
+        return lm.verticalScrollingController();
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.beloo.widget.chipslayoutmanager.layouter;
 import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
-import com.beloo.widget.chipslayoutmanager.HorizontalScrollingController;
 import com.beloo.widget.chipslayoutmanager.IScrollingController;
 import com.beloo.widget.chipslayoutmanager.anchor.ColumnsAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
@@ -59,7 +58,7 @@ public class ColumnsStateFactory implements IStateFactory {
 
     @Override
     public IScrollingController scrollingController() {
-        return new HorizontalScrollingController(lm);
+        return lm.horizontalScrollingController();
     }
 
     @Override
