@@ -1059,6 +1059,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 //        Log.d(TAG, "first pos = " + firstPos);
 //        Log.d(TAG, "last pos = " + lastPost);
 
+        Log.d(TAG, "child count = " + getChildCount());
+        Log.d(TAG, "first item pos = " + getPosition(getChildAt(0)));
+
         dy = scrollVerticallyInternal(dy);
         offsetChildrenVertical(-dy);
         anchorView = anchorFactory.getAnchor();
