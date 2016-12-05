@@ -1,4 +1,4 @@
-package beloo.recyclerviewcustomadapter.ui;
+package com.beloo.chipslayoumanager.sample.ui;
 
 
 import android.os.Bundle;

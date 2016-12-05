@@ -1,4 +1,4 @@
-package beloo.recyclerviewcustomadapter.util;
+package com.beloo.chipslayoumanager.sample;
 
 import android.content.Context;
 import android.graphics.Bitmap;

@@ -1,4 +1,4 @@
-package beloo.recyclerviewcustomadapter.ui;
+package com.beloo.chipslayoumanager.sample.ui;
 
 import android.support.v7.widget.RecyclerView;
 
@@ -7,10 +7,10 @@ import java.util.Collections;
 import java.util.List;
 
 import beloo.recyclerviewcustomadapter.R;
-import beloo.recyclerviewcustomadapter.ui.adapter.ChipsAdapter;
-import beloo.recyclerviewcustomadapter.entity.ChipsEntity;
+import com.beloo.chipslayoumanager.sample.ui.adapter.ChipsAdapter;
+import com.beloo.chipslayoumanager.sample.entity.ChipsEntity;
 
-class ChipsFactory implements IItemsFactory<ChipsEntity> {
+public class TallChipsFactory implements IItemsFactory<ChipsEntity> {
 
     @Override
     public List<ChipsEntity> getFewItems() {
@@ -28,7 +28,7 @@ class ChipsFactory implements IItemsFactory<ChipsEntity> {
         chipsList.add(ChipsEntity.newBuilder()
                 .drawableResId(R.drawable.girl2)
                 .name("Jayne")
-                .description("Everyone want to meet Jayne")
+                .description("Everyone want to meet Jayne because Jayne is cute. And other long text below\nYep it is")
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
@@ -49,7 +49,7 @@ class ChipsFactory implements IItemsFactory<ChipsEntity> {
         chipsList.add(ChipsEntity.newBuilder()
                 .drawableResId(R.drawable.batman)
                 .name("Second Batman")
-                .description("Batman is our friend")
+                .description("Batman is our friend. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore ")
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
@@ -80,10 +80,10 @@ class ChipsFactory implements IItemsFactory<ChipsEntity> {
         chipsEntities.addAll(getFewItems());
         chipsEntities.addAll(getFewItems());
 
-        for (int i=0; i< chipsEntities.size(); i++) {
-            ChipsEntity chipsEntity = chipsEntities.get(i);
-            chipsEntity.setName(chipsEntity.getName() + " " + i);
-        }
+//        for (int i=0; i< chipsEntities.size(); i++) {
+//            ChipsEntity chipsEntity = chipsEntities.get(i);
+//            chipsEntity.setName(chipsEntity.getName() + " " + i);
+//        }
 
         return chipsEntities;
     }

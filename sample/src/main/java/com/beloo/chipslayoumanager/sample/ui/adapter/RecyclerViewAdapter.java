@@ -1,4 +1,4 @@
-package beloo.recyclerviewcustomadapter.ui.adapter;
+package com.beloo.chipslayoumanager.sample.ui.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import beloo.recyclerviewcustomadapter.ui.OnRemoveListener;
+import com.beloo.chipslayoumanager.sample.ui.OnRemoveListener;
 import beloo.recyclerviewcustomadapter.R;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {

@@ -1,4 +1,4 @@
-package beloo.recyclerviewcustomadapter;
+package com.beloo.chipslayoumanager.sample;
 
 public class Application extends android.app.Application {
 

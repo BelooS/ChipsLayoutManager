@@ -1,4 +1,4 @@
-package beloo.recyclerviewcustomadapter.ui;
+package com.beloo.chipslayoumanager.sample.ui;
 
 import android.support.v7.widget.RecyclerView;
 
@@ -7,8 +7,8 @@ import java.util.Collections;
 import java.util.List;
 
 import beloo.recyclerviewcustomadapter.R;
-import beloo.recyclerviewcustomadapter.ui.adapter.ChipsAdapter;
-import beloo.recyclerviewcustomadapter.entity.ChipsEntity;
+import com.beloo.chipslayoumanager.sample.ui.adapter.ChipsAdapter;
+import com.beloo.chipslayoumanager.sample.entity.ChipsEntity;
 
 class ShortChipsFactory implements IItemsFactory<ChipsEntity> {
 

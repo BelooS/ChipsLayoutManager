@@ -1,4 +1,4 @@
-package beloo.recyclerviewcustomadapter.entity;
+package com.beloo.chipslayoumanager.sample.entity;
 
 import android.os.Parcel;
 import android.os.Parcelable;
