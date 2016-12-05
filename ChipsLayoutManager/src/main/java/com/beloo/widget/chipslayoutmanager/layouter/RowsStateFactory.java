@@ -11,8 +11,10 @@ import com.beloo.widget.chipslayoutmanager.gravity.RowGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.DecoratorBreakerFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.InfiniteCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.RowsCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacerFactory;
+import com.beloo.widget.chipslayoutmanager.util.StateHelper;
 
 public class RowsStateFactory implements IStateFactory {
 
@@ -45,7 +47,7 @@ public class RowsStateFactory implements IStateFactory {
 
     @Override
     public AbstractCriteriaFactory createDefaultFinishingCriteriaFactory() {
-        return new RowsCriteriaFactory();
+        return StateHelper.isInfinite(this)? new InfiniteCriteriaFactory() : new RowsCriteriaFactory();
     }
 
     @Override
@@ -56,6 +58,16 @@ public class RowsStateFactory implements IStateFactory {
     @Override
     public IScrollingController scrollingController() {
         return new VerticalScrollingController(lm);
+    }
+
+    @Override
+    public int getSizeMode() {
+        return lm.getHeightMode();
+    }
+
+    @Override
+    public int getEnd() {
+        return lm.getHeight();
     }
 
     @Override

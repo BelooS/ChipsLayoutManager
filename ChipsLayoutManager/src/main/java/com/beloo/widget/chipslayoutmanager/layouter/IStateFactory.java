@@ -18,6 +18,10 @@ public interface IStateFactory {
 
     IScrollingController scrollingController();
 
+    int getSizeMode();
+
+    int getEnd();
+
     int getStart(View view);
 
     int getEnd(View view);

@@ -5,8 +5,6 @@
     android:id="@+id/scvBottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:maxHeight="250dp"
-    app:behavior_peekHeight="120dp"
     android:clipToPadding="true"
     android:background="@android:color/holo_orange_light"
     app:layout_behavior="@string/bottom_sheet_behavior"

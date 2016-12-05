@@ -16,7 +16,9 @@ import com.beloo.widget.chipslayoutmanager.layouter.breaker.ColumnBreakerFactory
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ColumnsCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.criteria.InfiniteCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.IPlacerFactory;
+import com.beloo.widget.chipslayoutmanager.util.StateHelper;
 
 public class ColumnsStateFactory implements IStateFactory {
 
@@ -47,7 +49,7 @@ public class ColumnsStateFactory implements IStateFactory {
 
     @Override
     public AbstractCriteriaFactory createDefaultFinishingCriteriaFactory() {
-        return new ColumnsCriteriaFactory();
+        return StateHelper.isInfinite(this)? new InfiniteCriteriaFactory() : new ColumnsCriteriaFactory();
     }
 
     @Override
@@ -58,6 +60,16 @@ public class ColumnsStateFactory implements IStateFactory {
     @Override
     public IScrollingController scrollingController() {
         return new HorizontalScrollingController(lm);
+    }
+
+    @Override
+    public int getSizeMode() {
+        return lm.getWidthMode();
+    }
+
+    @Override
+    public int getEnd() {
+        return lm.getWidth();
     }
 
     @Override

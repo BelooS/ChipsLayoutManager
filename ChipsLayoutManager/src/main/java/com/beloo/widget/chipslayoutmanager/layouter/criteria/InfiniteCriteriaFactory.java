@@ -2,7 +2,7 @@ package com.beloo.widget.chipslayoutmanager.layouter.criteria;
 
 import android.support.annotation.NonNull;
 
-public class InfiniteCriteriaFactory implements ICriteriaFactory {
+public class InfiniteCriteriaFactory extends AbstractCriteriaFactory implements ICriteriaFactory {
     @NonNull
     @Override
     public IFinishingCriteria getBackwardFinishingCriteria() {

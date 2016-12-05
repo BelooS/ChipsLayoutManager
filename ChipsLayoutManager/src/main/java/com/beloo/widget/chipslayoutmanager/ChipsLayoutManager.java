@@ -947,6 +947,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @RestrictTo(RestrictTo.Scope.GROUP_ID)
     @Override
     public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
+        if (layoutOrientation() == VERTICAL) return 0;
         dx = scrollHorizontallyInternal(dx);
         offsetChildrenHorizontal(-dx);
 
@@ -1218,9 +1219,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         startSmoothScroll(scroller);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // measure
+    ///////////////////////////////////////////////////////////////////////////
+
     @Override
     public void setMeasuredDimension(int widthSize, int heightSize) {
         measureSupporter.measure(widthSize, heightSize);
+        Log.i(TAG, "measured dimension = " + heightSize);
         super.setMeasuredDimension(measureSupporter.getMeasuredWidth(), measureSupporter.getMeasuredHeight());
     }
 

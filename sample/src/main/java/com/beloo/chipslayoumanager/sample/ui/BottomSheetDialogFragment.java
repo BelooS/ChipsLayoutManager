@@ -35,7 +35,7 @@ public class BottomSheetDialogFragment extends android.support.design.widget.Bot
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.bottom_sheet_modal, container, false);
+        View view = inflater.inflate(R.layout.fragment_bottom_sheet_modal, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
