@@ -1,4 +1,4 @@
-package beloo.recyclerviewcustomadapter;
+package beloo.recyclerviewcustomadapter.ui;
 
 import android.support.v7.widget.RecyclerView;
 

@@ -1,10 +1,9 @@
-package beloo.recyclerviewcustomadapter;
+package beloo.recyclerviewcustomadapter.ui;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -15,6 +14,9 @@ import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import beloo.recyclerviewcustomadapter.R;
+
 
 public class MainActivity extends AppCompatActivity {
     private static final String EXTRA = "data";

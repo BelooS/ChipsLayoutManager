@@ -1,4 +1,4 @@
-package beloo.recyclerviewcustomadapter;
+package beloo.recyclerviewcustomadapter.ui;
 
 import android.support.v7.widget.RecyclerView;
 
@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import beloo.recyclerviewcustomadapter.adapter.ChipsAdapter;
+import beloo.recyclerviewcustomadapter.R;
+import beloo.recyclerviewcustomadapter.ui.adapter.ChipsAdapter;
 import beloo.recyclerviewcustomadapter.entity.ChipsEntity;
 
 public class TallChipsFactory implements IItemsFactory<ChipsEntity> {

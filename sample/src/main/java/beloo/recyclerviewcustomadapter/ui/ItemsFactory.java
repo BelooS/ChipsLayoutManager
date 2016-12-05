@@ -1,4 +1,4 @@
-package beloo.recyclerviewcustomadapter;
+package beloo.recyclerviewcustomadapter.ui;
 
 import android.support.v7.widget.RecyclerView;
 
@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import beloo.recyclerviewcustomadapter.adapter.RecyclerViewAdapter;
+import beloo.recyclerviewcustomadapter.ui.adapter.RecyclerViewAdapter;
 
 public class ItemsFactory implements IItemsFactory<String> {
     public List<String> getItems() {
