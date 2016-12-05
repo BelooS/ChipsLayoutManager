@@ -1004,6 +1004,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private int onContentScrolledLeft(int dx) {
         int delta;
         AnchorViewState state = anchorFactory.getAnchor();
+        if (state.getAnchorViewRect() == null) {
+            state.setAnchorViewRect(getCanvas().getCanvasRect());
+        }
 
         if (!isFirstItemAdded) { //in case 0 position haven't added in layout yet
             delta = dx;
@@ -1103,6 +1106,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         int delta;
 
         AnchorViewState state = anchorFactory.getAnchor();
+        if (state.getAnchorViewRect() == null) {
+            state.setAnchorViewRect(getCanvas().getCanvasRect());
+        }
 
         if (state.getPosition() != 0) { //in case 0 position haven't added in layout yet
             delta = dy;

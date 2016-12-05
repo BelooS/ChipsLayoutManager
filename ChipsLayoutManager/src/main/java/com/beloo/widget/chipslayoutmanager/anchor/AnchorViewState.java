@@ -43,6 +43,10 @@ public class AnchorViewState implements Parcelable {
         return anchorViewRect;
     }
 
+    public void setAnchorViewRect(Rect anchorViewRect) {
+        this.anchorViewRect = anchorViewRect;
+    }
+
     public boolean isRemoving() {
         return getPosition() == -1;
     }
