@@ -5,4 +5,7 @@
     <string name="move_to">Move to:</string>
     <string name="move">Move</string>
     <string name="scroll">Scroll</string>
+
+    <string name="main">Main</string>
+    <string name="bottom_sheet">Bottom Sheet</string>
 </resources>

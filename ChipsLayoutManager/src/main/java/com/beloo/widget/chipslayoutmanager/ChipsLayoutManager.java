@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RestrictTo;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
@@ -249,14 +250,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         requestLayoutWithAnimations();
     }
 
-    public IViewCacheStorage getViewPositionsStorage() {
-        return viewPositionsStorage;
-    }
-
-    public ICanvas getCanvas() {
-        return canvas;
-    }
-
     public Integer getMaxViewsInRow() {
         return maxViewsInRow;
     }
@@ -272,6 +265,16 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     public boolean isStrategyAppliedWithLastRow() {
         return isStrategyAppliedWithLastRow;
+    }
+
+    @RestrictTo(RestrictTo.Scope.GROUP_ID)
+    public IViewCacheStorage getViewPositionsStorage() {
+        return viewPositionsStorage;
+    }
+
+    @RestrictTo(RestrictTo.Scope.GROUP_ID)
+    public ICanvas getCanvas() {
+        return canvas;
     }
 
     /**
@@ -941,6 +944,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return isScrollingEnabledContract;
     }
 
+    @RestrictTo(RestrictTo.Scope.GROUP_ID)
     @Override
     public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
         dx = scrollHorizontallyInternal(dx);
@@ -1051,6 +1055,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /**
      * calculate offset of views while scrolling, layout items on new places
      */
+    @RestrictTo(RestrictTo.Scope.GROUP_ID)
     @Override
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
 
