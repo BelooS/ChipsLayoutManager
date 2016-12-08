@@ -13,9 +13,10 @@ import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 class ParcelableContainer implements Parcelable {
 
     private AnchorViewState anchorViewState;
-    private int anchorPosition;
     private SparseArray<Object> orientationCacheMap = new SparseArray<>();
     private SparseArray<Object> cacheNormalizationPositionMap = new SparseArray<>();
+    //store previous orientation
+    private int orientation;
 
     ParcelableContainer() {
         //initial values. We should normalize cache when scrolled to zero in case first time of changing layoutOrientation state
@@ -31,19 +32,21 @@ class ParcelableContainer implements Parcelable {
         return anchorViewState;
     }
 
-    public int getAnchorPosition() {
-        return anchorPosition;
+    @DeviceOrientation
+    int getOrientation() {
+        return orientation;
     }
 
-    public void putAnchorPosition(int anchorPosition) {
-        this.anchorPosition = anchorPosition;
+    void putOrientation(@DeviceOrientation int orientation) {
+        this.orientation = orientation;
     }
 
     @SuppressWarnings("unchecked")
     private ParcelableContainer(Parcel parcel) {
         anchorViewState = parcel.readParcelable(AnchorViewState.class.getClassLoader());
-        orientationCacheMap = parcel.readSparseArray(Parcelable.class.getClassLoader());
+        orientationCacheMap = parcel.readSparseArray(ParcelableContainer.class.getClassLoader());
         cacheNormalizationPositionMap = parcel.readSparseArray(Integer.class.getClassLoader());
+        orientation = parcel.readInt();
     }
 
     @Override
@@ -51,6 +54,7 @@ class ParcelableContainer implements Parcelable {
         parcel.writeParcelable(anchorViewState, 0);
         parcel.writeSparseArray(orientationCacheMap);
         parcel.writeSparseArray(cacheNormalizationPositionMap);
+        parcel.writeInt(orientation);
     }
 
     void putPositionsCache(@DeviceOrientation int orientation, Parcelable parcelable) {

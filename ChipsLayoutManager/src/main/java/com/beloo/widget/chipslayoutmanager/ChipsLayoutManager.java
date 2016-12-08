@@ -433,8 +433,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public void onRestoreInstanceState(Parcelable state) {
         container = (ParcelableContainer) state;
-        anchorView = anchorFactory.createNotFound();
-        anchorView.setPosition(container.getAnchorPosition());
+
+        anchorView = container.getAnchorViewState();
+        if (orientation != container.getOrientation()) {
+            //orientation have been changed, clear anchor rect
+            int anchorPos = anchorView.getPosition();
+            anchorView = anchorFactory.createNotFound();
+            anchorView.setPosition(anchorPos);
+        }
 
         viewPositionsStorage.onRestoreInstanceState(container.getPositionsCache(orientation));
         cacheNormalizationPosition = container.getNormalizationPosition(orientation);
@@ -443,8 +449,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         if (cacheNormalizationPosition != null) {
             viewPositionsStorage.purgeCacheFromPosition(cacheNormalizationPosition);
         }
-        viewPositionsStorage.purgeCacheFromPosition(container.getAnchorPosition());
-        Log.d(TAG, "RESTORE. anchor position =" + container.getAnchorPosition());
+        viewPositionsStorage.purgeCacheFromPosition(anchorView.getPosition());
+        Log.d(TAG, "RESTORE. anchor position =" + anchorView.getPosition());
         Log.d(TAG, "RESTORE. layoutOrientation = " + orientation + " normalizationPos = " + cacheNormalizationPosition);
         Log.d(TAG, "RESTORE. last cache position = " + viewPositionsStorage.getLastCachePosition());
     }
@@ -452,10 +458,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public Parcelable onSaveInstanceState() {
 
-        //store only position on anchor. Rect of anchor will be invalidated
-        int anchorPosition = anchorView.getPosition();
-        container.putAnchorPosition(anchorPosition);
+        container.putAnchorViewState(anchorView);
         container.putPositionsCache(orientation, viewPositionsStorage.onSaveInstanceState());
+        container.putOrientation(orientation);
         Log.d(TAG, "STORE. last cache position =" + viewPositionsStorage.getLastCachePosition());
 
         Integer storedNormalizationPosition = cacheNormalizationPosition != null ? cacheNormalizationPosition : viewPositionsStorage.getLastCachePosition();

@@ -43,7 +43,8 @@ public class BottomSheetDialogFragment extends android.support.design.widget.Bot
     @SuppressWarnings("unchecked")
     private RecyclerView.Adapter createAdapter() {
 
-        List<String> items = itemsFactory.getDoubleItems();
+//        List<String> items = itemsFactory.getDoubleItems();
+        List<String> items = itemsFactory.getFewItems();
 
         adapter = itemsFactory.createAdapter(items, null);
         return adapter;

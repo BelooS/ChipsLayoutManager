@@ -3,7 +3,11 @@ package com.beloo.widget.chipslayoutmanager.cache;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
@@ -17,23 +21,22 @@ final class ParcelableContainer implements Parcelable {
     }
 
     private ParcelableContainer(Parcel in) {
-        Integer[] startsRowArray = (Integer[]) in.readArray(Integer.class.getClassLoader());
-        Integer[] endsRowArray = (Integer[]) in.readArray(Integer.class.getClassLoader());
+        List<Integer> startsRowList = new LinkedList<>();
+        List<Integer> endsRowList = new LinkedList<>();
+        in.readList(startsRowList, Integer.class.getClassLoader());
+        in.readList(endsRowList, Integer.class.getClassLoader());
 
-        startsRow = new TreeSet<>(Arrays.asList(startsRowArray));
-        endsRow = new TreeSet<>(Arrays.asList(endsRowArray));
+        startsRow = new TreeSet<>(startsRowList);
+        endsRow = new TreeSet<>(endsRowList);
     }
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        Integer[] startsRowArray = new Integer[startsRow.size()];
-        startsRow.toArray(startsRowArray);
+        List<Integer> startRowList = new LinkedList<>(startsRow);
+        List<Integer> endRowList = new LinkedList<>(endsRow);
 
-        Integer[] endsRowArray = new Integer[endsRow.size()];
-        endsRow.toArray(endsRowArray);
-
-        parcel.writeArray(startsRowArray);
-        parcel.writeArray(endsRowArray);
+        parcel.writeList(startRowList);
+        parcel.writeList(endRowList);
     }
 
     NavigableSet<Integer> getStartsRow() {
