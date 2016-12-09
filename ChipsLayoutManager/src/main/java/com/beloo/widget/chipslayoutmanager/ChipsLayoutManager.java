@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearSmoothScroller;
-import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
@@ -20,6 +19,7 @@ import android.view.animation.LinearInterpolator;
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.ColumnsStateFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.ICanvas;
 import com.beloo.widget.chipslayoutmanager.layouter.IMeasureSupporter;
 import com.beloo.widget.chipslayoutmanager.layouter.IStateFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.MeasureSupporter;
@@ -80,7 +80,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private static final float FAST_SCROLLING_COEFFICIENT = 2;
 
     /** delegate which represents available canvas for drawing views according to layout*/
-    private ICanvas canvas = new Square(this);
+    private ICanvas canvas;
 
     /** iterable over views added to RecyclerView */
     private ChildViewsIterable childViews = new ChildViewsIterable(this);
@@ -410,8 +410,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             }
 
             stateFactory = layoutOrientation == HORIZONTAL ? new RowsStateFactory(ChipsLayoutManager.this) : new ColumnsStateFactory(ChipsLayoutManager.this);
+            canvas = stateFactory.getCanvas();
             anchorFactory = stateFactory.anchorFactory();
             scrollingController = stateFactory.scrollingController();
+
             anchorView = anchorFactory.createNotFound();
 
             return ChipsLayoutManager.this;

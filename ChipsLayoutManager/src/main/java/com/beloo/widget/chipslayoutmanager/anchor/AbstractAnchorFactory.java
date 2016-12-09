@@ -3,7 +3,7 @@ package com.beloo.widget.chipslayoutmanager.anchor;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.beloo.widget.chipslayoutmanager.ICanvas;
+import com.beloo.widget.chipslayoutmanager.layouter.ICanvas;
 
 abstract class AbstractAnchorFactory implements IAnchorFactory {
     RecyclerView.LayoutManager lm;

@@ -18,6 +18,8 @@ public interface IStateFactory {
 
     IScrollingController scrollingController();
 
+    ICanvas getCanvas();
+
     int getSizeMode();
 
     int getEnd();

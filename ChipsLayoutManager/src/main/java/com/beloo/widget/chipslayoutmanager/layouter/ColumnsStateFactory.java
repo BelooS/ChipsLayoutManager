@@ -62,6 +62,11 @@ public class ColumnsStateFactory implements IStateFactory {
     }
 
     @Override
+    public ICanvas getCanvas() {
+        return new ColumnSquare(lm);
+    }
+
+    @Override
     public int getSizeMode() {
         return lm.getWidthMode();
     }

@@ -60,6 +60,11 @@ public class RowsStateFactory implements IStateFactory {
     }
 
     @Override
+    public ICanvas getCanvas() {
+        return new RowSquare(lm);
+    }
+
+    @Override
     public int getSizeMode() {
         return lm.getHeightMode();
     }

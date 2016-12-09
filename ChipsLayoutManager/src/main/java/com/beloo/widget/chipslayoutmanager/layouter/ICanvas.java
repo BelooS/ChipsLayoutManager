@@ -1,9 +1,11 @@
-package com.beloo.widget.chipslayoutmanager;
+package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
 import android.view.View;
 
-public interface ICanvas extends IBorder{
+import com.beloo.widget.chipslayoutmanager.IBorder;
+
+public interface ICanvas extends IBorder {
     Rect getCanvasRect();
 
     Rect getViewRect(View view);

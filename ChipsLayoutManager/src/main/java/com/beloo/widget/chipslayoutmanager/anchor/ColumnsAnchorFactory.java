@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.ChildViewsIterable;
-import com.beloo.widget.chipslayoutmanager.ICanvas;
+import com.beloo.widget.chipslayoutmanager.layouter.ICanvas;
 
 public class ColumnsAnchorFactory extends AbstractAnchorFactory {
 
