@@ -17,7 +17,9 @@ public interface IScrollingController {
     /**
      * calculate offset of views while scrolling, layout items on new places
      */
-    int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state);
+    int scrollVerticallyBy(int d, RecyclerView.Recycler recycler, RecyclerView.State state);
 
-    int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state);
+    int scrollHorizontallyBy(int d, RecyclerView.Recycler recycler, RecyclerView.State state);
+
+    void offsetChildren(int d);
 }

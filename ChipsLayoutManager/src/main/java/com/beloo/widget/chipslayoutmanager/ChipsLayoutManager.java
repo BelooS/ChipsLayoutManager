@@ -1113,11 +1113,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return scrollingController.canScrollVertically();
     }
 
+    @RestrictTo(RestrictTo.Scope.GROUP_ID)
     @Override
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
         return scrollingController.scrollVerticallyBy(dy, recycler, state);
     }
 
+    @RestrictTo(RestrictTo.Scope.GROUP_ID)
     @Override
     public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
         return scrollingController.scrollHorizontallyBy(dx, recycler, state);
@@ -1131,7 +1133,60 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return new HorizontalScrollingController();
     }
 
-    private class VerticalScrollingController implements IScrollingController {
+    private abstract class ScrollingController implements IScrollingController {
+
+        abstract int onContentScrolledForward(int d);
+        abstract int onContentScrolledBackward(int d);
+
+        int scrollBy(int d) {
+            int childCount = getChildCount();
+            if (childCount == 0) {
+                return 0;
+            }
+
+            int delta = 0;
+            if (d < 0) {   //if content scrolled down
+                delta = onContentScrolledForward(d);
+            } else if (d > 0) { //if content scrolled up
+                delta = onContentScrolledBackward(d);
+            }
+
+            performNormalizationIfNeeded();
+
+            return delta;
+        }
+
+        public abstract void offsetChildren(int d);
+
+        @Override
+        public int scrollHorizontallyBy(int d, RecyclerView.Recycler recycler, RecyclerView.State state) {
+            return scrollBy(d, recycler, state);
+        }
+
+        @Override
+        public int scrollVerticallyBy(int d, RecyclerView.Recycler recycler, RecyclerView.State state) {
+            return scrollBy(d, recycler, state);
+        }
+
+        private int scrollBy(int d, RecyclerView.Recycler recycler, RecyclerView.State state) {
+            d = scrollBy(d);
+            offsetChildren(-d);
+
+            scrollingLogger.logChildCount(getChildCount());
+
+            anchorView = anchorFactory.getAnchor();
+            scrollingLogger.logAnchorView(anchorView);
+
+            AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
+            criteriaFactory.setAdditionalRowsCount(1);
+            LayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
+
+            fill(recycler, factory, anchorView, false);
+            return d;
+        }
+    }
+
+    private class VerticalScrollingController extends ScrollingController implements IScrollingController {
 
         VerticalScrollingController() {}
 
@@ -1193,48 +1248,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
 
         @Override
-        public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
+        public int scrollHorizontallyBy(int d, RecyclerView.Recycler recycler, RecyclerView.State state) {
             return 0;
         }
 
-        /**
-         * calculate offset of views while scrolling, layout items on new places
-         */
         @Override
-        public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
-
-            dy = scrollVerticallyInternal(dy);
-            offsetChildrenVertical(-dy);
-            anchorView = anchorFactory.getAnchor();
-
-            scrollingLogger.logChildCount(getChildCount());
-
-            //some bugs connected with displaying views from the last row, which not fully showed, so just add additional row to avoid a lot of it.
-            AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
-            criteriaFactory.setAdditionalRowsCount(1);
-
-            LayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
-
-            fill(recycler, factory, anchorView, false);
-            return dy;
-        }
-
-        private int scrollVerticallyInternal(int dy) {
-            int childCount = getChildCount();
-            if (childCount == 0) {
-                return 0;
-            }
-
-            int delta = 0;
-            if (dy < 0) {   //if content scrolled down
-                delta = onContentScrolledDown(dy);
-            } else if (dy > 0) { //if content scrolled up
-                delta = onContentScrolledUp(dy);
-            }
-
-            performNormalizationIfNeeded();
-
-            return delta;
+        public void offsetChildren(int d) {
+            offsetChildrenVertical(d);
         }
 
         /**
@@ -1243,7 +1263,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
          * @param dy not processed changing of y axis
          * @return delta. Calculated changing of y axis
          */
-        private int onContentScrolledDown(int dy) {
+        @Override
+        int onContentScrolledForward(int dy) {
             int delta;
 
             AnchorViewState state = anchorFactory.getAnchor();
@@ -1280,7 +1301,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
          * @param dy not processed changing of y axis
          * @return delta. Calculated changing of y axis
          */
-        private int onContentScrolledUp(int dy) {
+        @Override
+        int onContentScrolledBackward(int dy) {
             int childCount = getChildCount();
             int itemCount = getItemCount();
             int delta;
@@ -1300,7 +1322,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     }
 
-    private class HorizontalScrollingController implements IScrollingController {
+    private class HorizontalScrollingController extends ScrollingController implements IScrollingController {
 
         HorizontalScrollingController() {}
 
@@ -1363,45 +1385,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return isScrollingEnabledContract;
         }
 
-        @RestrictTo(RestrictTo.Scope.GROUP_ID)
         @Override
-        public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
-            dx = scrollHorizontallyInternal(dx);
-            offsetChildrenHorizontal(-dx);
-
-            scrollingLogger.logChildCount(getChildCount());
-
-            anchorView = anchorFactory.getAnchor();
-            scrollingLogger.logAnchorView(anchorView);
-
-            AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
-            criteriaFactory.setAdditionalRowsCount(1);
-            LayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
-
-            fill(recycler, factory, anchorView, false);
-            return dx;
-        }
-
-        private int scrollHorizontallyInternal(int dx) {
-            int childCount = getChildCount();
-            if (childCount == 0) {
-                return 0;
-            }
-
-            int delta = 0;
-            if (dx < 0) { //if content scrolled backward
-                delta = onContentScrolledLeft(dx);
-            } else if (dx > 0) { //if content scrolled forward
-                delta = onContentScrolledRight(dx);
-            }
-
-            performNormalizationIfNeeded();
-
-            return delta;
+        public void offsetChildren(int d) {
+            offsetChildrenHorizontal(d);
         }
 
         /** calculate dx, stop scrolling whether items bounds reached*/
-        private int onContentScrolledRight(int dx) {
+        @Override
+        int onContentScrolledBackward(int dx) {
             int childCount = getChildCount();
             int itemCount = getItemCount();
             int delta;
@@ -1420,7 +1411,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return delta;
         }
 
-        private int onContentScrolledLeft(int dx) {
+        @Override
+        int onContentScrolledForward(int dx) {
             int delta;
             AnchorViewState state = anchorFactory.getAnchor();
             if (state.getAnchorViewRect() == null) {
