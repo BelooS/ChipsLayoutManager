@@ -21,9 +21,28 @@ class RowSquare extends Square {
         return lm.getPaddingLeft();
     }
 
-    /** get top border. Controlled by clipToPadding property*/
+    /** get bottom border. Controlled by clipToPadding property*/
     public final int getCanvasTopBorder() {
         return 0;
     }
 
+    @Override
+    public int getEnd() {
+        return getCanvasBottomBorder();
+    }
+
+    @Override
+    public int getEndAfterPadding() {
+        return lm.getHeight() - lm.getPaddingBottom();
+    }
+
+    @Override
+    public int getStart() {
+        return 0;
+    }
+
+    @Override
+    public int getStartAfterPadding() {
+        return lm.getPaddingTop();
+    }
 }

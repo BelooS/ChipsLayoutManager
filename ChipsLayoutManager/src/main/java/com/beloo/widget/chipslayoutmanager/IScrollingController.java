@@ -22,4 +22,6 @@ public interface IScrollingController {
     int scrollHorizontallyBy(int d, RecyclerView.Recycler recycler, RecyclerView.State state);
 
     void offsetChildren(int d);
+
+    void normalizeGaps();
 }

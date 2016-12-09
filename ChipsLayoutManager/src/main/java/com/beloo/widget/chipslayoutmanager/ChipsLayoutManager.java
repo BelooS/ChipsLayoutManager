@@ -1138,6 +1138,23 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         abstract int onContentScrolledForward(int d);
         abstract int onContentScrolledBackward(int d);
 
+        private int calculateEndGap();
+        private int calculateStartGap();
+
+        @Override
+        public void normalizeGaps() {
+            int backwardGap = calculateStartGap();
+            if (backwardGap > 0) {
+                offsetChildren(backwardGap);
+                return;
+            }
+
+            int forwardGap = calculateEndGap();
+            if (forwardGap > 0) {
+                offsetChildren(-forwardGap);
+            }
+        }
+
         int scrollBy(int d) {
             int childCount = getChildCount();
             if (childCount == 0) {
@@ -1319,7 +1336,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             return delta;
         }
-
     }
 
     private class HorizontalScrollingController extends ScrollingController implements IScrollingController {
