@@ -23,5 +23,5 @@ public interface IScrollingController {
 
     void offsetChildren(int d);
 
-    void normalizeGaps();
+    boolean normalizeGaps(RecyclerView.Recycler recycler, RecyclerView.State state);
 }

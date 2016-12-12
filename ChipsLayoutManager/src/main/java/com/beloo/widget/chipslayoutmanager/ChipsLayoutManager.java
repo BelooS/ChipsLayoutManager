@@ -206,6 +206,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     private boolean isAfterPreLayout;
 
+    private boolean isAfterOffset;
+
     private ChipsLayoutManager(Context context) {
         @DeviceOrientation
         int orientation = context.getResources().getConfiguration().orientation;
@@ -604,6 +606,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return;
         }
 
+        if (isAfterOffset) {
+            isAfterOffset = false;
+            return;
+        }
+
         predictiveAnimationsLogger.logState(state);
 
         if (isLayoutRTL() != isLayoutRTL) {
@@ -611,7 +618,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             isLayoutRTL = isLayoutRTL();
             //so detach all views before we start searching for anchor view
             detachAndScrapAttachedViews(recycler);
-
         }
 
         calcRecyclerCacheSize(recycler);
@@ -636,8 +642,22 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
 
             LayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
+            ILayouter upLayouter = layouterFactory.getBackwardLayouter(anchorView.getAnchorViewRect());
+            ILayouter downLayouter = layouterFactory.getForwardLayouter(anchorView.getAnchorViewRect());
 
-            fill(recycler, layouterFactory, anchorView, isAfterPreLayout);
+            fill(recycler, upLayouter, downLayouter);
+
+            if (isAfterPreLayout) {
+                // changes may cause gaps on the UI, try to fix them.
+                /** should be executed before {@link #layoutDisappearingViews} */
+                if (scrollingController.normalizeGaps(recycler, null)) {
+                    isAfterOffset = true;
+                }
+
+                //we should layout disappearing views after pre-layout to support natural movements)
+                layoutDisappearingViews(recycler, upLayouter, downLayouter);
+            }
+
             isAfterPreLayout = false;
         } else {
             //inside pre-layout stage. It is called when item animation reconstruction will be played
@@ -658,7 +678,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             LayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
-            fill(recycler, layouterFactory, anchorView, false);
+            logger.onBeforeLayouter(anchorView);
+            fill(recycler,
+                    layouterFactory.getBackwardLayouter(anchorView.getAnchorViewRect()),
+                    layouterFactory.getForwardLayouter(anchorView.getAnchorViewRect()));
+
             isAfterPreLayout = true;
         }
 
@@ -678,6 +702,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         if (anchorFactory.normalize(anchorView)) {
             requestLayoutWithAnimations();
         }
+
     }
 
     /** layout disappearing view to support predictive animations */
@@ -789,7 +814,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     /**
-     * find highest & lowest views
+     * find highest & lowest views among visible attached views
      */
     private void findBorderViews() {
         topView = null;
@@ -802,30 +827,41 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         isFirstItemAdded = false;
 
         if (getChildCount() > 0) {
+            View initView = getChildAt(0);
+            topView = initView;
+            bottomView = initView;
+            leftView = initView;
+            rightView = initView;
+
             for (View view : childViews) {
                 int position = getPosition(view);
 
-                if (topView == null || getDecoratedTop(view) < getDecoratedTop(topView)) {
+                if (!canvas.isInside(view)) continue;
+
+                Log.d(TAG, "position = " + position);
+                Log.d(TAG, "bottom = " + getDecoratedBottom(view));
+
+                if (getDecoratedTop(view) < getDecoratedTop(topView)) {
                     topView = view;
                 }
 
-                if (bottomView == null || getDecoratedBottom(view) > getDecoratedBottom(bottomView)) {
+                if (getDecoratedBottom(view) > getDecoratedBottom(bottomView)) {
                     bottomView = view;
                 }
 
-                if (leftView == null || getDecoratedLeft(view) < getDecoratedLeft(leftView)) {
+                if (getDecoratedLeft(view) < getDecoratedLeft(leftView)) {
                     leftView = view;
                 }
 
-                if (rightView == null || getDecoratedRight(view) > getDecoratedRight(rightView)) {
+                if (getDecoratedRight(view) > getDecoratedRight(rightView)) {
                     rightView = view;
                 }
 
-                if (canvas.isInside(view) && (minPositionOnScreen == RecyclerView.NO_POSITION || position < minPositionOnScreen)) {
+                if (minPositionOnScreen == RecyclerView.NO_POSITION || position < minPositionOnScreen) {
                     minPositionOnScreen = position;
                 }
 
-                if (canvas.isInside(view) && (maxPositionOnScreen == RecyclerView.NO_POSITION || position > maxPositionOnScreen)) {
+                if (maxPositionOnScreen == RecyclerView.NO_POSITION || position > maxPositionOnScreen) {
                     maxPositionOnScreen = position;
                 }
 
@@ -834,15 +870,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 }
             }
         }
-    }
+      }
 
     /**
      * place all views on theirs right places according to current state
      */
-    private void fill(RecyclerView.Recycler recycler, LayouterFactory layouterFactory, @NonNull AnchorViewState anchorView, boolean isLayoutDisappearing) {
+    private void fill(RecyclerView.Recycler recycler, ILayouter upLayouter, ILayouter downLayouter) {
         int startingPos = anchorView.getPosition();
-        Rect anchorRect = anchorView.getAnchorViewRect();
-
         fillCache();
 
         //... and remove from layout
@@ -850,25 +884,16 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             detachView(viewCache.valueAt(i));
         }
 
-        logger.onBeforeLayouter(anchorView);
-
-        //up layouter should be invoked earlier than down layouter, because views with lower positions positioned above anchorView
-        ILayouter upLayouter = layouterFactory.getBackwardLayouter(anchorRect);
-
-        AbstractPositionIterator iterator = upLayouter.positionIterator();
-        //start from anchor position
-        iterator.move(startingPos - 1);
         logger.onStartLayouter(startingPos - 1);
 
-        fillWithLayouter(recycler, upLayouter);
-        ILayouter downLayouter = layouterFactory.getForwardLayouter(anchorRect);
-
-        iterator = downLayouter.positionIterator();
+        //up layouter should be invoked earlier than down layouter, because views with lower positions positioned above anchorView
         //start from anchor position
-        iterator.move(startingPos);
+        fillWithLayouter(recycler, upLayouter, startingPos - 1);
+
         logger.onStartLayouter(startingPos);
 
-        fillWithLayouter(recycler, downLayouter);
+        //start from anchor position
+        fillWithLayouter(recycler, downLayouter, startingPos);
 
         logger.onAfterLayouter();
         //move to trash everything, which haven't used in this layout cycle
@@ -878,21 +903,18 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             logger.onRemovedAndRecycled(i);
         }
 
-        viewCache.clear();
-        logger.onAfterRemovingViews();
-
         findBorderViews();
 
-        if (isLayoutDisappearing) {
-            layoutDisappearingViews(recycler, upLayouter, downLayouter);
-        }
+        viewCache.clear();
+        logger.onAfterRemovingViews();
     }
 
     /**
      * place views in layout started from chosen position with chosen layouter
      */
-    private void fillWithLayouter(RecyclerView.Recycler recycler, ILayouter layouter) {
+    private void fillWithLayouter(RecyclerView.Recycler recycler, ILayouter layouter, int startingPos) {
         AbstractPositionIterator iterator = layouter.positionIterator();
+        iterator.move(startingPos);
         while (iterator.hasNext()) {
             int pos = iterator.next();
             View view = viewCache.get(pos);
@@ -1138,24 +1160,31 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         abstract int onContentScrolledForward(int d);
         abstract int onContentScrolledBackward(int d);
 
-        private int calculateEndGap();
-        private int calculateStartGap();
+        abstract int calculateEndGap();
+        abstract int calculateStartGap();
 
         @Override
-        public void normalizeGaps() {
-            int backwardGap = calculateStartGap();
-            if (backwardGap > 0) {
-                offsetChildren(backwardGap);
-                return;
-            }
+        public final boolean normalizeGaps(RecyclerView.Recycler recycler, RecyclerView.State state) {
+            Log.w(TAG, "normalize gaps");
+//            int backwardGap = calculateStartGap();
+//            if (backwardGap > 0) {
+//                Log.d(TAG, "backward gap = " + backwardGap);
+//                offsetChildren(-backwardGap);
+//                return true;
+//            }
 
             int forwardGap = calculateEndGap();
             if (forwardGap > 0) {
-                offsetChildren(-forwardGap);
+                scrollBy(-forwardGap, recycler, state);
+                Log.d(TAG, "bottom pos =" + getPosition(bottomView));
+                Log.d(TAG, "forward gap = " + forwardGap);
+                return true;
             }
+
+            return false;
         }
 
-        int scrollBy(int d) {
+        int calcOffset(int d) {
             int childCount = getChildCount();
             if (childCount == 0) {
                 return 0;
@@ -1186,7 +1215,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
 
         private int scrollBy(int d, RecyclerView.Recycler recycler, RecyclerView.State state) {
-            d = scrollBy(d);
+            d = calcOffset(d);
             offsetChildren(-d);
 
             scrollingLogger.logChildCount(getChildCount());
@@ -1198,7 +1227,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             criteriaFactory.setAdditionalRowsCount(1);
             LayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
-            fill(recycler, factory, anchorView, false);
+            fill(recycler,
+                    factory.getBackwardLayouter(anchorView.getAnchorViewRect()),
+                    factory.getForwardLayouter(anchorView.getAnchorViewRect()));
+
             return d;
         }
     }
@@ -1336,6 +1368,27 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             return delta;
         }
+
+        @Override
+        int calculateEndGap() {
+            if (getChildCount() == 0) return 0;
+            int currentBottom = getDecoratedBottom(bottomView);
+            int desiredBottom = canvas.getEndAfterPadding();
+
+            int diff = desiredBottom - currentBottom;
+            if (diff < 0) return 0;
+            return diff;
+        }
+
+        @Override
+        int calculateStartGap() {
+            if (getChildCount() == 0) return 0;
+            int currentTop = getDecoratedTop(topView);
+            int desiredTop = canvas.getStartAfterPadding();
+            int diff = currentTop - desiredTop;
+            if (diff < 0) return 0;
+            return diff;
+        }
     }
 
     private class HorizontalScrollingController extends ScrollingController implements IScrollingController {
@@ -1425,6 +1478,16 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             }
 
             return delta;
+        }
+
+        @Override
+        int calculateEndGap() {
+            return 0;
+        }
+
+        @Override
+        int calculateStartGap() {
+            return 0;
         }
 
         @Override
