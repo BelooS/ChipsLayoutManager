@@ -206,8 +206,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     private boolean isAfterPreLayout;
 
-    private boolean isAfterOffset;
-
     private ChipsLayoutManager(Context context) {
         @DeviceOrientation
         int orientation = context.getResources().getConfiguration().orientation;
@@ -606,11 +604,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return;
         }
 
-        if (isAfterOffset) {
-            isAfterOffset = false;
-            return;
-        }
-
         predictiveAnimationsLogger.logState(state);
 
         if (isLayoutRTL() != isLayoutRTL) {
@@ -647,13 +640,15 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             fill(recycler, upLayouter, downLayouter);
 
-            if (isAfterPreLayout) {
-                // changes may cause gaps on the UI, try to fix them.
-                /** should be executed before {@link #layoutDisappearingViews} */
-                if (scrollingController.normalizeGaps(recycler, null)) {
-                    isAfterOffset = true;
-                }
+            // changes may cause gaps on the UI, try to fix them.
+            /** should be executed before {@link #layoutDisappearingViews} */
+            if (scrollingController.normalizeGaps(recycler, null)) {
+                //we should re-layout with new anchor after normalizing gaps
+                anchorView = anchorFactory.getAnchor();
+                requestLayoutWithAnimations();
+            }
 
+            if (isAfterPreLayout) {
                 //we should layout disappearing views after pre-layout to support natural movements)
                 layoutDisappearingViews(recycler, upLayouter, downLayouter);
             }
@@ -690,17 +685,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         if (!state.isMeasuring()) {
             measureSupporter.onSizeChanged();
-        }
-
-        //we should re-layout if previous anchor was removed or moved.
-        anchorView = anchorFactory.getAnchor();
-        if (!anchorView.isNotFoundState()) {
-            Rect rect = anchorView.getAnchorViewRect();
-            rect.left = getPaddingLeft();
-            rect.right = getPaddingRight();
-        }
-        if (anchorFactory.normalize(anchorView)) {
-            requestLayoutWithAnimations();
         }
 
     }
@@ -837,9 +821,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 int position = getPosition(view);
 
                 if (!canvas.isInside(view)) continue;
-
-                Log.d(TAG, "position = " + position);
-                Log.d(TAG, "bottom = " + getDecoratedBottom(view));
 
                 if (getDecoratedTop(view) < getDecoratedTop(topView)) {
                     topView = view;
@@ -1166,12 +1147,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         @Override
         public final boolean normalizeGaps(RecyclerView.Recycler recycler, RecyclerView.State state) {
             Log.w(TAG, "normalize gaps");
-//            int backwardGap = calculateStartGap();
-//            if (backwardGap > 0) {
-//                Log.d(TAG, "backward gap = " + backwardGap);
-//                offsetChildren(-backwardGap);
-//                return true;
-//            }
+            int backwardGap = calculateStartGap();
+            if (backwardGap > 0) {
+                Log.d(TAG, "backward gap = " + backwardGap);
+                offsetChildren(-backwardGap);
+                //if we have normalized start gap, normalizing bottom have no sense
+                return true;
+            }
 
             int forwardGap = calculateEndGap();
             if (forwardGap > 0) {
