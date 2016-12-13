@@ -70,6 +70,11 @@ public class RowsStateFactory implements IStateFactory {
     }
 
     @Override
+    public int getStart() {
+        return 0;
+    }
+
+    @Override
     public int getEnd() {
         return lm.getHeight();
     }
@@ -82,6 +87,16 @@ public class RowsStateFactory implements IStateFactory {
     @Override
     public int getEnd(View view) {
         return lm.getDecoratedBottom(view);
+    }
+
+    @Override
+    public int getStartAfterPadding() {
+        return lm.getPaddingTop();
+    }
+
+    @Override
+    public int getEndAfterPadding() {
+        return lm.getHeight() - lm.getPaddingBottom();
     }
 
 }

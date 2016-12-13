@@ -1374,8 +1374,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         @Override
         int calculateEndGap() {
             if (getChildCount() == 0) return 0;
-            int currentBottom = getDecoratedBottom(bottomView);
-            int desiredBottom = canvas.getEndAfterPadding();
+            int currentBottom = stateFactory.getEnd(bottomView);
+            int desiredBottom = stateFactory.getEndAfterPadding();
 
             int diff = desiredBottom - currentBottom;
             if (diff < 0) return 0;
@@ -1385,8 +1385,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         @Override
         int calculateStartGap() {
             if (getChildCount() == 0) return 0;
-            int currentTop = getDecoratedTop(topView);
-            int desiredTop = canvas.getStartAfterPadding();
+            int currentTop = stateFactory.getStart(topView);
+            int desiredTop = stateFactory.getStartAfterPadding();
             int diff = currentTop - desiredTop;
             if (diff < 0) return 0;
             return diff;
@@ -1480,8 +1480,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         @Override
         int calculateEndGap() {
             if (getChildCount() == 0) return 0;
-            int currentEnd = getDecoratedRight(rightView);
-            int desiredEnd = canvas.getEndAfterPadding();
+            int currentEnd = stateFactory.getEnd(rightView);
+            int desiredEnd = stateFactory.getEndAfterPadding();
 
             int diff = desiredEnd - currentEnd;
             if (diff < 0) return 0;
@@ -1491,8 +1491,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         @Override
         int calculateStartGap() {
             if (getChildCount() == 0) return 0;
-            int currentStart = getDecoratedLeft(leftView);
-            int desiredStart = canvas.getStartAfterPadding();
+            int currentStart = stateFactory.getStart(leftView);
+            int desiredStart = stateFactory.getStartAfterPadding();
             int diff = currentStart - desiredStart;
             if (diff < 0) return 0;
             return diff;

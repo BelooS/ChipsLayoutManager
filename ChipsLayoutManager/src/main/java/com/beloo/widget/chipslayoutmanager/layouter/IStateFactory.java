@@ -24,6 +24,12 @@ public interface IStateFactory {
 
     int getEnd();
 
+    int getEndAfterPadding();
+
+    int getStart();
+
+    int getStartAfterPadding();
+
     int getStart(View view);
 
     int getEnd(View view);

@@ -17,12 +17,4 @@ public interface ICanvas extends IBorder {
     boolean isFullyVisible(View view);
 
     boolean isFullyVisible(Rect rect);
-
-    int getEnd();
-
-    int getEndAfterPadding();
-
-    int getStart();
-
-    int getStartAfterPadding();
 }

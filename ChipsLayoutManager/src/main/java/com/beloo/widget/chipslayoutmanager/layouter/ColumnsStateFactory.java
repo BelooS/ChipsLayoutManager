@@ -72,6 +72,11 @@ public class ColumnsStateFactory implements IStateFactory {
     }
 
     @Override
+    public int getStart() {
+        return 0;
+    }
+
+    @Override
     public int getEnd() {
         return lm.getWidth();
     }
@@ -84,5 +89,15 @@ public class ColumnsStateFactory implements IStateFactory {
     @Override
     public int getEnd(View view) {
         return lm.getDecoratedRight(view);
+    }
+
+    @Override
+    public int getStartAfterPadding() {
+        return lm.getPaddingLeft();
+    }
+
+    @Override
+    public int getEndAfterPadding() {
+        return lm.getWidth() - lm.getPaddingRight();
     }
 }

@@ -24,23 +24,4 @@ class ColumnSquare extends Square {
         return lm.getPaddingTop();
     }
 
-    @Override
-    public int getEnd() {
-        return getCanvasRightBorder();
-    }
-
-    @Override
-    public int getEndAfterPadding() {
-        return lm.getWidth() - lm.getPaddingRight();
-    }
-
-    @Override
-    public int getStart() {
-        return 0;
-    }
-
-    @Override
-    public int getStartAfterPadding() {
-        return lm.getPaddingLeft();
-    }
 }

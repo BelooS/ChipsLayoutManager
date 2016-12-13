@@ -26,23 +26,4 @@ class RowSquare extends Square {
         return 0;
     }
 
-    @Override
-    public int getEnd() {
-        return getCanvasBottomBorder();
-    }
-
-    @Override
-    public int getEndAfterPadding() {
-        return lm.getHeight() - lm.getPaddingBottom();
-    }
-
-    @Override
-    public int getStart() {
-        return 0;
-    }
-
-    @Override
-    public int getStartAfterPadding() {
-        return lm.getPaddingTop();
-    }
 }
