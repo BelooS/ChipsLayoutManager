@@ -17,4 +17,20 @@ public interface ICanvas extends IBorder {
     boolean isFullyVisible(View view);
 
     boolean isFullyVisible(Rect rect);
+
+    void findBorderViews();
+
+    View getTopView();
+
+    View getBottomView();
+
+    View getLeftView();
+
+    View getRightView();
+
+    Integer getMinPositionOnScreen();
+
+    Integer getMaxPositionOnScreen();
+
+    boolean isFirstItemAdded();
 }

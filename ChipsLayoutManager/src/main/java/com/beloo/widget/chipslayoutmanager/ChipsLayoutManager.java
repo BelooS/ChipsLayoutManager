@@ -158,29 +158,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     private AnchorViewState anchorView;
 
-    /**
-     * highest view in layout. Have always actual value, because it set in {@link #onLayoutChildren}
-     */
-    private View topView;
-    /**
-     * lowest view in layout. Have always actual value, because it set in {@link #onLayoutChildren}
-     */
-    private View bottomView;
-
-    /**
-     * The view have placed in the closest to the left border. Have always actual value, because it set in {@link #onLayoutChildren}
-     */
-    private View leftView;
-
-    /** The view have placed in the closest to the right border. Have always actual value, because it set in {@link #onLayoutChildren} */
-    private View rightView;
-
-    /** minimal position visible on screen*/
-    private Integer minPositionOnScreen;
-    private Integer maxPositionOnScreen;
-
-    private boolean isFirstItemAdded;
-
     ///////////////////////////////////////////////////////////////////////////
     // state-dependent
     ///////////////////////////////////////////////////////////////////////////
@@ -516,7 +493,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public int findFirstVisibleItemPosition() {
         if (getChildCount() == 0)
             return RecyclerView.NO_POSITION;
-        return minPositionOnScreen;
+        return canvas.getMinPositionOnScreen();
     }
 
     /**
@@ -558,7 +535,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public int findLastVisibleItemPosition() {
         if (getChildCount() == 0)
             return RecyclerView.NO_POSITION;
-        return maxPositionOnScreen;
+        return canvas.getMaxPositionOnScreen();
     }
 
     /**
@@ -762,9 +739,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             final View child = holder.itemView;
             final RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) child.getLayoutParams();
             if (!lp.isItemRemoved()) {
-                if (lp.getViewAdapterPosition() < minPositionOnScreen) {
+                if (lp.getViewAdapterPosition() < canvas.getMinPositionOnScreen()) {
                     container.backwardViews.put(lp.getViewAdapterPosition(), child);
-                } else if (lp.getViewAdapterPosition() > maxPositionOnScreen) {
+                } else if (lp.getViewAdapterPosition() > canvas.getMaxPositionOnScreen()) {
                     container.forwardViews.put(lp.getViewAdapterPosition(), child);
                 }
             }
@@ -790,7 +767,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 int pos = lp.getViewLayoutPosition();
 
                 pos = recycler.convertPreLayoutPositionToPostLayout(pos);
-                probablyMovedFromScreen = pos < minPositionOnScreen || pos > maxPositionOnScreen;
+                probablyMovedFromScreen = pos < canvas.getMinPositionOnScreen() || pos > canvas.getMaxPositionOnScreen();
             }
 
             if (lp.isItemRemoved() || probablyMovedFromScreen) {
@@ -818,62 +795,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             viewCache.put(pos, view);
         }
     }
-
-    /**
-     * find highest & lowest views among visible attached views
-     */
-    private void findBorderViews() {
-        topView = null;
-        bottomView = null;
-        leftView = null;
-        rightView = null;
-        minPositionOnScreen = RecyclerView.NO_POSITION;
-        maxPositionOnScreen = RecyclerView.NO_POSITION;
-
-        isFirstItemAdded = false;
-
-        if (getChildCount() > 0) {
-            View initView = getChildAt(0);
-            topView = initView;
-            bottomView = initView;
-            leftView = initView;
-            rightView = initView;
-
-            for (View view : childViews) {
-                int position = getPosition(view);
-
-                if (!canvas.isInside(view)) continue;
-
-                if (getDecoratedTop(view) < getDecoratedTop(topView)) {
-                    topView = view;
-                }
-
-                if (getDecoratedBottom(view) > getDecoratedBottom(bottomView)) {
-                    bottomView = view;
-                }
-
-                if (getDecoratedLeft(view) < getDecoratedLeft(leftView)) {
-                    leftView = view;
-                }
-
-                if (getDecoratedRight(view) > getDecoratedRight(rightView)) {
-                    rightView = view;
-                }
-
-                if (minPositionOnScreen == RecyclerView.NO_POSITION || position < minPositionOnScreen) {
-                    minPositionOnScreen = position;
-                }
-
-                if (maxPositionOnScreen == RecyclerView.NO_POSITION || position > maxPositionOnScreen) {
-                    maxPositionOnScreen = position;
-                }
-
-                if (position == 0) {
-                    isFirstItemAdded = true;
-                }
-            }
-        }
-      }
 
     /**
      * place all views on theirs right places according to current state
@@ -906,7 +827,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             logger.onRemovedAndRecycled(i);
         }
 
-        findBorderViews();
+        canvas.findBorderViews();
 
         viewCache.clear();
         logger.onAfterRemovingViews();
@@ -1277,13 +1198,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         @Override
         public boolean canScrollVertically() {
-            findBorderViews();
+            canvas.findBorderViews();
             if (getChildCount() > 0) {
-                int top = getDecoratedTop(topView);
-                int bottom = getDecoratedBottom(bottomView);
+                int top = getDecoratedTop(canvas.getTopView());
+                int bottom = getDecoratedBottom(canvas.getBottomView());
 
-                if (minPositionOnScreen == 0
-                        && maxPositionOnScreen == getItemCount() - 1
+                if (canvas.getMinPositionOnScreen() == 0
+                        && canvas.getMaxPositionOnScreen() == getItemCount() - 1
                         && top >= getPaddingTop()
                         && bottom <= getHeight() - getPaddingBottom()) {
                     return false;
@@ -1320,7 +1241,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 return 0;
             }
 
-            if (!isFirstItemAdded) { //in case 0 position haven't added in layout yet
+            if (!canvas.isFirstItemAdded()) { //in case 0 position haven't added in layout yet
                 delta = dy;
             } else { //in case top view is a first view in adapter and wouldn't be any other view above
                 int topBorder = getPaddingTop();
@@ -1360,7 +1281,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
                 delta = dy;
             } else { //in case lower view is the last view in adapter and wouldn't be any other view below
-                int viewBottom = stateFactory.getEnd(bottomView);
+                int viewBottom = stateFactory.getEnd(canvas.getBottomView());
                 int parentBottom = stateFactory.getEnd();
                 delta = Math.min(viewBottom - parentBottom, dy);
             }
@@ -1371,7 +1292,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         @Override
         int calculateEndGap() {
             if (getChildCount() == 0) return 0;
-            int currentBottom = stateFactory.getEnd(bottomView);
+            int currentBottom = stateFactory.getEnd(canvas.getBottomView());
             int desiredBottom = stateFactory.getEndAfterPadding();
 
             int diff = desiredBottom - currentBottom;
@@ -1382,7 +1303,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         @Override
         int calculateStartGap() {
             if (getChildCount() == 0) return 0;
-            int currentTop = stateFactory.getStart(topView);
+            int currentTop = stateFactory.getStart(canvas.getTopView());
             int desiredTop = stateFactory.getStartAfterPadding();
             int diff = currentTop - desiredTop;
             if (diff < 0) return 0;
@@ -1430,13 +1351,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         @Override
         public boolean canScrollHorizontally() {
-            findBorderViews();
+            canvas.findBorderViews();
             if (getChildCount() > 0) {
-                int left = getDecoratedLeft(leftView);
-                int right = getDecoratedRight(rightView);
+                int left = getDecoratedLeft(canvas.getLeftView());
+                int right = getDecoratedRight(canvas.getRightView());
 
-                if (minPositionOnScreen == 0
-                        && maxPositionOnScreen == getItemCount() - 1
+                if (canvas.getMinPositionOnScreen() == 0
+                        && canvas.getMaxPositionOnScreen() == getItemCount() - 1
                         && left >= getPaddingLeft()
                         && right <= getWidth() - getPaddingRight()) {
                     return false;
@@ -1465,34 +1386,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
                 delta = dx;
             } else { //in case lower view is the last view in adapter and wouldn't be any other view below
-                int viewRight = stateFactory.getEnd(rightView);
+                int viewRight = stateFactory.getEnd(canvas.getRightView());
                 int parentRight = stateFactory.getEnd();
                 int distance = viewRight - parentRight;
                 delta = Math.min(distance, dx);
             }
 
             return delta;
-        }
-
-        @Override
-        int calculateEndGap() {
-            if (getChildCount() == 0) return 0;
-            int currentEnd = stateFactory.getEnd(rightView);
-            int desiredEnd = stateFactory.getEndAfterPadding();
-
-            int diff = desiredEnd - currentEnd;
-            if (diff < 0) return 0;
-            return diff;
-        }
-
-        @Override
-        int calculateStartGap() {
-            if (getChildCount() == 0) return 0;
-            int currentStart = stateFactory.getStart(leftView);
-            int desiredStart = stateFactory.getStartAfterPadding();
-            int diff = currentStart - desiredStart;
-            if (diff < 0) return 0;
-            return diff;
         }
 
         @Override
@@ -1503,7 +1403,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 return 0;
             }
 
-            if (!isFirstItemAdded) { //in case 0 position haven't added in layout yet
+            if (!canvas.isFirstItemAdded()) { //in case 0 position haven't added in layout yet
                 delta = dx;
             } else {
 
@@ -1525,6 +1425,26 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return delta;
         }
 
+        @Override
+        int calculateEndGap() {
+            if (getChildCount() == 0) return 0;
+            int currentEnd = stateFactory.getEnd(canvas.getRightView());
+            int desiredEnd = stateFactory.getEndAfterPadding();
+
+            int diff = desiredEnd - currentEnd;
+            if (diff < 0) return 0;
+            return diff;
+        }
+
+        @Override
+        int calculateStartGap() {
+            if (getChildCount() == 0) return 0;
+            int currentStart = stateFactory.getStart(canvas.getLeftView());
+            int desiredStart = stateFactory.getStartAfterPadding();
+            int diff = currentStart - desiredStart;
+            if (diff < 0) return 0;
+            return diff;
+        }
 
     }
 
