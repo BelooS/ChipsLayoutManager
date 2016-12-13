@@ -136,7 +136,7 @@ abstract class ScrollingController implements IScrollingController {
             delta = d;
         } else { //in case lower view is the last view in adapter and wouldn't be any other view below
             int viewEnd = stateFactory.getEndViewBound();
-            int parentEnd = stateFactory.getEnd();
+            int parentEnd = stateFactory.getEndAfterPadding();
             delta = Math.min(viewEnd - parentEnd, d);
         }
 
