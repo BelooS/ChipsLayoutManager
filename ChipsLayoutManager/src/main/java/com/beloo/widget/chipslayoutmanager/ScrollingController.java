@@ -75,9 +75,9 @@ abstract class ScrollingController implements IScrollingController {
 
         int delta = 0;
         if (d < 0) {   //if content scrolled down
-            delta = onContentScrolledForward(d);
-        } else if (d > 0) { //if content scrolled up
             delta = onContentScrolledBackward(d);
+        } else if (d > 0) { //if content scrolled up
+            delta = onContentScrolledForward(d);
         }
 
         return delta;
@@ -89,7 +89,7 @@ abstract class ScrollingController implements IScrollingController {
      * @param d not processed changing of x or y axis, depending on lm state
      * @return delta. Calculated changing of x or y axis, depending on lm state
      */
-    final int onContentScrolledForward(int d) {
+    final int onContentScrolledBackward(int d) {
         int delta;
 
         AnchorViewState anchor = layoutManager.getAnchor();
@@ -97,7 +97,7 @@ abstract class ScrollingController implements IScrollingController {
             return 0;
         }
 
-        if (!layoutManager.getCanvas().isFirstItemAdded()) { //in case 0 position haven't added in layout yet
+        if (anchor.getPosition() != 0) { //in case 0 position haven't added in layout yet
             delta = d;
         } else { //in case top view is a first view in adapter and wouldn't be any other view above
             int startBorder = stateFactory.getStartAfterPadding();
@@ -125,7 +125,7 @@ abstract class ScrollingController implements IScrollingController {
      * @param d not processed changing of x or y axis, depending on lm state
      * @return delta. Calculated changing of x or y axis, depending on lm state
      */
-    final int onContentScrolledBackward(int d) {
+    final int onContentScrolledForward(int d) {
         int childCount = layoutManager.getChildCount();
         int itemCount = layoutManager.getItemCount();
         int delta;
@@ -136,7 +136,7 @@ abstract class ScrollingController implements IScrollingController {
             delta = d;
         } else { //in case lower view is the last view in adapter and wouldn't be any other view below
             int viewEnd = stateFactory.getEndViewBound();
-            int parentEnd = stateFactory.getEnd();
+            int parentEnd = stateFactory.getEndAfterPadding();
             delta = Math.min(viewEnd - parentEnd, d);
         }
 
