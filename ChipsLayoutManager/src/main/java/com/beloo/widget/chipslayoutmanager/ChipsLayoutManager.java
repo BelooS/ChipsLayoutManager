@@ -1,7 +1,6 @@
 package com.beloo.widget.chipslayoutmanager;
 
 import android.content.Context;
-import android.graphics.PointF;
 import android.graphics.Rect;
 import android.os.Parcelable;
 import android.support.annotation.IntRange;
@@ -9,12 +8,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
-import android.view.animation.LinearInterpolator;
 
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
@@ -41,11 +38,11 @@ import com.beloo.widget.chipslayoutmanager.layouter.placer.PlacerFactory;
 import com.beloo.widget.chipslayoutmanager.logger.IAdapterActionsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IFillLogger;
 import com.beloo.widget.chipslayoutmanager.logger.IPredictiveAnimationsLogger;
-import com.beloo.widget.chipslayoutmanager.logger.IScrollingLogger;
 import com.beloo.widget.chipslayoutmanager.logger.LoggerFactory;
 import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
+import com.beloo.widget.chipslayoutmanager.util.LayoutManagerUtil;
 
-public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract, IStateHolder {
+public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract, IStateHolder, ScrollingController.IScrollerListener {
     ///////////////////////////////////////////////////////////////////////////
     // orientation types
     ///////////////////////////////////////////////////////////////////////////
@@ -135,7 +132,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private IFillLogger logger;
     private IAdapterActionsLogger adapterActionsLogger;
     private IPredictiveAnimationsLogger predictiveAnimationsLogger;
-    private IScrollingLogger scrollingLogger;
     //--- end loggers
 
     /**
@@ -188,12 +184,15 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         logger = loggerFactory.getFillLogger(viewCache);
         adapterActionsLogger = loggerFactory.getAdapterActionsLogger();
         predictiveAnimationsLogger = loggerFactory.getPredictiveAnimationsLogger();
-        scrollingLogger = loggerFactory.getScrollingLogger();
 
         viewPositionsStorage = new ViewCacheFactory(this).createCacheStorage();
         measureSupporter = new MeasureSupporter(this);
         setAutoMeasureEnabled(true);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // ChipsLayoutManager contract methods
+    ///////////////////////////////////////////////////////////////////////////
 
     public static Builder newBuilder(Context context) {
         return new ChipsLayoutManager(context).new StrategyBuilder();
@@ -207,6 +206,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      * If scrolling enabled it would be disabled in case all items fit on the screen */
     public void setScrollingEnabledContract(boolean isEnabled) {
         isScrollingEnabledContract = isEnabled;
+    }
+
+    @Override
+    public boolean isScrollingEnabledContract() {
+        return isScrollingEnabledContract;
     }
 
     /**
@@ -242,6 +246,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return rowStrategy;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // non-contract public methods. Used only for inner purposes
+    ///////////////////////////////////////////////////////////////////////////
+
     @RestrictTo(RestrictTo.Scope.GROUP_ID)
     public boolean isStrategyAppliedWithLastRow() {
         return isStrategyAppliedWithLastRow;
@@ -257,18 +265,15 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return canvas;
     }
 
-    /**
-     * perform changing layout with playing RecyclerView animations
-     */
-    private void requestLayoutWithAnimations() {
-        postOnAnimation(new Runnable() {
-            @Override
-            public void run() {
-                ChipsLayoutManager.super.requestLayout();
-                requestSimpleAnimationsInNextLayout();
-            }
-        });
+    @NonNull
+    @RestrictTo(RestrictTo.Scope.GROUP_ID)
+    AnchorViewState getAnchor() {
+        return anchorView;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // builder
+    ///////////////////////////////////////////////////////////////////////////
 
     //create decorator if any other builders would be added
     @SuppressWarnings("WeakerAccess")
@@ -283,10 +288,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
 
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // builder
-    ///////////////////////////////////////////////////////////////////////////
 
     @SuppressWarnings("WeakerAccess")
     public class Builder {
@@ -408,6 +409,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return new RecyclerView.LayoutParams(
                 RecyclerView.LayoutParams.WRAP_CONTENT,
                 RecyclerView.LayoutParams.WRAP_CONTENT);
+    }
+
+    private void requestLayoutWithAnimations() {
+        LayoutManagerUtil.requestLayoutWithAnimations(this);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1013,291 +1018,26 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     public VerticalScrollingController verticalScrollingController() {
-        return new VerticalScrollingController();
+        return new VerticalScrollingController(this, stateFactory, this);
     }
 
     public HorizontalScrollingController horizontalScrollingController() {
-        return new HorizontalScrollingController();
+        return new HorizontalScrollingController(this, stateFactory, this);
     }
 
-    private abstract class ScrollingController implements IScrollingController {
+    @Override
+    public void onScrolled(IScrollingController scrollingController, RecyclerView.Recycler recycler, RecyclerView.State state) {
 
-        final int calculateEndGap() {
-            if (getChildCount() == 0) return 0;
-            int currentEnd = stateFactory.getEndViewBound();
-            int desiredEnd = stateFactory.getEndAfterPadding();
+        performNormalizationIfNeeded();
+        anchorView = anchorFactory.getAnchor();
 
-            int diff = desiredEnd - currentEnd;
-            if (diff < 0) return 0;
-            return diff;
-        }
+        AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
+        criteriaFactory.setAdditionalRowsCount(1);
+        LayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
-        final int calculateStartGap() {
-            if (getChildCount() == 0) return 0;
-            int currentStart = stateFactory.getStartViewBound();
-            int desiredStart = stateFactory.getStartAfterPadding();
-            int diff = currentStart - desiredStart;
-            if (diff < 0) return 0;
-            return diff;
-        }
-
-        @Override
-        public final boolean normalizeGaps(RecyclerView.Recycler recycler, RecyclerView.State state) {
-            int backwardGap = calculateStartGap();
-            if (backwardGap > 0) {
-                offsetChildren(-backwardGap);
-                //if we have normalized start gap, normalizing bottom have no sense
-                return true;
-            }
-
-            int forwardGap = calculateEndGap();
-            if (forwardGap > 0) {
-                scrollBy(-forwardGap, recycler, state);
-                return true;
-            }
-
-            return false;
-        }
-
-        final int calcOffset(int d) {
-            int childCount = getChildCount();
-            if (childCount == 0) {
-                return 0;
-            }
-
-            int delta = 0;
-            if (d < 0) {   //if content scrolled down
-                delta = onContentScrolledForward(d);
-            } else if (d > 0) { //if content scrolled up
-                delta = onContentScrolledBackward(d);
-            }
-
-            performNormalizationIfNeeded();
-
-            return delta;
-        }
-
-        /**
-         * invoked when content scrolled forward (return to older items)
-         *
-         * @param d not processed changing of x or y axis, depending on lm state
-         * @return delta. Calculated changing of x or y axis, depending on lm state
-         */
-        final int onContentScrolledForward(int d) {
-            int delta;
-
-            AnchorViewState state = anchorFactory.getAnchor();
-            if (state.getAnchorViewRect() == null) {
-                return 0;
-            }
-
-            if (!canvas.isFirstItemAdded()) { //in case 0 position haven't added in layout yet
-                delta = d;
-            } else { //in case top view is a first view in adapter and wouldn't be any other view above
-                int startBorder = stateFactory.getStartAfterPadding();
-                int viewStart = stateFactory.getStart(anchorView);
-                int distance;
-                distance = viewStart - startBorder;
-
-                scrollingLogger.logUpScrollingNormalizationDistance(distance);
-
-                if (distance >= 0) {
-                    // in case over scroll on top border
-                    delta = distance;
-                } else {
-                    //in case first child showed partially
-                    delta = Math.max(distance, d);
-                }
-            }
-
-            return delta;
-        }
-
-        /**
-         * invoked when content scrolled up (to newer items)
-         *
-         * @param d not processed changing of x or y axis, depending on lm state
-         * @return delta. Calculated changing of x or y axis, depending on lm state
-         */
-        int onContentScrolledBackward(int d) {
-            int childCount = getChildCount();
-            int itemCount = getItemCount();
-            int delta;
-
-            View lastView = getChildAt(childCount - 1);
-            int lastViewAdapterPos = getPosition(lastView);
-            if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
-                delta = d;
-            } else { //in case lower view is the last view in adapter and wouldn't be any other view below
-                int viewEnd = stateFactory.getEndViewBound();
-                int parentEnd = stateFactory.getEnd();
-                delta = Math.min(viewEnd - parentEnd, d);
-            }
-
-            return delta;
-        }
-
-        public abstract void offsetChildren(int d);
-
-        @Override
-        public final int scrollHorizontallyBy(int d, RecyclerView.Recycler recycler, RecyclerView.State state) {
-            return canScrollHorizontally()? scrollBy(d, recycler, state) : 0;
-        }
-
-        @Override
-        public final int scrollVerticallyBy(int d, RecyclerView.Recycler recycler, RecyclerView.State state) {
-            return canScrollVertically()? scrollBy(d, recycler, state) : 0;
-        }
-
-        private int scrollBy(int d, RecyclerView.Recycler recycler, RecyclerView.State state) {
-            d = calcOffset(d);
-            offsetChildren(-d);
-
-            scrollingLogger.logChildCount(getChildCount());
-
-            anchorView = anchorFactory.getAnchor();
-            scrollingLogger.logAnchorView(anchorView);
-
-            AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
-            criteriaFactory.setAdditionalRowsCount(1);
-            LayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
-
-            fill(recycler,
-                    factory.getBackwardLayouter(anchorView.getAnchorViewRect()),
-                    factory.getForwardLayouter(anchorView.getAnchorViewRect()));
-
-            return d;
-        }
-    }
-
-    private class VerticalScrollingController extends ScrollingController implements IScrollingController {
-
-        VerticalScrollingController() {}
-
-        @Override
-        public RecyclerView.SmoothScroller createSmoothScroller(@NonNull Context context, final int position, final int timeMs, final AnchorViewState anchor) {
-            return new LinearSmoothScroller(context) {
-                /*
-                 * LinearSmoothScroller, at a minimum, just need to know the vector
-                 * (x/y distance) to travel in order to get from the current positioning
-                 * to the target.
-                 */
-                @Override
-                public PointF computeScrollVectorForPosition(int targetPosition) {
-                    int visiblePosition = anchor.getPosition();
-                    //determine scroll up or scroll down needed
-                    return new PointF(0, position > visiblePosition ? 1 : -1);
-                }
-
-                @Override
-                protected void onTargetFound(View targetView, RecyclerView.State state, Action action) {
-                    super.onTargetFound(targetView, state, action);
-                    int desiredTop = getPaddingTop();
-                    int currentTop = getDecoratedTop(targetView);
-
-                    int dy = currentTop - desiredTop;
-
-                    //perform fit animation to move target view at top of layout
-                    action.update(0, dy, timeMs, new LinearInterpolator());
-                }
-            };
-        }
-
-        @Override
-        public boolean canScrollVertically() {
-            canvas.findBorderViews();
-            if (getChildCount() > 0) {
-                int top = getDecoratedTop(canvas.getTopView());
-                int bottom = getDecoratedBottom(canvas.getBottomView());
-
-                if (canvas.getMinPositionOnScreen() == 0
-                        && canvas.getMaxPositionOnScreen() == getItemCount() - 1
-                        && top >= getPaddingTop()
-                        && bottom <= getHeight() - getPaddingBottom()) {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-
-            return isScrollingEnabledContract;
-        }
-
-        @Override
-        public boolean canScrollHorizontally() {
-            return false;
-        }
-
-        @Override
-        public void offsetChildren(int d) {
-            offsetChildrenVertical(d);
-        }
-
-    }
-
-    private class HorizontalScrollingController extends ScrollingController implements IScrollingController {
-
-        HorizontalScrollingController() {}
-
-        @Override
-        public RecyclerView.SmoothScroller createSmoothScroller(@NonNull Context context, final int position, final int timeMs, final AnchorViewState anchor) {
-            return new LinearSmoothScroller(context) {
-                /*
-                 * LinearSmoothScroller, at a minimum, just need to know the vector
-                 * (x/y distance) to travel in order to get from the current positioning
-                 * to the target.
-                 */
-                @Override
-                public PointF computeScrollVectorForPosition(int targetPosition) {
-                    int visiblePosition = anchor.getPosition();
-                    //determine scroll up or scroll down needed
-                    return new PointF(position > visiblePosition ? 1 : -1, 0);
-                }
-
-                @Override
-                protected void onTargetFound(View targetView, RecyclerView.State state, Action action) {
-                    super.onTargetFound(targetView, state, action);
-                    int currentLeft = getPaddingLeft();
-                    int desiredLeft = getDecoratedLeft(targetView);
-
-                    int dx = desiredLeft - currentLeft;
-
-                    //perform fit animation to move target view at top of layoutX
-                    action.update(dx, 0, timeMs, new LinearInterpolator());
-                }
-            };
-        }
-
-        @Override
-        public boolean canScrollVertically() {
-            return false;
-        }
-
-        @Override
-        public boolean canScrollHorizontally() {
-            canvas.findBorderViews();
-            if (getChildCount() > 0) {
-                int left = getDecoratedLeft(canvas.getLeftView());
-                int right = getDecoratedRight(canvas.getRightView());
-
-                if (canvas.getMinPositionOnScreen() == 0
-                        && canvas.getMaxPositionOnScreen() == getItemCount() - 1
-                        && left >= getPaddingLeft()
-                        && right <= getWidth() - getPaddingRight()) {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-
-            return isScrollingEnabledContract;
-        }
-
-        @Override
-        public void offsetChildren(int d) {
-            offsetChildrenHorizontal(d);
-        }
-
+        fill(recycler,
+                factory.getBackwardLayouter(anchorView.getAnchorViewRect()),
+                factory.getForwardLayouter(anchorView.getAnchorViewRect()));
     }
 
 }

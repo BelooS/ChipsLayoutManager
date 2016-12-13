@@ -26,4 +26,7 @@ interface IChipsLayoutManagerContract extends IPositionsContract {
     @Orientation
     /** orientation type of layout manager*/
     int layoutOrientation();
+
+    /** whether or not scrolling disabled outside*/
+    boolean isScrollingEnabledContract();
 }
