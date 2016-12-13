@@ -611,8 +611,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return;
         }
 
-        find24();
-
         predictiveAnimationsLogger.logState(state);
 
         if (isLayoutRTL() != isLayoutRTL) {
@@ -695,34 +693,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             measureSupporter.onSizeChanged();
         }
 
-        Log.d(TAG, "onLayoutChildren END");
-        find24();
-    }
-
-    private void find24() {
-        View view24 = null;
-        View view23 = null;
-        for (View child : childViews) {
-            int position = getPosition(child);
-            if (position == 23) {
-                view23 = child;
-            }
-            if (position == 24) {
-                view24 = child;
-            }
-        }
-
-        if (view23 != null) {
-            Log.d(TAG, "founded 23 = " + canvas.getViewRect(view23));
-        } else {
-            Log.w(TAG, "23 haven't founded");
-        }
-
-        if (view24 != null) {
-            Log.d(TAG, "founded 24 = " + canvas.getViewRect(view24));
-        } else {
-            Log.w(TAG, "24 haven't founded");
-        }
     }
 
     /** layout disappearing view to support predictive animations */
