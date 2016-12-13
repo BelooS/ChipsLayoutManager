@@ -1022,9 +1022,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     private abstract class ScrollingController implements IScrollingController {
 
-        abstract int onContentScrolledForward(int d);
-        abstract int onContentScrolledBackward(int d);
-
         final int calculateEndGap() {
             if (getChildCount() == 0) return 0;
             int currentEnd = stateFactory.getEndViewBound();
@@ -1076,6 +1073,66 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             }
 
             performNormalizationIfNeeded();
+
+            return delta;
+        }
+
+        /**
+         * invoked when content scrolled forward (return to older items)
+         *
+         * @param d not processed changing of x or y axis, depending on lm state
+         * @return delta. Calculated changing of x or y axis, depending on lm state
+         */
+        final int onContentScrolledForward(int d) {
+            int delta;
+
+            AnchorViewState state = anchorFactory.getAnchor();
+            if (state.getAnchorViewRect() == null) {
+                return 0;
+            }
+
+            if (!canvas.isFirstItemAdded()) { //in case 0 position haven't added in layout yet
+                delta = d;
+            } else { //in case top view is a first view in adapter and wouldn't be any other view above
+                int startBorder = stateFactory.getStartAfterPadding();
+                int viewStart = stateFactory.getStart(anchorView);
+                int distance;
+                distance = viewStart - startBorder;
+
+                scrollingLogger.logUpScrollingNormalizationDistance(distance);
+
+                if (distance >= 0) {
+                    // in case over scroll on top border
+                    delta = distance;
+                } else {
+                    //in case first child showed partially
+                    delta = Math.max(distance, d);
+                }
+            }
+
+            return delta;
+        }
+
+        /**
+         * invoked when content scrolled up (to newer items)
+         *
+         * @param d not processed changing of x or y axis, depending on lm state
+         * @return delta. Calculated changing of x or y axis, depending on lm state
+         */
+        int onContentScrolledBackward(int d) {
+            int childCount = getChildCount();
+            int itemCount = getItemCount();
+            int delta;
+
+            View lastView = getChildAt(childCount - 1);
+            int lastViewAdapterPos = getPosition(lastView);
+            if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
+                delta = d;
+            } else { //in case lower view is the last view in adapter and wouldn't be any other view below
+                int viewEnd = stateFactory.getEndViewBound();
+                int parentEnd = stateFactory.getEnd();
+                delta = Math.min(viewEnd - parentEnd, d);
+            }
 
             return delta;
         }
@@ -1176,69 +1233,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             offsetChildrenVertical(d);
         }
 
-        /**
-         * invoked when content scrolled down (return to older items)
-         *
-         * @param dy not processed changing of y axis
-         * @return delta. Calculated changing of y axis
-         */
-        @Override
-        int onContentScrolledForward(int dy) {
-            int delta;
-
-            AnchorViewState state = anchorFactory.getAnchor();
-            if (state.getAnchorViewRect() == null) {
-                return 0;
-            }
-
-            if (!canvas.isFirstItemAdded()) { //in case 0 position haven't added in layout yet
-                delta = dy;
-            } else { //in case top view is a first view in adapter and wouldn't be any other view above
-                int topBorder = getPaddingTop();
-                int viewTop = state.getAnchorViewRect().top;
-                int distance;
-                distance = viewTop - topBorder;
-
-                scrollingLogger.logUpScrollingNormalizationDistance(distance);
-
-                if (viewTop - topBorder >= 0) {
-                    // in case over scroll on top border
-                    delta = distance;
-                } else {
-                    //in case first child showed partially
-                    distance = viewTop - topBorder;
-                    delta = Math.max(distance, dy);
-                }
-            }
-
-            return delta;
-        }
-
-        /**
-         * invoked when content scrolled up (to newer items)
-         *
-         * @param dy not processed changing of y axis
-         * @return delta. Calculated changing of y axis
-         */
-        @Override
-        int onContentScrolledBackward(int dy) {
-            int childCount = getChildCount();
-            int itemCount = getItemCount();
-            int delta;
-
-            View lastView = getChildAt(childCount - 1);
-            int lastViewAdapterPos = getPosition(lastView);
-            if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
-                delta = dy;
-            } else { //in case lower view is the last view in adapter and wouldn't be any other view below
-                int viewBottom = stateFactory.getEnd(canvas.getBottomView());
-                int parentBottom = stateFactory.getEnd();
-                delta = Math.min(viewBottom - parentBottom, dy);
-            }
-
-            return delta;
-        }
-
     }
 
     private class HorizontalScrollingController extends ScrollingController implements IScrollingController {
@@ -1302,57 +1296,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         @Override
         public void offsetChildren(int d) {
             offsetChildrenHorizontal(d);
-        }
-
-        /** calculate dx, stop scrolling whether items bounds reached*/
-        @Override
-        int onContentScrolledBackward(int dx) {
-            int childCount = getChildCount();
-            int itemCount = getItemCount();
-            int delta;
-
-            View lastView = getChildAt(childCount - 1);
-            int lastViewAdapterPos = getPosition(lastView);
-            if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
-                delta = dx;
-            } else { //in case lower view is the last view in adapter and wouldn't be any other view below
-                int viewRight = stateFactory.getEnd(canvas.getRightView());
-                int parentRight = stateFactory.getEnd();
-                int distance = viewRight - parentRight;
-                delta = Math.min(distance, dx);
-            }
-
-            return delta;
-        }
-
-        @Override
-        int onContentScrolledForward(int dx) {
-            int delta;
-            AnchorViewState state = anchorFactory.getAnchor();
-            if (state.getAnchorViewRect() == null) {
-                return 0;
-            }
-
-            if (!canvas.isFirstItemAdded()) { //in case 0 position haven't added in layout yet
-                delta = dx;
-            } else {
-
-                int leftBorder = canvas.getCanvasLeftBorder();
-                int viewLeft = state.getAnchorViewRect().left;
-                int distance;
-                distance = viewLeft - leftBorder;
-
-                scrollingLogger.logUpScrollingNormalizationDistance(distance);
-
-                if (distance >= 0) {
-                    // in case over scroll on top border
-                    delta = distance;
-                } else {
-                    //in case first child showed partially
-                    delta = Math.max(distance, dx);
-                }
-            }
-            return delta;
         }
 
     }

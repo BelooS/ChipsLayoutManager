@@ -3,6 +3,7 @@ package com.beloo.widget.chipslayoutmanager.layouter;
 import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.IScrollingController;
+import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
@@ -24,15 +25,19 @@ public interface IStateFactory {
 
     int getEnd();
 
+    int getEnd(View view);
+
     int getEndAfterPadding();
+
+    int getEnd(AnchorViewState anchor);
 
     int getStart();
 
-    int getStartAfterPadding();
-
     int getStart(View view);
 
-    int getEnd(View view);
+    int getStart(AnchorViewState anchor);
+
+    int getStartAfterPadding();
 
     int getStartViewBound();
 

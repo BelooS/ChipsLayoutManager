@@ -4,6 +4,7 @@ import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.IScrollingController;
+import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.anchor.RowsAnchorFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.RowGravityModifiersFactory;
@@ -75,18 +76,28 @@ public class RowsStateFactory implements IStateFactory {
     }
 
     @Override
-    public int getEnd() {
-        return lm.getHeight();
-    }
-
-    @Override
     public int getStart(View view) {
         return lm.getDecoratedTop(view);
     }
 
     @Override
+    public int getStart(AnchorViewState anchor) {
+        return anchor.getAnchorViewRect().top;
+    }
+
+    @Override
+    public int getEnd() {
+        return lm.getHeight();
+    }
+
+    @Override
     public int getEnd(View view) {
         return lm.getDecoratedBottom(view);
+    }
+
+    @Override
+    public int getEnd(AnchorViewState anchor) {
+        return anchor.getAnchorViewRect().bottom;
     }
 
     @Override
