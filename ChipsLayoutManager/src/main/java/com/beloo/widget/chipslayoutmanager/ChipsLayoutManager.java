@@ -82,6 +82,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /** delegate which represents available canvas for drawing views according to layout*/
     private ICanvas canvas;
 
+    private IDisappearingViewsManager disappearingViewsManager;
+
     /** iterable over views added to RecyclerView */
     private ChildViewsIterable childViews = new ChildViewsIterable(this);
 
@@ -173,10 +175,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /** manage scrolling of layout manager according to current state */
     private IScrollingController scrollingController;
     //--- end state-dependent vars
-
-    /* in pre-layouter drawing we need item count with items will be actually deleted to pre-draw appearing items properly
-    * buf value*/
-    private int deletingItemsOnScreenCount;
 
     /** factory for placers factories*/
     private PlacerFactory placerFactory = new PlacerFactory(this);
@@ -397,6 +395,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             anchorView = anchorFactory.createNotFound();
 
+            disappearingViewsManager = new DisappearingViewsManager(canvas, childViews, stateFactory);
+
             return ChipsLayoutManager.this;
         }
 
@@ -589,7 +589,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public int getItemCount() {
         //in pre-layouter drawing we need item count with items will be actually deleted to pre-draw appearing items properly
-        return super.getItemCount() + deletingItemsOnScreenCount;
+        return super.getItemCount() + disappearingViewsManager.getDeletingItemsOnScreenCount();
     }
 
     /**
@@ -619,7 +619,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             //inside pre-layout stage. It is called when item animation reconstruction will be played
             //it is NOT called on layoutOrientation changes
 
-            int additionalLength = calcDisappearingViewsLength(recycler);
+            int additionalLength = disappearingViewsManager.calcDisappearingViewsLength(recycler);
             predictiveAnimationsLogger.heightOfCanvas(this);
             predictiveAnimationsLogger.onSummarizedDeletingItemsHeightCalculated(additionalLength);
             anchorView = anchorFactory.getAnchor();
@@ -680,7 +680,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             isAfterPreLayout = false;
         }
 
-        deletingItemsOnScreenCount = 0;
+        disappearingViewsManager.reset();
 
         if (!state.isMeasuring()) {
             measureSupporter.onSizeChanged();
@@ -694,7 +694,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         ICriteriaFactory criteriaFactory = new InfiniteCriteriaFactory();
         LayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createDisappearingPlacerFactory());
 
-        DisappearingViewsContainer disappearingViews = getDisappearingViews(recycler);
+        DisappearingViewsManager.DisappearingViewsContainer disappearingViews = disappearingViewsManager.getDisappearingViews(recycler);
 
         if (disappearingViews.size() > 0) {
             Log.d("disappearing views", "count = " + disappearingViews.size());
@@ -702,8 +702,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             downLayouter = layouterFactory.buildForwardLayouter(downLayouter);
 
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
-            for (int i = 0; i< disappearingViews.forwardViews.size(); i++) {
-                int position = disappearingViews.forwardViews.keyAt(i);
+            for (int i = 0; i< disappearingViews.getForwardViews().size(); i++) {
+                int position = disappearingViews.getForwardViews().keyAt(i);
                 downLayouter.placeView(recycler.getViewForPosition(position));
             }
             //layout last row
@@ -711,78 +711,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             upLayouter = layouterFactory.buildBackwardLayouter(upLayouter);
             //we should layout disappearing views left somewhere, just continue layout them in current layouter
-            for (int i = 0; i< disappearingViews.backwardViews.size(); i++) {
-                int position = disappearingViews.backwardViews.keyAt(i);
+            for (int i = 0; i< disappearingViews.getBackwardViews().size(); i++) {
+                int position = disappearingViews.getBackwardViews().keyAt(i);
                 upLayouter.placeView(recycler.getViewForPosition(position));
             }
 
             //layout last row
             upLayouter.layoutRow();
         }
-    }
-
-    private class DisappearingViewsContainer {
-        private SparseArray<View> backwardViews = new SparseArray<>();
-        private SparseArray<View> forwardViews = new SparseArray<>();
-
-        int size() {
-            return backwardViews.size() + forwardViews.size();
-        }
-    }
-
-    /** @return views which moved from screen, but not deleted*/
-    private DisappearingViewsContainer getDisappearingViews(RecyclerView.Recycler recycler) {
-        final List<RecyclerView.ViewHolder> scrapList = recycler.getScrapList();
-        DisappearingViewsContainer container = new DisappearingViewsContainer();
-
-        for (RecyclerView.ViewHolder holder : scrapList) {
-            final View child = holder.itemView;
-            final RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) child.getLayoutParams();
-            if (!lp.isItemRemoved()) {
-                if (lp.getViewAdapterPosition() < canvas.getMinPositionOnScreen()) {
-                    container.backwardViews.put(lp.getViewAdapterPosition(), child);
-                } else if (lp.getViewAdapterPosition() > canvas.getMaxPositionOnScreen()) {
-                    container.forwardViews.put(lp.getViewAdapterPosition(), child);
-                }
-            }
-        }
-
-        return container;
-    }
-    /** during pre-layout calculate approximate height which will be free after moving items offscreen (removed or moved)
-     * @return approximate height of disappearing views. Could be bigger, than accurate value. */
-    private int calcDisappearingViewsLength(RecyclerView.Recycler recycler) {
-        int removedLength = 0;
-
-        Integer minStart = Integer.MAX_VALUE;
-        Integer maxEnd = Integer.MIN_VALUE;
-
-        for (View view : childViews) {
-            RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) view.getLayoutParams();
-
-            boolean probablyMovedFromScreen = false;
-
-            if (!lp.isItemRemoved()) {
-                //view won't be removed, but maybe it is moved offscreen
-                int pos = lp.getViewLayoutPosition();
-
-                pos = recycler.convertPreLayoutPositionToPostLayout(pos);
-                probablyMovedFromScreen = pos < canvas.getMinPositionOnScreen() || pos > canvas.getMaxPositionOnScreen();
-            }
-
-            if (lp.isItemRemoved() || probablyMovedFromScreen) {
-                deletingItemsOnScreenCount++;
-
-                minStart = Math.min(minStart, stateFactory.getStart(view));
-                maxEnd = Math.max(maxEnd, stateFactory.getEnd(view));
-            }
-        }
-
-        if (minStart != Integer.MAX_VALUE) {
-            removedLength = maxEnd - minStart;
-        }
-
-        return removedLength;
     }
 
     /**
