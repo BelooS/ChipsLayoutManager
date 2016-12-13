@@ -604,11 +604,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+        Log.d(TAG, "onLayoutChildren. State =" + state);
         //We have nothing to show for an empty data set but clear any existing views
         if (getItemCount() == 0) {
             detachAndScrapAttachedViews(recycler);
             return;
         }
+
+        find24();
 
         predictiveAnimationsLogger.logState(state);
 
@@ -621,46 +624,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         calcRecyclerCacheSize(recycler);
 
-        if (!state.isPreLayout()) {
-            detachAndScrapAttachedViews(recycler);
-
-            //we perform layouting stage from scratch, so cache will be rebuilt soon, we could purge it and avoid unnecessary normalization
-            viewPositionsStorage.purgeCacheFromPosition(anchorView.getPosition());
-            if (cacheNormalizationPosition != null && anchorView.getPosition() <= cacheNormalizationPosition) {
-                cacheNormalizationPosition = null;
-            }
-
-            /** In case some moving views
-             * we should place it at layout to support predictive animations
-             * we can't place all possible moves on theirs real place, because concrete layout position of particular view depends on placing of previous views
-             * and there could be moving from 0 position to 10k. But it is preferably to place nearest moved view to real positions to make moving more natural
-             * like moving from 0 position to 15 for example, where user could scroll fast and check
-             * so we fill additional rows to cover nearest moves
-             */
-            AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
-            criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
-
-            LayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
-            ILayouter backwardLayouter = layouterFactory.getBackwardLayouter(anchorView.getAnchorViewRect());
-            ILayouter forwardLayouter = layouterFactory.getForwardLayouter(anchorView.getAnchorViewRect());
-
-            fill(recycler, backwardLayouter, forwardLayouter);
-
-            // changes may cause gaps on the UI, try to fix them.
-            /** should be executed before {@link #layoutDisappearingViews} */
-            if (scrollingController.normalizeGaps(recycler, null)) {
-                //we should re-layout with new anchor after normalizing gaps
-                anchorView = anchorFactory.getAnchor();
-                requestLayoutWithAnimations();
-            }
-
-            if (isAfterPreLayout) {
-                //we should layout disappearing views after pre-layout to support natural movements)
-                layoutDisappearingViews(recycler, backwardLayouter, forwardLayouter);
-            }
-
-            isAfterPreLayout = false;
-        } else {
+        if (state.isPreLayout()) {
             //inside pre-layout stage. It is called when item animation reconstruction will be played
             //it is NOT called on layoutOrientation changes
 
@@ -685,6 +649,44 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                     layouterFactory.getForwardLayouter(anchorView.getAnchorViewRect()));
 
             isAfterPreLayout = true;
+        } else {
+            detachAndScrapAttachedViews(recycler);
+
+            //we perform layouting stage from scratch, so cache will be rebuilt soon, we could purge it and avoid unnecessary normalization
+            viewPositionsStorage.purgeCacheFromPosition(anchorView.getPosition());
+            if (cacheNormalizationPosition != null && anchorView.getPosition() <= cacheNormalizationPosition) {
+                cacheNormalizationPosition = null;
+            }
+
+            /** In case some moving views
+             * we should place it at layout to support predictive animations
+             * we can't place all possible moves on theirs real place, because concrete layout position of particular view depends on placing of previous views
+             * and there could be moving from 0 position to 10k. But it is preferably to place nearest moved view to real positions to make moving more natural
+             * like moving from 0 position to 15 for example, where user could scroll fast and check
+             * so we fill additional rows to cover nearest moves
+             */
+            AbstractCriteriaFactory criteriaFactory = stateFactory.createDefaultFinishingCriteriaFactory();
+            criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
+
+            LayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
+            ILayouter backwardLayouter = layouterFactory.getBackwardLayouter(anchorView.getAnchorViewRect());
+            ILayouter forwardLayouter = layouterFactory.getForwardLayouter(anchorView.getAnchorViewRect());
+
+            fill(recycler, backwardLayouter, forwardLayouter);
+
+            /** should be executed before {@link #layoutDisappearingViews} */
+            if (scrollingController.normalizeGaps(recycler, null)) {
+                //we should re-layout with new anchor after normalizing gaps
+                anchorView = anchorFactory.getAnchor();
+                requestLayoutWithAnimations();
+            }
+
+            if (isAfterPreLayout) {
+                //we should layout disappearing views after pre-layout to support natural movements)
+                layoutDisappearingViews(recycler, backwardLayouter, forwardLayouter);
+            }
+
+            isAfterPreLayout = false;
         }
 
         deletingItemsOnScreenCount = 0;
@@ -693,6 +695,34 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             measureSupporter.onSizeChanged();
         }
 
+        Log.d(TAG, "onLayoutChildren END");
+        find24();
+    }
+
+    private void find24() {
+        View view24 = null;
+        View view23 = null;
+        for (View child : childViews) {
+            int position = getPosition(child);
+            if (position == 23) {
+                view23 = child;
+            }
+            if (position == 24) {
+                view24 = child;
+            }
+        }
+
+        if (view23 != null) {
+            Log.d(TAG, "founded 23 = " + canvas.getViewRect(view23));
+        } else {
+            Log.w(TAG, "23 haven't founded");
+        }
+
+        if (view24 != null) {
+            Log.d(TAG, "founded 24 = " + canvas.getViewRect(view24));
+        } else {
+            Log.w(TAG, "24 haven't founded");
+        }
     }
 
     /** layout disappearing view to support predictive animations */

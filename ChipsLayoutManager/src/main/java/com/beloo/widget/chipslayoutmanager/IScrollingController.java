@@ -23,5 +23,6 @@ public interface IScrollingController {
 
     void offsetChildren(int d);
 
+    /** changes may cause gaps on the UI, try to fix them */
     boolean normalizeGaps(RecyclerView.Recycler recycler, RecyclerView.State state);
 }
