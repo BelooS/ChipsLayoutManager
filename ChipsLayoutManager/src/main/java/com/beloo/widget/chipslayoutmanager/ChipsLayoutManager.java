@@ -1275,9 +1275,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             };
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public boolean canScrollVertically() {
             findBorderViews();
@@ -1323,7 +1320,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 return 0;
             }
 
-            if (state.getPosition() != 0) { //in case 0 position haven't added in layout yet
+            if (!isFirstItemAdded) { //in case 0 position haven't added in layout yet
                 delta = dy;
             } else { //in case top view is a first view in adapter and wouldn't be any other view above
                 int topBorder = getPaddingTop();
@@ -1363,8 +1360,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
                 delta = dy;
             } else { //in case lower view is the last view in adapter and wouldn't be any other view below
-                int viewBottom = getDecoratedBottom(bottomView);
-                int parentBottom = getHeight() - getPaddingBottom();
+                int viewBottom = stateFactory.getEnd(bottomView);
+                int parentBottom = stateFactory.getEnd();
                 delta = Math.min(viewBottom - parentBottom, dy);
             }
 
@@ -1420,7 +1417,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
                     int dx = desiredLeft - currentLeft;
 
-                    //perform fit animation to move target view at top of layout
+                    //perform fit animation to move target view at top of layoutX
                     action.update(dx, 0, timeMs, new LinearInterpolator());
                 }
             };
@@ -1468,8 +1465,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
                 delta = dx;
             } else { //in case lower view is the last view in adapter and wouldn't be any other view below
-                int viewRight = getDecoratedRight(rightView);
-                int parentRight = getWidth() - getPaddingRight();
+                int viewRight = stateFactory.getEnd(rightView);
+                int parentRight = stateFactory.getEnd();
                 int distance = viewRight - parentRight;
                 delta = Math.min(distance, dx);
             }
@@ -1510,7 +1507,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 delta = dx;
             } else {
 
-                int leftBorder = getPaddingLeft();
+                int leftBorder = canvas.getCanvasLeftBorder();
                 int viewLeft = state.getAnchorViewRect().left;
                 int distance;
                 distance = viewLeft - leftBorder;
