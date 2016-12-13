@@ -47,7 +47,7 @@ import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 
 import java.util.List;
 
-public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract, IStateHolder, IPositionsContract {
+public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract, IStateHolder {
     ///////////////////////////////////////////////////////////////////////////
     // orientation types
     ///////////////////////////////////////////////////////////////////////////
@@ -253,19 +253,23 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         requestLayoutWithAnimations();
     }
 
+    @Override
     public Integer getMaxViewsInRow() {
         return maxViewsInRow;
     }
 
+    @Override
     public IRowBreaker getRowBreaker() {
         return rowBreaker;
     }
 
+    @Override
     @RowStrategy
     public int getRowStrategyType() {
         return rowStrategy;
     }
 
+    @RestrictTo(RestrictTo.Scope.GROUP_ID)
     public boolean isStrategyAppliedWithLastRow() {
         return isStrategyAppliedWithLastRow;
     }
@@ -421,6 +425,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public RecyclerView.LayoutParams generateDefaultLayoutParams() {
         return new RecyclerView.LayoutParams(
@@ -432,6 +439,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     // instance state
     ///////////////////////////////////////////////////////////////////////////
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onRestoreInstanceState(Parcelable state) {
         container = (ParcelableContainer) state;
@@ -457,6 +467,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         Log.d(TAG, "RESTORE. last cache position = " + viewPositionsStorage.getLastCachePosition());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Parcelable onSaveInstanceState() {
 
@@ -474,6 +487,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return container;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean supportsPredictiveItemAnimations() {
         return true;
