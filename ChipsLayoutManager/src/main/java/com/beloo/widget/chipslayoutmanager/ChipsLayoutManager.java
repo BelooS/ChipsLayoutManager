@@ -45,8 +45,6 @@ import com.beloo.widget.chipslayoutmanager.logger.IScrollingLogger;
 import com.beloo.widget.chipslayoutmanager.logger.LoggerFactory;
 import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 
-import java.util.List;
-
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract, IStateHolder {
     ///////////////////////////////////////////////////////////////////////////
     // orientation types
@@ -389,7 +387,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             }
 
             stateFactory = layoutOrientation == HORIZONTAL ? new RowsStateFactory(ChipsLayoutManager.this) : new ColumnsStateFactory(ChipsLayoutManager.this);
-            canvas = stateFactory.getCanvas();
+            canvas = stateFactory.createCanvas();
             anchorFactory = stateFactory.anchorFactory();
             scrollingController = stateFactory.scrollingController();
 
@@ -1027,8 +1025,24 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         abstract int onContentScrolledForward(int d);
         abstract int onContentScrolledBackward(int d);
 
-        abstract int calculateEndGap();
-        abstract int calculateStartGap();
+        final int calculateEndGap() {
+            if (getChildCount() == 0) return 0;
+            int currentEnd = stateFactory.getEndViewBound();
+            int desiredEnd = stateFactory.getEndAfterPadding();
+
+            int diff = desiredEnd - currentEnd;
+            if (diff < 0) return 0;
+            return diff;
+        }
+
+        final int calculateStartGap() {
+            if (getChildCount() == 0) return 0;
+            int currentStart = stateFactory.getStartViewBound();
+            int desiredStart = stateFactory.getStartAfterPadding();
+            int diff = currentStart - desiredStart;
+            if (diff < 0) return 0;
+            return diff;
+        }
 
         @Override
         public final boolean normalizeGaps(RecyclerView.Recycler recycler, RecyclerView.State state) {
@@ -1225,26 +1239,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return delta;
         }
 
-        @Override
-        int calculateEndGap() {
-            if (getChildCount() == 0) return 0;
-            int currentBottom = stateFactory.getEnd(canvas.getBottomView());
-            int desiredBottom = stateFactory.getEndAfterPadding();
-
-            int diff = desiredBottom - currentBottom;
-            if (diff < 0) return 0;
-            return diff;
-        }
-
-        @Override
-        int calculateStartGap() {
-            if (getChildCount() == 0) return 0;
-            int currentTop = stateFactory.getStart(canvas.getTopView());
-            int desiredTop = stateFactory.getStartAfterPadding();
-            int diff = currentTop - desiredTop;
-            if (diff < 0) return 0;
-            return diff;
-        }
     }
 
     private class HorizontalScrollingController extends ScrollingController implements IScrollingController {
@@ -1359,27 +1353,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 }
             }
             return delta;
-        }
-
-        @Override
-        int calculateEndGap() {
-            if (getChildCount() == 0) return 0;
-            int currentEnd = stateFactory.getEnd(canvas.getRightView());
-            int desiredEnd = stateFactory.getEndAfterPadding();
-
-            int diff = desiredEnd - currentEnd;
-            if (diff < 0) return 0;
-            return diff;
-        }
-
-        @Override
-        int calculateStartGap() {
-            if (getChildCount() == 0) return 0;
-            int currentStart = stateFactory.getStart(canvas.getLeftView());
-            int desiredStart = stateFactory.getStartAfterPadding();
-            int diff = currentStart - desiredStart;
-            if (diff < 0) return 0;
-            return diff;
         }
 
     }

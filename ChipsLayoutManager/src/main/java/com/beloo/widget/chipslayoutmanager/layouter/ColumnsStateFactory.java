@@ -62,7 +62,7 @@ public class ColumnsStateFactory implements IStateFactory {
     }
 
     @Override
-    public ICanvas getCanvas() {
+    public ICanvas createCanvas() {
         return new ColumnSquare(lm);
     }
 
@@ -100,4 +100,16 @@ public class ColumnsStateFactory implements IStateFactory {
     public int getEndAfterPadding() {
         return lm.getWidth() - lm.getPaddingRight();
     }
+
+    @Override
+    public int getStartViewBound() {
+        return getStart(lm.getCanvas().getLeftView());
+    }
+
+    @Override
+    public int getEndViewBound() {
+        return getEnd(lm.getCanvas().getRightView());
+    }
+
+
 }

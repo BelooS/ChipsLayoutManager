@@ -18,7 +18,7 @@ public interface IStateFactory {
 
     IScrollingController scrollingController();
 
-    ICanvas getCanvas();
+    ICanvas createCanvas();
 
     int getSizeMode();
 
@@ -33,4 +33,8 @@ public interface IStateFactory {
     int getStart(View view);
 
     int getEnd(View view);
+
+    int getStartViewBound();
+
+    int getEndViewBound();
 }

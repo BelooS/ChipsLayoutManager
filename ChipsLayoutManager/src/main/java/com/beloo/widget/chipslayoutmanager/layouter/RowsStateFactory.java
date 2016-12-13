@@ -60,7 +60,7 @@ public class RowsStateFactory implements IStateFactory {
     }
 
     @Override
-    public ICanvas getCanvas() {
+    public ICanvas createCanvas() {
         return new RowSquare(lm);
     }
 
@@ -99,4 +99,13 @@ public class RowsStateFactory implements IStateFactory {
         return lm.getHeight() - lm.getPaddingBottom();
     }
 
+    @Override
+    public int getStartViewBound() {
+        return getStart(lm.getCanvas().getTopView());
+    }
+
+    @Override
+    public int getEndViewBound() {
+        return getEnd(lm.getCanvas().getBottomView());
+    }
 }
