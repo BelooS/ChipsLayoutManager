@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import beloo.recyclerviewcustomadapter.R;
@@ -100,7 +101,11 @@ class ChipsFactory implements IItemsFactory<ChipsEntity> {
 
     @Override
     public List<ChipsEntity> getALotOfItems() {
-        throw new UnsupportedOperationException("not implemented");
+        List<ChipsEntity> entities = new LinkedList<>();
+        for (int i=0; i < 5; i++){
+            entities.addAll(getItems());
+        }
+        return entities;
     }
 
     @Override
