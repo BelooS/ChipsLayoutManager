@@ -14,6 +14,7 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rvBottomSheet"
         android:nestedScrollingEnabled="false"
+        android:padding="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         />

@@ -44,7 +44,7 @@ public class BottomSheetDialogFragment extends android.support.design.widget.Bot
     private RecyclerView.Adapter createAdapter() {
 
 //        List<String> items = itemsFactory.getDoubleItems();
-        List<String> items = itemsFactory.getFewItems();
+        List<String> items = itemsFactory.getItems();
 
         adapter = itemsFactory.createAdapter(items, null);
         return adapter;
