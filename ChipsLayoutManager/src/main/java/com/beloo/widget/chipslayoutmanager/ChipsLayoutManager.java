@@ -670,6 +670,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             /** should be executed before {@link #layoutDisappearingViews} */
             if (scrollingController.normalizeGaps(recycler, null)) {
+                Log.d(TAG, "normalize gaps");
                 //we should re-layout with new anchor after normalizing gaps
                 anchorView = anchorFactory.getAnchor();
                 requestLayoutWithAnimations();
