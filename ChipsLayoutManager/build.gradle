@@ -49,6 +49,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets {
+        androidTest {
+            res.srcDirs = ['src/androidTest/res']
+        }
+    }
+
 }
 
 task androidJavadocs(type: Javadoc) {

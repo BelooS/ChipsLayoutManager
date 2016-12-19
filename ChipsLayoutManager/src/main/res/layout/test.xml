@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- this layout created for debugging cases.
-We could listen R.id.tvName inside library package-->
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tvName"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-</TextView>
