@@ -877,7 +877,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public void onAdapterChanged(RecyclerView.Adapter oldAdapter,
                                  RecyclerView.Adapter newAdapter) {
-        newAdapter.registerAdapterDataObserver((RecyclerView.AdapterDataObserver) measureSupporter);
+        if (oldAdapter != null) {
+            oldAdapter.unregisterAdapterDataObserver((RecyclerView.AdapterDataObserver) measureSupporter);
+        }
+        if (newAdapter != null) {
+            newAdapter.registerAdapterDataObserver((RecyclerView.AdapterDataObserver) measureSupporter);
+        }
         //Completely scrap the existing layout
         removeAllViews();
     }

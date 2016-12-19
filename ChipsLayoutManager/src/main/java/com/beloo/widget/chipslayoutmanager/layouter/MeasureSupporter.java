@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 
 public class MeasureSupporter extends RecyclerView.AdapterDataObserver implements IMeasureSupporter {
 
-    RecyclerView.LayoutManager lm;
+    private RecyclerView.LayoutManager lm;
     private boolean isAfterRemoving;
 
     private int measuredWidth;
