@@ -32,6 +32,7 @@ abstract class ScrollingController implements IScrollingController {
 
     final int calculateEndGap() {
         if (layoutManager.getChildCount() == 0) return 0;
+        if (layoutManager.getChildCount() == layoutManager.getItemCount()) return 0;
         int currentEnd = stateFactory.getEndViewBound();
         int desiredEnd = stateFactory.getEndAfterPadding();
 

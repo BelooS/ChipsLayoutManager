@@ -73,8 +73,8 @@ public class ItemsFragment extends Fragment {
 
         List<String> items;
         if (savedInstanceState == null) {
-//            items = itemsFactory.getFewItems();
-            items = itemsFactory.getALotOfItems();
+            items = itemsFactory.getFewItems();
+//            items = itemsFactory.getALotOfItems();
 //            items = itemsFactory.getItems();
         } else {
             items = savedInstanceState.getStringArrayList(EXTRA);
