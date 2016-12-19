@@ -57,11 +57,6 @@ class RightLayouter extends AbstractLayouter {
     }
 
     @Override
-    AbstractPositionIterator createPositionIterator() {
-        return new IncrementalPositionIterator(getLayoutManager().getItemCount());
-    }
-
-    @Override
     void onInterceptAttachView(View view) {
         viewTop = getLayoutManager().getDecoratedBottom(view);
         viewLeft = getLayoutManager().getDecoratedLeft(view);

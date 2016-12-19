@@ -66,11 +66,6 @@ class LeftLayouter extends AbstractLayouter {
     }
 
     @Override
-    AbstractPositionIterator createPositionIterator() {
-        return new DecrementalPositionIterator();
-    }
-
-    @Override
     void onInterceptAttachView(View view) {
         if (viewBottom != getCanvasBottomBorder() && viewBottom - getCurrentViewHeight() < getCanvasTopBorder()) {
             //new column

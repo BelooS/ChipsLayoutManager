@@ -2,9 +2,11 @@ package com.beloo.widget.chipslayoutmanager.gravity;
 
 import android.graphics.Rect;
 
-class CenterInRowGravityModifier implements IGravityModifier {
+class CenterInRowGravityModifier extends ValidGravityModifier implements IGravityModifier {
     @Override
-    public void modifyChildRect(int minStart, int maxEnd, Rect childRect) {
+    public Rect modifyChildRect(int minStart, int maxEnd, Rect inputRect) {
+        Rect childRect = super.modifyChildRect(minStart, maxEnd, inputRect);
+
         int placeHeight = maxEnd - minStart;
         int rectHeight = childRect.bottom - childRect.top;
         //calculate needed offset
@@ -12,5 +14,7 @@ class CenterInRowGravityModifier implements IGravityModifier {
 
         childRect.top = minStart + halfOffset;
         childRect.bottom = maxEnd - halfOffset;
+
+        return childRect;
     }
 }

@@ -69,11 +69,10 @@ public abstract class AbstractLayouter implements ILayouter, IBorder {
     private Set<ILayouterListener> layouterListeners = new HashSet<>();
     @NonNull
     private IGravityModifiersFactory gravityModifiersFactory;
-
-    //--- end input dependencies
-
+    @NonNull
     private AbstractPositionIterator positionIterator;
 
+    //--- end input dependencies
     AbstractLayouter(Builder builder) {
         //--- read builder
         layoutManager = builder.layoutManager;
@@ -90,9 +89,8 @@ public abstract class AbstractLayouter implements ILayouter, IBorder {
         this.breaker = builder.breaker;
         this.gravityModifiersFactory = builder.gravityModifiersFactory;
         this.rowStrategy = builder.rowStrategy;
+        this.positionIterator = builder.positionIterator;
         //--- end read builder
-
-        positionIterator = createPositionIterator();
     }
 
     void setFinishingCriteria(@NonNull IFinishingCriteria finishingCriteria) {
@@ -197,8 +195,6 @@ public abstract class AbstractLayouter implements ILayouter, IBorder {
 
     abstract boolean isAttachedViewFromNewRow(View view);
 
-    abstract AbstractPositionIterator createPositionIterator();
-
     abstract void onInterceptAttachView(View view);
 
     void setPlacer(@NonNull IPlacer placer) {
@@ -243,7 +239,7 @@ public abstract class AbstractLayouter implements ILayouter, IBorder {
             Rect viewRect = rowViewRectPair.first;
             View view = rowViewRectPair.second;
 
-            applyChildGravity(view, viewRect);
+            viewRect = applyChildGravity(view, viewRect);
             //add view to layout
             placer.addView(view);
 
@@ -264,12 +260,13 @@ public abstract class AbstractLayouter implements ILayouter, IBorder {
     }
 
     /** by default items placed and attached to a top of the row.
-     * Modify theirs relative positions according to the selected child gravity */
-    private void applyChildGravity(View view, Rect viewRect) {
+     * Modify theirs relative positions according to the selected child gravity
+     * @return modified rect with applied gravity */
+    private Rect applyChildGravity(View view, Rect viewRect) {
         @SpanLayoutChildGravity
         int viewGravity = childGravityResolver.getItemGravity(getLayoutManager().getPosition(view));
         IGravityModifier gravityModifier = gravityModifiersFactory.getGravityModifier(viewGravity);
-        gravityModifier.modifyChildRect(getStartRowBorder(), getEndRowBorder(), viewRect);
+        return gravityModifier.modifyChildRect(getStartRowBorder(), getEndRowBorder(), viewRect);
     }
 
     @NonNull
@@ -336,6 +333,7 @@ public abstract class AbstractLayouter implements ILayouter, IBorder {
         private HashSet<ILayouterListener> layouterListeners = new HashSet<>();
         private IGravityModifiersFactory gravityModifiersFactory;
         private IRowStrategy rowStrategy;
+        private AbstractPositionIterator positionIterator;
 
         Builder() {}
 
@@ -417,6 +415,12 @@ public abstract class AbstractLayouter implements ILayouter, IBorder {
         }
 
         @NonNull
+        public Builder positionIterator(AbstractPositionIterator positionIterator) {
+            this.positionIterator = positionIterator;
+            return this;
+        }
+
+        @NonNull
         protected abstract AbstractLayouter createLayouter();
 
         public final AbstractLayouter build() {
@@ -449,6 +453,9 @@ public abstract class AbstractLayouter implements ILayouter, IBorder {
 
             if (childGravityResolver == null)
                 throw new IllegalStateException("childGravityResolver can't be null, call #childGravityResolver()");
+
+            if (positionIterator == null)
+                throw new IllegalStateException("positionIterator can't be null, call #positionIterator()");
 
             return createLayouter();
         }

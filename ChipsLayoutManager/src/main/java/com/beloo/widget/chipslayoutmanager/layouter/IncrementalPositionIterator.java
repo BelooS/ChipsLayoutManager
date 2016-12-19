@@ -1,11 +1,11 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
+import android.support.annotation.IntRange;
+
 class IncrementalPositionIterator extends AbstractPositionIterator {
 
-    private int itemCount;
-
-    public IncrementalPositionIterator(int itemCount) {
-        this.itemCount = itemCount;
+    IncrementalPositionIterator(@IntRange(from = 0) int itemCount) {
+        super(itemCount);
     }
 
     @Override
@@ -15,6 +15,7 @@ class IncrementalPositionIterator extends AbstractPositionIterator {
 
     @Override
     public Integer next() {
+        if (!hasNext()) throw new IllegalStateException("position out of bounds reached");
         return pos++;
     }
 

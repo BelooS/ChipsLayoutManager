@@ -1,9 +1,10 @@
 package com.beloo.widget.chipslayoutmanager.gravity;
 
 import android.graphics.Rect;
-
-import com.beloo.widget.chipslayoutmanager.layouter.AbstractLayouter;
+import android.support.annotation.IntRange;
 
 public interface IGravityModifier {
-    void modifyChildRect(int minStart, int maxEnd, Rect childRect);
+    /** @return created rect based on modified input rect due to concrete gravity modifier.
+     * @param childRect input rect. Immutable*/
+    Rect modifyChildRect(@IntRange(from = 0) int minTop, @IntRange(from = 0) int maxBottom, Rect childRect);
 }

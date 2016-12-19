@@ -47,11 +47,6 @@ class RTLDownLayouter extends AbstractLayouter {
     }
 
     @Override
-    AbstractPositionIterator createPositionIterator() {
-        return new IncrementalPositionIterator(getLayoutManager().getItemCount());
-    }
-
-    @Override
     Rect createViewRect(View view) {
         Rect viewRect = new Rect(viewRight - getCurrentViewWidth(), viewTop, viewRight, viewTop + getCurrentViewHeight());
         viewRight = viewRect.left;

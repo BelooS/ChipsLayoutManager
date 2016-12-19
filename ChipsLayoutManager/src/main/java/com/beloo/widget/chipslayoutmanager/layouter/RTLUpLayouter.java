@@ -91,11 +91,6 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
         return getCanvasRightBorder() - viewLeft;
     }
 
-    @Override
-    AbstractPositionIterator createPositionIterator() {
-        return new DecrementalPositionIterator();
-    }
-
     public static final class Builder extends AbstractLayouter.Builder {
         private Builder() {
         }

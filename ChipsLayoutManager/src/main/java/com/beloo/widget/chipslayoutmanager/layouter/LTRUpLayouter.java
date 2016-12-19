@@ -91,12 +91,6 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
         return getCanvasRightBorder() - viewRight;
     }
 
-    @Override
-    AbstractPositionIterator createPositionIterator() {
-        return new DecrementalPositionIterator();
-    }
-
-
     public static final class Builder extends AbstractLayouter.Builder {
         private Builder() {
         }

@@ -87,6 +87,7 @@ public class LayouterFactory {
                 .finishingCriteria(criteriaFactory.getBackwardFinishingCriteria())
                 .rowStrategy(rowStrategy)
                 .placer(placerFactory.getAtStartPlacer())
+                .positionIterator(new DecrementalPositionIterator(layoutManager.getItemCount()))
                 .build();
     }
 
@@ -98,6 +99,7 @@ public class LayouterFactory {
                 .finishingCriteria(criteriaFactory.getForwardFinishingCriteria())
                 .rowStrategy(new SkipLastRowStrategy(rowStrategy, !layoutManager.isStrategyAppliedWithLastRow()))
                 .placer(placerFactory.getAtEndPlacer())
+                .positionIterator(new IncrementalPositionIterator(layoutManager.getItemCount()))
                 .build();
     }
 

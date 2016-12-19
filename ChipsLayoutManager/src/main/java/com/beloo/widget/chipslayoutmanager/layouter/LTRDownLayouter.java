@@ -59,11 +59,6 @@ class LTRDownLayouter extends AbstractLayouter {
     }
 
     @Override
-    AbstractPositionIterator createPositionIterator() {
-        return new IncrementalPositionIterator(getLayoutManager().getItemCount());
-    }
-
-    @Override
     public void onInterceptAttachView(View view) {
         viewTop = getLayoutManager().getDecoratedTop(view);
         viewLeft = getLayoutManager().getDecoratedRight(view);
