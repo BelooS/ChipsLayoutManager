@@ -2,10 +2,10 @@ package com.beloo.widget.chipslayoutmanager.gravity;
 
 import android.graphics.Rect;
 
-class RightGravityModifier extends ValidGravityModifier implements IGravityModifier {
+class RightGravityModifier implements IGravityModifier {
     @Override
-    public Rect modifyChildRect(int minStart, int maxEnd, Rect inputRect) {
-        Rect childRect = super.modifyChildRect(minStart, maxEnd, inputRect);
+    public Rect modifyChildRect(int minStart, int maxEnd, Rect childRect) {
+        childRect = new Rect(childRect);
 
         if (childRect.right < maxEnd) {
             childRect.left += maxEnd - childRect.right;

@@ -776,6 +776,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      * place views in layout started from chosen position with chosen layouter
      */
     private void fillWithLayouter(RecyclerView.Recycler recycler, ILayouter layouter, int startingPos) {
+        if (startingPos < 0) return;
         AbstractPositionIterator iterator = layouter.positionIterator();
         iterator.move(startingPos);
         while (iterator.hasNext()) {
