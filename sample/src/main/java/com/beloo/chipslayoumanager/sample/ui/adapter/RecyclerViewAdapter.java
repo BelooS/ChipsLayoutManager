@@ -10,7 +10,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import com.beloo.chipslayoumanager.sample.ui.OnRemoveListener;
-import beloo.recyclerviewcustomadapter.R;
+import com.beloo.chipslayoutmanager.sample.ui.R;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
     private static String TAG = RecyclerViewAdapter.class.getSimpleName();

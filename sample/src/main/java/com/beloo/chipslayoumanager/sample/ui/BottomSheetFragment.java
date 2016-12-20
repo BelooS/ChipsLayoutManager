@@ -18,7 +18,7 @@ import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 
 import java.util.List;
 
-import beloo.recyclerviewcustomadapter.R;
+import com.beloo.chipslayoutmanager.sample.ui.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;

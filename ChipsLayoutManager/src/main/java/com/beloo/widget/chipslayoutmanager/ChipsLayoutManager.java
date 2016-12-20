@@ -7,6 +7,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -41,6 +42,8 @@ import com.beloo.widget.chipslayoutmanager.logger.IPredictiveAnimationsLogger;
 import com.beloo.widget.chipslayoutmanager.logger.LoggerFactory;
 import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 import com.beloo.widget.chipslayoutmanager.util.LayoutManagerUtil;
+import com.beloo.widget.chipslayoutmanager.util.testing.EmptySpy;
+import com.beloo.widget.chipslayoutmanager.util.testing.ISpy;
 
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract, IStateHolder, ScrollingController.IScrollerListener {
     ///////////////////////////////////////////////////////////////////////////
@@ -173,9 +176,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /** factory for placers factories*/
     private PlacerFactory placerFactory = new PlacerFactory(this);
 
+    /** used for testing purposes to spy for {@link ChipsLayoutManager} behaviour */
+    private ISpy spy = new EmptySpy();
+
     private boolean isAfterPreLayout;
 
-    private ChipsLayoutManager(Context context) {
+    @VisibleForTesting
+    ChipsLayoutManager(Context context) {
         @DeviceOrientation
         int orientation = context.getResources().getConfiguration().orientation;
         this.orientation = orientation;
@@ -196,6 +203,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     public static Builder newBuilder(Context context) {
         return new ChipsLayoutManager(context).new StrategyBuilder();
+    }
+
+    void setSpy(ISpy spy) {
+        this.spy = spy;
     }
 
     public IChildGravityResolver getChildGravityResolver() {
@@ -600,6 +611,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+        spy.onLayoutChildren(recycler, state);
         Log.d(TAG, "onLayoutChildren. State =" + state);
         //We have nothing to show for an empty data set but clear any existing views
         if (getItemCount() == 0) {

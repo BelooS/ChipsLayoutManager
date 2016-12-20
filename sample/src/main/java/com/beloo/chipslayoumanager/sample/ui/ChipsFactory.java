@@ -7,9 +7,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import beloo.recyclerviewcustomadapter.R;
 import com.beloo.chipslayoumanager.sample.ui.adapter.ChipsAdapter;
 import com.beloo.chipslayoumanager.sample.entity.ChipsEntity;
+import com.beloo.chipslayoutmanager.sample.ui.R;
 
 class ChipsFactory implements IItemsFactory<ChipsEntity> {
 

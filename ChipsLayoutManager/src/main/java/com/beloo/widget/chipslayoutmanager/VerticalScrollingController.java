@@ -11,7 +11,7 @@ import android.view.animation.LinearInterpolator;
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 import com.beloo.widget.chipslayoutmanager.layouter.IStateFactory;
 
-class VerticalScrollingController extends ScrollingController implements IScrollingController {
+public class VerticalScrollingController extends ScrollingController implements IScrollingController {
 
     private ChipsLayoutManager layoutManager;
 

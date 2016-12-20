@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="beloo.recyclerviewcustomadapter"
+          package="com.beloo.chipslayoutmanager.sample.ui"
     >
 
     <application
@@ -19,8 +19,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.beloo.chipslayoumanager.sample.ui.TestActivity">
-        </activity>
+        <activity android:name="com.beloo.chipslayoumanager.sample.ui.TestActivity"/>
+
     </application>
 
 </manifest>

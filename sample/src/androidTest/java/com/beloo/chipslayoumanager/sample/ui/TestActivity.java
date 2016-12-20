@@ -8,14 +8,13 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import beloo.recyclerviewcustomadapter.R;
+import com.beloo.chipslayoutmanager.sample.ui.R;
 
 
 public class TestActivity extends AppCompatActivity {
@@ -28,8 +27,9 @@ public class TestActivity extends AppCompatActivity {
     private List items;
 
     /** replace here different data sets */
-    static IItemsFactory itemsFactory = new ShortChipsFactory();
+    static IItemsFacade itemsFactory = new FewChipsFacade();
     static LayoutManagerFactory lmFactory = new LayoutManagerFactory();
+    public static boolean isInitializeOutside;
 
     private OnRemoveListener onRemoveListener = new OnRemoveListener() {
         @Override
@@ -41,12 +41,12 @@ public class TestActivity extends AppCompatActivity {
         }
     };
 
-    public static void setItemsFactory(IItemsFactory itemsFactory) {
-        TestActivity.itemsFactory = itemsFactory;
-    }
-
     public static void setLmFactory(LayoutManagerFactory lmFactory) {
         TestActivity.lmFactory = lmFactory;
+    }
+
+    public static void setItemsFactory(IItemsFacade itemsFactory) {
+        TestActivity.itemsFactory = itemsFactory;
     }
 
     @SuppressWarnings("unchecked")
@@ -78,7 +78,22 @@ public class TestActivity extends AppCompatActivity {
         spinnerMoveTo = (Spinner) findViewById(R.id.spinnerMoveTo);
 
         adapter = createAdapter(savedInstanceState);
+        if (!isInitializeOutside) {
+            initialize();
+        }
+    }
 
+    public void initialize() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                initRv();
+            }
+        });
+
+    }
+
+    private void initRv() {
         RecyclerView.LayoutManager layoutManager = lmFactory.layoutManager(this);
 
         rvTest.addItemDecoration(new SpacingItemDecoration(getResources().getDimensionPixelOffset(R.dimen.item_space),

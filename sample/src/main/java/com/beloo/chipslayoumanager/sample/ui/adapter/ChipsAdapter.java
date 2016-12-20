@@ -14,7 +14,7 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 import com.beloo.chipslayoumanager.sample.ui.OnRemoveListener;
-import beloo.recyclerviewcustomadapter.R;
+import com.beloo.chipslayoutmanager.sample.ui.R;
 import com.beloo.chipslayoumanager.sample.entity.ChipsEntity;
 import com.beloo.chipslayoumanager.sample.CircleTransform;
 

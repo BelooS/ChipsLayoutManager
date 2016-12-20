@@ -11,7 +11,7 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
-import beloo.recyclerviewcustomadapter.R;
+import com.beloo.chipslayoutmanager.sample.ui.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
