@@ -3,14 +3,16 @@ package com.beloo.widget.chipslayoutmanager;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.beloo.chipslayoumanager.sample.ui.FewChipsFacade;
 import com.beloo.chipslayoumanager.sample.ui.LayoutManagerFactory;
+import com.beloo.chipslayoumanager.sample.ui.ManyChipsFacade;
 import com.beloo.chipslayoumanager.sample.ui.TestActivity;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
-import com.beloo.widget.chipslayoutmanager.util.testing.ISpy;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -19,15 +21,15 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.concurrent.CountDownLatch;
+import com.beloo.chipslayoutmanager.sample.ui.R;
 
-import static android.support.test.InstrumentationRegistry.getInstrumentation;
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
 
 /**
  * test for {@link TestActivity}
@@ -36,7 +38,7 @@ import static org.mockito.Mockito.verify;
 public class ChipsLayoutManagerTest {
 
     static {
-        TestActivity.setItemsFactory(new FewChipsFacade());
+        TestActivity.setItemsFactory(new ManyChipsFacade());
         TestActivity.isInitializeOutside = true;
     }
 
@@ -82,7 +84,9 @@ public class ChipsLayoutManagerTest {
         //verify no exceptions
     }
 
-    /** verify that orientation change is performed successfully */
+    /**
+     * verify that orientation change is performed successfully
+     */
     @Test
     public void changeOrientation_LMBuiltFirstTime_NoExceptions() throws Exception {
         //arrange
@@ -94,7 +98,10 @@ public class ChipsLayoutManagerTest {
     @Test
     public void changeOrientation_LMHasItems_firstItemNotChanged() throws Exception {
         //arrange
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(7));
         InstrumentalUtil.waitForIdle();
+
         int expected = layoutManager.findFirstVisibleItemPosition();
         //act
         performOrientationChangeAndWaitIdle();
