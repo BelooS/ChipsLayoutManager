@@ -65,9 +65,9 @@ public class ChipsLayoutManagerLoopingTest {
         //arrange
 
         //act
-        Thread.sleep(500);
+        Thread.sleep(700);
 
         //assert
-        verify(spy, atMost(3)).onLayoutChildren(any(RecyclerView.Recycler.class), any(RecyclerView.State.class));
+        verify(spy, atMost(6)).onLayoutChildren(any(RecyclerView.Recycler.class), any(RecyclerView.State.class));
     }
 }
