@@ -154,13 +154,13 @@ class ViewCacheStorage implements IViewCacheStorage {
 
     @Override
     public Parcelable onSaveInstanceState() {
-        return new ParcelableContainer(startsRow, endsRow);
+        return new CacheParcelableContainer(startsRow, endsRow);
     }
 
     public void onRestoreInstanceState(@Nullable Parcelable parcelable) {
         if (parcelable == null) return;
-        if (!(parcelable instanceof ParcelableContainer)) throw new IllegalStateException("wrong parcelable passed");
-        ParcelableContainer container = (ParcelableContainer) parcelable;
+        if (!(parcelable instanceof CacheParcelableContainer)) throw new IllegalStateException("wrong parcelable passed");
+        CacheParcelableContainer container = (CacheParcelableContainer) parcelable;
         startsRow = container.getStartsRow();
         endsRow = container.getEndsRow();
     }

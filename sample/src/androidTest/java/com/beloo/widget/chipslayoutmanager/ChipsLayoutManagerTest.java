@@ -105,4 +105,11 @@ public class ChipsLayoutManagerTest {
         assertEquals("first visible positions before and after rotation doesn't match", expected, actual);
         System.out.println("first visible position = " + actual);
     }
+
+    @Test
+    public void deleteItem_ItemHasMaximumHeight_SamePadding() throws Exception {
+        //arrange
+        //act
+        //assert
+    }
 }

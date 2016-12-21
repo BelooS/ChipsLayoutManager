@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.util.SparseArray;
 
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
+import com.beloo.widget.chipslayoutmanager.cache.CacheParcelableContainer;
 
 class ParcelableContainer implements Parcelable {
 
@@ -43,15 +44,15 @@ class ParcelableContainer implements Parcelable {
 
     @SuppressWarnings("unchecked")
     private ParcelableContainer(Parcel parcel) {
-        anchorViewState = parcel.readParcelable(AnchorViewState.class.getClassLoader());
-        orientationCacheMap = parcel.readSparseArray(ParcelableContainer.class.getClassLoader());
+        anchorViewState = AnchorViewState.CREATOR.createFromParcel(parcel);
+        orientationCacheMap = parcel.readSparseArray(CacheParcelableContainer.class.getClassLoader());
         cacheNormalizationPositionMap = parcel.readSparseArray(Integer.class.getClassLoader());
         orientation = parcel.readInt();
     }
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeParcelable(anchorViewState, 0);
+        anchorViewState.writeToParcel(parcel, i);
         parcel.writeSparseArray(orientationCacheMap);
         parcel.writeSparseArray(cacheNormalizationPositionMap);
         parcel.writeInt(orientation);
