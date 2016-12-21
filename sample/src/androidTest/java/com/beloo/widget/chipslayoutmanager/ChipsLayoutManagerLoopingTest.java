@@ -19,7 +19,9 @@ import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * test for {@link TestActivity}
@@ -27,41 +29,40 @@ import static org.mockito.Mockito.verify;
 @RunWith(AndroidJUnit4.class)
 public class ChipsLayoutManagerLoopingTest {
 
+    static {
+        TestActivity.isInitializeOutside = true;
+        TestActivity.setItemsFactory(new FewChipsFacade());
+    }
+
     @Rule
-    public ActivityTestRule<TestActivity> activityTestRule = new ActivityTestRule<TestActivity>(TestActivity.class) {
-        @Override
-        protected void beforeActivityLaunched() {
-            super.beforeActivityLaunched();
-            TestActivity.isInitializeOutside = true;
-        }
-    };
+    public ActivityTestRule<TestActivity> activityTestRule = new ActivityTestRule<>(TestActivity.class);
 
     @Mock
     ISpy spy;
 
-    private ChipsLayoutManager chipsLayoutManager;
+    @Mock
+    LayoutManagerFactory layoutManagerFactory;
 
     @Before
     public void setUp() throws Throwable {
         MockitoAnnotations.initMocks(this);
 
-        LayoutManagerFactory layoutManagerFactory = new LayoutManagerFactory() {
-            @Override
-            public RecyclerView.LayoutManager layoutManager(Context context) {
-                chipsLayoutManager = (ChipsLayoutManager) super.layoutManager(context);
-                chipsLayoutManager.setSpy(spy);
-                return chipsLayoutManager;
-            }
-        };
+        ChipsLayoutManager layoutManager = ChipsLayoutManager.newBuilder(activityTestRule.getActivity())
+                .setOrientation(ChipsLayoutManager.HORIZONTAL)
+                .build();
+
+        layoutManager.setSpy(spy);
+
+        doReturn(layoutManager).when(layoutManagerFactory).layoutManager(activityTestRule.getActivity());
 
         TestActivity.setLmFactory(layoutManagerFactory);
-        TestActivity.setItemsFactory(new FewChipsFacade());
 
         activityTestRule.getActivity().initialize();
     }
 
+    /** test, that {@link android.support.v7.widget.LinearLayoutManager#onLayoutChildren} isn't called infinitely */
     @Test
-    public void onLayoutCallLimited() throws Exception {
+    public void onLayoutChildren_afterActivityStarted_onLayoutCallLimited() throws Exception {
         //arrange
 
         //act
