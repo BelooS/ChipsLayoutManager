@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.beloo.chipslayoutmanager.sample.R;
+import com.beloo.widget.chipslayoutmanager.util.RecyclerViewActionsFactory;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -36,7 +37,10 @@ import static org.mockito.Mockito.doReturn;
 @RunWith(AndroidJUnit4.class)
 public class ChipsLayoutManagerTest {
 
+    private static RecyclerViewActionsFactory actionsFactory;
+
     static {
+        actionsFactory = new RecyclerViewActionsFactory();
         TestActivity.setItemsFactory(new ChipsFacade());
         TestActivity.isInitializeOutside = true;
     }
@@ -62,6 +66,19 @@ public class ChipsLayoutManagerTest {
         TestActivity.setLmFactory(layoutManagerFactory);
 
         activityTestRule.getActivity().initialize();
+    }
+
+    @Test
+    public void scrollToPosition_LMInInitialState_FirstVisiblePositionsEqualsScrollingTarget() throws Exception {
+        //arrange
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(8));
+        InstrumentalUtil.waitForIdle();
+        //act
+        int actual = layoutManager.findFirstVisibleItemPosition();
+
+        //assert
+        assertEquals(8, actual);
     }
 
     @Test
@@ -158,7 +175,11 @@ public class ChipsLayoutManagerTest {
     @Test
     public void deleteItem_ItemHasMaximumHeight_SamePadding() throws Exception {
         //arrange
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+        recyclerView.perform(actionsFactory.scrollBy(500, 0));
+        InstrumentalUtil.waitForIdle();
         //act
+        Thread.sleep(2000);
         //assert
     }
 }

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.beloo.chipslayoutmanager.sample"
-    >
+    package="com.beloo.chipslayoutmanager.sample">
 
     <application
         android:allowBackup="true"
@@ -10,7 +9,8 @@
         android:name="com.beloo.chipslayoutmanager.sample.Application"
         >
 
-        <activity android:name="com.beloo.chipslayoutmanager.sample.ui.TestActivity"/>
+        <activity
+            android:name="com.beloo.chipslayoutmanager.sample.ui.TestActivity"/>
     </application>
 
 </manifest>
