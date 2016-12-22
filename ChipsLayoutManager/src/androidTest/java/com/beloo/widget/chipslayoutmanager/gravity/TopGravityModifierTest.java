@@ -8,8 +8,10 @@ import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
+import static com.beloo.widget.chipslayoutmanager.ParamsType.INVALID;
 import static com.beloo.widget.chipslayoutmanager.ParamsType.VALID;
 
 /** test for {@link TopGravityModifier}*/
@@ -25,7 +27,7 @@ public class TopGravityModifierTest extends GravityModifierTest {
                 {VALID, 0, 100, new Rect(0, 10, 0, 20), new Rect(0, 0, 0, 10)},
                 {VALID, 0, 100, new Rect(0, 0, 0, 100), new Rect(0, 0, 0, 100)}
         }));
-        data.addAll(GravityDataProvider.getInvalidGravityModifierParams());
+        data.addAll(getInvalidGravityModifierParams());
         return data;
     }
 
@@ -38,4 +40,11 @@ public class TopGravityModifierTest extends GravityModifierTest {
         return new TopGravityModifier();
     }
 
+    private static Collection<Object[]> getInvalidGravityModifierParams() {
+        return Arrays.asList(new Object[][]{
+                {INVALID, 0, 100, new Rect(-50, 0, 0, 0), new Rect(0, 0, 0, 0)},
+                {INVALID, 20, 100, new Rect(10, 0, 0, 0), new Rect(0, 0, 0, 0)},
+                {INVALID, 20, 100, new Rect(20, 0, 120, 0), new Rect(0, 0, 0, 0)}
+        });
+    }
 }
