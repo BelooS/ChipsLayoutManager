@@ -1,4 +1,4 @@
-package com.beloo.chipslayoumanager.sample.ui;
+package com.beloo.chipslayoutmanager.sample.ui;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,7 +13,7 @@ import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 
 import java.util.List;
 
-import com.beloo.chipslayoutmanager.sample.ui.R;
+import com.beloo.chipslayoutmanager.sample.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 

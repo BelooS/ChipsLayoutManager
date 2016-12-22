@@ -4,6 +4,8 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
+    testBuildType "debug"
+
     defaultConfig {
         applicationId "com.beloo.chipslayoutmanager.sample"
         minSdkVersion rootProject.ext.minSdkVersion

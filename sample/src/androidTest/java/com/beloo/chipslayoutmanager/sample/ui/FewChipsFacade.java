@@ -1,18 +1,18 @@
-package com.beloo.chipslayoumanager.sample.ui;
+package com.beloo.chipslayoutmanager.sample.ui;
 
 import android.support.v7.widget.RecyclerView;
 
-import com.beloo.chipslayoumanager.sample.entity.ChipsEntity;
+import com.beloo.chipslayoutmanager.sample.entity.ChipsEntity;
 
 import java.util.List;
 
-public class ManyChipsFacade implements IItemsFacade<ChipsEntity> {
+public class FewChipsFacade implements IItemsFacade<ChipsEntity> {
 
     private ChipsFactory chipsFactory = new ChipsFactory();
 
     @Override
     public List<ChipsEntity> getItems() {
-        return chipsFactory.getALotOfItems();
+        return chipsFactory.getFewItems();
     }
 
     @Override

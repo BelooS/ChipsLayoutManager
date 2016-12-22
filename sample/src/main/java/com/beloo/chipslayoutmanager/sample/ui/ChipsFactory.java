@@ -1,4 +1,4 @@
-package com.beloo.chipslayoumanager.sample.ui;
+package com.beloo.chipslayoutmanager.sample.ui;
 
 import android.support.v7.widget.RecyclerView;
 
@@ -7,11 +7,11 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.beloo.chipslayoutmanager.sample.ui.R;
-import com.beloo.chipslayoumanager.sample.ui.adapter.ChipsAdapter;
-import com.beloo.chipslayoumanager.sample.entity.ChipsEntity;
+import com.beloo.chipslayoutmanager.sample.ui.adapter.ChipsAdapter;
+import com.beloo.chipslayoutmanager.sample.entity.ChipsEntity;
+import com.beloo.chipslayoutmanager.sample.R;
 
-class ShortChipsFactory implements IItemsFactory<ChipsEntity> {
+class ChipsFactory implements IItemsFactory<ChipsEntity> {
 
     @Override
     public List<ChipsEntity> getFewItems() {
@@ -22,7 +22,8 @@ class ShortChipsFactory implements IItemsFactory<ChipsEntity> {
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
-                .name("V")
+                .drawableResId(R.drawable.girl1)
+                .name("Veronic Cloyd")
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
@@ -37,11 +38,13 @@ class ShortChipsFactory implements IItemsFactory<ChipsEntity> {
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
-                .name("J")
+                .drawableResId(R.drawable.girl2)
+                .name("Jess")
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
-                .name("A")
+                .drawableResId(R.drawable.girl4)
+                .name("Ann Ackerman")
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
@@ -51,7 +54,8 @@ class ShortChipsFactory implements IItemsFactory<ChipsEntity> {
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
-                .name("C")
+                .drawableResId(R.drawable.girl5)
+                .name("Claudette")
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()

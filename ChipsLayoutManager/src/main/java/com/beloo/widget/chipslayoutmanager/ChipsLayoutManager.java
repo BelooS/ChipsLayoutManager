@@ -507,7 +507,15 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public int findFirstVisibleItemPosition() {
         if (getChildCount() == 0)
             return RecyclerView.NO_POSITION;
-        return canvas.getMinPositionOnScreen();
+//        return canvas.getMinPositionOnScreen();
+        for (View view : childViews) {
+            Rect rect = canvas.getViewRect(view);
+            if (canvas.isInside(rect)) {
+                return getPosition(view);
+            }
+        }
+
+        return RecyclerView.NO_POSITION;
     }
 
     /**

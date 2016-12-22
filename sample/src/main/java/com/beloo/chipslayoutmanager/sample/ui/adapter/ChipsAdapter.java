@@ -1,4 +1,4 @@
-package com.beloo.chipslayoumanager.sample.ui.adapter;
+package com.beloo.chipslayoutmanager.sample.ui.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -13,10 +13,10 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
-import com.beloo.chipslayoumanager.sample.ui.OnRemoveListener;
-import com.beloo.chipslayoutmanager.sample.ui.R;
-import com.beloo.chipslayoumanager.sample.entity.ChipsEntity;
-import com.beloo.chipslayoumanager.sample.CircleTransform;
+import com.beloo.chipslayoutmanager.sample.ui.OnRemoveListener;
+import com.beloo.chipslayoutmanager.sample.R;
+import com.beloo.chipslayoutmanager.sample.entity.ChipsEntity;
+import com.beloo.chipslayoutmanager.sample.CircleTransform;
 
 public class ChipsAdapter extends  RecyclerView.Adapter<ChipsAdapter.ViewHolder> {
 

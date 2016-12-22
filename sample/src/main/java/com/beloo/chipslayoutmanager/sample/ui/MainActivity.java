@@ -1,4 +1,4 @@
-package com.beloo.chipslayoumanager.sample.ui;
+package com.beloo.chipslayoutmanager.sample.ui;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,7 +11,7 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
-import com.beloo.chipslayoutmanager.sample.ui.R;
+import com.beloo.chipslayoutmanager.sample.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 

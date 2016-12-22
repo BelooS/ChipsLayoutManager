@@ -1,4 +1,4 @@
-package com.beloo.chipslayoumanager.sample;
+package com.beloo.chipslayoutmanager.sample;
 
 public class Application extends android.app.Application {
 

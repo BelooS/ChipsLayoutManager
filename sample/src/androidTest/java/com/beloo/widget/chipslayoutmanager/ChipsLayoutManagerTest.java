@@ -8,10 +8,9 @@ import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.beloo.chipslayoumanager.sample.ui.FewChipsFacade;
-import com.beloo.chipslayoumanager.sample.ui.LayoutManagerFactory;
-import com.beloo.chipslayoumanager.sample.ui.ManyChipsFacade;
-import com.beloo.chipslayoumanager.sample.ui.TestActivity;
+import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
+import com.beloo.chipslayoutmanager.sample.ui.ChipsFacade;
+import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
 
 import org.junit.Before;
@@ -21,7 +20,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.beloo.chipslayoutmanager.sample.ui.R;
+import com.beloo.chipslayoutmanager.sample.R;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -38,7 +37,7 @@ import static org.mockito.Mockito.doReturn;
 public class ChipsLayoutManagerTest {
 
     static {
-        TestActivity.setItemsFactory(new ManyChipsFacade());
+        TestActivity.setItemsFactory(new ChipsFacade());
         TestActivity.isInitializeOutside = true;
     }
 
@@ -65,6 +64,48 @@ public class ChipsLayoutManagerTest {
         activityTestRule.getActivity().initialize();
     }
 
+    @Test
+    public void findFirstVisibleItem_scrolledCompletelyToItemInTheMiddle_resultCorrect() throws Exception {
+        //arrange
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(7));
+        InstrumentalUtil.waitForIdle();
+
+        //act
+        int actual = layoutManager.findFirstVisibleItemPosition();
+
+        //assert
+        assertEquals(6, actual);
+    }
+
+    @Test
+    public void findLastVisibleItem_scrolledCompletelyToItemInTheMiddle_resultCorrect() throws Exception {
+        //arrange
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(7));
+        InstrumentalUtil.waitForIdle();
+
+        //act
+        int actual = layoutManager.findLastVisibleItemPosition();
+
+        //assert
+        assertEquals(19, actual);
+    }
+
+    @Test
+    public void findLastCompletelyVisibleItem_scrolledCompletelyToItemInTheMiddle_resultCorrect() throws Exception {
+        //arrange
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(7));
+        InstrumentalUtil.waitForIdle();
+
+        //act
+        int actual = layoutManager.findLastCompletelyVisibleItemPosition();
+
+        //assert
+        assertEquals(17, actual);
+    }
+
     private void performOrientationChangeAndWaitIdle() throws Exception {
         //arrange
 
@@ -83,6 +124,7 @@ public class ChipsLayoutManagerTest {
 
         //verify no exceptions
     }
+
 
     /**
      * verify that orientation change is performed successfully

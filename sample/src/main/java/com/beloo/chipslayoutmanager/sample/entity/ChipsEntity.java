@@ -1,4 +1,4 @@
-package com.beloo.chipslayoumanager.sample.entity;
+package com.beloo.chipslayoutmanager.sample.entity;
 
 import android.os.Parcel;
 import android.os.Parcelable;

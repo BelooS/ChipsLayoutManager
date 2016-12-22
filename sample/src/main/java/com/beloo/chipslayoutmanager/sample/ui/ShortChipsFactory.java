@@ -1,4 +1,4 @@
-package com.beloo.chipslayoumanager.sample.ui;
+package com.beloo.chipslayoutmanager.sample.ui;
 
 import android.support.v7.widget.RecyclerView;
 
@@ -7,11 +7,11 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.beloo.chipslayoumanager.sample.ui.adapter.ChipsAdapter;
-import com.beloo.chipslayoumanager.sample.entity.ChipsEntity;
-import com.beloo.chipslayoutmanager.sample.ui.R;
+import com.beloo.chipslayoutmanager.sample.R;
+import com.beloo.chipslayoutmanager.sample.ui.adapter.ChipsAdapter;
+import com.beloo.chipslayoutmanager.sample.entity.ChipsEntity;
 
-class ChipsFactory implements IItemsFactory<ChipsEntity> {
+class ShortChipsFactory implements IItemsFactory<ChipsEntity> {
 
     @Override
     public List<ChipsEntity> getFewItems() {
@@ -22,8 +22,7 @@ class ChipsFactory implements IItemsFactory<ChipsEntity> {
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
-                .drawableResId(R.drawable.girl1)
-                .name("Veronic Cloyd")
+                .name("V")
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
@@ -38,13 +37,11 @@ class ChipsFactory implements IItemsFactory<ChipsEntity> {
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
-                .drawableResId(R.drawable.girl2)
-                .name("Jess")
+                .name("J")
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
-                .drawableResId(R.drawable.girl4)
-                .name("Ann Ackerman")
+                .name("A")
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
@@ -54,8 +51,7 @@ class ChipsFactory implements IItemsFactory<ChipsEntity> {
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()
-                .drawableResId(R.drawable.girl5)
-                .name("Claudette")
+                .name("C")
                 .build());
 
         chipsList.add(ChipsEntity.newBuilder()

@@ -1,4 +1,4 @@
-package com.beloo.chipslayoumanager.sample.ui;
+package com.beloo.chipslayoutmanager.sample.ui;
 
 import android.support.v7.widget.RecyclerView;
 

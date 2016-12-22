@@ -1,4 +1,4 @@
-package com.beloo.chipslayoumanager.sample.ui;
+package com.beloo.chipslayoutmanager.sample.ui;
 
 
 import android.os.Bundle;
@@ -12,13 +12,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.beloo.chipslayoumanager.sample.entity.ChipsEntity;
-import com.beloo.chipslayoumanager.sample.ui.adapter.ChipsAdapter;
+import com.beloo.chipslayoutmanager.sample.entity.ChipsEntity;
+import com.beloo.chipslayoutmanager.sample.ui.adapter.ChipsAdapter;
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 
 import java.util.List;
 
-import com.beloo.chipslayoutmanager.sample.ui.R;
+import com.beloo.chipslayoutmanager.sample.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;

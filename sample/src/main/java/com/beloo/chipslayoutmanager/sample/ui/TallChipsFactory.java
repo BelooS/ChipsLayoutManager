@@ -1,4 +1,4 @@
-package com.beloo.chipslayoumanager.sample.ui;
+package com.beloo.chipslayoutmanager.sample.ui;
 
 import android.support.v7.widget.RecyclerView;
 
@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.beloo.chipslayoutmanager.sample.ui.R;
-import com.beloo.chipslayoumanager.sample.ui.adapter.ChipsAdapter;
-import com.beloo.chipslayoumanager.sample.entity.ChipsEntity;
+import com.beloo.chipslayoutmanager.sample.R;
+import com.beloo.chipslayoutmanager.sample.ui.adapter.ChipsAdapter;
+import com.beloo.chipslayoutmanager.sample.entity.ChipsEntity;
 
 public class TallChipsFactory implements IItemsFactory<ChipsEntity> {
 

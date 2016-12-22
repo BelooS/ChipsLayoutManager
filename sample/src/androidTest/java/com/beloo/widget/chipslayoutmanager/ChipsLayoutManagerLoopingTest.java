@@ -5,9 +5,9 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.widget.RecyclerView;
 
-import com.beloo.chipslayoumanager.sample.ui.FewChipsFacade;
-import com.beloo.chipslayoumanager.sample.ui.LayoutManagerFactory;
-import com.beloo.chipslayoumanager.sample.ui.TestActivity;
+import com.beloo.chipslayoutmanager.sample.ui.FewChipsFacade;
+import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
+import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.widget.chipslayoutmanager.util.testing.ISpy;
 
 import org.junit.Before;

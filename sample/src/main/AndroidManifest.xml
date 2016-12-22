@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.beloo.chipslayoutmanager.sample.ui"
+          package="com.beloo.chipslayoutmanager.sample"
     >
 
     <application
@@ -9,17 +9,15 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name="com.beloo.chipslayoumanager.sample.Application"
+        android:name="com.beloo.chipslayoutmanager.sample.Application"
         >
-        <activity android:name="com.beloo.chipslayoumanager.sample.ui.MainActivity">
+        <activity android:name="com.beloo.chipslayoutmanager.sample.ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <activity android:name="com.beloo.chipslayoumanager.sample.ui.TestActivity"/>
 
     </application>
 

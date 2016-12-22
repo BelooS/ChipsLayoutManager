@@ -1,4 +1,4 @@
-package com.beloo.chipslayoumanager.sample;
+package com.beloo.chipslayoutmanager.sample;
 
 import android.content.Context;
 import android.graphics.Bitmap;
