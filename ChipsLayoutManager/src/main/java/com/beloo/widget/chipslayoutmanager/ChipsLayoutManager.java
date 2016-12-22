@@ -261,23 +261,23 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     // non-contract public methods. Used only for inner purposes
     ///////////////////////////////////////////////////////////////////////////
 
-    @RestrictTo(RestrictTo.Scope.GROUP_ID)
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public boolean isStrategyAppliedWithLastRow() {
         return isStrategyAppliedWithLastRow;
     }
 
-    @RestrictTo(RestrictTo.Scope.GROUP_ID)
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public IViewCacheStorage getViewPositionsStorage() {
         return viewPositionsStorage;
     }
 
-    @RestrictTo(RestrictTo.Scope.GROUP_ID)
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public ICanvas getCanvas() {
         return canvas;
     }
 
     @NonNull
-    @RestrictTo(RestrictTo.Scope.GROUP_ID)
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     AnchorViewState getAnchor() {
         return anchorView;
     }
@@ -1032,13 +1032,13 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return scrollingController.canScrollVertically();
     }
 
-    @RestrictTo(RestrictTo.Scope.GROUP_ID)
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @Override
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
         return scrollingController.scrollVerticallyBy(dy, recycler, state);
     }
 
-    @RestrictTo(RestrictTo.Scope.GROUP_ID)
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @Override
     public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
         return scrollingController.scrollHorizontallyBy(dx, recycler, state);

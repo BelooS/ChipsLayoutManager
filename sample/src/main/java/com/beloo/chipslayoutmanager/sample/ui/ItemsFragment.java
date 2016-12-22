@@ -115,6 +115,7 @@ public class ItemsFragment extends Fragment {
         rvTest.getRecycledViewPool().setMaxRecycledViews(0, 10);
         rvTest.getRecycledViewPool().setMaxRecycledViews(1, 10);
         rvTest.setAdapter(adapter);
+
     }
 
     private OnRemoveListener onRemoveListener = new OnRemoveListener() {
@@ -200,6 +201,7 @@ public class ItemsFragment extends Fragment {
 
     @OnClick(R.id.btnScroll)
     public void onScrollClicked(View view) {
+//        rvTest.scrollBy(0, 500);
         rvTest.scrollToPosition(spinnerPosition.getSelectedItemPosition());
     }
 

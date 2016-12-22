@@ -69,6 +69,32 @@ public class ChipsLayoutManagerTest {
     }
 
     @Test
+    public void scrollBy_LMInInitialStateAndScrollForward_CorrectFirstCompletelyVisibleItem() throws Exception {
+        //arrange
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+        InstrumentalUtil.waitForIdle();
+        //act
+        recyclerView.perform(actionsFactory.scrollBy(0, 300));
+        int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
+        //assert
+        assertEquals(4, actual);
+    }
+
+    @Test
+    public void scrollBy_ScrolledForwardScrollBackward_CorrectFirstCompletelyVisibleItem() throws Exception {
+        //arrange
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+        InstrumentalUtil.waitForIdle();
+        recyclerView.perform(actionsFactory.scrollBy(0, 300));
+        //act
+        recyclerView.perform(actionsFactory.scrollBy(0, -300));
+        Thread.sleep(10000);
+        int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
+        //assert
+        assertEquals(0, actual);
+    }
+
+    @Test
     public void scrollToPosition_LMInInitialState_FirstVisiblePositionsEqualsScrollingTarget() throws Exception {
         //arrange
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
@@ -175,11 +201,7 @@ public class ChipsLayoutManagerTest {
     @Test
     public void deleteItem_ItemHasMaximumHeight_SamePadding() throws Exception {
         //arrange
-        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
-        recyclerView.perform(actionsFactory.scrollBy(500, 0));
-        InstrumentalUtil.waitForIdle();
         //act
-        Thread.sleep(2000);
         //assert
     }
 }
