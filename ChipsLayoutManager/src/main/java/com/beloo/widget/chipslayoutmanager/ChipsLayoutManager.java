@@ -487,6 +487,24 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // visible items
+    ///////////////////////////////////////////////////////////////////////////
+
+    /** returns count of completely visible views
+     * @see #findFirstCompletelyVisibleItemPosition() ()
+     * @see #findLastCompletelyVisibleItemPosition() */
+    public int getCompletelyVisibleViewsCount() {
+        int visibleViewsCount = 0;
+        for (View child : childViews) {
+            if (canvas.isFullyVisible(child)){
+                visibleViewsCount++;
+            }
+        }
+
+        return visibleViewsCount;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // positions contract
     ///////////////////////////////////////////////////////////////////////////
 

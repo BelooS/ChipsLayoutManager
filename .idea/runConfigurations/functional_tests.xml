@@ -8,7 +8,7 @@
     <option name="PACKAGE_NAME" value="com.beloo.widget.chipslayoutmanager" />
     <option name="EXTRA_OPTIONS" value="" />
     <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
-    <option name="PREFERRED_AVD" value="" />
+    <option name="PREFERRED_AVD" value="Nexus_5_API_24" />
     <option name="CLEAR_LOGCAT" value="false" />
     <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
     <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
