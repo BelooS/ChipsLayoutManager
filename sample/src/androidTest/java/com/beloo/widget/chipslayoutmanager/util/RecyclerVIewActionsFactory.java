@@ -22,8 +22,43 @@ public class RecyclerViewActionsFactory {
         return new ScrollByRecyclerViewAction(x, y);
     }
 
+    public ViewAction smoothScrollToPosition(int position) {
+        return new SmoothScrollToPositionRecyclerViewAction(position);
+    }
+
+
     public Matcher<View> correctOrder() {
         return orderMatcher();
+    }
+
+    private static final class SmoothScrollToPositionRecyclerViewAction implements ViewAction {
+        private final int position;
+
+        private SmoothScrollToPositionRecyclerViewAction(int position) {
+            this.position = position;
+        }
+
+        @Override
+        public Matcher<View> getConstraints() {
+            return allOf(isAssignableFrom(RecyclerView.class), isDisplayed());
+        }
+
+        @Override
+        public String getDescription() {
+            return String.format(Locale.getDefault(), "smooth scroll RecyclerView to position %d", position);
+        }
+
+        @Override
+        public void perform(UiController uiController, View view) {
+            RecyclerView recyclerView = (RecyclerView) view;
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                }
+            });
+            recyclerView.smoothScrollToPosition(position);
+        }
     }
 
     private static final class ScrollByRecyclerViewAction implements ViewAction {

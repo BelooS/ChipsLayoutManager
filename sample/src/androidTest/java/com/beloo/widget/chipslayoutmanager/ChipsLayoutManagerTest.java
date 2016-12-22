@@ -114,9 +114,25 @@ public class ChipsLayoutManagerTest {
         recyclerView.perform(RecyclerViewActions.scrollToPosition(8));
         InstrumentalUtil.waitForIdle();
         //act
-        int actual = layoutManager.findFirstVisibleItemPosition();
+        int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
 
         //assert
+        assertEquals(8, actual);
+    }
+
+    @Test
+    public void smoothScrollToPosition_LMInInitialState_FirstVisiblePositionsEqualsScrollingTarget() throws Exception {
+        //arrange
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+        InstrumentalUtil.waitForIdle();
+        recyclerView.perform(actionsFactory.smoothScrollToPosition(8));
+        InstrumentalUtil.waitForIdle();
+        //todo remove it with some concrete lock
+        Thread.sleep(500);
+        //act
+        int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
+        //assert
+
         assertEquals(8, actual);
     }
 
