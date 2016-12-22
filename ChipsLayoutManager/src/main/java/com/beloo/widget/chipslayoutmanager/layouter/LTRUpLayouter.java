@@ -28,6 +28,11 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
     }
 
     @Override
+    boolean isReverseOrder() {
+        return true;
+    }
+
+    @Override
     void onPreLayout() {
         int leftOffsetOfRow = viewRight - getCanvasLeftBorder();
         viewLeft = 0;
@@ -42,9 +47,6 @@ class LTRUpLayouter extends AbstractLayouter implements ILayouter {
             viewTop = Math.min(viewTop, viewRect.top);
             viewBottom = Math.max(viewBottom, viewRect.bottom);
         }
-
-        //return to natural order
-        Collections.reverse(rowViews);
     }
 
     @Override

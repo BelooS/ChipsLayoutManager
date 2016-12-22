@@ -55,6 +55,11 @@ class RTLDownLayouter extends AbstractLayouter {
     }
 
     @Override
+    boolean isReverseOrder() {
+        return false;
+    }
+
+    @Override
     public void onInterceptAttachView(View view) {
         viewTop = getLayoutManager().getDecoratedTop(view);
         viewRight = getLayoutManager().getDecoratedLeft(view);

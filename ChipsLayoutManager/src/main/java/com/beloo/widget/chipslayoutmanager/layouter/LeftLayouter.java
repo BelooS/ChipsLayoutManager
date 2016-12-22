@@ -31,6 +31,11 @@ class LeftLayouter extends AbstractLayouter {
     }
 
     @Override
+    boolean isReverseOrder() {
+        return true;
+    }
+
+    @Override
     void onPreLayout() {
         int topOffsetOfRow = viewBottom - getCanvasTopBorder();
         viewBottom = 0;
@@ -45,9 +50,6 @@ class LeftLayouter extends AbstractLayouter {
             viewLeft = Math.min(viewLeft, viewRect.left);
             viewRight = Math.max(viewRight, viewRect.right);
         }
-
-        //return to natural order
-        Collections.reverse(rowViews);
     }
 
     @Override

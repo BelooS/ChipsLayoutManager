@@ -27,6 +27,11 @@ class RightLayouter extends AbstractLayouter {
     }
 
     @Override
+    boolean isReverseOrder() {
+        return false;
+    }
+
+    @Override
     void onPreLayout() {
         if (!rowViews.isEmpty()) {
             //todo this isn't great place for that. Should be refactored somehow

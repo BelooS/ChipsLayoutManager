@@ -25,6 +25,11 @@ class LTRDownLayouter extends AbstractLayouter {
         return viewRect;
     }
 
+    @Override
+    boolean isReverseOrder() {
+        return false;
+    }
+
 
     @Override
     void onPreLayout() {

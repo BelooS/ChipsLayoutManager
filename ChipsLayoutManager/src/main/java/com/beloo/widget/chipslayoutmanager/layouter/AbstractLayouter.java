@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.util.Pair;
 import android.view.View;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -108,7 +109,11 @@ public abstract class AbstractLayouter implements ILayouter, IBorder {
 
     public List<Item> getCurrentRowItems() {
         List<Item> items = new LinkedList<>();
-        for (Pair<Rect, View> rowView : rowViews) {
+        List<Pair<Rect, View>> mutableRowViews = new LinkedList<>(rowViews);
+        if (isReverseOrder()) {
+            Collections.reverse(mutableRowViews);
+        }
+        for (Pair<Rect, View> rowView : mutableRowViews) {
             items.add(new Item(rowView.first, layoutManager.getPosition(rowView.second)));
         }
         return items;
@@ -186,6 +191,9 @@ public abstract class AbstractLayouter implements ILayouter, IBorder {
 
     /** factory method for Rect, where view will be placed. Creation based on inner layouter parameters */
     abstract Rect createViewRect(View view);
+
+    /** check whether items in {@link #rowViews} are in reverse order. It is true for backward layouters */
+    abstract boolean isReverseOrder();
 
     /** called when layouter ready to add row to border. Children could perform normalization actions on created row*/
     abstract void onPreLayout();

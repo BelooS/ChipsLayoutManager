@@ -69,6 +69,19 @@ public class ChipsLayoutManagerTest {
     }
 
     @Test
+    public void layouting_ScrollForwardAndBackward_VerifyCorrectOrder () throws Exception {
+        //arrange
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+        InstrumentalUtil.waitForIdle();
+        //act
+        recyclerView.perform(actionsFactory.scrollBy(0, 300));
+        recyclerView.perform(actionsFactory.scrollBy(0, -300));
+        InstrumentalUtil.waitForIdle();
+        //assert
+        recyclerView.check(matches(actionsFactory.correctOrder()));
+    }
+
+    @Test
     public void scrollBy_LMInInitialStateAndScrollForward_CorrectFirstCompletelyVisibleItem() throws Exception {
         //arrange
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
@@ -84,11 +97,11 @@ public class ChipsLayoutManagerTest {
     public void scrollBy_ScrolledForwardScrollBackward_CorrectFirstCompletelyVisibleItem() throws Exception {
         //arrange
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+
         InstrumentalUtil.waitForIdle();
         recyclerView.perform(actionsFactory.scrollBy(0, 300));
         //act
         recyclerView.perform(actionsFactory.scrollBy(0, -300));
-        Thread.sleep(10000);
         int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
         //assert
         assertEquals(0, actual);

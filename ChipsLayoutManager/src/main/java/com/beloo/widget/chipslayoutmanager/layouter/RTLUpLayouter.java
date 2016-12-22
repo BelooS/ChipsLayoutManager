@@ -34,9 +34,6 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
             viewTop = Math.min(viewTop, viewRect.top);
             viewBottom = Math.max(viewBottom, viewRect.bottom);
         }
-
-        //return to natural order
-        Collections.reverse(rowViews);
     }
 
     @Override
@@ -62,6 +59,11 @@ class RTLUpLayouter extends AbstractLayouter implements ILayouter {
         Rect viewRect = new Rect(viewLeft, viewTop, right, viewBottom);
         viewLeft = viewRect.right;
         return viewRect;
+    }
+
+    @Override
+    boolean isReverseOrder() {
+        return true;
     }
 
     @Override
