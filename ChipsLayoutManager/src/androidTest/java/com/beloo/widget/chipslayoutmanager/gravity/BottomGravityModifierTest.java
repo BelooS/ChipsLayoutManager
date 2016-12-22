@@ -15,6 +15,7 @@ import java.util.List;
 import static com.beloo.widget.chipslayoutmanager.ParamsType.VALID;
 import static org.junit.Assert.assertEquals;
 
+/** test for {@link BottomGravityModifier}*/
 @RunWith(Parameterized.class)
 public class BottomGravityModifierTest extends GravityModifierTest {
 

@@ -42,7 +42,7 @@ abstract class GravityModifierTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void invalidDataForBottomModifierShouldThrowIllegalArgumentException() {
+    public void invalidDataForModifierShouldThrowIllegalArgumentException() {
         Assume.assumeTrue(paramsType.equals(INVALID));
         gravityModifier.modifyChildRect(minTop, maxBottom, testRect);
     }
