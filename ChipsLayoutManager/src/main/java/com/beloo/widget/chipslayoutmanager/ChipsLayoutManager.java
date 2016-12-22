@@ -696,7 +696,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 requestLayoutWithAnimations();
             }
 
-            if (isAfterPreLayout) {
+            if (isAfterPreLayout && backwardLayouter != null) {
                 //we should layout disappearing views after pre-layout to support natural movements)
                 layoutDisappearingViews(recycler, backwardLayouter, forwardLayouter);
             }
@@ -713,7 +713,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     /** layout disappearing view to support predictive animations */
-    private void layoutDisappearingViews(RecyclerView.Recycler recycler, ILayouter upLayouter, ILayouter downLayouter) {
+    private void layoutDisappearingViews(RecyclerView.Recycler recycler, @NonNull ILayouter upLayouter, ILayouter downLayouter) {
 
         ICriteriaFactory criteriaFactory = new InfiniteCriteriaFactory();
         LayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createDisappearingPlacerFactory());
@@ -770,9 +770,14 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         logger.onStartLayouter(startingPos - 1);
 
-        //up layouter should be invoked earlier than down layouter, because views with lower positions positioned above anchorView
-        //start from anchor position
-        fillWithLayouter(recycler, backwardLayouter, startingPos - 1);
+        /* there is no sense to perform backward layouting when anchor is null.
+           null anchor means that layout will be performed from absolutely top corner with start at anchor position
+        */
+        if (anchorView.getAnchorViewRect() != null) {
+            //up layouter should be invoked earlier than down layouter, because views with lower positions positioned above anchorView
+            //start from anchor position
+            fillWithLayouter(recycler, backwardLayouter, startingPos - 1);
+        }
 
         logger.onStartLayouter(startingPos);
 

@@ -1,6 +1,7 @@
 package com.beloo.widget.chipslayoutmanager.layouter;
 
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
@@ -20,13 +21,14 @@ class LTRRowsCreator implements ILayouterCreator {
     }
 
     @Override
-    public Rect createOffsetRectForBackwardLayouter(Rect anchorRect) {
+    public Rect createOffsetRectForBackwardLayouter(@NonNull Rect anchorRect) {
+        //for backward layouting anchor can't be null, because it doesn't have sense
         return new Rect(
                 0,
-                anchorRect == null ? layoutManager.getPaddingTop() : anchorRect.top,
+                anchorRect.top,
                 //we shouldn't include anchor view here, so anchorLeft is a rightOffset
-                anchorRect == null ? layoutManager.getPaddingRight() : anchorRect.left,
-                anchorRect == null ? layoutManager.getPaddingBottom() : anchorRect.bottom);
+                anchorRect.left,
+                anchorRect.bottom);
     }
 
     @Override

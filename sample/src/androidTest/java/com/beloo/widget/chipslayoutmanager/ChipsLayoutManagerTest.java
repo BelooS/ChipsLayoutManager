@@ -14,6 +14,7 @@ import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -227,6 +228,7 @@ public class ChipsLayoutManagerTest {
         System.out.println("first visible position = " + actual);
     }
 
+    @Ignore
     @Test
     public void deleteItem_ItemHasMaximumHeight_SamePadding() throws Exception {
         //arrange

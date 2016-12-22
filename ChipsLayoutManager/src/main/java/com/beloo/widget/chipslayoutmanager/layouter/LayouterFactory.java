@@ -59,7 +59,7 @@ public class LayouterFactory {
     private AbstractLayouter.Builder createForwardBuilder() {
         return layouterCreator.createForwardBuilder();
     }
-    private Rect createOffsetRectForBackwardLayouter(Rect anchorRect) {
+    private Rect createOffsetRectForBackwardLayouter(@NonNull Rect anchorRect) {
         return layouterCreator.createOffsetRectForBackwardLayouter(anchorRect);
     }
     private Rect createOffsetRectForForwardLayouter(Rect anchorRect) {
@@ -79,8 +79,9 @@ public class LayouterFactory {
                 .addLayouterListeners(layouterListeners);
     }
 
-    @NonNull
-    public final ILayouter getBackwardLayouter(@Nullable Rect anchorRect) {
+    @Nullable
+    public final ILayouter getBackwardLayouter(Rect anchorRect) {
+        if (anchorRect == null) return null;
         return fillBasicBuilder(createBackwardBuilder())
                 .offsetRect(createOffsetRectForBackwardLayouter(anchorRect))
                 .breaker(breakerFactory.createBackwardRowBreaker())
