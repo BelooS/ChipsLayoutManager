@@ -4,6 +4,8 @@ import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
+import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
+
 class ColumnsCreator implements ILayouterCreator {
 
     private RecyclerView.LayoutManager layoutManager;
@@ -23,7 +25,9 @@ class ColumnsCreator implements ILayouterCreator {
     }
 
     @Override
-    public Rect createOffsetRectForBackwardLayouter(@NonNull Rect anchorRect) {
+    public Rect createOffsetRectForBackwardLayouter(@NonNull AnchorViewState anchor) {
+        Rect anchorRect = anchor.getAnchorViewRect();
+
         return new Rect(
                 anchorRect.left,
                 0,
@@ -33,12 +37,14 @@ class ColumnsCreator implements ILayouterCreator {
     }
 
     @Override
-    public Rect createOffsetRectForForwardLayouter(Rect anchorRect) {
+    public Rect createOffsetRectForForwardLayouter(@NonNull AnchorViewState anchor) {
+        Rect anchorRect = anchor.getAnchorViewRect();
+
         return new Rect(
-                anchorRect == null ? layoutManager.getPaddingLeft() : anchorRect.left,
+                anchorRect == null ? anchor.getPosition() == 0 ? layoutManager.getPaddingLeft() : 0 : anchorRect.left,
                 //we should include anchor view here, so anchorTop is a topOffset
                 anchorRect == null ? layoutManager.getPaddingTop() : anchorRect.top,
-                anchorRect == null ? layoutManager.getPaddingRight() : anchorRect.right,
+                anchorRect == null ? anchor.getPosition() == 0 ? layoutManager.getPaddingRight() : 0 : anchorRect.right,
                 0);
     }
 }

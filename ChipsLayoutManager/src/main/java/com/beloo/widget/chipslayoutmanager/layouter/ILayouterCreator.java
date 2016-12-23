@@ -8,7 +8,7 @@ import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 
 interface ILayouterCreator {
     //---- up layouter below
-    Rect createOffsetRectForBackwardLayouter(@Nullable AnchorViewState anchorRect);
+    Rect createOffsetRectForBackwardLayouter(@NonNull AnchorViewState anchorRect);
 
     AbstractLayouter.Builder createBackwardBuilder();
 

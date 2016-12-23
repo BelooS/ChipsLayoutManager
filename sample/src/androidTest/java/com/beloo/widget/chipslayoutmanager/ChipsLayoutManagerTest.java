@@ -266,26 +266,28 @@ public class ChipsLayoutManagerTest {
     @Test
     public void clipToPadding_IsTrue_paddingStaySame() throws Exception {
         //arrange
+        RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
 
         ViewAction viewAction = new Action<RecyclerView>() {
             @Override
             public void performAction(UiController uiController, RecyclerView view) {
                 view.setClipToPadding(true);
-                view.setPadding(50, 50, 50, 50);
+                view.setPadding(150, 150, 150, 150);
                 view.requestLayout();
             }
         };
 
         //act
         recyclerView.perform(viewAction);
-        recyclerView.perform(RecyclerViewActions.scrollToPosition(12));
+        InstrumentalUtil.waitForIdle();
+        recyclerView.perform(actionsFactory.scrollBy(0, 200));
         InstrumentalUtil.waitForIdle();
 
         //assert
         View view = layoutManager.getChildAt(0);
-        int padding = layoutManager.getDecoratedTop(view);
-        assertEquals(50, padding);
+        double padding = view.getX() - rvTest.getX();
+        assertTrue(padding >= 150);
     }
 
 
@@ -298,14 +300,14 @@ public class ChipsLayoutManagerTest {
             @Override
             public void performAction(UiController uiController, RecyclerView view) {
                 view.setClipToPadding(false);
-                view.setPadding(50, 50, 50, 50);
+                view.setPadding(150, 150, 150, 150);
                 view.requestLayout();
             }
         };
 
         //act
         recyclerView.perform(viewAction);
-        recyclerView.perform(RecyclerViewActions.scrollToPosition(12));
+        recyclerView.perform(actionsFactory.scrollBy(0, 200));
         InstrumentalUtil.waitForIdle();
 
         //assert
