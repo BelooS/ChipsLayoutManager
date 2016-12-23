@@ -27,8 +27,36 @@ public class RecyclerViewActionsFactory {
     }
 
 
+    public ViewAction setAdapter(RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter) {
+        return new SetAdapterAction(adapter);
+    }
+
     public Matcher<View> correctOrder() {
         return orderMatcher();
+    }
+
+    private static final class SetAdapterAction implements ViewAction {
+        private final RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter;
+
+        private SetAdapterAction(RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter) {
+            this.adapter = adapter;
+        }
+
+        @Override
+        public Matcher<View> getConstraints() {
+            return allOf(isAssignableFrom(RecyclerView.class), isDisplayed());
+        }
+
+        @Override
+        public String getDescription() {
+            return"set adapter to recycler view";
+        }
+
+        @Override
+        public void perform(UiController uiController, View view) {
+            RecyclerView recyclerView = (RecyclerView) view;
+            recyclerView.setAdapter(adapter);
+        }
     }
 
     private static final class SmoothScrollToPositionRecyclerViewAction implements ViewAction {
@@ -55,9 +83,16 @@ public class RecyclerViewActionsFactory {
                 @Override
                 public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                     super.onScrollStateChanged(recyclerView, newState);
+                    SmoothScrollToPositionRecyclerViewAction.this.onScrollStateChanged(recyclerView, newState);
                 }
             });
             recyclerView.smoothScrollToPosition(position);
+        }
+
+        private synchronized void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                notify();
+            }
         }
     }
 

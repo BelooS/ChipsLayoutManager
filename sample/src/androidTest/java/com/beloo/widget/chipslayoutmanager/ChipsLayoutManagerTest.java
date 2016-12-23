@@ -3,14 +3,19 @@ package com.beloo.widget.chipslayoutmanager;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.v7.widget.RecyclerView;
 
+import com.beloo.chipslayoutmanager.sample.entity.ChipsEntity;
 import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
 import com.beloo.chipslayoutmanager.sample.ui.ChipsFacade;
+import com.beloo.chipslayoutmanager.sample.ui.OnRemoveListener;
 import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
+import com.beloo.chipslayoutmanager.sample.ui.adapter.ChipsAdapter;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
 
 import org.junit.Before;
@@ -30,7 +35,14 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 /**
  * test for {@link TestActivity}
@@ -112,28 +124,33 @@ public class ChipsLayoutManagerTest {
     public void scrollToPosition_LMInInitialState_FirstVisiblePositionsEqualsScrollingTarget() throws Exception {
         //arrange
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+
+        //act
         recyclerView.perform(RecyclerViewActions.scrollToPosition(8));
         InstrumentalUtil.waitForIdle();
-        //act
-        int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
 
         //assert
+        int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
         assertEquals(8, actual);
     }
 
     @Test
-    public void smoothScrollToPosition_LMInInitialState_FirstVisiblePositionsEqualsScrollingTarget() throws Exception {
+    public synchronized void smoothScrollToPosition_LMInInitialState_FirstVisiblePositionsEqualsScrollingTarget() throws Exception {
         //arrange
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         InstrumentalUtil.waitForIdle();
-        recyclerView.perform(actionsFactory.smoothScrollToPosition(8));
-        InstrumentalUtil.waitForIdle();
-        //todo remove it with some concrete lock
-        Thread.sleep(500);
-        //act
-        int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
-        //assert
 
+        //act
+        ViewAction scrollAction = actionsFactory.smoothScrollToPosition(8);
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
+        synchronized (scrollAction) {
+            recyclerView.perform(scrollAction);
+            //wait for completion of SmoothScrollAction
+            scrollAction.wait();
+        }
+
+        //assert
+        int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
         assertEquals(8, actual);
     }
 
@@ -226,6 +243,25 @@ public class ChipsLayoutManagerTest {
         assertNotEquals(-1, actual);
         assertEquals("first visible positions before and after rotation doesn't match", expected, actual);
         System.out.println("first visible position = " + actual);
+    }
+
+    @Test
+    public void setAdapterTwice_ChipsLayoutManagerHaveSetToRecyclerView_NoException() throws Exception {
+        //arrange
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+
+        ChipsFacade chipsFacade = spy(new ChipsFacade());
+        ChipsAdapter chipsAdapter = new ChipsAdapter(chipsFacade.getItems(), null);
+
+        //act
+        recyclerView.perform(actionsFactory.setAdapter(chipsAdapter));
+        InstrumentalUtil.waitForIdle();
+        recyclerView.perform(actionsFactory.setAdapter(chipsAdapter));
+        InstrumentalUtil.waitForIdle();
+
+        //assert
+        int pos = layoutManager.findFirstVisibleItemPosition();
+        assertNotEquals(RecyclerView.NO_POSITION, pos);
     }
 
     @Ignore
