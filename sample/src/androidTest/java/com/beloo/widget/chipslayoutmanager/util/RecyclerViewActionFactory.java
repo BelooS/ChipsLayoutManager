@@ -17,7 +17,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFro
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static org.hamcrest.Matchers.allOf;
 
-public class RecyclerViewActionsFactory {
+public class RecyclerViewActionFactory {
     public ViewAction scrollBy(int x, int y) {
         return new ScrollByRecyclerViewAction(x, y);
     }

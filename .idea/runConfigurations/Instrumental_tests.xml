@@ -1,11 +1,11 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Functional tests" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests">
-    <module name="sample" />
+  <configuration default="false" name="Instrumental tests" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests">
+    <module name="ChipsLayoutManager" />
     <option name="TESTING_TYPE" value="1" />
     <option name="INSTRUMENTATION_RUNNER_CLASS" value="android.support.test.runner.AndroidJUnitRunner" />
     <option name="METHOD_NAME" value="" />
     <option name="CLASS_NAME" value="" />
-    <option name="PACKAGE_NAME" value="com.beloo.widget.chipslayoutmanager" />
+    <option name="PACKAGE_NAME" value="com.beloo.widget.chipslayoutmanager.gravity" />
     <option name="EXTRA_OPTIONS" value="" />
     <option name="PREFERRED_AVD" value="" />
     <option name="CLEAR_LOGCAT" value="false" />

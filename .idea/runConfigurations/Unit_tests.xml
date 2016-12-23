@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Unit tests" type="JUnit" factoryName="JUnit" singleton="true">
+  <configuration default="false" name="Unit tests" type="AndroidJUnit" factoryName="Android JUnit" singleton="true">
     <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
     <module name="ChipsLayoutManager" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -8,9 +8,9 @@
     <option name="MAIN_CLASS_NAME" value="" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="directory" />
-    <option name="VM_PARAMETERS" value="-ea" />
+    <option name="VM_PARAMETERS" value="" />
     <option name="PARAMETERS" value="" />
-    <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$/ChipsLayoutManager" />
+    <option name="WORKING_DIRECTORY" value="" />
     <option name="ENV_VARIABLES" />
     <option name="PASS_PARENT_ENVS" value="true" />
     <option name="TEST_SEARCH_SCOPE">

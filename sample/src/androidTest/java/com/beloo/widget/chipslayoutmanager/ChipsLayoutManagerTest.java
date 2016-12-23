@@ -10,10 +10,8 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.widget.RecyclerView;
 
-import com.beloo.chipslayoutmanager.sample.entity.ChipsEntity;
 import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
 import com.beloo.chipslayoutmanager.sample.ui.ChipsFacade;
-import com.beloo.chipslayoutmanager.sample.ui.OnRemoveListener;
 import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.chipslayoutmanager.sample.ui.adapter.ChipsAdapter;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
@@ -27,7 +25,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.beloo.chipslayoutmanager.sample.R;
-import com.beloo.widget.chipslayoutmanager.util.RecyclerViewActionsFactory;
+import com.beloo.widget.chipslayoutmanager.util.RecyclerViewActionFactory;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -36,13 +34,9 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 /**
  * test for {@link TestActivity}
@@ -50,10 +44,10 @@ import static org.mockito.Mockito.when;
 @RunWith(AndroidJUnit4.class)
 public class ChipsLayoutManagerTest {
 
-    private static RecyclerViewActionsFactory actionsFactory;
+    private static RecyclerViewActionFactory actionsFactory;
 
     static {
-        actionsFactory = new RecyclerViewActionsFactory();
+        actionsFactory = new RecyclerViewActionFactory();
         TestActivity.setItemsFactory(new ChipsFacade());
         TestActivity.isInitializeOutside = true;
     }
