@@ -16,7 +16,7 @@ but with support of CRUD animations i decided to make such stuff and share it.
 
 with gradle
 ```GRADLE 
-compile 'com.beloo.widget:ChipsLayoutManager:0.3.4.1@aar'
+compile 'com.beloo.widget:ChipsLayoutManager:0.3.5@aar'
 ```
 
 Assuming you have installed jCenter provider:
@@ -137,10 +137,11 @@ It contained in same package and named `SpacingItemDecoration`.
 ## Support
 BETA is going.
 I respond to your founded issues. Just create a ticket if you found something goes wrong.
+Thanks for testing, guys. I'm really appreciate it.
 
 ### Contributors
-All pull requests are welcome. I've tried to make code clean & readable, so the next is up to you. 
-I appreciate any help and contributors will be mentioned here. 
+All pull requests are welcome. I've tried to make code clean & readable, so the next is up to you.
+I appreciate any help and contributors will be mentioned here.
 
 ### Known issues
 I create issues in tracking board of known problems.

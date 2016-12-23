@@ -96,8 +96,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /** determines whether LM should break row from view position */
     private IRowBreaker rowBreaker = new EmptyRowBreaker();
     //--- end contract parameters
-    @Orientation
     /** layoutOrientation of layout. Could have HORIZONTAL or VERTICAL style */
+    @Orientation
     private int layoutOrientation = HORIZONTAL;
     @RowStrategy
     private int rowStrategy = STRATEGY_DEFAULT;
@@ -181,6 +181,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     private boolean isAfterPreLayout;
 
+    @SuppressWarnings("WeakerAccess")
     @VisibleForTesting
     ChipsLayoutManager(Context context) {
         @DeviceOrientation
@@ -493,6 +494,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /** returns count of completely visible views
      * @see #findFirstCompletelyVisibleItemPosition() ()
      * @see #findLastCompletelyVisibleItemPosition() */
+    @SuppressWarnings("WeakerAccess")
     public int getCompletelyVisibleViewsCount() {
         int visibleViewsCount = 0;
         for (View child : childViews) {
@@ -690,7 +692,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 cacheNormalizationPosition = null;
             }
 
-            /** In case some moving views
+            /* In case some moving views
              * we should place it at layout to support predictive animations
              * we can't place all possible moves on theirs real place, because concrete layout position of particular view depends on placing of previous views
              * and there could be moving from 0 position to 10k. But it is preferably to place nearest moved view to real positions to make moving more natural
@@ -706,7 +708,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             fill(recycler, backwardLayouter, forwardLayouter);
 
-            /** should be executed before {@link #layoutDisappearingViews} */
+            /* should be executed before {@link #layoutDisappearingViews} */
             if (scrollingController.normalizeGaps(recycler, null)) {
                 Log.d(TAG, "normalize gaps");
                 //we should re-layout with new anchor after normalizing gaps
@@ -830,7 +832,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 try {
                     view = recycler.getViewForPosition(pos);
                 } catch (IndexOutOfBoundsException e) {
-                    /** WTF sometimes on prediction animation playing in case very fast sequential changes in adapter
+                    /* WTF sometimes on prediction animation playing in case very fast sequential changes in adapter
                      * {@link #getItemCount} could return value bigger than real count of items
                      * & {@link RecyclerView.Recycler#getViewForPosition(int)} throws exception in this case!
                      * to handle it, just leave the loop*/
