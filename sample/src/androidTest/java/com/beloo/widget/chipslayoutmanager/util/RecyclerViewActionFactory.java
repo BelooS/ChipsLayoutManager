@@ -18,6 +18,10 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static org.hamcrest.Matchers.allOf;
 
 public class RecyclerViewActionFactory {
+    ///////////////////////////////////////////////////////////////////////////
+    // Actions factory
+    ///////////////////////////////////////////////////////////////////////////
+
     public ViewAction scrollBy(int x, int y) {
         return new ScrollByRecyclerViewAction(x, y);
     }
@@ -26,25 +30,27 @@ public class RecyclerViewActionFactory {
         return new SmoothScrollToPositionRecyclerViewAction(position);
     }
 
-
     public ViewAction setAdapter(RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter) {
         return new SetAdapterAction(adapter);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Matcher factory
+    ///////////////////////////////////////////////////////////////////////////
 
     public Matcher<View> correctOrder() {
         return orderMatcher();
     }
 
-    private static final class SetAdapterAction implements ViewAction {
+    ///////////////////////////////////////////////////////////////////////////
+    // Actions
+    ///////////////////////////////////////////////////////////////////////////
+
+    private static final class SetAdapterAction extends RecyclerViewAction {
         private final RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter;
 
         private SetAdapterAction(RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter) {
             this.adapter = adapter;
-        }
-
-        @Override
-        public Matcher<View> getConstraints() {
-            return allOf(isAssignableFrom(RecyclerView.class), isDisplayed());
         }
 
         @Override
@@ -59,16 +65,11 @@ public class RecyclerViewActionFactory {
         }
     }
 
-    private static final class SmoothScrollToPositionRecyclerViewAction implements ViewAction {
+    private static final class SmoothScrollToPositionRecyclerViewAction extends RecyclerViewAction {
         private final int position;
 
         private SmoothScrollToPositionRecyclerViewAction(int position) {
             this.position = position;
-        }
-
-        @Override
-        public Matcher<View> getConstraints() {
-            return allOf(isAssignableFrom(RecyclerView.class), isDisplayed());
         }
 
         @Override
@@ -96,18 +97,13 @@ public class RecyclerViewActionFactory {
         }
     }
 
-    private static final class ScrollByRecyclerViewAction implements ViewAction {
+    private static final class ScrollByRecyclerViewAction extends RecyclerViewAction {
         private final int x;
         private final int y;
 
         private ScrollByRecyclerViewAction(int x, int y) {
             this.x = x;
             this.y = y;
-        }
-
-        @Override
-        public Matcher<View> getConstraints() {
-            return allOf(isAssignableFrom(RecyclerView.class), isDisplayed());
         }
 
         @Override
@@ -121,6 +117,23 @@ public class RecyclerViewActionFactory {
             recyclerView.scrollBy(x, y);
         }
     }
+
+    private abstract static class RecyclerViewAction implements ViewAction {
+
+        @Override
+        public Matcher<View> getConstraints() {
+            return allOf(isAssignableFrom(RecyclerView.class), isDisplayed());
+        }
+
+        @Override
+        public String getDescription() {
+            return "RecyclerView action " + this.getClass().getSimpleName();
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Matcher
+    ///////////////////////////////////////////////////////////////////////////
 
     private Matcher<View> orderMatcher() {
         return new TypeSafeMatcher<View>() {

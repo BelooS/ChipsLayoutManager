@@ -793,11 +793,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         /* there is no sense to perform backward layouting when anchor is null.
            null anchor means that layout will be performed from absolutely top corner with start at anchor position
         */
-        if (anchorView.getAnchorViewRect() != null) {
+//        if (anchorView.getAnchorViewRect() != null) {
             //up layouter should be invoked earlier than down layouter, because views with lower positions positioned above anchorView
             //start from anchor position
-            fillWithLayouter(recycler, backwardLayouter, startingPos - 1);
-        }
+        fillWithLayouter(recycler, backwardLayouter, startingPos - 1);
+//        }
 
         logger.onStartLayouter(startingPos);
 

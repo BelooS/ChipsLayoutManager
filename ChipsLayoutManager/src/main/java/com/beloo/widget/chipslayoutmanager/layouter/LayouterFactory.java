@@ -81,7 +81,6 @@ public class LayouterFactory {
 
     @Nullable
     public final ILayouter getBackwardLayouter(Rect anchorRect) {
-        if (anchorRect == null) return null;
         return fillBasicBuilder(createBackwardBuilder())
                 .offsetRect(createOffsetRectForBackwardLayouter(anchorRect))
                 .breaker(breakerFactory.createBackwardRowBreaker())

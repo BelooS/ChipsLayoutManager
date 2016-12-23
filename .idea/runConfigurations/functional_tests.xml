@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Functional tests" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests">
+  <configuration default="false" name="functional tests" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests">
     <module name="sample" />
     <option name="TESTING_TYPE" value="1" />
     <option name="INSTRUMENTATION_RUNNER_CLASS" value="android.support.test.runner.AndroidJUnitRunner" />
