@@ -29,11 +29,11 @@ class ColumnsCreator implements ILayouterCreator {
         Rect anchorRect = anchor.getAnchorViewRect();
 
         return new Rect(
-                anchorRect.left,
+                anchorRect == null ? 0 : anchorRect.left,
                 0,
-                anchorRect.right,
+                anchorRect == null ? 0 : anchorRect.right,
                 //we shouldn't include anchor view here, so anchorTop is a bottomOffset
-                anchorRect.top);
+                anchorRect == null ? 0 : anchorRect.top);
     }
 
     @Override

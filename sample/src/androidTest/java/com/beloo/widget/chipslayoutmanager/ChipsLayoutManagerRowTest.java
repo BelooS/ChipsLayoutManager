@@ -43,10 +43,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 /**
- * test for {@link TestActivity}
  */
-@RunWith(AndroidJUnit4.class)
-public class ChipsLayoutManagerTest {
+public abstract class ChipsLayoutManagerRowTest {
 
     private static RecyclerViewActionFactory actionsFactory;
 
@@ -68,9 +66,7 @@ public class ChipsLayoutManagerTest {
     public void setUp() throws Throwable {
         MockitoAnnotations.initMocks(this);
 
-        layoutManager = ChipsLayoutManager.newBuilder(activityTestRule.getActivity())
-                .setOrientation(ChipsLayoutManager.HORIZONTAL)
-                .build();
+        layoutManager = getLayoutManager();
 
         doReturn(layoutManager).when(layoutManagerFactory).layoutManager(activityTestRule.getActivity());
 
@@ -79,6 +75,8 @@ public class ChipsLayoutManagerTest {
         activityTestRule.getActivity().initialize();
 
     }
+
+    protected abstract ChipsLayoutManager getLayoutManager();
 
     @Test
     public void layouting_ScrollForwardAndBackward_VerifyCorrectOrder () throws Exception {

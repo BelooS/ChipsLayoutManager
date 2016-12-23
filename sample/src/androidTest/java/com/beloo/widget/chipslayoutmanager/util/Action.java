@@ -26,7 +26,5 @@ public abstract class Action<T extends View> implements ViewAction {
         performAction(uiController, (T) view);
     }
 
-    public void performAction(UiController uiController, T view) {
-
-    }
+    public abstract void performAction(UiController uiController, T view);
 }
