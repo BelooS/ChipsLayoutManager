@@ -679,8 +679,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
             logger.onBeforeLayouter(anchorView);
             fill(recycler,
-                    layouterFactory.getBackwardLayouter(anchorView.getAnchorViewRect()),
-                    layouterFactory.getForwardLayouter(anchorView.getAnchorViewRect()));
+                    layouterFactory.getBackwardLayouter(anchorView),
+                    layouterFactory.getForwardLayouter(anchorView));
 
             isAfterPreLayout = true;
         } else {
@@ -703,8 +703,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             criteriaFactory.setAdditionalRowsCount(APPROXIMATE_ADDITIONAL_ROWS_COUNT);
 
             LayouterFactory layouterFactory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
-            ILayouter backwardLayouter = layouterFactory.getBackwardLayouter(anchorView.getAnchorViewRect());
-            ILayouter forwardLayouter = layouterFactory.getForwardLayouter(anchorView.getAnchorViewRect());
+            ILayouter backwardLayouter = layouterFactory.getBackwardLayouter(anchorView);
+            ILayouter forwardLayouter = layouterFactory.getForwardLayouter(anchorView);
 
             fill(recycler, backwardLayouter, forwardLayouter);
 
@@ -793,11 +793,11 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         /* there is no sense to perform backward layouting when anchor is null.
            null anchor means that layout will be performed from absolutely top corner with start at anchor position
         */
-//        if (anchorView.getAnchorViewRect() != null) {
+        if (anchorView.getAnchorViewRect() != null) {
             //up layouter should be invoked earlier than down layouter, because views with lower positions positioned above anchorView
             //start from anchor position
-        fillWithLayouter(recycler, backwardLayouter, startingPos - 1);
-//        }
+            fillWithLayouter(recycler, backwardLayouter, startingPos - 1);
+        }
 
         logger.onStartLayouter(startingPos);
 
@@ -1088,8 +1088,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         LayouterFactory factory = stateFactory.createLayouterFactory(criteriaFactory, placerFactory.createRealPlacerFactory());
 
         fill(recycler,
-                factory.getBackwardLayouter(anchorView.getAnchorViewRect()),
-                factory.getForwardLayouter(anchorView.getAnchorViewRect()));
+                factory.getBackwardLayouter(anchorView),
+                factory.getForwardLayouter(anchorView));
     }
 
 }

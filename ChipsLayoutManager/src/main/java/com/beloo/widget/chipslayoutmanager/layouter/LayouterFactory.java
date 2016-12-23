@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
+import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 import com.beloo.widget.chipslayoutmanager.gravity.IGravityModifiersFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.IRowStrategy;
 import com.beloo.widget.chipslayoutmanager.gravity.SkipLastRowStrategy;
@@ -59,10 +60,10 @@ public class LayouterFactory {
     private AbstractLayouter.Builder createForwardBuilder() {
         return layouterCreator.createForwardBuilder();
     }
-    private Rect createOffsetRectForBackwardLayouter(@NonNull Rect anchorRect) {
+    private Rect createOffsetRectForBackwardLayouter(@NonNull AnchorViewState anchorRect) {
         return layouterCreator.createOffsetRectForBackwardLayouter(anchorRect);
     }
-    private Rect createOffsetRectForForwardLayouter(Rect anchorRect) {
+    private Rect createOffsetRectForForwardLayouter(AnchorViewState anchorRect) {
         return layouterCreator.createOffsetRectForForwardLayouter(anchorRect);
     }
     private ICanvas createCanvas() {
@@ -80,7 +81,7 @@ public class LayouterFactory {
     }
 
     @Nullable
-    public final ILayouter getBackwardLayouter(Rect anchorRect) {
+    public final ILayouter getBackwardLayouter(@NonNull AnchorViewState anchorRect) {
         return fillBasicBuilder(createBackwardBuilder())
                 .offsetRect(createOffsetRectForBackwardLayouter(anchorRect))
                 .breaker(breakerFactory.createBackwardRowBreaker())
@@ -92,7 +93,7 @@ public class LayouterFactory {
     }
 
     @NonNull
-    public final ILayouter getForwardLayouter(@Nullable Rect anchorRect) {
+    public final ILayouter getForwardLayouter(@NonNull AnchorViewState anchorRect) {
         return fillBasicBuilder(createForwardBuilder())
                 .offsetRect(createOffsetRectForForwardLayouter(anchorRect))
                 .breaker(breakerFactory.createForwardRowBreaker())
