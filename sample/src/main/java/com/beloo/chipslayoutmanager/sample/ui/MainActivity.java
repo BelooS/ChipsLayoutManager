@@ -6,13 +6,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.beloo.widget.chipslayoutmanager.BuildConfig;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import com.beloo.chipslayoutmanager.sample.R;
-import com.mikepenz.materialdrawer.util.DrawerItemViewHelper;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        toolbar.setTitle(getString(R.string.app_name_and_version, BuildConfig.VERSION_NAME));
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
