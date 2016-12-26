@@ -1,5 +1,6 @@
 package com.beloo.widget.chipslayoutmanager.util;
 
+import android.support.annotation.Nullable;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.v7.widget.RecyclerView;
@@ -34,6 +35,14 @@ public class RecyclerViewActionFactory {
         return new SetAdapterAction(adapter);
     }
 
+    public ViewAction notifyItemRemovedAction(int removePosition) {
+        return new NotifyItemRemovedAction(removePosition);
+    }
+
+    public ViewAction notifyItemRangeRemovedAction(int removePosition, int itemCount) {
+        return new NotifyItemRemovedAction(removePosition, itemCount);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Matcher factory
     ///////////////////////////////////////////////////////////////////////////
@@ -45,6 +54,27 @@ public class RecyclerViewActionFactory {
     ///////////////////////////////////////////////////////////////////////////
     // Actions
     ///////////////////////////////////////////////////////////////////////////
+
+    private static final class NotifyItemRemovedAction extends RecyclerViewAction {
+
+        private final int removePosition;
+        private final int itemCount;
+
+        public NotifyItemRemovedAction(int removePosition, int itemCount) {
+            this.removePosition = removePosition;
+            this.itemCount = itemCount;
+        }
+
+        public NotifyItemRemovedAction(int removePosition) {
+            this.removePosition = removePosition;
+            this.itemCount = 1;
+        }
+
+        @Override
+        public void performAction(UiController uiController, RecyclerView recyclerView) {
+            recyclerView.getAdapter().notifyItemRangeRemoved(removePosition, itemCount);
+        }
+    }
 
     private static final class SetAdapterAction extends RecyclerViewAction {
         private final RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter;
@@ -59,8 +89,7 @@ public class RecyclerViewActionFactory {
         }
 
         @Override
-        public void perform(UiController uiController, View view) {
-            RecyclerView recyclerView = (RecyclerView) view;
+        public void performAction(UiController uiController, RecyclerView recyclerView) {
             recyclerView.setAdapter(adapter);
         }
     }
@@ -78,8 +107,7 @@ public class RecyclerViewActionFactory {
         }
 
         @Override
-        public void perform(UiController uiController, View view) {
-            RecyclerView recyclerView = (RecyclerView) view;
+        public void performAction(UiController uiController, RecyclerView recyclerView) {
             recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -112,8 +140,7 @@ public class RecyclerViewActionFactory {
         }
 
         @Override
-        public void perform(UiController uiController, View view) {
-            RecyclerView recyclerView = (RecyclerView) view;
+        public void performAction(UiController uiController, RecyclerView recyclerView) {
             recyclerView.scrollBy(x, y);
         }
     }
@@ -128,6 +155,15 @@ public class RecyclerViewActionFactory {
         @Override
         public String getDescription() {
             return "RecyclerView action " + this.getClass().getSimpleName();
+        }
+
+        @Override
+        public final void perform(UiController uiController, View view) {
+            performAction(uiController, (RecyclerView) view);
+        }
+
+        public void performAction(UiController uiController, RecyclerView recyclerView) {
+
         }
     }
 
