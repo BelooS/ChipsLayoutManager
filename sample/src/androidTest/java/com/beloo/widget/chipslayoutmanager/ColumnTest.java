@@ -3,6 +3,7 @@ package com.beloo.widget.chipslayoutmanager;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Rect;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
@@ -334,6 +335,46 @@ public class ColumnTest {
         View view = layoutManager.getChildAt(0);
         int padding = layoutManager.getDecoratedLeft(view);
         assertTrue(padding < 0);
+    }
+
+    private View getViewForPosition(RecyclerView recyclerView, int position) {
+        return recyclerView.findViewHolderForAdapterPosition(position).itemView;
+    }
+
+    @Test
+    public void layouting_ScrollForwardOffScreenAndBackward_ItemsStayOnASamePlace() throws Exception {
+        InstrumentalUtil.waitForIdle();
+
+        //arrange
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+        RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
+        View child = getViewForPosition(rvTest, 7);
+        Rect expectedViewRect = layoutManager.getCanvas().getViewRect(child);
+
+        //act
+        recyclerView.perform(actionsFactory.scrollBy(2000, 0), actionsFactory.scrollBy(-2000, 0));
+        Rect resultViewRect = layoutManager.getCanvas().getViewRect(child);
+
+        //assert
+        assertEquals(expectedViewRect, resultViewRect);
+    }
+
+    @Test
+    public void layouting_ScrollForwardOnScreenAndBackward_ItemsStayOnASamePlace() throws Exception {
+        InstrumentalUtil.waitForIdle();
+
+        //arrange
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+        RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
+        View child = getViewForPosition(rvTest, 6);
+        Rect expectedViewRect = layoutManager.getCanvas().getViewRect(child);
+
+        //act
+        recyclerView.perform(actionsFactory.scrollBy(500, 0), actionsFactory.scrollBy(-500, 0));
+        Rect resultViewRect = layoutManager.getCanvas().getViewRect(child);
+
+        //assert
+        assertEquals(expectedViewRect, resultViewRect);
     }
 
     @Ignore

@@ -3,6 +3,7 @@ package com.beloo.widget.chipslayoutmanager;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Rect;
 import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewAction;
@@ -343,6 +344,42 @@ public class RowTest {
         assertNotEquals(0.0d, bottom, 0.01);
         assertNotEquals(0.0d, result, 0.01);
         assertEquals(bottom, result, 0.01);
+    }
+
+    @Test
+    public void layouting_ScrollForwardOffScreenAndBackward_ItemsStayOnASamePlace() throws Exception {
+        InstrumentalUtil.waitForIdle();
+
+        //arrange
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+        RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
+        View child = getViewForPosition(rvTest, 7);
+        Rect expectedViewRect = layoutManager.getCanvas().getViewRect(child);
+
+        //act
+        recyclerView.perform(actionsFactory.scrollBy(0, 1000), actionsFactory.scrollBy(0, -1000));
+        Rect resultViewRect = layoutManager.getCanvas().getViewRect(child);
+
+        //assert
+        assertEquals(expectedViewRect, resultViewRect);
+    }
+
+    @Test
+    public void layouting_ScrollForwardOnScreenAndBackward_ItemsStayOnASamePlace() throws Exception {
+        InstrumentalUtil.waitForIdle();
+
+        //arrange
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+        RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
+        View child = getViewForPosition(rvTest, 6);
+        Rect expectedViewRect = layoutManager.getCanvas().getViewRect(child);
+
+        //act
+        recyclerView.perform(actionsFactory.scrollBy(0, 250), actionsFactory.scrollBy(0, -250));
+        Rect resultViewRect = layoutManager.getCanvas().getViewRect(child);
+
+        //assert
+        assertEquals(expectedViewRect, resultViewRect);
     }
 
     private View getViewForPosition(RecyclerView recyclerView, int position) {
