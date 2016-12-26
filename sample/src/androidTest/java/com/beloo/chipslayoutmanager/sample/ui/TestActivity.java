@@ -1,6 +1,5 @@
 package com.beloo.chipslayoutmanager.sample.ui;
 
-import android.support.test.espresso.core.deps.guava.annotations.VisibleForTesting;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -51,36 +50,32 @@ public class TestActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("unchecked")
-    private RecyclerView.Adapter createAdapter(Bundle savedInstanceState) {
-
-        List<String> items;
-        if (savedInstanceState == null) {
+    private RecyclerView.Adapter createAdapter() {
+        if (items == null) {
             items = itemsFactory.getItems();
-        } else {
-            items = savedInstanceState.getStringArrayList(EXTRA);
         }
 
         adapter = itemsFactory.createAdapter(items, onRemoveListener);
-        this.items = items;
 
         return adapter;
 
     }
 
-    @VisibleForTesting
-    private Bundle savedInstanceState;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.savedInstanceState = savedInstanceState;
+
+        if (savedInstanceState != null) {
+            items = savedInstanceState.getParcelableArrayList(EXTRA);
+        }
+
         setContentView(R.layout.activity_test);
 
         rvTest = (RecyclerView) findViewById(R.id.rvTest);
         spinnerPosition = (Spinner) findViewById(R.id.spinnerPosition);
         spinnerMoveTo = (Spinner) findViewById(R.id.spinnerMoveTo);
 
-        if (!isInitializeOutside) {
+        if (!isInitializeOutside || savedInstanceState != null) {
             initialize();
         }
     }
@@ -91,7 +86,7 @@ public class TestActivity extends AppCompatActivity {
     }
 
     private void initRv() {
-        adapter = createAdapter(savedInstanceState);
+        adapter = createAdapter();
         RecyclerView.LayoutManager layoutManager = lmFactory.layoutManager(this);
 
         rvTest.addItemDecoration(new SpacingItemDecoration(getResources().getDimensionPixelOffset(R.dimen.item_space),

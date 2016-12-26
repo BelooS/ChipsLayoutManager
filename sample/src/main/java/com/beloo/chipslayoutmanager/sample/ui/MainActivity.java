@@ -12,6 +12,8 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import com.beloo.chipslayoutmanager.sample.R;
+import com.mikepenz.materialdrawer.util.DrawerItemViewHelper;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -43,27 +45,31 @@ public class MainActivity extends AppCompatActivity {
                 .withToolbar(toolbar)
                 .addDrawerItems(new PrimaryDrawerItem().withName(R.string.main).withIdentifier(1))
                 .addDrawerItems(new PrimaryDrawerItem().withName(R.string.bottom_sheet).withIdentifier(2))
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        int id = (int) drawerItem.getIdentifier();
-                        switch (id) {
-                            case 1:
-                                getSupportFragmentManager().beginTransaction()
-                                        .replace(R.id.fragmentContainer, ItemsFragment.newInstance())
-                                        .commit();
-                                drawer.closeDrawer();
-                                break;
-                            case 2:
-                                getSupportFragmentManager().beginTransaction()
-                                        .replace(R.id.fragmentContainer, BottomSheetFragment.newInstance())
-                                        .commit();
-                                drawer.closeDrawer();
-                                break;
-                        }
-                        return true;
-                    }
-                })
+                .withOnDrawerItemClickListener(this::onDrawerItemClickListener)
                 .build();
+    }
+
+    private boolean onDrawerItemClickListener(View view, int position, IDrawerItem drawerItem) {
+        int id = (int) drawerItem.getIdentifier();
+        switch (id) {
+            case 1:
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainer, ItemsFragment.newInstance())
+                        .commit();
+                drawer.closeDrawer();
+                break;
+            case 2:
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainer, BottomSheetFragment.newInstance())
+                        .commit();
+                drawer.closeDrawer();
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    protected void onResumeFragments() {
+        super.onResumeFragments();
     }
 }

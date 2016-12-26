@@ -2,8 +2,8 @@ package com.beloo.widget.chipslayoutmanager;
 
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.contrib.RecyclerViewActions;
@@ -15,7 +15,6 @@ import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
 import com.beloo.chipslayoutmanager.sample.ui.ChipsFacade;
 import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.chipslayoutmanager.sample.ui.adapter.ChipsAdapter;
-import com.beloo.widget.chipslayoutmanager.util.Action;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
 
 import org.junit.Before;
@@ -42,7 +41,7 @@ import static org.mockito.Mockito.spy;
 
 /**
  */
-public abstract class RowTest {
+public class RowTest {
 
     static RecyclerViewActionFactory actionsFactory;
 
@@ -195,7 +194,7 @@ public abstract class RowTest {
         assertEquals(17, actual);
     }
 
-    private void performOrientationChangeAndWaitIdle() throws Exception {
+    private void rotateAndWaitIdle() throws Exception {
         //arrange
 
         final int orientation = InstrumentationRegistry.getTargetContext()
@@ -219,15 +218,15 @@ public abstract class RowTest {
      * verify that orientation change is performed successfully
      */
     @Test
-    public void changeOrientation_LMBuiltFirstTime_NoExceptions() throws Exception {
+    public void rotate_LMBuiltFirstTime_NoExceptions() throws Exception {
         //arrange
         //act
-        performOrientationChangeAndWaitIdle();
+        rotateAndWaitIdle();
         //assert
     }
 
     @Test
-    public void changeOrientation_LMHasItems_firstItemNotChanged() throws Exception {
+    public void rotate_LMHasItems_firstItemNotChanged() throws Exception {
         //arrange
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         recyclerView.perform(RecyclerViewActions.scrollToPosition(7));
@@ -235,7 +234,7 @@ public abstract class RowTest {
 
         int expected = layoutManager.findFirstVisibleItemPosition();
         //act
-        performOrientationChangeAndWaitIdle();
+        rotateAndWaitIdle();
         int actual = layoutManager.findFirstVisibleItemPosition();
         //assert
         assertNotEquals(-1, expected);
@@ -305,6 +304,24 @@ public abstract class RowTest {
         View view = layoutManager.getChildAt(0);
         int padding = layoutManager.getDecoratedTop(view);
         assertTrue(padding < 0);
+    }
+
+    @Test
+    public void rotate_ScrolledToEndOfItems_BottomPaddingStaySame() throws Exception {
+        //arrange
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(layoutManager.getItemCount() - 1));
+        View child = layoutManager.getChildAt(layoutManager.getChildCount() - 1);
+        int bottom = child.getBottom();
+
+        //act
+        rotateAndWaitIdle();
+        rotateAndWaitIdle();
+        child = layoutManager.getChildAt(layoutManager.getChildCount() - 1);
+        int result = child.getBottom();
+
+        //assert
+        assertEquals(bottom, result);
     }
 
     @Ignore
