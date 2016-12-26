@@ -71,7 +71,7 @@ public class FewChipsRowTest {
 
         layoutManager = getLayoutManager();
 
-        doReturn(layoutManager).when(layoutManagerFactory).layoutManager(activityTestRule.getActivity());
+        doReturn(layoutManager).when(layoutManagerFactory).layoutManager(any());
 
         IItemsFacade<ChipsEntity> chipsFacade = spy(new FewChipsFacade());
         items = chipsFacade.getItems();

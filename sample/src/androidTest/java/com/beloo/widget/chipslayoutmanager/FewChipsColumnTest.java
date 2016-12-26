@@ -70,7 +70,7 @@ public class FewChipsColumnTest {
 
         layoutManager = getLayoutManager();
 
-        doReturn(layoutManager).when(layoutManagerFactory).layoutManager(activityTestRule.getActivity());
+        doReturn(layoutManager).when(layoutManagerFactory).layoutManager(any());
 
         ChipsFacade chipsFacade = spy(new ChipsFacade());
         items = chipsFacade.getItems();

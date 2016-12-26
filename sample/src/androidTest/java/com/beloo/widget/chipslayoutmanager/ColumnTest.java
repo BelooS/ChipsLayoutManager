@@ -1,15 +1,16 @@
 package com.beloo.widget.chipslayoutmanager;
 
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 
 import com.beloo.chipslayoutmanager.sample.R;
@@ -17,7 +18,6 @@ import com.beloo.chipslayoutmanager.sample.ui.ChipsFacade;
 import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
 import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.chipslayoutmanager.sample.ui.adapter.ChipsAdapter;
-import com.beloo.widget.chipslayoutmanager.util.Action;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
 import com.beloo.widget.chipslayoutmanager.util.RecyclerViewActionFactory;
 
@@ -26,7 +26,6 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -36,7 +35,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.spy;
 
 /**
@@ -55,9 +54,6 @@ public class ColumnTest {
     @Rule
     public ActivityTestRule<TestActivity> activityTestRule = new ActivityTestRule<>(TestActivity.class);
 
-    @Mock
-    LayoutManagerFactory layoutManagerFactory;
-
     private ChipsLayoutManager layoutManager;
 
     @Before
@@ -66,12 +62,23 @@ public class ColumnTest {
 
         layoutManager = getLayoutManager();
 
-        doReturn(layoutManager).when(layoutManagerFactory).layoutManager(activityTestRule.getActivity());
+        LayoutManagerFactory layoutManagerFactory = new LayoutManagerFactory() {
+            @Override
+            public RecyclerView.LayoutManager layoutManager(Context context) {
+                //we need clean layout manager for each request
+                return retrieveLayoutManager();
+            }
+        };
 
         TestActivity.setLmFactory(layoutManagerFactory);
 
         activityTestRule.getActivity().initialize();
 
+    }
+
+    private ChipsLayoutManager retrieveLayoutManager() {
+        this.layoutManager = getLayoutManager();
+        return layoutManager;
     }
 
     protected ChipsLayoutManager getLayoutManager() {
@@ -217,7 +224,7 @@ public class ColumnTest {
         assertEquals(26, actual);
     }
 
-    private void performOrientationChangeAndWaitIdle() throws Exception {
+    private void rotateAndWaitIdle() throws Exception {
         //arrange
 
         final int orientation = InstrumentationRegistry.getTargetContext()
@@ -241,15 +248,15 @@ public class ColumnTest {
      * verify that orientation change is performed successfully
      */
     @Test
-    public void changeOrientation_LMBuiltFirstTime_NoExceptions() throws Exception {
+    public void rotate_LMBuiltFirstTime_NoExceptions() throws Exception {
         //arrange
         //act
-        performOrientationChangeAndWaitIdle();
+        rotateAndWaitIdle();
         //assert
     }
 
     @Test
-    public void changeOrientation_LMHasItems_firstItemNotChanged() throws Exception {
+    public void rotate_LMHasItems_firstItemNotChanged() throws Exception {
         //arrange
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         recyclerView.perform(RecyclerViewActions.scrollToPosition(18));
@@ -257,7 +264,7 @@ public class ColumnTest {
 
         int expected = layoutManager.findFirstVisibleItemPosition();
         //act
-        performOrientationChangeAndWaitIdle();
+        rotateAndWaitIdle();
         int actual = layoutManager.findFirstVisibleItemPosition();
         //assert
         assertNotEquals(-1, expected);

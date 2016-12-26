@@ -88,6 +88,7 @@ public class TestActivity extends AppCompatActivity {
     private void initRv() {
         adapter = createAdapter();
         RecyclerView.LayoutManager layoutManager = lmFactory.layoutManager(this);
+        if (layoutManager == null) throw new IllegalStateException("lm manager is null");
 
         rvTest.addItemDecoration(new SpacingItemDecoration(getResources().getDimensionPixelOffset(R.dimen.item_space),
                 getResources().getDimensionPixelOffset(R.dimen.item_space)));

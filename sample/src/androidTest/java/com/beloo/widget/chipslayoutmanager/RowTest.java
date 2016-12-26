@@ -1,5 +1,6 @@
 package com.beloo.widget.chipslayoutmanager;
 
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.SystemClock;
@@ -9,6 +10,7 @@ import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 
 import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
@@ -54,7 +56,6 @@ public class RowTest {
     @Rule
     public ActivityTestRule<TestActivity> activityTestRule = new ActivityTestRule<>(TestActivity.class);
 
-    @Mock
     LayoutManagerFactory layoutManagerFactory;
 
     private ChipsLayoutManager layoutManager;
@@ -63,14 +64,22 @@ public class RowTest {
     public void setUp() throws Throwable {
         MockitoAnnotations.initMocks(this);
 
-        layoutManager = getLayoutManager();
-
-        doReturn(layoutManager).when(layoutManagerFactory).layoutManager(activityTestRule.getActivity());
+        layoutManagerFactory = new LayoutManagerFactory() {
+            @Override
+            public RecyclerView.LayoutManager layoutManager(Context context) {
+                return retrieveLayoutManager();
+            }
+        };
 
         TestActivity.setLmFactory(layoutManagerFactory);
 
         activityTestRule.getActivity().initialize();
 
+    }
+
+    private ChipsLayoutManager retrieveLayoutManager() {
+        layoutManager = getLayoutManager();
+        return layoutManager;
     }
 
     protected ChipsLayoutManager getLayoutManager() {
@@ -308,20 +317,36 @@ public class RowTest {
 
     @Test
     public void rotate_ScrolledToEndOfItems_BottomPaddingStaySame() throws Exception {
+        InstrumentalUtil.waitForIdle();
         //arrange
+        RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         recyclerView.perform(RecyclerViewActions.scrollToPosition(layoutManager.getItemCount() - 1));
-        View child = layoutManager.getChildAt(layoutManager.getChildCount() - 1);
-        int bottom = child.getBottom();
+
+        InstrumentalUtil.waitForIdle();
+
+        View child = getViewForPosition(rvTest, layoutManager.findLastVisibleItemPosition());
+        double bottom = (rvTest.getY() + rvTest.getHeight()) - (child.getY() + child.getHeight());
+
+        Log.println(Log.ASSERT, "rotateTest", "expected child padding = " + bottom);
 
         //act
         rotateAndWaitIdle();
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(layoutManager.getItemCount() - 1));
         rotateAndWaitIdle();
-        child = layoutManager.getChildAt(layoutManager.getChildCount() - 1);
-        int result = child.getBottom();
+        rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
+        child = getViewForPosition(rvTest, layoutManager.findLastVisibleItemPosition());
+        double result = (rvTest.getY() + rvTest.getHeight()) - (child.getY() + child.getHeight());
+        Log.println(Log.ASSERT, "rotateTest", "result child padding = " + result);
 
         //assert
-        assertEquals(bottom, result);
+        assertNotEquals(0.0d, bottom, 0.01);
+        assertNotEquals(0.0d, result, 0.01);
+        assertEquals(bottom, result, 0.01);
+    }
+
+    private View getViewForPosition(RecyclerView recyclerView, int position) {
+        return recyclerView.findViewHolderForAdapterPosition(position).itemView;
     }
 
     @Ignore
