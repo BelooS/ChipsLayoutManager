@@ -38,7 +38,7 @@ public class RecyclerViewActionFactory {
     // Matcher factory
     ///////////////////////////////////////////////////////////////////////////
 
-    public Matcher<View> correctOrder() {
+    public Matcher<View> incrementOrder() {
         return orderMatcher();
     }
 

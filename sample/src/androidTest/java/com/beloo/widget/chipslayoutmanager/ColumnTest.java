@@ -8,25 +8,26 @@ import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
+import com.beloo.chipslayoutmanager.sample.R;
 import com.beloo.chipslayoutmanager.sample.ui.ChipsFacade;
+import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
 import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.chipslayoutmanager.sample.ui.adapter.ChipsAdapter;
 import com.beloo.widget.chipslayoutmanager.util.Action;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
+import com.beloo.widget.chipslayoutmanager.util.RecyclerViewActionFactory;
 
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import com.beloo.chipslayoutmanager.sample.R;
-import com.beloo.widget.chipslayoutmanager.util.RecyclerViewActionFactory;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -35,14 +36,13 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 /**
  */
-public abstract class ChipsLayoutManagerRowTest {
+@RunWith(AndroidJUnit4.class)
+public class ColumnTest {
 
     private static RecyclerViewActionFactory actionsFactory;
 
@@ -76,7 +76,7 @@ public abstract class ChipsLayoutManagerRowTest {
 
     protected ChipsLayoutManager getLayoutManager() {
         return ChipsLayoutManager.newBuilder(activityTestRule.getActivity())
-                .setOrientation(ChipsLayoutManager.HORIZONTAL)
+                .setOrientation(ChipsLayoutManager.VERTICAL)
                 .build();
     }
 
@@ -86,8 +86,8 @@ public abstract class ChipsLayoutManagerRowTest {
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         InstrumentalUtil.waitForIdle();
         //act
-        recyclerView.perform(actionsFactory.scrollBy(0, 300));
-        recyclerView.perform(actionsFactory.scrollBy(0, -300));
+        recyclerView.perform(actionsFactory.scrollBy(1000, 0));
+        recyclerView.perform(actionsFactory.scrollBy(-1000, 0));
         InstrumentalUtil.waitForIdle();
         //assert
         recyclerView.check(matches(actionsFactory.incrementOrder()));
@@ -99,10 +99,10 @@ public abstract class ChipsLayoutManagerRowTest {
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         InstrumentalUtil.waitForIdle();
         //act
-        recyclerView.perform(actionsFactory.scrollBy(0, 300));
+        recyclerView.perform(actionsFactory.scrollBy(300, 0));
         int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
         //assert
-        assertEquals(4, actual);
+        assertEquals(9, actual);
     }
 
     @Test
@@ -111,36 +111,36 @@ public abstract class ChipsLayoutManagerRowTest {
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
 
         InstrumentalUtil.waitForIdle();
-        recyclerView.perform(actionsFactory.scrollBy(0, 300));
+        recyclerView.perform(actionsFactory.scrollBy(1000, 0));
         //act
-        recyclerView.perform(actionsFactory.scrollBy(0, -300));
+        recyclerView.perform(actionsFactory.scrollBy(-1000, 0));
         int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
         //assert
         assertEquals(0, actual);
     }
 
     @Test
-    public void scrollToPosition_LMInInitialState_FirstVisiblePositionsEqualsScrollingTarget() throws Exception {
+    public void scrollToPosition_ScrollItemIsNotVisible_FirstVisiblePositionsEqualsScrollingTarget() throws Exception {
         //arrange
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
 
         //act
-        recyclerView.perform(RecyclerViewActions.scrollToPosition(8));
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(18));
         InstrumentalUtil.waitForIdle();
 
         //assert
         int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
-        assertEquals(8, actual);
+        assertEquals(18, actual);
     }
 
     @Test
-    public synchronized void smoothScrollToPosition_LMInInitialState_FirstVisiblePositionsEqualsScrollingTarget() throws Exception {
+    public synchronized void smoothScrollToPosition_ScrollItemIsNotVisible_FirstVisiblePositionsEqualsScrollingTarget() throws Exception {
         //arrange
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         InstrumentalUtil.waitForIdle();
 
         //act
-        ViewAction scrollAction = actionsFactory.smoothScrollToPosition(8);
+        ViewAction scrollAction = actionsFactory.smoothScrollToPosition(18);
         //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (scrollAction) {
             recyclerView.perform(scrollAction);
@@ -150,49 +150,69 @@ public abstract class ChipsLayoutManagerRowTest {
 
         //assert
         int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
-        assertEquals(8, actual);
+        assertEquals(18, actual);
+    }
+
+    @Test
+    public synchronized void smoothScrollToPosition_ScrollItemIsVisible_ScrollItemDockedToStartBorder() throws Exception {
+        //arrange
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+        InstrumentalUtil.waitForIdle();
+
+        //act
+        ViewAction scrollAction = actionsFactory.smoothScrollToPosition(3);
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
+        synchronized (scrollAction) {
+            recyclerView.perform(scrollAction);
+            //wait for completion of SmoothScrollAction
+            scrollAction.wait();
+        }
+
+        //assert
+        int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
+        assertEquals(3, actual);
     }
 
     @Test
     public void findFirstVisibleItem_scrolledCompletelyToItemInTheMiddle_resultCorrect() throws Exception {
         //arrange
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
-        recyclerView.perform(RecyclerViewActions.scrollToPosition(7));
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(19));
         InstrumentalUtil.waitForIdle();
 
         //act
         int actual = layoutManager.findFirstVisibleItemPosition();
 
         //assert
-        assertEquals(6, actual);
+        assertEquals(18, actual);
     }
 
     @Test
     public void findLastVisibleItem_scrolledCompletelyToItemInTheMiddle_resultCorrect() throws Exception {
         //arrange
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
-        recyclerView.perform(RecyclerViewActions.scrollToPosition(7));
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(18));
         InstrumentalUtil.waitForIdle();
 
         //act
         int actual = layoutManager.findLastVisibleItemPosition();
 
         //assert
-        assertEquals(19, actual);
+        assertEquals(35, actual);
     }
 
     @Test
     public void findLastCompletelyVisibleItem_scrolledCompletelyToItemInTheMiddle_resultCorrect() throws Exception {
         //arrange
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
-        recyclerView.perform(RecyclerViewActions.scrollToPosition(7));
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(18));
         InstrumentalUtil.waitForIdle();
 
         //act
         int actual = layoutManager.findLastCompletelyVisibleItemPosition();
 
         //assert
-        assertEquals(17, actual);
+        assertEquals(26, actual);
     }
 
     private void performOrientationChangeAndWaitIdle() throws Exception {
@@ -230,7 +250,7 @@ public abstract class ChipsLayoutManagerRowTest {
     public void changeOrientation_LMHasItems_firstItemNotChanged() throws Exception {
         //arrange
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
-        recyclerView.perform(RecyclerViewActions.scrollToPosition(7));
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(18));
         InstrumentalUtil.waitForIdle();
 
         int expected = layoutManager.findFirstVisibleItemPosition();
@@ -279,11 +299,11 @@ public abstract class ChipsLayoutManagerRowTest {
 
         //act
         recyclerView.perform(viewAction);
-        recyclerView.perform(RecyclerViewActions.scrollToPosition(8));
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(18));
 
         //assert
         View view = layoutManager.getChildAt(0);
-        double padding = view.getY() - rvTest.getY();
+        double padding = view.getX() - rvTest.getX();
         assertTrue(padding >= 150);
     }
 
@@ -304,12 +324,12 @@ public abstract class ChipsLayoutManagerRowTest {
 
         //act
         recyclerView.perform(viewAction);
-        recyclerView.perform(RecyclerViewActions.scrollToPosition(8));
-        recyclerView.perform(actionsFactory.scrollBy(0, 200));
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(18));
+        recyclerView.perform(actionsFactory.scrollBy(200, 0));
 
         //assert
         View view = layoutManager.getChildAt(0);
-        int padding = layoutManager.getDecoratedTop(view);
+        int padding = layoutManager.getDecoratedLeft(view);
         assertTrue(padding < 0);
     }
 
