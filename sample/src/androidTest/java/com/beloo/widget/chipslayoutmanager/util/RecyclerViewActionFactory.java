@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.ChildViewsIterable;
+import com.beloo.widget.chipslayoutmanager.support.BiConsumer;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -43,6 +44,10 @@ public class RecyclerViewActionFactory {
         return new NotifyItemRemovedAction(removePosition, itemCount);
     }
 
+    public ViewAction actionDelegate(BiConsumer<UiController, RecyclerView> performAction) {
+        return new ActionDelegate<>(performAction);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Matcher factory
     ///////////////////////////////////////////////////////////////////////////
@@ -60,12 +65,12 @@ public class RecyclerViewActionFactory {
         private final int removePosition;
         private final int itemCount;
 
-        public NotifyItemRemovedAction(int removePosition, int itemCount) {
+        private NotifyItemRemovedAction(int removePosition, int itemCount) {
             this.removePosition = removePosition;
             this.itemCount = itemCount;
         }
 
-        public NotifyItemRemovedAction(int removePosition) {
+        private NotifyItemRemovedAction(int removePosition) {
             this.removePosition = removePosition;
             this.itemCount = 1;
         }

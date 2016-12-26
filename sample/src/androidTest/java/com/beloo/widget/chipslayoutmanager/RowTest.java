@@ -42,9 +42,9 @@ import static org.mockito.Mockito.spy;
 
 /**
  */
-public abstract class ChipsLayoutManagerRowTest {
+public abstract class RowTest {
 
-    private static RecyclerViewActionFactory actionsFactory;
+    static RecyclerViewActionFactory actionsFactory;
 
     static {
         actionsFactory = new RecyclerViewActionFactory();
@@ -268,17 +268,14 @@ public abstract class ChipsLayoutManagerRowTest {
         RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
 
-        ViewAction viewAction = new Action<RecyclerView>() {
-            @Override
-            public void performAction(UiController uiController, RecyclerView view) {
-                view.setClipToPadding(true);
-                view.setPadding(150, 150, 150, 150);
-                view.requestLayout();
-            }
-        };
+        ViewAction initAction = actionsFactory.actionDelegate((uiController, view) ->  {
+            view.setClipToPadding(true);
+            view.setPadding(150, 150, 150, 150);
+            view.requestLayout();
+        });
+        recyclerView.perform(initAction);
 
         //act
-        recyclerView.perform(viewAction);
         recyclerView.perform(RecyclerViewActions.scrollToPosition(8));
 
         //assert
@@ -293,19 +290,16 @@ public abstract class ChipsLayoutManagerRowTest {
         //arrange
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
 
-        ViewAction viewAction = new Action<RecyclerView>() {
-            @Override
-            public void performAction(UiController uiController, RecyclerView view) {
-                view.setClipToPadding(false);
-                view.setPadding(150, 150, 150, 150);
-                view.requestLayout();
-            }
-        };
+        ViewAction arrangeAction = actionsFactory.actionDelegate((uiController, view) -> {
+            view.setClipToPadding(false);
+            view.setPadding(150, 150, 150, 150);
+            view.requestLayout();
+        });
+        recyclerView.perform(arrangeAction);
 
         //act
-        recyclerView.perform(viewAction);
-        recyclerView.perform(RecyclerViewActions.scrollToPosition(8));
-        recyclerView.perform(actionsFactory.scrollBy(0, 200));
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(8),
+                actionsFactory.scrollBy(0, 200));
 
         //assert
         View view = layoutManager.getChildAt(0);

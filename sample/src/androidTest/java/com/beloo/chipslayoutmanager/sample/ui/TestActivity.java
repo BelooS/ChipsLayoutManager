@@ -1,5 +1,6 @@
 package com.beloo.chipslayoutmanager.sample.ui;
 
+import android.support.test.espresso.core.deps.guava.annotations.VisibleForTesting;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -54,8 +55,6 @@ public class TestActivity extends AppCompatActivity {
 
         List<String> items;
         if (savedInstanceState == null) {
-//            items = itemsFactory.getFewItems();
-//            items = itemsFactory.getALotOfItems();
             items = itemsFactory.getItems();
         } else {
             items = savedInstanceState.getStringArrayList(EXTRA);
@@ -68,32 +67,31 @@ public class TestActivity extends AppCompatActivity {
 
     }
 
+    @VisibleForTesting
+    private Bundle savedInstanceState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.savedInstanceState = savedInstanceState;
         setContentView(R.layout.activity_test);
 
         rvTest = (RecyclerView) findViewById(R.id.rvTest);
         spinnerPosition = (Spinner) findViewById(R.id.spinnerPosition);
         spinnerMoveTo = (Spinner) findViewById(R.id.spinnerMoveTo);
 
-        adapter = createAdapter(savedInstanceState);
         if (!isInitializeOutside) {
             initialize();
         }
     }
 
     public void initialize() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                initRv();
-            }
-        });
+        runOnUiThread(this::initRv);
 
     }
 
     private void initRv() {
+        adapter = createAdapter(savedInstanceState);
         RecyclerView.LayoutManager layoutManager = lmFactory.layoutManager(this);
 
         rvTest.addItemDecoration(new SpacingItemDecoration(getResources().getDimensionPixelOffset(R.dimen.item_space),

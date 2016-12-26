@@ -85,10 +85,11 @@ public class ColumnTest {
         //arrange
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         InstrumentalUtil.waitForIdle();
+
         //act
         recyclerView.perform(actionsFactory.scrollBy(1000, 0));
         recyclerView.perform(actionsFactory.scrollBy(-1000, 0));
-        InstrumentalUtil.waitForIdle();
+
         //assert
         recyclerView.check(matches(actionsFactory.incrementOrder()));
     }
@@ -109,12 +110,13 @@ public class ColumnTest {
     public void scrollBy_ScrolledForwardScrollBackward_CorrectFirstCompletelyVisibleItem() throws Exception {
         //arrange
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
-
         InstrumentalUtil.waitForIdle();
         recyclerView.perform(actionsFactory.scrollBy(1000, 0));
+
         //act
         recyclerView.perform(actionsFactory.scrollBy(-1000, 0));
         int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
+
         //assert
         assertEquals(0, actual);
     }
@@ -288,14 +290,11 @@ public class ColumnTest {
         RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
 
-        ViewAction viewAction = new Action<RecyclerView>() {
-            @Override
-            public void performAction(UiController uiController, RecyclerView view) {
-                view.setClipToPadding(true);
-                view.setPadding(150, 150, 150, 150);
-                view.requestLayout();
-            }
-        };
+        ViewAction viewAction = actionsFactory.actionDelegate((uiController, view) -> {
+            view.setClipToPadding(true);
+            view.setPadding(150, 150, 150, 150);
+            view.requestLayout();
+        });
 
         //act
         recyclerView.perform(viewAction);
@@ -313,19 +312,16 @@ public class ColumnTest {
         //arrange
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
 
-        ViewAction viewAction = new Action<RecyclerView>() {
-            @Override
-            public void performAction(UiController uiController, RecyclerView view) {
-                view.setClipToPadding(false);
-                view.setPadding(150, 150, 150, 150);
-                view.requestLayout();
-            }
-        };
+        ViewAction viewAction = actionsFactory.actionDelegate((uiController, view) -> {
+            view.setClipToPadding(false);
+            view.setPadding(150, 150, 150, 150);
+            view.requestLayout();
+        });
 
         //act
-        recyclerView.perform(viewAction);
-        recyclerView.perform(RecyclerViewActions.scrollToPosition(18));
-        recyclerView.perform(actionsFactory.scrollBy(200, 0));
+        recyclerView.perform(viewAction,
+                RecyclerViewActions.scrollToPosition(18),
+                actionsFactory.scrollBy(200, 0));
 
         //assert
         View view = layoutManager.getChildAt(0);

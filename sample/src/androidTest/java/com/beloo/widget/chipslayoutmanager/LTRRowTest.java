@@ -1,6 +1,6 @@
 package com.beloo.widget.chipslayoutmanager;
 
-public class LTRRowTest extends ChipsLayoutManagerRowTest {
+public class LTRRowTest extends RowTest {
 
     @Override
     protected ChipsLayoutManager getLayoutManager() {
