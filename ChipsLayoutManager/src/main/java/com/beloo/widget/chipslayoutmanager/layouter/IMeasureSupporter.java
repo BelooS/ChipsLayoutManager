@@ -12,4 +12,8 @@ public interface IMeasureSupporter {
     int getMeasuredWidth();
 
     int getMeasuredHeight();
+
+    boolean isRegistered();
+
+    void setRegistered(boolean isRegistered);
 }

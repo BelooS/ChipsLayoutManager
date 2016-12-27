@@ -1,15 +1,16 @@
 package com.beloo.widget.chipslayoutmanager;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Rect;
-import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -21,10 +22,9 @@ import com.beloo.chipslayoutmanager.sample.ui.adapter.ChipsAdapter;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
+import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 
 import com.beloo.chipslayoutmanager.sample.R;
@@ -37,14 +37,12 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 /**
  */
-public abstract class RowTest {
+@RunWith(AndroidJUnit4.class)
+public class RowTest {
 
     static RecyclerViewActionFactory actionsFactory;
 
@@ -55,15 +53,21 @@ public abstract class RowTest {
     }
 
     @Rule
-    public ActivityTestRule<TestActivity> activityTestRule = new ActivityTestRule<>(TestActivity.class);
+    public ActivityTestRule<TestActivity> activityTestRule = new ActivityTestRule<TestActivity>(TestActivity.class) {
+        @Override
+        protected void afterActivityLaunched() {
+            super.afterActivityLaunched();
+
+        }
+    };
 
     private ChipsLayoutManager layoutManager;
     private TestActivity activity;
 
-    private ViewInteraction recyclerView;
+    ViewInteraction recyclerView;
 
     @Before
-    public void setUp() throws Throwable {
+    public final void setUp() throws Throwable {
         MockitoAnnotations.initMocks(this);
         activity = activityTestRule.getActivity();
 
@@ -74,12 +78,20 @@ public abstract class RowTest {
             }
         };
 
+        RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
+        //disable all animations
+        rvTest.setItemAnimator(null);
+
         TestActivity.setLmFactory(layoutManagerFactory);
 
         recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
 
+        onSetUp();
+
         activity.runOnUiThread(() -> activity.initialize());
     }
+
+    public void onSetUp() {}
 
     private ChipsLayoutManager retrieveLayoutManager() {
         layoutManager = getLayoutManager();
@@ -87,6 +99,7 @@ public abstract class RowTest {
     }
 
     protected ChipsLayoutManager getLayoutManager() {
+        if (activityTestRule.getActivity() == null) return null;
         return ChipsLayoutManager.newBuilder(activityTestRule.getActivity())
                 .setOrientation(ChipsLayoutManager.HORIZONTAL)
                 .build();
@@ -200,7 +213,11 @@ public abstract class RowTest {
         assertEquals(17, actual);
     }
 
-    private void rotateAndWaitIdle() throws Exception {
+    ///////////////////////////////////////////////////////////////////////////
+    // rotate
+    ///////////////////////////////////////////////////////////////////////////
+
+    void rotateAndWaitIdle() throws Exception {
         //arrange
 
         final int orientation = InstrumentationRegistry.getTargetContext()
@@ -219,16 +236,9 @@ public abstract class RowTest {
         //verify no exceptions
     }
 
-
-    /**
-     * verify that orientation change is performed successfully
-     */
-    @Test
-    public void rotate_LMBuiltFirstTime_NoExceptions() throws Exception {
-        //arrange
-        //act
-        rotateAndWaitIdle();
-        //assert
+    private void resetToInitialAfterRotate() throws Exception {
+        activityTestRule.launchActivity(new Intent(activity, TestActivity.class));
+        InstrumentalUtil.waitForIdle();
     }
 
     @Test
@@ -241,11 +251,45 @@ public abstract class RowTest {
         //act
         rotateAndWaitIdle();
         int actual = layoutManager.findFirstVisibleItemPosition();
+        resetToInitialAfterRotate();
+
         //assert
         assertNotEquals(-1, expected);
         assertNotEquals(-1, actual);
         assertEquals("first visible positions before and after rotation doesn't match", expected, actual);
         System.out.println("first visible position = " + actual);
+    }
+
+    @Test
+    public void rotate_ScrolledToEndOfItems_BottomPaddingStaySame() throws Exception {
+        InstrumentalUtil.waitForIdle();
+        //arrange
+        RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(layoutManager.getItemCount() - 1));
+
+        InstrumentalUtil.waitForIdle();
+        Thread.sleep(200);
+
+        View child = getViewForPosition(rvTest, layoutManager.findLastVisibleItemPosition());
+        double bottom = (rvTest.getY() + rvTest.getHeight()) - (child.getY() + child.getHeight());
+
+        Log.println(Log.ASSERT, "rotateTest", "expected child padding = " + bottom);
+
+        //act
+        rotateAndWaitIdle();
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(layoutManager.getItemCount() - 1));
+        rotateAndWaitIdle();
+        rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
+        child = getViewForPosition(rvTest, layoutManager.findLastVisibleItemPosition());
+        double result = (rvTest.getY() + rvTest.getHeight()) - (child.getY() + child.getHeight());
+        Log.println(Log.ASSERT, "rotateTest", "result child padding = " + result);
+        //reset
+        resetToInitialAfterRotate();
+
+        //assert
+        assertNotEquals(0.0d, bottom, 0.01);
+        assertNotEquals(0.0d, result, 0.01);
+        assertEquals(bottom, result, 0.01);
     }
 
     @Test
@@ -303,35 +347,6 @@ public abstract class RowTest {
         View view = layoutManager.getChildAt(0);
         int padding = layoutManager.getDecoratedTop(view);
         assertTrue(padding < 0);
-    }
-
-    @Test
-    public void rotate_ScrolledToEndOfItems_BottomPaddingStaySame() throws Exception {
-        InstrumentalUtil.waitForIdle();
-        //arrange
-        RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
-        recyclerView.perform(RecyclerViewActions.scrollToPosition(layoutManager.getItemCount() - 1));
-
-        InstrumentalUtil.waitForIdle();
-
-        View child = getViewForPosition(rvTest, layoutManager.findLastVisibleItemPosition());
-        double bottom = (rvTest.getY() + rvTest.getHeight()) - (child.getY() + child.getHeight());
-
-        Log.println(Log.ASSERT, "rotateTest", "expected child padding = " + bottom);
-
-        //act
-        rotateAndWaitIdle();
-        recyclerView.perform(RecyclerViewActions.scrollToPosition(layoutManager.getItemCount() - 1));
-        rotateAndWaitIdle();
-        rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
-        child = getViewForPosition(rvTest, layoutManager.findLastVisibleItemPosition());
-        double result = (rvTest.getY() + rvTest.getHeight()) - (child.getY() + child.getHeight());
-        Log.println(Log.ASSERT, "rotateTest", "result child padding = " + result);
-
-        //assert
-        assertNotEquals(0.0d, bottom, 0.01);
-        assertNotEquals(0.0d, result, 0.01);
-        assertEquals(bottom, result, 0.01);
     }
 
     @Test

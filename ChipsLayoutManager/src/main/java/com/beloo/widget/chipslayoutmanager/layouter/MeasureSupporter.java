@@ -11,6 +11,7 @@ public class MeasureSupporter extends RecyclerView.AdapterDataObserver implement
     private int measuredWidth;
     private int measuredHeight;
 
+    private boolean isRegistered;
 
     /**
      * width of RecyclerView before removing item
@@ -60,6 +61,16 @@ public class MeasureSupporter extends RecyclerView.AdapterDataObserver implement
     @Override
     public int getMeasuredHeight() {
         return measuredHeight;
+    }
+
+    @Override
+    public boolean isRegistered() {
+        return isRegistered;
+    }
+
+    @Override
+    public void setRegistered(boolean isRegistered) {
+        this.isRegistered = isRegistered;
     }
 
     private void setMeasuredHeight(int measuredHeight) {

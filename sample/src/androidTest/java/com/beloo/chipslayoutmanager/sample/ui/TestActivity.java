@@ -90,7 +90,7 @@ public class TestActivity extends AppCompatActivity {
     private void initRv() {
         adapter = createAdapter();
         RecyclerView.LayoutManager layoutManager = lmFactory.layoutManager(this);
-        if (layoutManager == null) throw new IllegalStateException("lm manager is null");
+        if (layoutManager == null) Log.e("initRv", "lm manager is null");
 
         rvTest.addItemDecoration(new SpacingItemDecoration(getResources().getDimensionPixelOffset(R.dimen.item_space),
                 getResources().getDimensionPixelOffset(R.dimen.item_space)));
@@ -116,7 +116,11 @@ public class TestActivity extends AppCompatActivity {
     @SuppressWarnings("unchecked")
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(EXTRA, new ArrayList<>(items));
+        if (items == null) {
+            Log.e("onSaveInstanceState", "possible problem due to rotation test runned before");
+        } else {
+            outState.putParcelableArrayList(EXTRA, new ArrayList<>(items));
+        }
     }
 
     private void updateSpinners() {

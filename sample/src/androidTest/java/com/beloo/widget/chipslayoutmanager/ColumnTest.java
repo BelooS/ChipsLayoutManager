@@ -85,7 +85,8 @@ public class ColumnTest {
         return layoutManager;
     }
 
-    protected ChipsLayoutManager getLayoutManager() {
+    private ChipsLayoutManager getLayoutManager() {
+        if (activityTestRule.getActivity() == null) return null;
         return ChipsLayoutManager.newBuilder(activityTestRule.getActivity())
                 .setOrientation(ChipsLayoutManager.VERTICAL)
                 .build();

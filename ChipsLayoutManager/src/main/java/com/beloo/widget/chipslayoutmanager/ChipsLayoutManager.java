@@ -203,6 +203,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     ///////////////////////////////////////////////////////////////////////////
 
     public static Builder newBuilder(Context context) {
+        if (context == null) throw new IllegalArgumentException("you have passed null context to builder");
         return new ChipsLayoutManager(context).new StrategyBuilder();
     }
 
@@ -925,10 +926,16 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public void onAdapterChanged(RecyclerView.Adapter oldAdapter,
                                  RecyclerView.Adapter newAdapter) {
-        if (oldAdapter != null) {
-            oldAdapter.unregisterAdapterDataObserver((RecyclerView.AdapterDataObserver) measureSupporter);
+        if (oldAdapter != null && measureSupporter.isRegistered()) {
+            try {
+                measureSupporter.setRegistered(false);
+                oldAdapter.unregisterAdapterDataObserver((RecyclerView.AdapterDataObserver) measureSupporter);
+            } catch (IllegalStateException e) {
+                //skip unregister errors
+            }
         }
         if (newAdapter != null) {
+            measureSupporter.setRegistered(true);
             newAdapter.registerAdapterDataObserver((RecyclerView.AdapterDataObserver) measureSupporter);
         }
         //Completely scrap the existing layout
