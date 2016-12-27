@@ -94,7 +94,6 @@ public class FewChipsRowTest {
         TestActivity.setItemsFactory(chipsFacade);
         TestActivity.setLmFactory(layoutManagerFactory);
 
-        activity.runOnUiThread(() -> activity.initialize());
     }
 
     protected ChipsLayoutManager getLayoutManager() {
@@ -109,6 +108,7 @@ public class FewChipsRowTest {
     @Test
     public void onLayoutChildren_afterActivityStarted_onLayoutCallLimited() throws Exception {
         //arrange
+        activity.runOnUiThread(() -> activity.initialize());
         layoutManager.setSpy(spy);
 
         //act
@@ -122,6 +122,7 @@ public class FewChipsRowTest {
     @Test
     public void wrapContent_HeightIsWrapContent_DeletedLastItemInLastRowCauseHeightToDecrease() throws Exception {
         //arrange
+        activity.runOnUiThread(() -> activity.initialize());
         final RecyclerView[] rvTest = new RecyclerView[1];
 
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
@@ -150,11 +151,11 @@ public class FewChipsRowTest {
     @Test
     public void deleteItemInTheFirstLine_ItemHasMaximumHeight_SameStartPadding() throws Exception {
         //arrange
-        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         //just adapt input items list to required start values
-        recyclerView.perform(
-                actionFactory.actionDelegate(((uiController, view) -> items.remove(1))),
-                actionFactory.notifyItemRemovedAction(1));
+        items.remove(1);
+        activity.runOnUiThread(() -> activity.initialize());
+
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
 
         InstrumentalUtil.waitForIdle();
 
@@ -179,6 +180,6 @@ public class FewChipsRowTest {
 
         assertNotEquals(0, expectedY, 0.01);
         assertNotEquals(0, resultY, 0.01);
-        assertEquals(expectedY, resultY, 0.01);
+        assertEquals(resultY, expectedY, 0.01);
     }
 }

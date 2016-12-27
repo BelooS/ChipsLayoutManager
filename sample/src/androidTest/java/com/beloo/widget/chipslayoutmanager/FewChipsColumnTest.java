@@ -5,6 +5,7 @@ import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.beloo.chipslayoutmanager.sample.R;
@@ -30,7 +31,10 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.doReturn;
@@ -75,14 +79,16 @@ public class FewChipsColumnTest {
 
         doReturn(layoutManager).when(layoutManagerFactory).layoutManager(any());
 
+        RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
+        //disable all animations
+        rvTest.setItemAnimator(null);
+
         ChipsFacade chipsFacade = spy(new ChipsFacade());
         items = chipsFacade.getItems();
         when(chipsFacade.getItems()).thenReturn(items);
 
         TestActivity.setItemsFactory(chipsFacade);
         TestActivity.setLmFactory(layoutManagerFactory);
-
-        activity.runOnUiThread(() -> activity.initialize());
     }
 
     protected ChipsLayoutManager getLayoutManager() {
@@ -97,6 +103,7 @@ public class FewChipsColumnTest {
     @Test
     public void onLayoutChildren_afterActivityStarted_onLayoutCallLimited() throws Exception {
         //arrange
+        activity.runOnUiThread(() -> activity.initialize());
 
         //act
         //we can't wait for idle, coz in case of error it won't be achieved. So just approximate time here.
@@ -109,6 +116,7 @@ public class FewChipsColumnTest {
     @Test
     public void wrapContent_HeightIsWrapContent_DeletedLastItemInLastRowCauseHeightToDecrease() throws Exception {
         //arrange
+        activity.runOnUiThread(() -> activity.initialize());
         final RecyclerView[] rvTest = new RecyclerView[1];
 
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
@@ -132,5 +140,39 @@ public class FewChipsColumnTest {
         int endWidth = rvTest[0].getWidth();
         System.out.println(String.format(Locale.getDefault(), "start height = %d, end height = %d", startWidth, endWidth));
         assertTrue(endWidth < startWidth);
+    }
+
+    @Test
+    public void deleteItemInTheFirstLine_ItemHasMaximumWidth_SameStartPadding() throws Exception {
+        //arrange
+        //just adapt input items list to required start values
+        items.remove(1);
+        items.remove(10);
+        ChipsEntity longItem = items.remove(9);
+        items.add(1, longItem);
+
+        activity.runOnUiThread(() -> activity.initialize());
+        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
+        //just adapt input items list to required start values
+
+        InstrumentalUtil.waitForIdle();
+
+        View second = layoutManager.getChildAt(1);
+        double expectedX = second.getX();
+
+        //act
+        recyclerView.perform(
+                actionFactory.actionDelegate(((uiController, view) -> items.remove(1))),
+                actionFactory.notifyItemRemovedAction(1));
+
+        InstrumentalUtil.waitForIdle();
+
+        second = layoutManager.getChildAt(5);
+        double resultX = second.getX();
+
+        //assert
+        assertNotEquals(0, expectedX, 0.01);
+        assertNotEquals(0, resultX, 0.01);
+        assertEquals(resultX, expectedX, 0.01);
     }
 }

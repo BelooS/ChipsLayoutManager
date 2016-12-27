@@ -60,6 +60,8 @@ public class RowTest {
     private ChipsLayoutManager layoutManager;
     private TestActivity activity;
 
+    private ViewInteraction recyclerView;
+
     @Before
     public void setUp() throws Throwable {
         MockitoAnnotations.initMocks(this);
@@ -73,6 +75,8 @@ public class RowTest {
         };
 
         TestActivity.setLmFactory(layoutManagerFactory);
+
+        recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
 
         activity.runOnUiThread(() -> activity.initialize());
     }
@@ -91,7 +95,6 @@ public class RowTest {
     @Test
     public void layouting_ScrollForwardAndBackward_VerifyCorrectOrder () throws Exception {
         //arrange
-        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         InstrumentalUtil.waitForIdle();
         //act
         recyclerView.perform(actionsFactory.scrollBy(0, 300));
@@ -104,7 +107,6 @@ public class RowTest {
     @Test
     public void scrollBy_LMInInitialStateAndScrollForward_CorrectFirstCompletelyVisibleItem() throws Exception {
         //arrange
-        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         InstrumentalUtil.waitForIdle();
         //act
         recyclerView.perform(actionsFactory.scrollBy(0, 300));
@@ -116,13 +118,13 @@ public class RowTest {
     @Test
     public void scrollBy_ScrolledForwardScrollBackward_CorrectFirstCompletelyVisibleItem() throws Exception {
         //arrange
-        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
-
         InstrumentalUtil.waitForIdle();
         recyclerView.perform(actionsFactory.scrollBy(0, 300));
+
         //act
         recyclerView.perform(actionsFactory.scrollBy(0, -300));
         int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
+
         //assert
         assertEquals(0, actual);
     }
@@ -130,7 +132,6 @@ public class RowTest {
     @Test
     public void scrollToPosition_LMInInitialState_FirstVisiblePositionsEqualsScrollingTarget() throws Exception {
         //arrange
-        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
 
         //act
         recyclerView.perform(RecyclerViewActions.scrollToPosition(8));
@@ -144,7 +145,6 @@ public class RowTest {
     @Test
     public synchronized void smoothScrollToPosition_LMInInitialState_FirstVisiblePositionsEqualsScrollingTarget() throws Exception {
         //arrange
-        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         InstrumentalUtil.waitForIdle();
 
         //act
@@ -164,7 +164,6 @@ public class RowTest {
     @Test
     public void findFirstVisibleItem_scrolledCompletelyToItemInTheMiddle_resultCorrect() throws Exception {
         //arrange
-        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         recyclerView.perform(RecyclerViewActions.scrollToPosition(7));
         InstrumentalUtil.waitForIdle();
 
@@ -178,7 +177,6 @@ public class RowTest {
     @Test
     public void findLastVisibleItem_scrolledCompletelyToItemInTheMiddle_resultCorrect() throws Exception {
         //arrange
-        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         recyclerView.perform(RecyclerViewActions.scrollToPosition(7));
         InstrumentalUtil.waitForIdle();
 
@@ -192,7 +190,6 @@ public class RowTest {
     @Test
     public void findLastCompletelyVisibleItem_scrolledCompletelyToItemInTheMiddle_resultCorrect() throws Exception {
         //arrange
-        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         recyclerView.perform(RecyclerViewActions.scrollToPosition(7));
         InstrumentalUtil.waitForIdle();
 
@@ -237,7 +234,6 @@ public class RowTest {
     @Test
     public void rotate_LMHasItems_firstItemNotChanged() throws Exception {
         //arrange
-        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         recyclerView.perform(RecyclerViewActions.scrollToPosition(7));
         InstrumentalUtil.waitForIdle();
 
@@ -255,8 +251,6 @@ public class RowTest {
     @Test
     public void setAdapterTwice_ChipsLayoutManagerHaveSetToRecyclerView_NoException() throws Exception {
         //arrange
-        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
-
         ChipsFacade chipsFacade = spy(new ChipsFacade());
         ChipsAdapter chipsAdapter = new ChipsAdapter(chipsFacade.getItems(), null);
 
@@ -274,8 +268,6 @@ public class RowTest {
     public void clipToPadding_IsTrue_paddingStaySame() throws Exception {
         //arrange
         RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
-        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
-
         ViewAction initAction = actionsFactory.actionDelegate((uiController, view) ->  {
             view.setClipToPadding(true);
             view.setPadding(150, 150, 150, 150);
@@ -296,8 +288,6 @@ public class RowTest {
     @Test
     public void clipToPadding_IsFalse_paddingOfScrolledViewIsLowerThanInitial() throws Exception {
         //arrange
-        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
-
         ViewAction arrangeAction = actionsFactory.actionDelegate((uiController, view) -> {
             view.setClipToPadding(false);
             view.setPadding(150, 150, 150, 150);
@@ -320,7 +310,6 @@ public class RowTest {
         InstrumentalUtil.waitForIdle();
         //arrange
         RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
-        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         recyclerView.perform(RecyclerViewActions.scrollToPosition(layoutManager.getItemCount() - 1));
 
         InstrumentalUtil.waitForIdle();
@@ -350,7 +339,6 @@ public class RowTest {
         InstrumentalUtil.waitForIdle();
 
         //arrange
-        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
         View child = getViewForPosition(rvTest, 7);
         Rect expectedViewRect = layoutManager.getCanvas().getViewRect(child);
@@ -368,7 +356,6 @@ public class RowTest {
         InstrumentalUtil.waitForIdle();
 
         //arrange
-        ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
         RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
         View child = getViewForPosition(rvTest, 6);
         Rect expectedViewRect = layoutManager.getCanvas().getViewRect(child);
