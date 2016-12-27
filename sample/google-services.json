@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "768263406042",
+    "firebase_url": "https://chipslayoutmanager-3ffb0.firebaseio.com",
+    "project_id": "chipslayoutmanager-3ffb0",
+    "storage_bucket": "chipslayoutmanager-3ffb0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:768263406042:android:f226369b63d0a90c",
+        "android_client_info": {
+          "package_name": "com.beloo.chipslayoutmanager.sample"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "768263406042-fupp34n4ra9u9i87pjd5bispd85pli47.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.beloo.chipslayoutmanager.sample",
+            "certificate_hash": "5C94B181CC62488ADF25C8F06418E8AB850E07D6"
+          }
+        },
+        {
+          "client_id": "768263406042-ag9m6v7fmbgtpm7egh2a141mh37308hc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOsC7zMsIYLPbszZjPYLZxJryUE0vrFbc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "768263406042-ag9m6v7fmbgtpm7egh2a141mh37308hc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
