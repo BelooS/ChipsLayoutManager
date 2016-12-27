@@ -57,15 +57,15 @@ public class RowTest {
     @Rule
     public ActivityTestRule<TestActivity> activityTestRule = new ActivityTestRule<>(TestActivity.class);
 
-    LayoutManagerFactory layoutManagerFactory;
-
     private ChipsLayoutManager layoutManager;
+    private TestActivity activity;
 
     @Before
     public void setUp() throws Throwable {
         MockitoAnnotations.initMocks(this);
+        activity = activityTestRule.getActivity();
 
-        layoutManagerFactory = new LayoutManagerFactory() {
+        LayoutManagerFactory layoutManagerFactory = new LayoutManagerFactory() {
             @Override
             public RecyclerView.LayoutManager layoutManager(Context context) {
                 return retrieveLayoutManager();
@@ -74,8 +74,7 @@ public class RowTest {
 
         TestActivity.setLmFactory(layoutManagerFactory);
 
-        activityTestRule.getActivity().initialize();
-
+        activity.runOnUiThread(() -> activity.initialize());
     }
 
     private ChipsLayoutManager retrieveLayoutManager() {
@@ -384,13 +383,5 @@ public class RowTest {
 
     private View getViewForPosition(RecyclerView recyclerView, int position) {
         return recyclerView.findViewHolderForAdapterPosition(position).itemView;
-    }
-
-    @Ignore
-    @Test
-    public void deleteItem_ItemHasMaximumHeight_SamePadding() throws Exception {
-        //arrange
-        //act
-        //assert
     }
 }

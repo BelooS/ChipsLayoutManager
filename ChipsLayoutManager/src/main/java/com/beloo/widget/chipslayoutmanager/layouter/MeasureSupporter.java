@@ -82,18 +82,27 @@ public class MeasureSupporter extends RecyclerView.AdapterDataObserver implement
     public void onItemsRemoved(final RecyclerView recyclerView){
         //subscribe to next animations tick
         lm.postOnAnimation(new Runnable() {
+
+            private void onFinished() {
+                //when removing animation finished return auto-measuring back
+                isAfterRemoving = false;
+                // and process measure again
+                lm.requestLayout();
+            }
+
             @Override
             public void run() {
-                //listen removing animation
-                recyclerView.getItemAnimator().isRunning(new RecyclerView.ItemAnimator.ItemAnimatorFinishedListener() {
-                    @Override
-                    public void onAnimationsFinished() {
-                        //when removing animation finished return auto-measuring back
-                        isAfterRemoving = false;
-                        // and process measure again
-                        lm.requestLayout();
-                    }
-                });
+                if (recyclerView.getItemAnimator() != null) {
+                    //listen removing animation
+                    recyclerView.getItemAnimator().isRunning(new RecyclerView.ItemAnimator.ItemAnimatorFinishedListener() {
+                        @Override
+                        public void onAnimationsFinished() {
+                            onFinished();
+                        }
+                    });
+                } else {
+                    onFinished();
+                }
             }
         });
     }

@@ -1,5 +1,6 @@
 package com.beloo.chipslayoutmanager.sample.ui;
 
+import android.support.annotation.UiThread;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -80,11 +81,12 @@ public class TestActivity extends AppCompatActivity {
         }
     }
 
+    @UiThread
     public void initialize() {
-        runOnUiThread(this::initRv);
-
+        initRv();
     }
 
+    @UiThread
     private void initRv() {
         adapter = createAdapter();
         RecyclerView.LayoutManager layoutManager = lmFactory.layoutManager(this);

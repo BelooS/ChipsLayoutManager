@@ -54,12 +54,14 @@ public class ColumnTest {
 
     @Rule
     public ActivityTestRule<TestActivity> activityTestRule = new ActivityTestRule<>(TestActivity.class);
+    private TestActivity activity;
 
     private ChipsLayoutManager layoutManager;
 
     @Before
     public void setUp() throws Throwable {
         MockitoAnnotations.initMocks(this);
+        activity = activityTestRule.getActivity();
 
         layoutManager = getLayoutManager();
 
@@ -73,8 +75,7 @@ public class ColumnTest {
 
         TestActivity.setLmFactory(layoutManagerFactory);
 
-        activityTestRule.getActivity().initialize();
-
+        activity.runOnUiThread(() -> activity.initialize());
     }
 
     private ChipsLayoutManager retrieveLayoutManager() {

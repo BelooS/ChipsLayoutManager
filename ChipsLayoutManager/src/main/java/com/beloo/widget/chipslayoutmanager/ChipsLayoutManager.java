@@ -206,10 +206,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return new ChipsLayoutManager(context).new StrategyBuilder();
     }
 
-    void setSpy(ISpy spy) {
-        this.spy = spy;
-    }
-
     public IChildGravityResolver getChildGravityResolver() {
         return childGravityResolver;
     }
@@ -281,6 +277,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     AnchorViewState getAnchor() {
         return anchorView;
+    }
+
+    @VisibleForTesting
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    void setSpy(ISpy spy) {
+        this.spy = spy;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -716,7 +718,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 requestLayoutWithAnimations();
             }
 
-            if (isAfterPreLayout && backwardLayouter != null) {
+            if (isAfterPreLayout) {
                 //we should layout disappearing views after pre-layout to support natural movements)
                 layoutDisappearingViews(recycler, backwardLayouter, forwardLayouter);
             }
