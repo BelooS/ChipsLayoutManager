@@ -145,11 +145,13 @@ public class FewChipsColumnTest {
     @Test
     public void deleteItemInTheFirstLine_ItemHasMaximumWidth_SameStartPadding() throws Exception {
         //arrange
-        //just adapt input items list to required start values
-        items.remove(1);
-        items.remove(10);
-        ChipsEntity longItem = items.remove(9);
-        items.add(1, longItem);
+        {
+            //just adapt input items list to required start values
+            items.remove(1);
+            items.remove(10);
+            ChipsEntity longItem = items.remove(9);
+            items.add(1, longItem);
+        }
 
         activity.runOnUiThread(() -> activity.initialize());
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));

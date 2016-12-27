@@ -44,7 +44,7 @@ import static org.mockito.Mockito.spy;
 
 /**
  */
-public class RowTest {
+public abstract class RowTest {
 
     static RecyclerViewActionFactory actionsFactory;
 
