@@ -148,7 +148,6 @@ public class RowTest {
     @Test
     public void layouting_ScrollForwardAndBackward_VerifyCorrectOrder () throws Exception {
         //arrange
-        InstrumentalUtil.waitForIdle();
         //act
         recyclerView.perform(actionsFactory.scrollBy(0, 300));
         recyclerView.perform(actionsFactory.scrollBy(0, -300));
@@ -218,17 +217,34 @@ public class RowTest {
         assertEquals(8, actual);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // find visible item
+    ///////////////////////////////////////////////////////////////////////////
+
     @Test
     public void findFirstVisibleItem_scrolledCompletelyToItemInTheMiddle_resultCorrect() throws Exception {
         //arrange
-        recyclerView.perform(RecyclerViewActions.scrollToPosition(7));
-        InstrumentalUtil.waitForIdle();
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(7),
+                actionsFactory.scrollBy(0, 50));
 
         //act
         int actual = layoutManager.findFirstVisibleItemPosition();
 
         //assert
         assertEquals(6, actual);
+    }
+
+    @Test
+    public void findFirstCompletelyVisibleItem_scrolledCompletelyToItemInTheMiddle_resultCorrect() throws Exception {
+        //arrange
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(7),
+                actionsFactory.scrollBy(0, 50));
+
+        //act
+        int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
+
+        //assert
+        assertEquals(7, actual);
     }
 
     @Test
