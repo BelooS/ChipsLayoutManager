@@ -136,7 +136,7 @@ It contained in same package and named `SpacingItemDecoration`.
 
 ## Support
 BETA is going.
-I respond to your founded issues. Just create a ticket if you found something goes wrong.
+I respond to your founded issues. Just create a ticket if you found something goes wrong.<br/>
 Thanks for testing, guys. I'm really appreciate it.
 
 ### Contributors
