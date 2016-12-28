@@ -15,12 +15,14 @@ import android.util.Log;
 import android.view.View;
 
 import com.beloo.chipslayoutmanager.sample.R;
+import com.beloo.chipslayoutmanager.sample.entity.ChipsEntity;
 import com.beloo.chipslayoutmanager.sample.ui.ChipsFacade;
 import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
 import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.chipslayoutmanager.sample.ui.adapter.ChipsAdapter;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
 import com.beloo.widget.chipslayoutmanager.util.RecyclerViewActionFactory;
+import com.beloo.widget.chipslayoutmanager.util.RecyclerViewMatcher;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -28,6 +30,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
+
+import java.util.List;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -38,6 +42,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 /**
  */
@@ -48,13 +53,14 @@ public class ColumnTest {
 
     static {
         actionsFactory = new RecyclerViewActionFactory();
-        TestActivity.setItemsFactory(new ChipsFacade());
         TestActivity.isInitializeOutside = true;
     }
 
     @Rule
     public ActivityTestRule<TestActivity> activityTestRule = new ActivityTestRule<>(TestActivity.class);
     private TestActivity activity;
+
+    private List<ChipsEntity> items;
 
     private ChipsLayoutManager layoutManager;
     private ViewInteraction recyclerView;
@@ -74,6 +80,12 @@ public class ColumnTest {
                 return retrieveLayoutManager();
             }
         };
+
+        //set items
+        ChipsFacade chipsFacade = spy(new ChipsFacade());
+        items = chipsFacade.getItems();
+        when(chipsFacade.getItems()).thenReturn(items);
+        TestActivity.setItemsFactory(chipsFacade);
 
         TestActivity.setLmFactory(layoutManagerFactory);
 
@@ -105,6 +117,10 @@ public class ColumnTest {
         recyclerView.check(matches(actionsFactory.incrementOrder()));
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // scrolling
+    ///////////////////////////////////////////////////////////////////////////
+
     @Test
     public void scrollBy_LMInInitialStateAndScrollForward_CorrectFirstCompletelyVisibleItem() throws Exception {
         //arrange
@@ -128,6 +144,32 @@ public class ColumnTest {
 
         //assert
         assertEquals(0, actual);
+    }
+
+    @Test
+    public void scrollBy_LastItemInLastRowHasSmallSize_scrolledCompletelyToBiggestItemSize() throws Exception {
+        //arrange
+
+        //act
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(36),
+                actionsFactory.scrollBy(0, -200),
+                actionsFactory.scrollBy(0, 200));
+
+
+        //assert
+        recyclerView.check(matches(RecyclerViewMatcher.atPosition(39, new RecyclerViewMatcher.ViewHolderMatcher<RecyclerView.ViewHolder>() {
+
+            @Override
+            public boolean matches(RecyclerView parent, View itemView, RecyclerView.ViewHolder viewHolder) {
+                int expectedPadding = parent.getPaddingRight();
+                int right = layoutManager.getDecoratedRight(itemView);
+                int parentRight = parent.getRight();
+                int padding = parentRight - right;
+                assertEquals("padding of RecyclerView item doesn't equal expected padding" ,expectedPadding, padding);
+                return true;
+            }
+
+        })));
     }
 
     @Test
@@ -180,6 +222,10 @@ public class ColumnTest {
         int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
         assertEquals(3, actual);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // find visible item
+    ///////////////////////////////////////////////////////////////////////////
 
     @Test
     public void findFirstVisibleItem_scrolledCompletelyToItemInTheMiddle_resultCorrect() throws Exception {

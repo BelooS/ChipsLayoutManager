@@ -83,11 +83,12 @@ public class FewChipsColumnTest {
         //disable all animations
         rvTest.setItemAnimator(null);
 
+        //set items
         ChipsFacade chipsFacade = spy(new ChipsFacade());
         items = chipsFacade.getItems();
         when(chipsFacade.getItems()).thenReturn(items);
-
         TestActivity.setItemsFactory(chipsFacade);
+
         TestActivity.setLmFactory(layoutManagerFactory);
     }
 

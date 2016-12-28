@@ -10,18 +10,22 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.contrib.RecyclerViewActions;
+import android.support.test.espresso.matcher.BoundedMatcher;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
+import com.beloo.chipslayoutmanager.sample.entity.ChipsEntity;
 import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
 import com.beloo.chipslayoutmanager.sample.ui.ChipsFacade;
 import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.chipslayoutmanager.sample.ui.adapter.ChipsAdapter;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
 
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,15 +34,20 @@ import org.mockito.MockitoAnnotations;
 
 import com.beloo.chipslayoutmanager.sample.R;
 import com.beloo.widget.chipslayoutmanager.util.RecyclerViewActionFactory;
+import com.beloo.widget.chipslayoutmanager.util.RecyclerViewMatcher;
+
+import java.util.List;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static org.hamcrest.Matchers.allOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 /**
  */
@@ -49,7 +58,6 @@ public class RowTest {
 
     static {
         actionsFactory = new RecyclerViewActionFactory();
-        TestActivity.setItemsFactory(new ChipsFacade());
         TestActivity.isInitializeOutside = true;
     }
 
@@ -64,6 +72,8 @@ public class RowTest {
 
     private ChipsLayoutManager layoutManager;
     private TestActivity activity;
+
+    private List<ChipsEntity> items;
 
     private ViewInteraction recyclerView;
 
@@ -82,6 +92,12 @@ public class RowTest {
         RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
         //disable all animations
         rvTest.setItemAnimator(null);
+
+        //set items
+        ChipsFacade chipsFacade = spy(new ChipsFacade());
+        items = chipsFacade.getItems();
+        when(chipsFacade.getItems()).thenReturn(items);
+        TestActivity.setItemsFactory(chipsFacade);
 
         TestActivity.setLmFactory(layoutManagerFactory);
 
@@ -183,6 +199,38 @@ public class RowTest {
 
         //assert
         assertEquals(0, actual);
+    }
+
+    @Test
+    public void scrollBy_LastItemInLastRowHasSmallSize_scrolledCompletelyToBiggestItemSize() throws Exception {
+        //arrange
+        {
+            items.remove(39);
+            items.remove(37);
+        }
+        activity.runOnUiThread(() -> activity.initialize());
+        InstrumentalUtil.waitForIdle();
+
+        //act
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(37),
+                actionsFactory.scrollBy(0, -200),
+                actionsFactory.scrollBy(0, 200));
+
+
+        //assert
+        recyclerView.check(matches(RecyclerViewMatcher.atPosition(36, new RecyclerViewMatcher.ViewHolderMatcher<RecyclerView.ViewHolder>() {
+
+            @Override
+            public boolean matches(RecyclerView parent, View itemView, RecyclerView.ViewHolder viewHolder) {
+                int expectedPadding = parent.getPaddingBottom();
+                int bottom = layoutManager.getDecoratedBottom(itemView);
+                int parentBottom = parent.getBottom();
+                int padding = parentBottom - bottom;
+                assertEquals("padding of RecyclerView item doesn't equal expected padding" ,expectedPadding, padding);
+                return true;
+            }
+
+        })));
     }
 
     @Test
