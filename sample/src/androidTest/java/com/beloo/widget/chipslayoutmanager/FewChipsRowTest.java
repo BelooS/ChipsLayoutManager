@@ -16,7 +16,6 @@ import com.beloo.chipslayoutmanager.sample.ui.IItemsFacade;
 import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
 import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
-import com.beloo.test.util.RecyclerViewEspressoFactory;
 import com.beloo.widget.chipslayoutmanager.util.testing.ISpy;
 
 import org.junit.Before;
@@ -33,6 +32,8 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static com.beloo.test.util.RecyclerViewEspressoFactory.actionDelegate;
+import static com.beloo.test.util.RecyclerViewEspressoFactory.notifyItemRemovedAction;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertNotEquals;
@@ -50,11 +51,8 @@ import static org.mockito.Mockito.when;
 @RunWith(AndroidJUnit4.class)
 public class FewChipsRowTest {
 
-    private static RecyclerViewEspressoFactory actionFactory;
-
     static {
         TestActivity.isInitializeOutside = true;
-        FewChipsRowTest.actionFactory = new RecyclerViewEspressoFactory();
     }
 
     @Rule
@@ -124,7 +122,7 @@ public class FewChipsRowTest {
         final RecyclerView[] rvTest = new RecyclerView[1];
 
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
-        ViewAction viewAction = actionFactory.actionDelegate((uiController, view) -> {
+        ViewAction viewAction = actionDelegate((uiController, view) -> {
             rvTest[0] = view;
             view.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             view.requestLayout();
@@ -136,8 +134,8 @@ public class FewChipsRowTest {
 
         //act
         recyclerView.perform(
-                actionFactory.actionDelegate(((uiController, view) -> items.remove(9))),
-                actionFactory.notifyItemRemovedAction(9));
+                actionDelegate(((uiController, view) -> items.remove(9))),
+                notifyItemRemovedAction(9));
 
         //assert
         int endHeight = rvTest[0].getHeight();
@@ -163,8 +161,8 @@ public class FewChipsRowTest {
 
         //act
         recyclerView.perform(
-                actionFactory.actionDelegate(((uiController, view) -> items.remove(1))),
-                actionFactory.notifyItemRemovedAction(1));
+                actionDelegate(((uiController, view) -> items.remove(1))),
+                notifyItemRemovedAction(1));
 
         InstrumentalUtil.waitForIdle();
 

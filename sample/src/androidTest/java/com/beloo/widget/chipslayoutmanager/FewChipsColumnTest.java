@@ -14,7 +14,6 @@ import com.beloo.chipslayoutmanager.sample.ui.ChipsFacade;
 import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
 import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
-import com.beloo.test.util.RecyclerViewEspressoFactory;
 import com.beloo.widget.chipslayoutmanager.util.testing.ISpy;
 
 import org.junit.Before;
@@ -31,10 +30,11 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static com.beloo.test.util.RecyclerViewEspressoFactory.actionDelegate;
+import static com.beloo.test.util.RecyclerViewEspressoFactory.notifyItemRemovedAction;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assume.assumeTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.doReturn;
@@ -48,11 +48,8 @@ import static org.mockito.Mockito.when;
 @RunWith(AndroidJUnit4.class)
 public class FewChipsColumnTest {
 
-    private static RecyclerViewEspressoFactory actionFactory;
-
     static {
         TestActivity.isInitializeOutside = true;
-        FewChipsColumnTest.actionFactory = new RecyclerViewEspressoFactory();
     }
 
     @Rule
@@ -121,7 +118,7 @@ public class FewChipsColumnTest {
         final RecyclerView[] rvTest = new RecyclerView[1];
 
         ViewInteraction recyclerView = onView(withId(R.id.rvTest)).check(matches(isDisplayed()));
-        ViewAction viewAction = actionFactory.actionDelegate(((uiController, view) -> {
+        ViewAction viewAction = actionDelegate(((uiController, view) -> {
             rvTest[0] = view;
             view.getLayoutParams().width = ViewGroup.LayoutParams.WRAP_CONTENT;
             view.requestLayout();
@@ -133,8 +130,8 @@ public class FewChipsColumnTest {
 
         //act
         recyclerView.perform(
-                actionFactory.actionDelegate(((uiController, view) -> items.remove(9))),
-                actionFactory.notifyItemRemovedAction(9));
+                actionDelegate(((uiController, view) -> items.remove(9))),
+                notifyItemRemovedAction(9));
         InstrumentalUtil.waitForIdle();
 
         //assert
@@ -165,8 +162,8 @@ public class FewChipsColumnTest {
 
         //act
         recyclerView.perform(
-                actionFactory.actionDelegate(((uiController, view) -> items.remove(1))),
-                actionFactory.notifyItemRemovedAction(1));
+                actionDelegate(((uiController, view) -> items.remove(1))),
+                notifyItemRemovedAction(1));
 
         InstrumentalUtil.waitForIdle();
 

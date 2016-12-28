@@ -134,9 +134,9 @@ For example look at sample application.
 You may need an `RecyclerView.ItemDecoration` to work with `ChipsLayoutManager` for fast setup as showed in sample. <br/>
 It contained in same package and named `SpacingItemDecoration`.
 
-## Support
+## Support [ ![Maintained](https://img.shields.io/maintenance/yes/2016.svg)]()
 BETA is going.
-I respond to your founded issues. Just create a ticket if you found something goes wrong.
+I respond to your founded issues. Just create a ticket if you found something goes wrong.<br/>
 Thanks for testing, guys. I'm really appreciate it.
 
 ### Contributors
