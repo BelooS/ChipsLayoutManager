@@ -11,7 +11,6 @@ import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 
 import com.beloo.chipslayoutmanager.sample.R;
@@ -21,11 +20,9 @@ import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
 import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.chipslayoutmanager.sample.ui.adapter.ChipsAdapter;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
-import com.beloo.widget.chipslayoutmanager.util.RecyclerViewActionFactory;
-import com.beloo.widget.chipslayoutmanager.util.RecyclerViewMatcher;
+import com.beloo.widget.chipslayoutmanager.util.RecyclerViewEspressoFactory;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,10 +46,10 @@ import static org.mockito.Mockito.when;
 @RunWith(AndroidJUnit4.class)
 public class ColumnTest {
 
-    private static RecyclerViewActionFactory actionsFactory;
+    private static RecyclerViewEspressoFactory actionsFactory;
 
     static {
-        actionsFactory = new RecyclerViewActionFactory();
+        actionsFactory = new RecyclerViewEspressoFactory();
         TestActivity.isInitializeOutside = true;
     }
 
@@ -157,7 +154,7 @@ public class ColumnTest {
 
 
         //assert
-        recyclerView.check(matches(RecyclerViewMatcher.atPosition(39, new RecyclerViewMatcher.ViewHolderMatcher<RecyclerView.ViewHolder>() {
+        recyclerView.check(matches(actionsFactory.atPosition(39, new RecyclerViewEspressoFactory.ViewHolderMatcher<RecyclerView.ViewHolder>() {
 
             @Override
             public boolean matches(RecyclerView parent, View itemView, RecyclerView.ViewHolder viewHolder) {

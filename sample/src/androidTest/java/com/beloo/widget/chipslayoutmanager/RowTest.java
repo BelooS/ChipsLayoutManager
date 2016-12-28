@@ -10,7 +10,6 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.contrib.RecyclerViewActions;
-import android.support.test.espresso.matcher.BoundedMatcher;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.widget.RecyclerView;
@@ -24,8 +23,6 @@ import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.chipslayoutmanager.sample.ui.adapter.ChipsAdapter;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
 
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,8 +30,7 @@ import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 
 import com.beloo.chipslayoutmanager.sample.R;
-import com.beloo.widget.chipslayoutmanager.util.RecyclerViewActionFactory;
-import com.beloo.widget.chipslayoutmanager.util.RecyclerViewMatcher;
+import com.beloo.widget.chipslayoutmanager.util.RecyclerViewEspressoFactory;
 
 import java.util.List;
 
@@ -54,10 +50,10 @@ import static org.mockito.Mockito.when;
 @RunWith(AndroidJUnit4.class)
 public class RowTest {
 
-    private static RecyclerViewActionFactory actionsFactory;
+    private static RecyclerViewEspressoFactory actionsFactory;
 
     static {
-        actionsFactory = new RecyclerViewActionFactory();
+        actionsFactory = new RecyclerViewEspressoFactory();
         TestActivity.isInitializeOutside = true;
     }
 
@@ -218,7 +214,7 @@ public class RowTest {
 
 
         //assert
-        recyclerView.check(matches(RecyclerViewMatcher.atPosition(36, new RecyclerViewMatcher.ViewHolderMatcher<RecyclerView.ViewHolder>() {
+        recyclerView.check(matches(actionsFactory.atPosition(36, new RecyclerViewEspressoFactory.ViewHolderMatcher<RecyclerView.ViewHolder>() {
 
             @Override
             public boolean matches(RecyclerView parent, View itemView, RecyclerView.ViewHolder viewHolder) {

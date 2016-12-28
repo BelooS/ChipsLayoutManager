@@ -14,7 +14,7 @@ import com.beloo.chipslayoutmanager.sample.ui.ChipsFacade;
 import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
 import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
-import com.beloo.widget.chipslayoutmanager.util.RecyclerViewActionFactory;
+import com.beloo.widget.chipslayoutmanager.util.RecyclerViewEspressoFactory;
 import com.beloo.widget.chipslayoutmanager.util.testing.ISpy;
 
 import org.junit.Before;
@@ -48,11 +48,11 @@ import static org.mockito.Mockito.when;
 @RunWith(AndroidJUnit4.class)
 public class FewChipsColumnTest {
 
-    private static RecyclerViewActionFactory actionFactory;
+    private static RecyclerViewEspressoFactory actionFactory;
 
     static {
         TestActivity.isInitializeOutside = true;
-        FewChipsColumnTest.actionFactory = new RecyclerViewActionFactory();
+        FewChipsColumnTest.actionFactory = new RecyclerViewEspressoFactory();
     }
 
     @Rule

@@ -1,6 +1,5 @@
 package com.beloo.widget.chipslayoutmanager;
 
-import android.app.Activity;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
@@ -17,11 +16,10 @@ import com.beloo.chipslayoutmanager.sample.ui.IItemsFacade;
 import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
 import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
-import com.beloo.widget.chipslayoutmanager.util.RecyclerViewActionFactory;
+import com.beloo.widget.chipslayoutmanager.util.RecyclerViewEspressoFactory;
 import com.beloo.widget.chipslayoutmanager.util.testing.ISpy;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,11 +50,11 @@ import static org.mockito.Mockito.when;
 @RunWith(AndroidJUnit4.class)
 public class FewChipsRowTest {
 
-    private static RecyclerViewActionFactory actionFactory;
+    private static RecyclerViewEspressoFactory actionFactory;
 
     static {
         TestActivity.isInitializeOutside = true;
-        FewChipsRowTest.actionFactory = new RecyclerViewActionFactory();
+        FewChipsRowTest.actionFactory = new RecyclerViewEspressoFactory();
     }
 
     @Rule

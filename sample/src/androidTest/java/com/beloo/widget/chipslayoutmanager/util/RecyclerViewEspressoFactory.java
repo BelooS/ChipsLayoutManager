@@ -1,25 +1,28 @@
 package com.beloo.widget.chipslayoutmanager.util;
 
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
+import android.support.test.espresso.matcher.BoundedMatcher;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.ChildViewsIterable;
 import com.beloo.widget.chipslayoutmanager.support.BiConsumer;
 
+import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 import java.util.Locale;
 
+import static android.support.test.espresso.core.deps.guava.base.Preconditions.checkNotNull;
 import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static org.hamcrest.Matchers.allOf;
 
-public class RecyclerViewActionFactory {
+public class RecyclerViewEspressoFactory {
     ///////////////////////////////////////////////////////////////////////////
     // Actions factory
     ///////////////////////////////////////////////////////////////////////////
@@ -54,6 +57,40 @@ public class RecyclerViewActionFactory {
 
     public Matcher<View> incrementOrder() {
         return orderMatcher();
+    }
+
+    public Matcher<View> atPosition(final int position, @NonNull final Matcher<View> itemMatcher) {
+        checkNotNull(itemMatcher);
+        return new BoundedMatcher<View, RecyclerView>(RecyclerView.class) {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("has item at position " + position + ":\n");
+                itemMatcher.describeTo(description);
+            }
+
+            @Override
+            protected boolean matchesSafely(final RecyclerView view) {
+                RecyclerView.ViewHolder viewHolder = view.findViewHolderForAdapterPosition(position);
+                return viewHolder != null && itemMatcher.matches(viewHolder.itemView);
+            }
+        };
+    }
+
+    public <T extends RecyclerView.ViewHolder> Matcher<View> atPosition(final int position, @NonNull final ViewHolderMatcher<T> itemMatcher) {
+        checkNotNull(itemMatcher);
+        return new BoundedMatcher<View, RecyclerView>(RecyclerView.class) {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("has item at position " + position + ":\n");
+                itemMatcher.describeTo(description);
+            }
+
+            @Override
+            protected boolean matchesSafely(final RecyclerView view) {
+                RecyclerView.ViewHolder viewHolder = view.findViewHolderForAdapterPosition(position);
+                return viewHolder != null && itemMatcher.matches(viewHolder);
+            }
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -198,5 +235,22 @@ public class RecyclerViewActionFactory {
                 return true;
             }
         };
+    }
+
+    public abstract static class ViewHolderMatcher<VH extends RecyclerView.ViewHolder> extends BaseMatcher<VH> {
+
+        @Override
+        public boolean matches(Object item) {
+            VH viewHolder = (VH) item;
+            RecyclerView recyclerView = (RecyclerView) viewHolder.itemView.getParent();
+            return matches(recyclerView, viewHolder.itemView, viewHolder);
+        }
+
+        @Override
+        public void describeTo(Description description) {
+
+        }
+
+        public abstract boolean matches(RecyclerView parent, View itemView, RecyclerView.ViewHolder viewHolder);
     }
 }
