@@ -20,7 +20,7 @@ import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
 import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.chipslayoutmanager.sample.ui.adapter.ChipsAdapter;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
-import com.beloo.widget.chipslayoutmanager.util.RecyclerViewEspressoFactory;
+import com.beloo.test.util.RecyclerViewEspressoFactory;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -37,19 +37,16 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static com.beloo.test.util.RecyclerViewEspressoFactory.*;
 
 /**
  */
 @RunWith(AndroidJUnit4.class)
 public class ColumnTest {
 
-    private static RecyclerViewEspressoFactory actionsFactory;
-
     static {
-        actionsFactory = new RecyclerViewEspressoFactory();
         TestActivity.isInitializeOutside = true;
     }
 
@@ -107,11 +104,11 @@ public class ColumnTest {
         InstrumentalUtil.waitForIdle();
 
         //act
-        recyclerView.perform(actionsFactory.scrollBy(1000, 0));
-        recyclerView.perform(actionsFactory.scrollBy(-1000, 0));
+        recyclerView.perform(scrollBy(1000, 0));
+        recyclerView.perform(scrollBy(-1000, 0));
 
         //assert
-        recyclerView.check(matches(actionsFactory.incrementOrder()));
+        recyclerView.check(matches(incrementOrder()));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -123,7 +120,7 @@ public class ColumnTest {
         //arrange
         InstrumentalUtil.waitForIdle();
         //act
-        recyclerView.perform(actionsFactory.scrollBy(300, 0));
+        recyclerView.perform(scrollBy(300, 0));
         int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
         //assert
         assertEquals(9, actual);
@@ -133,10 +130,10 @@ public class ColumnTest {
     public void scrollBy_ScrolledForwardScrollBackward_CorrectFirstCompletelyVisibleItem() throws Exception {
         //arrange
         InstrumentalUtil.waitForIdle();
-        recyclerView.perform(actionsFactory.scrollBy(1000, 0));
+        recyclerView.perform(scrollBy(1000, 0));
 
         //act
-        recyclerView.perform(actionsFactory.scrollBy(-1000, 0));
+        recyclerView.perform(scrollBy(-1000, 0));
         int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
 
         //assert
@@ -149,12 +146,12 @@ public class ColumnTest {
 
         //act
         recyclerView.perform(RecyclerViewActions.scrollToPosition(36),
-                actionsFactory.scrollBy(0, -200),
-                actionsFactory.scrollBy(0, 200));
+                scrollBy(0, -200),
+                scrollBy(0, 200));
 
 
         //assert
-        recyclerView.check(matches(actionsFactory.atPosition(39, new RecyclerViewEspressoFactory.ViewHolderMatcher<RecyclerView.ViewHolder>() {
+        recyclerView.check(matches(atPosition(39, new RecyclerViewEspressoFactory.ViewHolderMatcher<RecyclerView.ViewHolder>() {
 
             @Override
             public boolean matches(RecyclerView parent, View itemView, RecyclerView.ViewHolder viewHolder) {
@@ -188,7 +185,7 @@ public class ColumnTest {
         InstrumentalUtil.waitForIdle();
 
         //act
-        ViewAction scrollAction = actionsFactory.smoothScrollToPosition(18);
+        ViewAction scrollAction = smoothScrollToPosition(18);
         //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (scrollAction) {
             recyclerView.perform(scrollAction);
@@ -207,7 +204,7 @@ public class ColumnTest {
         InstrumentalUtil.waitForIdle();
 
         //act
-        ViewAction scrollAction = actionsFactory.smoothScrollToPosition(3);
+        ViewAction scrollAction = smoothScrollToPosition(3);
         //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (scrollAction) {
             recyclerView.perform(scrollAction);
@@ -318,8 +315,8 @@ public class ColumnTest {
         ChipsAdapter chipsAdapter = new ChipsAdapter(chipsFacade.getItems(), null);
 
         //act
-        recyclerView.perform(actionsFactory.setAdapter(chipsAdapter));
-        recyclerView.perform(actionsFactory.setAdapter(chipsAdapter));
+        recyclerView.perform(setAdapter(chipsAdapter));
+        recyclerView.perform(setAdapter(chipsAdapter));
         InstrumentalUtil.waitForIdle();
 
         //assert
@@ -331,7 +328,7 @@ public class ColumnTest {
     public void clipToPadding_IsTrue_paddingStaySame() throws Exception {
         //arrange
         RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
-        ViewAction viewAction = actionsFactory.actionDelegate((uiController, view) -> {
+        ViewAction viewAction = actionDelegate((uiController, view) -> {
             view.setClipToPadding(true);
             view.setPadding(150, 150, 150, 150);
             view.requestLayout();
@@ -351,7 +348,7 @@ public class ColumnTest {
     @Test
     public void clipToPadding_IsFalse_paddingOfScrolledViewIsLowerThanInitial() throws Exception {
         //arrange
-        ViewAction viewAction = actionsFactory.actionDelegate((uiController, view) -> {
+        ViewAction viewAction = actionDelegate((uiController, view) -> {
             view.setClipToPadding(false);
             view.setPadding(150, 150, 150, 150);
             view.requestLayout();
@@ -360,7 +357,7 @@ public class ColumnTest {
         //act
         recyclerView.perform(viewAction,
                 RecyclerViewActions.scrollToPosition(18),
-                actionsFactory.scrollBy(200, 0));
+                scrollBy(200, 0));
 
         //assert
         View view = layoutManager.getChildAt(0);
@@ -382,7 +379,7 @@ public class ColumnTest {
         Rect expectedViewRect = layoutManager.getCanvas().getViewRect(child);
 
         //act
-        recyclerView.perform(actionsFactory.scrollBy(2000, 0), actionsFactory.scrollBy(-2000, 0));
+        recyclerView.perform(scrollBy(2000, 0), scrollBy(-2000, 0));
         Rect resultViewRect = layoutManager.getCanvas().getViewRect(child);
 
         //assert
@@ -399,7 +396,7 @@ public class ColumnTest {
         Rect expectedViewRect = layoutManager.getCanvas().getViewRect(child);
 
         //act
-        recyclerView.perform(actionsFactory.scrollBy(500, 0), actionsFactory.scrollBy(-500, 0));
+        recyclerView.perform(scrollBy(500, 0), scrollBy(-500, 0));
         Rect resultViewRect = layoutManager.getCanvas().getViewRect(child);
 
         //assert

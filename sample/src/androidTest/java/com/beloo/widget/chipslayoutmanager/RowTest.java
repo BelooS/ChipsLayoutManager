@@ -30,7 +30,7 @@ import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 
 import com.beloo.chipslayoutmanager.sample.R;
-import com.beloo.widget.chipslayoutmanager.util.RecyclerViewEspressoFactory;
+import com.beloo.test.util.RecyclerViewEspressoFactory;
 
 import java.util.List;
 
@@ -38,22 +38,19 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static org.hamcrest.Matchers.allOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static com.beloo.test.util.RecyclerViewEspressoFactory.*;
 
 /**
  */
 @RunWith(AndroidJUnit4.class)
 public class RowTest {
 
-    private static RecyclerViewEspressoFactory actionsFactory;
-
     static {
-        actionsFactory = new RecyclerViewEspressoFactory();
         TestActivity.isInitializeOutside = true;
     }
 
@@ -133,7 +130,7 @@ public class RowTest {
         Rect expectedViewRect = layoutManager.getCanvas().getViewRect(child);
 
         //act
-        recyclerView.perform(actionsFactory.scrollBy(0, 1000), actionsFactory.scrollBy(0, -1000));
+        recyclerView.perform(scrollBy(0, 1000), scrollBy(0, -1000));
         Rect resultViewRect = layoutManager.getCanvas().getViewRect(child);
 
         //assert
@@ -150,7 +147,7 @@ public class RowTest {
         Rect expectedViewRect = layoutManager.getCanvas().getViewRect(child);
 
         //act
-        recyclerView.perform(actionsFactory.scrollBy(0, 250), actionsFactory.scrollBy(0, -250));
+        recyclerView.perform(scrollBy(0, 250), scrollBy(0, -250));
         Rect resultViewRect = layoutManager.getCanvas().getViewRect(child);
 
         //assert
@@ -161,11 +158,11 @@ public class RowTest {
     public void layouting_ScrollForwardAndBackward_VerifyCorrectOrder () throws Exception {
         //arrange
         //act
-        recyclerView.perform(actionsFactory.scrollBy(0, 300));
-        recyclerView.perform(actionsFactory.scrollBy(0, -300));
+        recyclerView.perform(scrollBy(0, 300));
+        recyclerView.perform(scrollBy(0, -300));
         InstrumentalUtil.waitForIdle();
         //assert
-        recyclerView.check(matches(actionsFactory.incrementOrder()));
+        recyclerView.check(matches(incrementOrder()));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -177,7 +174,7 @@ public class RowTest {
         //arrange
         InstrumentalUtil.waitForIdle();
         //act
-        recyclerView.perform(actionsFactory.scrollBy(0, 300));
+        recyclerView.perform(scrollBy(0, 300));
         int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
         //assert
         assertEquals(4, actual);
@@ -187,10 +184,10 @@ public class RowTest {
     public void scrollBy_ScrolledForwardScrollBackward_CorrectFirstCompletelyVisibleItem() throws Exception {
         //arrange
         InstrumentalUtil.waitForIdle();
-        recyclerView.perform(actionsFactory.scrollBy(0, 300));
+        recyclerView.perform(scrollBy(0, 300));
 
         //act
-        recyclerView.perform(actionsFactory.scrollBy(0, -300));
+        recyclerView.perform(scrollBy(0, -300));
         int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
 
         //assert
@@ -209,12 +206,12 @@ public class RowTest {
 
         //act
         recyclerView.perform(RecyclerViewActions.scrollToPosition(37),
-                actionsFactory.scrollBy(0, -200),
-                actionsFactory.scrollBy(0, 200));
+                scrollBy(0, -200),
+                scrollBy(0, 200));
 
 
         //assert
-        recyclerView.check(matches(actionsFactory.atPosition(36, new RecyclerViewEspressoFactory.ViewHolderMatcher<RecyclerView.ViewHolder>() {
+        recyclerView.check(matches(atPosition(36, new RecyclerViewEspressoFactory.ViewHolderMatcher<RecyclerView.ViewHolder>() {
 
             @Override
             public boolean matches(RecyclerView parent, View itemView, RecyclerView.ViewHolder viewHolder) {
@@ -248,7 +245,7 @@ public class RowTest {
         InstrumentalUtil.waitForIdle();
 
         //act
-        ViewAction scrollAction = actionsFactory.smoothScrollToPosition(8);
+        ViewAction scrollAction = smoothScrollToPosition(8);
         //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (scrollAction) {
             recyclerView.perform(scrollAction);
@@ -269,7 +266,7 @@ public class RowTest {
     public void findFirstVisibleItem_scrolledCompletelyToItemInTheMiddle_resultCorrect() throws Exception {
         //arrange
         recyclerView.perform(RecyclerViewActions.scrollToPosition(7),
-                actionsFactory.scrollBy(0, 50));
+                scrollBy(0, 50));
 
         //act
         int actual = layoutManager.findFirstVisibleItemPosition();
@@ -282,7 +279,7 @@ public class RowTest {
     public void findFirstCompletelyVisibleItem_scrolledCompletelyToItemInTheMiddle_resultCorrect() throws Exception {
         //arrange
         recyclerView.perform(RecyclerViewActions.scrollToPosition(7),
-                actionsFactory.scrollBy(0, 50));
+                scrollBy(0, 50));
 
         //act
         int actual = layoutManager.findFirstCompletelyVisibleItemPosition();
@@ -403,8 +400,8 @@ public class RowTest {
         ChipsAdapter chipsAdapter = new ChipsAdapter(chipsFacade.getItems(), null);
 
         //act
-        recyclerView.perform(actionsFactory.setAdapter(chipsAdapter));
-        recyclerView.perform(actionsFactory.setAdapter(chipsAdapter));
+        recyclerView.perform(setAdapter(chipsAdapter));
+        recyclerView.perform(setAdapter(chipsAdapter));
         InstrumentalUtil.waitForIdle();
 
         //assert
@@ -420,7 +417,7 @@ public class RowTest {
     public void clipToPadding_IsTrue_paddingStaySame() throws Exception {
         //arrange
         RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
-        ViewAction initAction = actionsFactory.actionDelegate((uiController, view) ->  {
+        ViewAction initAction = actionDelegate((uiController, view) ->  {
             view.setClipToPadding(true);
             view.setPadding(150, 150, 150, 150);
             view.requestLayout();
@@ -440,7 +437,7 @@ public class RowTest {
     @Test
     public void clipToPadding_IsFalse_paddingOfScrolledViewIsLowerThanInitial() throws Exception {
         //arrange
-        ViewAction arrangeAction = actionsFactory.actionDelegate((uiController, view) -> {
+        ViewAction arrangeAction = actionDelegate((uiController, view) -> {
             view.setClipToPadding(false);
             view.setPadding(150, 150, 150, 150);
             view.requestLayout();
@@ -449,7 +446,7 @@ public class RowTest {
 
         //act
         recyclerView.perform(RecyclerViewActions.scrollToPosition(8),
-                actionsFactory.scrollBy(0, 200));
+                scrollBy(0, 200));
 
         //assert
         View view = layoutManager.getChildAt(0);

@@ -16,7 +16,7 @@ import com.beloo.chipslayoutmanager.sample.ui.IItemsFacade;
 import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
 import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
-import com.beloo.widget.chipslayoutmanager.util.RecyclerViewEspressoFactory;
+import com.beloo.test.util.RecyclerViewEspressoFactory;
 import com.beloo.widget.chipslayoutmanager.util.testing.ISpy;
 
 import org.junit.Before;

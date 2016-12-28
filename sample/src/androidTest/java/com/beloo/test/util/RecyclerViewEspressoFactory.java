@@ -1,4 +1,4 @@
-package com.beloo.widget.chipslayoutmanager.util;
+package com.beloo.test.util;
 
 import android.support.annotation.NonNull;
 import android.support.test.espresso.UiController;
@@ -9,6 +9,7 @@ import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.ChildViewsIterable;
 import com.beloo.widget.chipslayoutmanager.support.BiConsumer;
+import com.beloo.widget.chipslayoutmanager.util.ActionDelegate;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -22,32 +23,32 @@ import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFro
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static org.hamcrest.Matchers.allOf;
 
-public class RecyclerViewEspressoFactory {
+public abstract class RecyclerViewEspressoFactory {
     ///////////////////////////////////////////////////////////////////////////
     // Actions factory
     ///////////////////////////////////////////////////////////////////////////
 
-    public ViewAction scrollBy(int x, int y) {
+    public static ViewAction scrollBy(int x, int y) {
         return new ScrollByRecyclerViewAction(x, y);
     }
 
-    public ViewAction smoothScrollToPosition(int position) {
+    public static ViewAction smoothScrollToPosition(int position) {
         return new SmoothScrollToPositionRecyclerViewAction(position);
     }
 
-    public ViewAction setAdapter(RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter) {
+    public static ViewAction setAdapter(RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter) {
         return new SetAdapterAction(adapter);
     }
 
-    public ViewAction notifyItemRemovedAction(int removePosition) {
+    public static ViewAction notifyItemRemovedAction(int removePosition) {
         return new NotifyItemRemovedAction(removePosition);
     }
 
-    public ViewAction notifyItemRangeRemovedAction(int removePosition, int itemCount) {
+    public static ViewAction notifyItemRangeRemovedAction(int removePosition, int itemCount) {
         return new NotifyItemRemovedAction(removePosition, itemCount);
     }
 
-    public ViewAction actionDelegate(BiConsumer<UiController, RecyclerView> performAction) {
+    public static ViewAction actionDelegate(BiConsumer<UiController, RecyclerView> performAction) {
         return new ActionDelegate<>(performAction);
     }
 
@@ -55,11 +56,11 @@ public class RecyclerViewEspressoFactory {
     // Matcher factory
     ///////////////////////////////////////////////////////////////////////////
 
-    public Matcher<View> incrementOrder() {
+    public static Matcher<View> incrementOrder() {
         return orderMatcher();
     }
 
-    public Matcher<View> atPosition(final int position, @NonNull final Matcher<View> itemMatcher) {
+    public static Matcher<View> atPosition(final int position, @NonNull final Matcher<View> itemMatcher) {
         checkNotNull(itemMatcher);
         return new BoundedMatcher<View, RecyclerView>(RecyclerView.class) {
             @Override
@@ -76,7 +77,7 @@ public class RecyclerViewEspressoFactory {
         };
     }
 
-    public <T extends RecyclerView.ViewHolder> Matcher<View> atPosition(final int position, @NonNull final ViewHolderMatcher<T> itemMatcher) {
+    public static <T extends RecyclerView.ViewHolder> Matcher<View> atPosition(final int position, @NonNull final ViewHolderMatcher<T> itemMatcher) {
         checkNotNull(itemMatcher);
         return new BoundedMatcher<View, RecyclerView>(RecyclerView.class) {
             @Override
@@ -213,7 +214,7 @@ public class RecyclerViewEspressoFactory {
     // Matcher
     ///////////////////////////////////////////////////////////////////////////
 
-    private Matcher<View> orderMatcher() {
+    private static Matcher<View> orderMatcher() {
         return new TypeSafeMatcher<View>() {
             @Override
             public void describeTo(Description description) {
