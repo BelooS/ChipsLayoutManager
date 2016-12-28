@@ -148,8 +148,8 @@ public class FewChipsColumnTest {
         {
             //just adapt input items list to required start values
             items.remove(1);
-            items.remove(10);
-            ChipsEntity longItem = items.remove(9);
+            items.remove(9);
+            ChipsEntity longItem = items.remove(8);
             items.add(1, longItem);
         }
 

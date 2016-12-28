@@ -133,6 +133,7 @@ public class ColumnTest {
     @Test
     public void scrollToPosition_ScrollItemIsNotVisible_FirstVisiblePositionsEqualsScrollingTarget() throws Exception {
         //arrange
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(0));
         //act
         recyclerView.perform(RecyclerViewActions.scrollToPosition(18));
         InstrumentalUtil.waitForIdle();

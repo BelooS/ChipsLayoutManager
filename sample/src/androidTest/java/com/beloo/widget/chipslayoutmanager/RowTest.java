@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Rect;
+import android.support.annotation.UiThread;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
@@ -44,7 +45,7 @@ import static org.mockito.Mockito.spy;
 @RunWith(AndroidJUnit4.class)
 public class RowTest {
 
-    static RecyclerViewActionFactory actionsFactory;
+    private static RecyclerViewActionFactory actionsFactory;
 
     static {
         actionsFactory = new RecyclerViewActionFactory();
@@ -64,7 +65,7 @@ public class RowTest {
     private ChipsLayoutManager layoutManager;
     private TestActivity activity;
 
-    ViewInteraction recyclerView;
+    private ViewInteraction recyclerView;
 
     @Before
     public final void setUp() throws Throwable {
@@ -98,11 +99,50 @@ public class RowTest {
         return layoutManager;
     }
 
+    @UiThread
     protected ChipsLayoutManager getLayoutManager() {
         if (activityTestRule.getActivity() == null) return null;
         return ChipsLayoutManager.newBuilder(activityTestRule.getActivity())
                 .setOrientation(ChipsLayoutManager.HORIZONTAL)
                 .build();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // layouting, main feature
+    ///////////////////////////////////////////////////////////////////////////
+
+    @Test
+    public void layouting_ScrollForwardOffScreenAndBackward_ItemsStayOnASamePlace() throws Exception {
+        InstrumentalUtil.waitForIdle();
+
+        //arrange
+        RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
+        View child = getViewForPosition(rvTest, 7);
+        Rect expectedViewRect = layoutManager.getCanvas().getViewRect(child);
+
+        //act
+        recyclerView.perform(actionsFactory.scrollBy(0, 1000), actionsFactory.scrollBy(0, -1000));
+        Rect resultViewRect = layoutManager.getCanvas().getViewRect(child);
+
+        //assert
+        assertEquals(expectedViewRect, resultViewRect);
+    }
+
+    @Test
+    public void layouting_ScrollForwardOnScreenAndBackward_ItemsStayOnASamePlace() throws Exception {
+        InstrumentalUtil.waitForIdle();
+
+        //arrange
+        RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
+        View child = getViewForPosition(rvTest, 6);
+        Rect expectedViewRect = layoutManager.getCanvas().getViewRect(child);
+
+        //act
+        recyclerView.perform(actionsFactory.scrollBy(0, 250), actionsFactory.scrollBy(0, -250));
+        Rect resultViewRect = layoutManager.getCanvas().getViewRect(child);
+
+        //assert
+        assertEquals(expectedViewRect, resultViewRect);
     }
 
     @Test
@@ -116,6 +156,10 @@ public class RowTest {
         //assert
         recyclerView.check(matches(actionsFactory.incrementOrder()));
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // scroll
+    ///////////////////////////////////////////////////////////////////////////
 
     @Test
     public void scrollBy_LMInInitialStateAndScrollForward_CorrectFirstCompletelyVisibleItem() throws Exception {
@@ -308,6 +352,10 @@ public class RowTest {
         assertNotEquals(RecyclerView.NO_POSITION, pos);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // padding
+    ///////////////////////////////////////////////////////////////////////////
+
     @Test
     public void clipToPadding_IsTrue_paddingStaySame() throws Exception {
         //arrange
@@ -347,40 +395,6 @@ public class RowTest {
         View view = layoutManager.getChildAt(0);
         int padding = layoutManager.getDecoratedTop(view);
         assertTrue(padding < 0);
-    }
-
-    @Test
-    public void layouting_ScrollForwardOffScreenAndBackward_ItemsStayOnASamePlace() throws Exception {
-        InstrumentalUtil.waitForIdle();
-
-        //arrange
-        RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
-        View child = getViewForPosition(rvTest, 7);
-        Rect expectedViewRect = layoutManager.getCanvas().getViewRect(child);
-
-        //act
-        recyclerView.perform(actionsFactory.scrollBy(0, 1000), actionsFactory.scrollBy(0, -1000));
-        Rect resultViewRect = layoutManager.getCanvas().getViewRect(child);
-
-        //assert
-        assertEquals(expectedViewRect, resultViewRect);
-    }
-
-    @Test
-    public void layouting_ScrollForwardOnScreenAndBackward_ItemsStayOnASamePlace() throws Exception {
-        InstrumentalUtil.waitForIdle();
-
-        //arrange
-        RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
-        View child = getViewForPosition(rvTest, 6);
-        Rect expectedViewRect = layoutManager.getCanvas().getViewRect(child);
-
-        //act
-        recyclerView.perform(actionsFactory.scrollBy(0, 250), actionsFactory.scrollBy(0, -250));
-        Rect resultViewRect = layoutManager.getCanvas().getViewRect(child);
-
-        //assert
-        assertEquals(expectedViewRect, resultViewRect);
     }
 
     private View getViewForPosition(RecyclerView recyclerView, int position) {

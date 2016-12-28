@@ -1,23 +1,21 @@
 package com.beloo.widget.chipslayoutmanager;
 
-import android.support.test.espresso.ViewAction;
-import android.support.test.espresso.ViewInteraction;
+import android.support.annotation.UiThread;
 import android.support.v4.view.ViewCompat;
+import android.view.View;
+
 import com.beloo.chipslayoutmanager.sample.R;
-
-import org.junit.Before;
-
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 public class RTLRowTest extends RowTest {
 
+    @UiThread
     @Override
-    public void onSetUp() throws Exception {
-        resetToInitialAfterRotate();
-        ViewAction action = actionsFactory.actionDelegate((uiController, view) -> ViewCompat.setLayoutDirection(view, ViewCompat.LAYOUT_DIRECTION_RTL));
-        recyclerView.perform(action);
+    protected ChipsLayoutManager getLayoutManager() {
+        ChipsLayoutManager layoutManager = super.getLayoutManager();
+        if (activityTestRule.getActivity() != null) {
+            View recyclerView = activityTestRule.getActivity().findViewById(R.id.rvTest);
+            ViewCompat.setLayoutDirection(recyclerView, ViewCompat.LAYOUT_DIRECTION_RTL);
+        }
+        return layoutManager;
     }
 }
