@@ -18,6 +18,7 @@ project.ext {
     buildToolsVersion = "25.0.2"
     minSdkVersion = 15
     targetSdkVersion = 25
+    libraryVersion = "0.3.5"
 }
 
 allprojects {

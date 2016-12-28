@@ -91,7 +91,7 @@ public class RowTest {
         activity.runOnUiThread(() -> activity.initialize());
     }
 
-    public void onSetUp() {}
+    public void onSetUp() throws Exception {}
 
     private ChipsLayoutManager retrieveLayoutManager() {
         layoutManager = getLayoutManager();
@@ -236,7 +236,7 @@ public class RowTest {
         //verify no exceptions
     }
 
-    private void resetToInitialAfterRotate() throws Exception {
+    void resetToInitialAfterRotate() throws Exception {
         activityTestRule.launchActivity(new Intent(activity, TestActivity.class));
         InstrumentalUtil.waitForIdle();
     }

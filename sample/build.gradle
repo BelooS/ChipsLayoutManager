@@ -8,18 +8,25 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
-    testBuildType "debug"
+    testBuildType "development"
 
     defaultConfig {
         applicationId "com.beloo.chipslayoutmanager.sample"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName rootProject.ext.libraryVersion
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        all {
+            buildConfigField("boolean", "isReportCrashes", "true")
+        }
+        development {
+            buildConfigField("boolean", "isReportCrashes", "false")
+            debuggable true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -40,17 +47,34 @@ def supportVersion = "25+";
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile "com.android.support:appcompat-v7:$supportVersion"
-    compile "com.android.support:design:$supportVersion"
-    compile "com.android.support:recyclerview-v7:$supportVersion"
-    compile "com.android.support:cardview-v7:$supportVersion"
-    compile "com.android.support:support-v4:$supportVersion"
+    //modules
     compile project(':ChipsLayoutManager')
-    compile('com.mikepenz:materialdrawer:5.8.0@aar') {
+    //support libraries
+    compile ("com.android.support:appcompat-v7:$supportVersion")
+    compile ("com.android.support:design:$supportVersion")
+    compile ("com.android.support:recyclerview-v7:$supportVersion")
+    compile ("com.android.support:cardview-v7:$supportVersion")
+    compile ("com.android.support:support-v4:$supportVersion")
+
+    //3rd party libraries
+    compile('com.mikepenz:materialdrawer:5.8.0@aar')
+    {
         transitive = true
     }
-
-
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    //butterKnife
+    compile 'com.jakewharton:butterknife:8.4.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+    //crash tracking tool
+    compile 'com.google.firebase:firebase-crash:10.0.1'
+    testCompile 'junit:junit:4.12'
+    //android tests
+    androidTestCompile ("com.android.support:support-annotations:$supportVersion")
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'org.mockito:mockito-core:1.+'
+    androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
+    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
     androidTestCompile('com.android.support.test.espresso:espresso-contrib:2.2.2') {
         //this library has conflicts with app dependencies
         exclude group: 'com.android.support', module: 'appcompat'
@@ -58,17 +82,6 @@ dependencies {
         exclude group: 'com.android.support', module: 'design'
         exclude module: 'recyclerview-v7'
     }
-    androidTestCompile "com.android.support:support-annotations:$supportVersion"
-    compile 'com.github.bumptech.glide:glide:3.7.0'
-    compile 'com.jakewharton:butterknife:8.4.0'
-    compile 'com.google.firebase:firebase-crash:10.0.1'
-    testCompile 'junit:junit:4.12'
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile 'org.mockito:mockito-core:1.+'
-    androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
-    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
 }
 
 

@@ -15,17 +15,9 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 public class RTLRowTest extends RowTest {
 
     @Override
-    public void onSetUp() {
+    public void onSetUp() throws Exception {
+        resetToInitialAfterRotate();
         ViewAction action = actionsFactory.actionDelegate((uiController, view) -> ViewCompat.setLayoutDirection(view, ViewCompat.LAYOUT_DIRECTION_RTL));
         recyclerView.perform(action);
-    }
-
-    @Override
-    protected ChipsLayoutManager getLayoutManager() {
-        if (activityTestRule.getActivity() == null) return null;
-
-        return ChipsLayoutManager.newBuilder(activityTestRule.getActivity())
-                .setOrientation(ChipsLayoutManager.HORIZONTAL)
-                .build();
     }
 }
