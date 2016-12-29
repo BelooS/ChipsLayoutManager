@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.support.annotation.UiThread;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.contrib.RecyclerViewActions;
@@ -21,6 +22,7 @@ import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
 import com.beloo.chipslayoutmanager.sample.ui.ChipsFacade;
 import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.chipslayoutmanager.sample.ui.adapter.ChipsAdapter;
+import com.beloo.widget.chipslayoutmanager.support.BiConsumer;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
 
 import org.junit.Before;
@@ -211,19 +213,7 @@ public class RowTest {
 
 
         //assert
-        recyclerView.check(matches(atPosition(36, new RecyclerViewEspressoFactory.ViewHolderMatcher<RecyclerView.ViewHolder>() {
-
-            @Override
-            public boolean matches(RecyclerView parent, View itemView, RecyclerView.ViewHolder viewHolder) {
-                int expectedPadding = parent.getPaddingBottom();
-                int bottom = layoutManager.getDecoratedBottom(itemView);
-                int parentBottom = parent.getBottom();
-                int padding = parentBottom - bottom;
-                assertEquals("padding of RecyclerView item doesn't equal expected padding" ,expectedPadding, padding);
-                return true;
-            }
-
-        })));
+        recyclerView.check(matches(atPosition(36, rvPaddingMatcher())));
     }
 
     @Test
@@ -452,6 +442,31 @@ public class RowTest {
         View view = layoutManager.getChildAt(0);
         int padding = layoutManager.getDecoratedTop(view);
         assertTrue(padding < 0);
+    }
+
+    private ViewHolderMatcher<RecyclerView.ViewHolder> rvPaddingMatcher() {
+        return new ViewHolderMatcher<RecyclerView.ViewHolder>() {
+            @Override
+            public boolean matches(RecyclerView parent, View itemView, RecyclerView.ViewHolder viewHolder) {
+                int expectedPadding = parent.getPaddingBottom();
+                int bottom = layoutManager.getDecoratedBottom(itemView);
+                int parentBottom = parent.getBottom();
+                int padding = parentBottom - bottom;
+                assertEquals("padding of RecyclerView item doesn't equal expected padding" ,expectedPadding, padding);
+                return true;
+            }
+        };
+    }
+
+    @Test
+    public void gapsNormalization_OnLastRowDeleted_PaddingStaySame() throws Exception {
+        //arrange
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(39));
+        //act
+        recyclerView.perform(actionDelegate((uiController, recyclerView) -> items.remove(39)),
+                notifyItemRemovedAction(39));
+        //assert
+        recyclerView.check(matches(atPosition(38, rvPaddingMatcher())));
     }
 
     private View getViewForPosition(RecyclerView recyclerView, int position) {

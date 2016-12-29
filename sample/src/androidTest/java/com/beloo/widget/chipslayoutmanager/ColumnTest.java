@@ -151,7 +151,11 @@ public class ColumnTest {
 
 
         //assert
-        recyclerView.check(matches(atPosition(39, new RecyclerViewEspressoFactory.ViewHolderMatcher<RecyclerView.ViewHolder>() {
+        recyclerView.check(matches(atPosition(39, rvPaddingMatcher())));
+    }
+
+    private ViewHolderMatcher<RecyclerView.ViewHolder> rvPaddingMatcher() {
+        return new RecyclerViewEspressoFactory.ViewHolderMatcher<RecyclerView.ViewHolder>() {
 
             @Override
             public boolean matches(RecyclerView parent, View itemView, RecyclerView.ViewHolder viewHolder) {
@@ -162,8 +166,7 @@ public class ColumnTest {
                 assertEquals("padding of RecyclerView item doesn't equal expected padding" ,expectedPadding, padding);
                 return true;
             }
-
-        })));
+        };
     }
 
     @Test
@@ -402,5 +405,23 @@ public class ColumnTest {
 
         //assert
         assertEquals(expectedViewRect, resultViewRect);
+    }
+
+    @Test
+    public void gapsNormalization_OnLastRowDeleted_PaddingStaySame() throws Exception {
+        //arrange
+        {
+            items.remove(39);
+            items.remove(38);
+            items.remove(37);
+            activity.runOnUiThread(() -> activity.initialize());
+            InstrumentalUtil.waitForIdle();
+        }
+        recyclerView.perform(RecyclerViewActions.scrollToPosition(36));
+        //act
+        recyclerView.perform(actionDelegate((uiController, recyclerView) -> items.remove(36)),
+                notifyItemRemovedAction(36));
+        //assert
+        recyclerView.check(matches(atPosition(29, rvPaddingMatcher())));
     }
 }
