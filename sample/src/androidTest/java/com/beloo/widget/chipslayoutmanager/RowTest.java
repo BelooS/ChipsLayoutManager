@@ -102,7 +102,7 @@ public class RowTest {
 
     public void onSetUp() throws Exception {}
 
-    private IScrollingContract retrieveLayoutManager() {
+    private RecyclerView.LayoutManager retrieveLayoutManager() {
         layoutManager = getLayoutManager();
         return layoutManager;
     }

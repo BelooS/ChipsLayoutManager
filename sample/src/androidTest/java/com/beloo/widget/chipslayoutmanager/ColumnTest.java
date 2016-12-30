@@ -1,6 +1,7 @@
 package com.beloo.widget.chipslayoutmanager;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Rect;
@@ -86,7 +87,7 @@ public class ColumnTest {
         activity.runOnUiThread(() -> activity.initialize());
     }
 
-    private IScrollingContract retrieveLayoutManager() {
+    private RecyclerView.LayoutManager retrieveLayoutManager() {
         this.layoutManager = getLayoutManager();
         return layoutManager;
     }
@@ -310,6 +311,13 @@ public class ColumnTest {
         assertNotEquals(-1, actual);
         assertEquals("first visible positions before and after rotation doesn't match", expected, actual);
         System.out.println("first visible position = " + actual);
+
+        resetToInitialAfterRotate();
+    }
+
+    void resetToInitialAfterRotate() throws Exception {
+        activityTestRule.launchActivity(new Intent(activity, TestActivity.class));
+        InstrumentalUtil.waitForIdle();
     }
 
     @Test
