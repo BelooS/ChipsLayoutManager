@@ -18,6 +18,7 @@ public interface ICanvas extends IBorder {
 
     boolean isFullyVisible(Rect rect);
 
+    /** calculate border state of layout manager after filling children*/
     void findBorderViews();
 
     View getTopView();

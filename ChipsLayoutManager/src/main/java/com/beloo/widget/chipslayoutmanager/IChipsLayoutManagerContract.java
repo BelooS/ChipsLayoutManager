@@ -4,7 +4,7 @@ import android.support.annotation.IntRange;
 
 import com.beloo.widget.chipslayoutmanager.layouter.breaker.IRowBreaker;
 
-interface IChipsLayoutManagerContract extends IPositionsContract {
+interface IChipsLayoutManagerContract extends IPositionsContract, IScrollingContract {
     /** use it to strictly disable scrolling.
      * If scrolling enabled it would be disabled in case all items fit on the screen */
     void setScrollingEnabledContract(boolean isEnabled);

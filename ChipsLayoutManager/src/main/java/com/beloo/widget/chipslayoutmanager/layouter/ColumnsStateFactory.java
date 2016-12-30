@@ -103,8 +103,18 @@ public class ColumnsStateFactory implements IStateFactory {
     }
 
     @Override
+    public int getEndViewPosition() {
+        return lm.getPosition(lm.getCanvas().getBottomView());
+    }
+
+    @Override
     public int getStartAfterPadding() {
         return lm.getPaddingLeft();
+    }
+
+    @Override
+    public int getStartViewPosition() {
+        return lm.getPosition(lm.getCanvas().getTopView());
     }
 
     @Override
@@ -120,6 +130,12 @@ public class ColumnsStateFactory implements IStateFactory {
     @Override
     public int getEndViewBound() {
         return getEnd(lm.getCanvas().getRightView());
+    }
+
+    @Override
+    public int getTotalSpace() {
+        return lm.getHeight() - lm.getPaddingTop()
+                - lm.getPaddingBottom();
     }
 
 

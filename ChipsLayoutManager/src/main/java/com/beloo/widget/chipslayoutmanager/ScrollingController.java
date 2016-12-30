@@ -169,6 +169,8 @@ abstract class ScrollingController implements IScrollingController {
         return d;
     }
 
+    /** @see ChipsLayoutManager#computeVerticalScrollExtent(RecyclerView.State)
+     * @see ChipsLayoutManager#computeHorizontalScrollExtent(RecyclerView.State) */
     private int computeScrollExtent(RecyclerView.State state) {
         if (lm.getChildCount() == 0 || state.getItemCount() == 0) {
             return 0;
@@ -177,8 +179,15 @@ abstract class ScrollingController implements IScrollingController {
         int firstVisiblePos = lm.findFirstVisibleItemPosition();
         int lastVisiblePos = lm.findLastVisibleItemPosition();
 
-        return Math.abs(lastVisiblePos - firstVisiblePos) + 1;
+        if (!lm.isSmoothScrollbarEnabled()) {
+            return Math.abs(lastVisiblePos - firstVisiblePos) + 1;
+        }
+
+        return Math.min(stateFactory.getTotalSpace(), getLaidOutArea());
     }
+
+    /** @see ChipsLayoutManager#computeVerticalScrollOffset(RecyclerView.State)
+     * @see ChipsLayoutManager#computeHorizontalScrollOffset(RecyclerView.State) */
     private int computeScrollOffset(RecyclerView.State state) {
         if (lm.getChildCount() == 0 || state.getItemCount() == 0) {
             return 0;
@@ -186,15 +195,42 @@ abstract class ScrollingController implements IScrollingController {
 
         int firstVisiblePos = lm.findFirstVisibleItemPosition();
         int lastVisiblePos = lm.findLastVisibleItemPosition();
+        final int itemsBefore = Math.max(0, firstVisiblePos);
 
-        return Math.min(firstVisiblePos, lastVisiblePos);
+        if (!lm.isSmoothScrollbarEnabled()) {
+            return itemsBefore;
+        }
+
+        final int itemRange = Math.abs(firstVisiblePos - lastVisiblePos) + 1;
+
+        final float avgSizePerRow = (float) getLaidOutArea() / itemRange;
+
+        return Math.round(itemsBefore * avgSizePerRow +
+                (stateFactory.getStartAfterPadding() - stateFactory.getStartViewBound()));
+    }
+
+    private int getLaidOutArea() {
+        return stateFactory.getEndViewBound() -
+                stateFactory.getStartViewBound();
     }
 
     private int computeScrollRange(RecyclerView.State state) {
         if (lm.getChildCount() == 0 || state.getItemCount() == 0) {
             return 0;
         }
-        return state.getItemCount();
+
+        if (!lm.isSmoothScrollbarEnabled()) {
+            return state.getItemCount();
+        }
+
+        int firstVisiblePos = lm.findFirstVisibleItemPosition();
+        int lastVisiblePos = lm.findLastVisibleItemPosition();
+
+        // smooth scrollbar enabled. try to estimate better.
+        final int laidOutRange = Math.abs(firstVisiblePos - lastVisiblePos) + 1;
+
+        // estimate a size for full list.
+        return (int) ((float) getLaidOutArea() / laidOutRange * state.getItemCount());
     }
 
     @Override

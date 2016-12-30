@@ -23,14 +23,6 @@ public interface IStateFactory {
 
     int getSizeMode();
 
-    int getEnd();
-
-    int getEnd(View view);
-
-    int getEndAfterPadding();
-
-    int getEnd(AnchorViewState anchor);
-
     int getStart();
 
     int getStart(View view);
@@ -39,7 +31,21 @@ public interface IStateFactory {
 
     int getStartAfterPadding();
 
+    int getStartViewPosition();
+
     int getStartViewBound();
 
+    int getEnd();
+
+    int getEnd(View view);
+
+    int getEndAfterPadding();
+
+    int getEnd(AnchorViewState anchor);
+
+    int getEndViewPosition();
+
     int getEndViewBound();
+
+    int getTotalSpace();
 }

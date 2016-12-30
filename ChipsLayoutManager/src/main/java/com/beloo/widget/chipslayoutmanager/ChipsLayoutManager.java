@@ -45,7 +45,9 @@ import com.beloo.widget.chipslayoutmanager.util.LayoutManagerUtil;
 import com.beloo.widget.chipslayoutmanager.util.testing.EmptySpy;
 import com.beloo.widget.chipslayoutmanager.util.testing.ISpy;
 
-public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract, IStateHolder, ScrollingController.IScrollerListener {
+public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract,
+        IStateHolder,
+        ScrollingController.IScrollerListener {
     ///////////////////////////////////////////////////////////////////////////
     // orientation types
     ///////////////////////////////////////////////////////////////////////////
@@ -85,6 +87,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     /** iterable over views added to RecyclerView */
     private ChildViewsIterable childViews = new ChildViewsIterable(this);
 
+    private SparseArray<View> childViewPositions = new SparseArray<>();
+
     ///////////////////////////////////////////////////////////////////////////
     // contract parameters
     ///////////////////////////////////////////////////////////////////////////
@@ -102,6 +106,8 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @RowStrategy
     private int rowStrategy = STRATEGY_DEFAULT;
     private boolean isStrategyAppliedWithLastRow;
+    /** @see #setSmoothScrollbarEnabled(boolean). True by default */
+    private boolean isSmoothScrollbarEnabled = true;
 
     ///////////////////////////////////////////////////////////////////////////
     // cache
@@ -213,6 +219,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     /** use it to strictly disable scrolling.
      * If scrolling enabled it would be disabled in case all items fit on the screen */
+    @Override
     public void setScrollingEnabledContract(boolean isEnabled) {
         isScrollingEnabledContract = isEnabled;
     }
@@ -530,15 +537,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     public int findFirstVisibleItemPosition() {
         if (getChildCount() == 0)
             return RecyclerView.NO_POSITION;
-//        return canvas.getMinPositionOnScreen();
-        for (View view : childViews) {
-            Rect rect = canvas.getViewRect(view);
-            if (canvas.isInside(rect)) {
-                return getPosition(view);
-            }
-        }
-
-        return RecyclerView.NO_POSITION;
+        return canvas.getMinPositionOnScreen();
     }
 
     /**
@@ -605,6 +604,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
 
         return RecyclerView.NO_POSITION;
+    }
+
+    /** @return child for requested position. Null if that child haven't added to layout manager*/
+    @Nullable
+    View getChildWithPosition(int position) {
+        return childViewPositions.get(position);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -735,6 +740,12 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     }
 
+    @Override
+    public void detachAndScrapAttachedViews(RecyclerView.Recycler recycler) {
+        super.detachAndScrapAttachedViews(recycler);
+        childViewPositions.clear();
+    }
+
     /** layout disappearing view to support predictive animations */
     private void layoutDisappearingViews(RecyclerView.Recycler recycler, @NonNull ILayouter upLayouter, ILayouter downLayouter) {
 
@@ -816,9 +827,18 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         }
 
         canvas.findBorderViews();
+        buildChildWithPositionsMap();
 
         viewCache.clear();
         logger.onAfterRemovingViews();
+    }
+
+    private void buildChildWithPositionsMap() {
+        childViewPositions.clear();
+        for (View view : childViews) {
+            int position = getPosition(view);
+            childViewPositions.put(position, view);
+        }
     }
 
     /**
@@ -1016,6 +1036,40 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     ///////////////////////////////////////////////////////////////////////////
     // Scrolling
     ///////////////////////////////////////////////////////////////////////////
+
+    /**
+     * When smooth scrollbar is enabled, the position and size of the scrollbar thumb is computed
+     * based on the number of visible pixels in the visible items. This however assumes that all
+     * list items have similar or equal widths or heights (depending on list orientation).
+     * If you use a list in which items have different dimensions, the scrollbar will change
+     * appearance as the user scrolls through the list. To avoid this issue,  you need to disable
+     * this property.
+     *
+     * When smooth scrollbar is disabled, the position and size of the scrollbar thumb is based
+     * solely on the number of items in the adapter and the position of the visible items inside
+     * the adapter. This provides a stable scrollbar as the user navigates through a list of items
+     * with varying widths / heights.
+     *
+     * @param enabled Whether or not to enable smooth scrollbar.
+     *
+     * @see #isSmoothScrollbarEnabled()
+     */
+    @Override
+    public void setSmoothScrollbarEnabled(boolean enabled) {
+        isSmoothScrollbarEnabled = enabled;
+    }
+
+    /**
+     * Returns the current state of the smooth scrollbar feature. It is enabled by default.
+     *
+     * @return True if smooth scrollbar is enabled, false otherwise.
+     *
+     * @see #setSmoothScrollbarEnabled(boolean)
+     */
+    @Override
+    public boolean isSmoothScrollbarEnabled() {
+        return isSmoothScrollbarEnabled;
+    }
 
     /**
      * {@inheritDoc}

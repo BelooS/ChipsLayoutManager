@@ -86,7 +86,7 @@ public class ColumnTest {
         activity.runOnUiThread(() -> activity.initialize());
     }
 
-    private ChipsLayoutManager retrieveLayoutManager() {
+    private IScrollingContract retrieveLayoutManager() {
         this.layoutManager = getLayoutManager();
         return layoutManager;
     }

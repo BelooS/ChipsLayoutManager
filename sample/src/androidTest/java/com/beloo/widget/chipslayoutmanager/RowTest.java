@@ -7,7 +7,6 @@ import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.support.annotation.UiThread;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.contrib.RecyclerViewActions;
@@ -22,7 +21,6 @@ import com.beloo.chipslayoutmanager.sample.ui.LayoutManagerFactory;
 import com.beloo.chipslayoutmanager.sample.ui.ChipsFacade;
 import com.beloo.chipslayoutmanager.sample.ui.TestActivity;
 import com.beloo.chipslayoutmanager.sample.ui.adapter.ChipsAdapter;
-import com.beloo.widget.chipslayoutmanager.support.BiConsumer;
 import com.beloo.widget.chipslayoutmanager.util.InstrumentalUtil;
 
 import org.junit.Before;
@@ -32,7 +30,6 @@ import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 
 import com.beloo.chipslayoutmanager.sample.R;
-import com.beloo.test.util.RecyclerViewEspressoFactory;
 
 import java.util.List;
 
@@ -105,7 +102,7 @@ public class RowTest {
 
     public void onSetUp() throws Exception {}
 
-    private ChipsLayoutManager retrieveLayoutManager() {
+    private IScrollingContract retrieveLayoutManager() {
         layoutManager = getLayoutManager();
         return layoutManager;
     }
