@@ -147,7 +147,10 @@ abstract class ScrollingController implements IScrollingController {
         return delta;
     }
 
-    public abstract void offsetChildren(int d);
+    abstract void offsetChildren(int d);
+    abstract int computeScrollExtent(RecyclerView.State state);
+    abstract int computeScrollOffset(RecyclerView.State state);
+    abstract int computeScrollRange(RecyclerView.State state);
 
     @Override
     public final int scrollHorizontallyBy(int d, RecyclerView.Recycler recycler, RecyclerView.State state) {
@@ -167,5 +170,35 @@ abstract class ScrollingController implements IScrollingController {
         scrollerListener.onScrolled(this, recycler, state);
 
         return d;
+    }
+
+    @Override
+    public final int computeVerticalScrollExtent(RecyclerView.State state) {
+        return canScrollVertically() ? computeScrollExtent(state) : 0;
+    }
+
+    @Override
+    public final int computeVerticalScrollRange(RecyclerView.State state) {
+        return canScrollVertically() ? computeScrollRange(state) : 0;
+    }
+
+    @Override
+    public final int computeVerticalScrollOffset(RecyclerView.State state) {
+        return canScrollVertically() ? computeScrollOffset(state) : 0;
+    }
+
+    @Override
+    public final int computeHorizontalScrollRange(RecyclerView.State state) {
+        return canScrollHorizontally() ? computeScrollRange(state) : 0;
+    }
+
+    @Override
+    public final int computeHorizontalScrollOffset(RecyclerView.State state) {
+        return canScrollHorizontally() ? computeScrollOffset(state) : 0;
+    }
+
+    @Override
+    public final int computeHorizontalScrollExtent(RecyclerView.State state) {
+        return canScrollHorizontally() ? computeScrollExtent(state) : 0;
     }
 }

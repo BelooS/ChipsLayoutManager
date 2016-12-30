@@ -1101,4 +1101,39 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
                 factory.getForwardLayouter(anchorView));
     }
 
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @Override
+    public int computeVerticalScrollOffset(RecyclerView.State state) {
+        return scrollingController.computeVerticalScrollOffset(state);
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @Override
+    public int computeVerticalScrollExtent(RecyclerView.State state) {
+        return scrollingController.computeVerticalScrollExtent(state);
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @Override
+    public int computeVerticalScrollRange(RecyclerView.State state) {
+        return scrollingController.computeVerticalScrollRange(state);
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @Override
+    public int computeHorizontalScrollExtent(RecyclerView.State state) {
+        return scrollingController.computeHorizontalScrollExtent(state);
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @Override
+    public int computeHorizontalScrollOffset(RecyclerView.State state) {
+        return scrollingController.computeHorizontalScrollOffset(state);
+    }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @Override
+    public int computeHorizontalScrollRange(RecyclerView.State state) {
+        return scrollingController.computeHorizontalScrollRange(state);
+    }
 }

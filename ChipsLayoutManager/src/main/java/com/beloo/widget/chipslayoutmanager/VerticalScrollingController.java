@@ -11,7 +11,7 @@ import android.view.animation.LinearInterpolator;
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 import com.beloo.widget.chipslayoutmanager.layouter.IStateFactory;
 
-public class VerticalScrollingController extends ScrollingController implements IScrollingController {
+class VerticalScrollingController extends ScrollingController implements IScrollingController {
 
     private ChipsLayoutManager layoutManager;
 
@@ -75,8 +75,23 @@ public class VerticalScrollingController extends ScrollingController implements 
     }
 
     @Override
-    public void offsetChildren(int d) {
+    void offsetChildren(int d) {
         layoutManager.offsetChildrenVertical(d);
+    }
+
+    @Override
+    int computeScrollExtent(RecyclerView.State state) {
+        return 0;
+    }
+
+    @Override
+    int computeScrollOffset(RecyclerView.State state) {
+        return 0;
+    }
+
+    @Override
+    int computeScrollRange(RecyclerView.State state) {
+        return 0;
     }
 
 }
