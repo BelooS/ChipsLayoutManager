@@ -134,8 +134,8 @@ public class ColumnsStateFactory implements IStateFactory {
 
     @Override
     public int getTotalSpace() {
-        return lm.getHeight() - lm.getPaddingTop()
-                - lm.getPaddingBottom();
+        return lm.getWidth() - lm.getPaddingLeft()
+                - lm.getPaddingRight();
     }
 
 

@@ -132,7 +132,7 @@ public class RowsStateFactory implements IStateFactory {
 
     @Override
     public int getTotalSpace() {
-        return lm.getWidth() - lm.getPaddingLeft()
-                - lm.getPaddingRight();
+        return lm.getHeight() - lm.getPaddingTop()
+                - lm.getPaddingBottom();
     }
 }

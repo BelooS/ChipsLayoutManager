@@ -107,7 +107,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private int rowStrategy = STRATEGY_DEFAULT;
     private boolean isStrategyAppliedWithLastRow;
     /** @see #setSmoothScrollbarEnabled(boolean). True by default */
-    private boolean isSmoothScrollbarEnabled = true;
+    private boolean isSmoothScrollbarEnabled = false;
 
     ///////////////////////////////////////////////////////////////////////////
     // cache
@@ -1041,6 +1041,16 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      * When smooth scrollbar is enabled, the position and size of the scrollbar thumb is computed
      * based on the number of visible pixels in the visible items. This however assumes that all
      * list items have similar or equal widths or heights (depending on list orientation).
+     *
+     * Also this is {@link ChipsLayoutManager} specific issue, that we can't predict exact count of items on screen
+     * in general case, because we can't predict items count in row.
+     * So to enable it you should accomplish one of those conditions:
+     * <ul>
+     *     <li> Your items have same width and height </li>
+     *     <li> You have {@link ChipsLayoutManager#setMaxViewsInRow(Integer)} set and you able to make sure, that there won't be many rows with lower items count.
+     *     The best is none. </li>
+     * </ul>
+     *
      * If you use a list in which items have different dimensions, the scrollbar will change
      * appearance as the user scrolls through the list. To avoid this issue,  you need to disable
      * this property.
@@ -1060,7 +1070,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     }
 
     /**
-     * Returns the current state of the smooth scrollbar feature. It is enabled by default.
+     * Returns the current state of the smooth scrollbar feature. It is NOT enabled by default.
      *
      * @return True if smooth scrollbar is enabled, false otherwise.
      *

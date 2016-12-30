@@ -169,21 +169,9 @@ abstract class ScrollingController implements IScrollingController {
         return d;
     }
 
-    /** @see ChipsLayoutManager#computeVerticalScrollExtent(RecyclerView.State)
-     * @see ChipsLayoutManager#computeHorizontalScrollExtent(RecyclerView.State) */
-    private int computeScrollExtent(RecyclerView.State state) {
-        if (lm.getChildCount() == 0 || state.getItemCount() == 0) {
-            return 0;
-        }
-
-        int firstVisiblePos = lm.findFirstVisibleItemPosition();
-        int lastVisiblePos = lm.findLastVisibleItemPosition();
-
-        if (!lm.isSmoothScrollbarEnabled()) {
-            return Math.abs(lastVisiblePos - firstVisiblePos) + 1;
-        }
-
-        return Math.min(stateFactory.getTotalSpace(), getLaidOutArea());
+    private int getLaidOutArea() {
+        return stateFactory.getEndViewBound() -
+                stateFactory.getStartViewBound();
     }
 
     /** @see ChipsLayoutManager#computeVerticalScrollOffset(RecyclerView.State)
@@ -209,9 +197,21 @@ abstract class ScrollingController implements IScrollingController {
                 (stateFactory.getStartAfterPadding() - stateFactory.getStartViewBound()));
     }
 
-    private int getLaidOutArea() {
-        return stateFactory.getEndViewBound() -
-                stateFactory.getStartViewBound();
+    /** @see ChipsLayoutManager#computeVerticalScrollExtent(RecyclerView.State)
+     * @see ChipsLayoutManager#computeHorizontalScrollExtent(RecyclerView.State) */
+    private int computeScrollExtent(RecyclerView.State state) {
+        if (lm.getChildCount() == 0 || state.getItemCount() == 0) {
+            return 0;
+        }
+
+        int firstVisiblePos = lm.findFirstVisibleItemPosition();
+        int lastVisiblePos = lm.findLastVisibleItemPosition();
+
+        if (!lm.isSmoothScrollbarEnabled()) {
+            return Math.abs(lastVisiblePos - firstVisiblePos) + 1;
+        }
+
+        return Math.min(stateFactory.getTotalSpace(), getLaidOutArea());
     }
 
     private int computeScrollRange(RecyclerView.State state) {
