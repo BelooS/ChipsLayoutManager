@@ -11,7 +11,7 @@ import com.beloo.widget.chipslayoutmanager.logger.LoggerFactory;
 
 abstract class ScrollingController implements IScrollingController {
 
-    private ChipsLayoutManager layoutManager;
+    private ChipsLayoutManager lm;
     private IScrollerListener scrollerListener;
     private IScrollingLogger scrollingLogger;
     private IStateFactory stateFactory;
@@ -22,7 +22,7 @@ abstract class ScrollingController implements IScrollingController {
     }
 
     ScrollingController(ChipsLayoutManager layoutManager, IStateFactory stateFactory, IScrollerListener scrollerListener) {
-        this.layoutManager = layoutManager;
+        this.lm = layoutManager;
         this.scrollerListener = scrollerListener;
         LoggerFactory loggerFactory = new LoggerFactory();
         scrollingLogger = loggerFactory.getScrollingLogger();
@@ -31,11 +31,11 @@ abstract class ScrollingController implements IScrollingController {
     }
 
     final int calculateEndGap() {
-        if (layoutManager.getChildCount() == 0) return 0;
+        if (lm.getChildCount() == 0) return 0;
 
-        int visibleViewsCount = layoutManager.getCompletelyVisibleViewsCount();
+        int visibleViewsCount = lm.getCompletelyVisibleViewsCount();
 
-        if (visibleViewsCount == layoutManager.getItemCount()) return 0;
+        if (visibleViewsCount == lm.getItemCount()) return 0;
         int currentEnd = stateFactory.getEndViewBound();
         int desiredEnd = stateFactory.getEndAfterPadding();
 
@@ -45,7 +45,7 @@ abstract class ScrollingController implements IScrollingController {
     }
 
     final int calculateStartGap() {
-        if (layoutManager.getChildCount() == 0) return 0;
+        if (lm.getChildCount() == 0) return 0;
         int currentStart = stateFactory.getStartViewBound();
         int desiredStart = stateFactory.getStartAfterPadding();
         int diff = currentStart - desiredStart;
@@ -72,7 +72,7 @@ abstract class ScrollingController implements IScrollingController {
     }
 
     final int calcOffset(int d) {
-        int childCount = layoutManager.getChildCount();
+        int childCount = lm.getChildCount();
         if (childCount == 0) {
             return 0;
         }
@@ -96,7 +96,7 @@ abstract class ScrollingController implements IScrollingController {
     final int onContentScrolledBackward(int d) {
         int delta;
 
-        AnchorViewState anchor = layoutManager.getAnchor();
+        AnchorViewState anchor = lm.getAnchor();
         if (anchor.getAnchorViewRect() == null) {
             return 0;
         }
@@ -130,12 +130,12 @@ abstract class ScrollingController implements IScrollingController {
      * @return delta. Calculated changing of x or y axis, depending on lm state
      */
     final int onContentScrolledForward(int d) {
-        int childCount = layoutManager.getChildCount();
-        int itemCount = layoutManager.getItemCount();
+        int childCount = lm.getChildCount();
+        int itemCount = lm.getItemCount();
         int delta;
 
-        View lastView = layoutManager.getChildAt(childCount - 1);
-        int lastViewAdapterPos = layoutManager.getPosition(lastView);
+        View lastView = lm.getChildAt(childCount - 1);
+        int lastViewAdapterPos = lm.getPosition(lastView);
         if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
             delta = d;
         } else { //in case lower view is the last view in adapter and wouldn't be any other view below
@@ -148,9 +148,6 @@ abstract class ScrollingController implements IScrollingController {
     }
 
     abstract void offsetChildren(int d);
-    abstract int computeScrollExtent(RecyclerView.State state);
-    abstract int computeScrollOffset(RecyclerView.State state);
-    abstract int computeScrollRange(RecyclerView.State state);
 
     @Override
     public final int scrollHorizontallyBy(int d, RecyclerView.Recycler recycler, RecyclerView.State state) {
@@ -165,11 +162,39 @@ abstract class ScrollingController implements IScrollingController {
     private int scrollBy(int d, RecyclerView.Recycler recycler, RecyclerView.State state) {
         d = calcOffset(d);
         offsetChildren(-d);
-        scrollingLogger.logChildCount(layoutManager.getChildCount());
+        scrollingLogger.logChildCount(lm.getChildCount());
 
         scrollerListener.onScrolled(this, recycler, state);
 
         return d;
+    }
+
+    private int computeScrollExtent(RecyclerView.State state) {
+        if (lm.getChildCount() == 0 || state.getItemCount() == 0) {
+            return 0;
+        }
+
+        int firstVisiblePos = lm.findFirstVisibleItemPosition();
+        int lastVisiblePos = lm.findLastVisibleItemPosition();
+
+        return Math.abs(lastVisiblePos - firstVisiblePos) + 1;
+    }
+    private int computeScrollOffset(RecyclerView.State state) {
+        if (lm.getChildCount() == 0 || state.getItemCount() == 0) {
+            return 0;
+        }
+
+        int firstVisiblePos = lm.findFirstVisibleItemPosition();
+        int lastVisiblePos = lm.findLastVisibleItemPosition();
+
+        return Math.min(firstVisiblePos, lastVisiblePos);
+    }
+
+    private int computeScrollRange(RecyclerView.State state) {
+        if (lm.getChildCount() == 0 || state.getItemCount() == 0) {
+            return 0;
+        }
+        return state.getItemCount();
     }
 
     @Override

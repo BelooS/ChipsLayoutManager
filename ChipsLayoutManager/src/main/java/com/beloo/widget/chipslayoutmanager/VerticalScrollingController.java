@@ -13,11 +13,11 @@ import com.beloo.widget.chipslayoutmanager.layouter.IStateFactory;
 
 class VerticalScrollingController extends ScrollingController implements IScrollingController {
 
-    private ChipsLayoutManager layoutManager;
+    private ChipsLayoutManager lm;
 
     VerticalScrollingController(ChipsLayoutManager layoutManager, IStateFactory stateFactory, IScrollerListener scrollerListener) {
         super(layoutManager, stateFactory, scrollerListener);
-        this.layoutManager = layoutManager;
+        this.lm = layoutManager;
     }
 
     @Override
@@ -38,8 +38,8 @@ class VerticalScrollingController extends ScrollingController implements IScroll
             @Override
             protected void onTargetFound(View targetView, RecyclerView.State state, Action action) {
                 super.onTargetFound(targetView, state, action);
-                int desiredTop = layoutManager.getPaddingTop();
-                int currentTop = layoutManager.getDecoratedTop(targetView);
+                int desiredTop = lm.getPaddingTop();
+                int currentTop = lm.getDecoratedTop(targetView);
 
                 int dy = currentTop - desiredTop;
 
@@ -52,21 +52,21 @@ class VerticalScrollingController extends ScrollingController implements IScroll
     @Override
     public boolean canScrollVertically() {
         canvas.findBorderViews();
-        if (layoutManager.getChildCount() > 0) {
-            int top = layoutManager.getDecoratedTop(canvas.getTopView());
-            int bottom = layoutManager.getDecoratedBottom(canvas.getBottomView());
+        if (lm.getChildCount() > 0) {
+            int top = lm.getDecoratedTop(canvas.getTopView());
+            int bottom = lm.getDecoratedBottom(canvas.getBottomView());
 
             if (canvas.getMinPositionOnScreen() == 0
-                    && canvas.getMaxPositionOnScreen() == layoutManager.getItemCount() - 1
-                    && top >= layoutManager.getPaddingTop()
-                    && bottom <= layoutManager.getHeight() - layoutManager.getPaddingBottom()) {
+                    && canvas.getMaxPositionOnScreen() == lm.getItemCount() - 1
+                    && top >= lm.getPaddingTop()
+                    && bottom <= lm.getHeight() - lm.getPaddingBottom()) {
                 return false;
             }
         } else {
             return false;
         }
 
-        return layoutManager.isScrollingEnabledContract();
+        return lm.isScrollingEnabledContract();
     }
 
     @Override
@@ -76,22 +76,7 @@ class VerticalScrollingController extends ScrollingController implements IScroll
 
     @Override
     void offsetChildren(int d) {
-        layoutManager.offsetChildrenVertical(d);
-    }
-
-    @Override
-    int computeScrollExtent(RecyclerView.State state) {
-        return 0;
-    }
-
-    @Override
-    int computeScrollOffset(RecyclerView.State state) {
-        return 0;
-    }
-
-    @Override
-    int computeScrollRange(RecyclerView.State state) {
-        return 0;
+        lm.offsetChildrenVertical(d);
     }
 
 }

@@ -79,19 +79,4 @@ class HorizontalScrollingController extends ScrollingController implements IScro
         layoutManager.offsetChildrenHorizontal(d);
     }
 
-    @Override
-    int computeScrollExtent(RecyclerView.State state) {
-        return 0;
-    }
-
-    @Override
-    int computeScrollOffset(RecyclerView.State state) {
-        return 0;
-    }
-
-    @Override
-    int computeScrollRange(RecyclerView.State state) {
-        return 0;
-    }
-
 }
