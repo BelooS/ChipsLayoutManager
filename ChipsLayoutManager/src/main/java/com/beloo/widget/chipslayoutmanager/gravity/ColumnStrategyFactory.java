@@ -10,6 +10,8 @@ public class ColumnStrategyFactory implements IRowStrategyFactory {
         switch (rowStrategy) {
             case ChipsLayoutManager.STRATEGY_CENTER:
                 return new ColumnFillSpaceCenterStrategy();
+            case ChipsLayoutManager.STRATEGY_CENTER_DENSE:
+                return new ColumnFillSpaceCenterDenseStrategy();
             case ChipsLayoutManager.STRATEGY_FILL_SPACE:
                 return new ColumnFillSpaceStrategy();
             case ChipsLayoutManager.STRATEGY_FILL_VIEW:

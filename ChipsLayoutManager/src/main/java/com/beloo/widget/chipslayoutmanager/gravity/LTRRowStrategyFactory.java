@@ -10,6 +10,8 @@ public class LTRRowStrategyFactory implements IRowStrategyFactory {
         switch (rowStrategy) {
             case ChipsLayoutManager.STRATEGY_CENTER:
                 return new LTRRowFillSpaceCenterStrategy();
+            case ChipsLayoutManager.STRATEGY_CENTER_DENSE:
+                return new LTRRowFillSpaceCenterDenseStrategy();
             case ChipsLayoutManager.STRATEGY_FILL_SPACE:
                 return new LTRRowFillSpaceStrategy();
             case ChipsLayoutManager.STRATEGY_FILL_VIEW:
