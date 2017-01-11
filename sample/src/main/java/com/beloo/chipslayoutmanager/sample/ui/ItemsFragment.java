@@ -2,17 +2,22 @@ package com.beloo.chipslayoutmanager.sample.ui;
 
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import com.beloo.chipslayoutmanager.sample.entity.ChipsEntity;
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager;
 import com.beloo.widget.chipslayoutmanager.SpacingItemDecoration;
 
@@ -155,7 +160,7 @@ public class ItemsFragment extends Fragment {
     }
 
     @OnClick(R.id.btnRevert)
-    public void onRevertClicked(View view) {
+    public void onRevertClicked() {
         int position = spinnerPosition.getSelectedItemPosition();
         if (position == Spinner.INVALID_POSITION)
             return;
@@ -171,7 +176,7 @@ public class ItemsFragment extends Fragment {
     }
 
     @OnClick(R.id.btnDelete)
-    public void onDeleteClicked(View view) {
+    public void onDeleteClicked() {
         int position = spinnerPosition.getSelectedItemPosition();
         if (position == Spinner.INVALID_POSITION)
             return;
@@ -182,7 +187,7 @@ public class ItemsFragment extends Fragment {
     }
 
     @OnClick(R.id.btnMove)
-    public void onMoveClicked(View view) {
+    public void onMoveClicked() {
         int position = spinnerPosition.getSelectedItemPosition();
         if (position == Spinner.INVALID_POSITION)
             return;
@@ -194,19 +199,23 @@ public class ItemsFragment extends Fragment {
         if (position == positionMoveTo) return;
 
         Object item = items.remove(position);
+
+        ChipsEntity entity = (ChipsEntity) item;
+        entity.setName("changed\nname\nblah blah");
         items.add(positionMoveTo, item);
 
+        adapter.notifyItemChanged(position);
         adapter.notifyItemMoved(position, positionMoveTo);
     }
 
     @OnClick(R.id.btnScroll)
-    public void onScrollClicked(View view) {
+    public void onScrollClicked() {
 //        rvTest.scrollBy(0, 500);
         rvTest.scrollToPosition(spinnerPosition.getSelectedItemPosition());
     }
 
     @OnClick(R.id.btnInsert)
-    public void onInsertClicked(View view) {
+    public void onInsertClicked() {
         int position = spinnerPosition.getSelectedItemPosition();
         if (position == Spinner.INVALID_POSITION)
             position = 0;
