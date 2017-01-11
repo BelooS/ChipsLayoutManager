@@ -70,6 +70,7 @@ Row strategy is a mode of distribution left space.
 * `STRATEGY_FILL_VIEW` - available space is distributed among views.
 * `STRATEGY_FILL_SPACE` - available space is distributed among spaces between views, start & end views are docked to a nearest border.
 * `STRATEGY_CENTER` - available space is distributed among spaces between views, start & end spaces included. Views are placed in center of canvas.
+* `STRATEGY_CENTER_DENSE` - Views are placed in center of canvas. There is no extra space distributed between views.
 
 In such layouts by default last row isn't considered completed. So strategy isn't applied for last row.
 But you can also enable opposite behaviour.
@@ -134,7 +135,7 @@ For example look at sample application.
 You may need an `RecyclerView.ItemDecoration` to work with `ChipsLayoutManager` for fast setup as showed in sample. <br/>
 It contained in same package and named `SpacingItemDecoration`.
 
-## Support [ ![Maintained](https://img.shields.io/maintenance/yes/2016.svg)]()
+## Support [ ![Maintained](https://img.shields.io/maintenance/yes/2017.svg) ](https://github.com/BelooS/ChipsLayoutManager/tree/dev)
 BETA is going.
 I respond to your founded issues. Just create a ticket if you found something goes wrong.<br/>
 Thanks for testing, guys. I'm really appreciate it.
@@ -143,11 +144,13 @@ Thanks for testing, guys. I'm really appreciate it.
 All pull requests are welcome. I've tried to make code clean & readable, so the next is up to you.
 I appreciate any help and contributors will be mentioned here.
 
+Thanks, [szijpeter](https://github.com/szijpeter) and everyone for valuable updates.
+
 ### Known issues
 I create issues in tracking board of known problems.
 These issues are going to be fixed in next versions.
 
-### License [![license for ChipsLayoutManager](https://img.shields.io/crates/l/rustc-serialize.svg)](#)
+### License [ ![license for ChipsLayoutManager](https://img.shields.io/hexpm/l/plug.svg) ](https://github.com/BelooS/ChipsLayoutManager/blob/dev/LICENSE)
 
     Copyright 2016 Beloy Oleg, Ukraine.
     
