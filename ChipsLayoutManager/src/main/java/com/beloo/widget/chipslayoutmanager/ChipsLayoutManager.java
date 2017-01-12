@@ -10,7 +10,6 @@ import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
@@ -36,14 +35,16 @@ import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractCriteriaFac
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.InfiniteCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.PlacerFactory;
-import com.beloo.widget.chipslayoutmanager.logger.IAdapterActionsLogger;
-import com.beloo.widget.chipslayoutmanager.logger.IFillLogger;
-import com.beloo.widget.chipslayoutmanager.logger.IPredictiveAnimationsLogger;
-import com.beloo.widget.chipslayoutmanager.logger.LoggerFactory;
+import com.beloo.widget.chipslayoutmanager.util.log.IFillLogger;
+import com.beloo.widget.chipslayoutmanager.util.log.LoggerFactory;
 import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 import com.beloo.widget.chipslayoutmanager.util.LayoutManagerUtil;
+import com.beloo.widget.chipslayoutmanager.util.log.Log;
+import com.beloo.widget.chipslayoutmanager.util.log.LogSwitcherFactory;
 import com.beloo.widget.chipslayoutmanager.util.testing.EmptySpy;
 import com.beloo.widget.chipslayoutmanager.util.testing.ISpy;
+
+import java.util.Locale;
 
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract,
         IStateHolder,
@@ -141,8 +142,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     // loggers
     ///////////////////////////////////////////////////////////////////////////
     private IFillLogger logger;
-    private IAdapterActionsLogger adapterActionsLogger;
-    private IPredictiveAnimationsLogger predictiveAnimationsLogger;
     //--- end loggers
 
     /**
@@ -198,8 +197,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
         LoggerFactory loggerFactory = new LoggerFactory();
         logger = loggerFactory.getFillLogger(viewCache);
-        adapterActionsLogger = loggerFactory.getAdapterActionsLogger();
-        predictiveAnimationsLogger = loggerFactory.getPredictiveAnimationsLogger();
 
         viewPositionsStorage = new ViewCacheFactory(this).createCacheStorage();
         measureSupporter = new MeasureSupporter(this);
@@ -658,7 +655,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return;
         }
 
-        predictiveAnimationsLogger.logState(state);
+        Log.i("onLayoutChildren", "isPreLayout = " + state.isPreLayout(), LogSwitcherFactory.PREDICTIVE_ANIMATIONS);
 
         if (isLayoutRTL() != isLayoutRTL) {
             //if layout direction changed programmatically we should clear anchors
@@ -674,8 +671,10 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             //it is NOT called on layoutOrientation changes
 
             int additionalLength = disappearingViewsManager.calcDisappearingViewsLength(recycler);
-            predictiveAnimationsLogger.heightOfCanvas(this);
-            predictiveAnimationsLogger.onSummarizedDeletingItemsHeightCalculated(additionalLength);
+
+            Log.d("LayoutManager", "height =" + getHeight(), LogSwitcherFactory.PREDICTIVE_ANIMATIONS);
+            Log.d("onDeletingHeightCalc", "additional height  = " + additionalLength, LogSwitcherFactory.PREDICTIVE_ANIMATIONS);
+
             anchorView = anchorFactory.getAnchor();
             anchorFactory.resetRowCoordinates(anchorView);
             Log.w(TAG, "anchor state in pre-layout = " + anchorView);
@@ -970,7 +969,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     @Override
     public void onItemsRemoved(final RecyclerView recyclerView, int positionStart, int itemCount) {
-        adapterActionsLogger.onItemsRemoved(positionStart, itemCount);
+        Log.d("onItemsRemoved", "starts from = " + positionStart + ", item count = " + itemCount, LogSwitcherFactory.ADAPTER_ACTIONS);
         super.onItemsRemoved(recyclerView, positionStart, itemCount);
         onLayoutUpdatedFromPosition(positionStart);
 
@@ -982,7 +981,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     @Override
     public void onItemsAdded(RecyclerView recyclerView, int positionStart, int itemCount) {
-        adapterActionsLogger.onItemsAdded(positionStart, itemCount);
+        Log.d("onItemsAdded",  "starts from = " + positionStart + ", item count = " + itemCount, LogSwitcherFactory.ADAPTER_ACTIONS);
         super.onItemsAdded(recyclerView, positionStart, itemCount);
         onLayoutUpdatedFromPosition(positionStart);
     }
@@ -992,7 +991,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     @Override
     public void onItemsChanged(RecyclerView recyclerView) {
-        adapterActionsLogger.onItemsChanged();
+        Log.d("onItemsChanged", "", LogSwitcherFactory.ADAPTER_ACTIONS);
         super.onItemsChanged(recyclerView);
         viewPositionsStorage.purge();
         onLayoutUpdatedFromPosition(0);
@@ -1003,7 +1002,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     @Override
     public void onItemsUpdated(RecyclerView recyclerView, int positionStart, int itemCount) {
-        adapterActionsLogger.onItemsUpdated(positionStart, itemCount);
+        Log.d("onItemsUpdated", "starts from = " + positionStart + ", item count = " + itemCount, LogSwitcherFactory.ADAPTER_ACTIONS);
         super.onItemsUpdated(recyclerView, positionStart, itemCount);
         onLayoutUpdatedFromPosition(positionStart);
     }
@@ -1021,7 +1020,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      */
     @Override
     public void onItemsMoved(RecyclerView recyclerView, int from, int to, int itemCount) {
-        adapterActionsLogger.onItemsMoved(from, to, itemCount);
+        Log.d("onItemsMoved", String.format(Locale.US, "from = %d, to = %d, itemCount = %d", from, to, itemCount), LogSwitcherFactory.ADAPTER_ACTIONS);
         super.onItemsMoved(recyclerView, from, to, itemCount);
         onLayoutUpdatedFromPosition(Math.min(from, to));
     }

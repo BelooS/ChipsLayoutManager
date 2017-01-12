@@ -47,9 +47,17 @@ android {
     }
     buildTypes {
 
+        all {
+            buildConfigField("boolean", "isLogEnabled", "false")
+        }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        development {
+            buildConfigField("boolean", "isLogEnabled", "true")
         }
     }
 

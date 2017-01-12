@@ -6,14 +6,11 @@ import android.view.View;
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 import com.beloo.widget.chipslayoutmanager.layouter.ICanvas;
 import com.beloo.widget.chipslayoutmanager.layouter.IStateFactory;
-import com.beloo.widget.chipslayoutmanager.logger.IScrollingLogger;
-import com.beloo.widget.chipslayoutmanager.logger.LoggerFactory;
 
 abstract class ScrollingController implements IScrollingController {
 
     private ChipsLayoutManager lm;
     private IScrollerListener scrollerListener;
-    private IScrollingLogger scrollingLogger;
     private IStateFactory stateFactory;
     ICanvas canvas;
 
@@ -24,8 +21,6 @@ abstract class ScrollingController implements IScrollingController {
     ScrollingController(ChipsLayoutManager layoutManager, IStateFactory stateFactory, IScrollerListener scrollerListener) {
         this.lm = layoutManager;
         this.scrollerListener = scrollerListener;
-        LoggerFactory loggerFactory = new LoggerFactory();
-        scrollingLogger = loggerFactory.getScrollingLogger();
         this.stateFactory = stateFactory;
         this.canvas = layoutManager.getCanvas();
     }
@@ -109,8 +104,6 @@ abstract class ScrollingController implements IScrollingController {
             int distance;
             distance = viewStart - startBorder;
 
-            scrollingLogger.logUpScrollingNormalizationDistance(distance);
-
             if (distance >= 0) {
                 // in case over scroll on top border
                 delta = distance;
@@ -162,7 +155,6 @@ abstract class ScrollingController implements IScrollingController {
     private int scrollBy(int d, RecyclerView.Recycler recycler, RecyclerView.State state) {
         d = calcOffset(d);
         offsetChildren(-d);
-        scrollingLogger.logChildCount(lm.getChildCount());
 
         scrollerListener.onScrolled(this, recycler, state);
 

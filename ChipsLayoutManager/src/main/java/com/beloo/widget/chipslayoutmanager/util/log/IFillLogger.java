@@ -1,4 +1,4 @@
-package com.beloo.widget.chipslayoutmanager.logger;
+package com.beloo.widget.chipslayoutmanager.util.log;
 
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 
