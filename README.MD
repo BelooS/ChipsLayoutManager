@@ -70,7 +70,7 @@ Row strategy is a mode of distribution left space.
 * `STRATEGY_FILL_VIEW` - available space is distributed among views.
 * `STRATEGY_FILL_SPACE` - available space is distributed among spaces between views, start & end views are docked to a nearest border.
 * `STRATEGY_CENTER` - available space is distributed among spaces between views, start & end spaces included. Views are placed in center of canvas.
-* `STRATEGY_CENTER_DENSE` - Views are placed in center of canvas. There is no extra space distributed between views.
+* `STRATEGY_CENTER_DENSE` - Views are placed in center of canvas. Available space is distributed among start & end spaces. There is no extra space distributed between views.
 
 In such layouts by default last row isn't considered completed. So strategy isn't applied for last row.
 But you can also enable opposite behaviour.
