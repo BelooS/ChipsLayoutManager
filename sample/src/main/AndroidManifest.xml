@@ -19,9 +19,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name="com.beloo.chipslayoutmanager.sample.ui.TestActivity"/>
-
     </application>
 
 </manifest>

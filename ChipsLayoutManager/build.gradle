@@ -47,11 +47,12 @@ android {
     }
     buildTypes {
 
-        all {
+        debug {
             buildConfigField("boolean", "isLogEnabled", "false")
         }
 
         release {
+            buildConfigField("boolean", "isLogEnabled", "false")
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -66,7 +67,10 @@ android {
             res.srcDirs = ['src/androidTest/res']
         }
     }
-
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 task androidJavadocs(type: Javadoc) {
@@ -90,19 +94,16 @@ artifacts {
     archives androidJavadocsJar
 }
 
-
-def supportVersion = "25+";
-
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
 
-    compile "com.android.support:appcompat-v7:$supportVersion"
-    compile "com.android.support:recyclerview-v7:$supportVersion"
+    compile "com.android.support:appcompat-v7:$rootProject.ext.supportVersion"
+    compile "com.android.support:recyclerview-v7:$rootProject.ext.supportVersion"
 
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile "com.android.support:support-annotations:$supportVersion"
+    androidTestCompile "com.android.support.test.espresso:espresso-core:$rootProject.ext.espresso"
+    androidTestCompile "com.android.support.test:runner:1.0.0"
+    androidTestCompile "com.android.support:support-annotations:$rootProject.ext.supportVersion"
     androidTestCompile 'pl.pragmatists:JUnitParams:1.0.5'
 }
 

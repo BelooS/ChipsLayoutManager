@@ -7,7 +7,6 @@
     <option name="CLASS_NAME" value="" />
     <option name="PACKAGE_NAME" value="com.beloo.widget.chipslayoutmanager" />
     <option name="EXTRA_OPTIONS" value="" />
-    <option name="PREFERRED_AVD" value="" />
     <option name="CLEAR_LOGCAT" value="false" />
     <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
     <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
@@ -15,6 +14,8 @@
     <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
     <option name="USE_LAST_SELECTED_DEVICE" value="false" />
     <option name="PREFERRED_AVD" value="" />
+    <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="-1" />
+    <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
     <option name="DEBUGGER_TYPE" value="Auto" />
     <Auto>
       <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
@@ -39,9 +40,7 @@
       <option name="SHOW_OPTIMIZED_WARNING" value="true" />
     </Native>
     <Profilers>
-      <option name="ENABLE_ADVANCED_PROFILING" value="false" />
-      <option name="SUPPORT_LIB_ENABLED" value="true" />
-      <option name="INSTRUMENTATION_ENABLED" value="true" />
+      <option name="ADVANCED_PROFILING_ENABLED" value="false" />
     </Profilers>
     <method />
   </configuration>

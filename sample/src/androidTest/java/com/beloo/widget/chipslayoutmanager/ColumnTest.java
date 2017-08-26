@@ -339,7 +339,7 @@ public class ColumnTest {
     @Test
     public void clipToPadding_IsTrue_paddingStaySame() throws Exception {
         //arrange
-        RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
+        RecyclerView rvTest = activityTestRule.getActivity().findViewById(R.id.rvTest);
         ViewAction viewAction = actionDelegate((uiController, view) -> {
             view.setClipToPadding(true);
             view.setPadding(150, 150, 150, 150);
@@ -386,7 +386,7 @@ public class ColumnTest {
         InstrumentalUtil.waitForIdle();
 
         //arrange
-        RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
+        RecyclerView rvTest = activityTestRule.getActivity().findViewById(R.id.rvTest);
         View child = getViewForPosition(rvTest, 7);
         Rect expectedViewRect = layoutManager.getCanvas().getViewRect(child);
 
@@ -403,7 +403,7 @@ public class ColumnTest {
         InstrumentalUtil.waitForIdle();
 
         //arrange
-        RecyclerView rvTest = (RecyclerView) activityTestRule.getActivity().findViewById(R.id.rvTest);
+        RecyclerView rvTest = activityTestRule.getActivity().findViewById(R.id.rvTest);
         View child = getViewForPosition(rvTest, 6);
         Rect expectedViewRect = layoutManager.getCanvas().getViewRect(child);
 
