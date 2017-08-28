@@ -132,7 +132,7 @@ abstract class ScrollingController implements IScrollingController {
         if (lastViewAdapterPos < itemCount - 1) { //in case lower view isn't the last view in adapter
             delta = d;
         } else { //in case lower view is the last view in adapter and wouldn't be any other view below
-            int viewEnd = stateFactory.getEndViewBound();
+            int viewEnd = canvas.isInside(lastView) ? stateFactory.getEndViewBound() : stateFactory.getEnd(lastView);
             int parentEnd = stateFactory.getEndAfterPadding();
             delta = Math.min(viewEnd - parentEnd, d);
         }
